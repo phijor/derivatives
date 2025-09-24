@@ -7,11 +7,15 @@ open import Cubical.Foundations.Isomorphism hiding (iso) public
 open import Cubical.Foundations.Equiv renaming (_■ to _≃∎) public
 open import Cubical.Foundations.HLevels public
 open import Cubical.Reflection.StrictEquiv public
-
 open import Cubical.Data.Sigma using (_×_ ; ΣPathP ; Σ≡Prop) public
+open import Cubical.Data.Unit.Base using (tt*) public
+
+open import Cubical.Foundations.Equiv.Properties
+open import Cubical.Foundations.Path
+open import Cubical.Foundations.Transport
+open import Cubical.Data.Sigma
 import      Cubical.Data.Empty as Empty
 open import Cubical.Data.Unit.Base
-open import Cubical.Data.Unit.Base using (tt*) public
 
 private
   variable
@@ -82,3 +86,54 @@ isPropFromPointed→isProp h a b = h a a b
 
 ex-falso : Empty.⊥ → A
 ex-falso ()
+
+substAdjointEquiv : (B : A → Type ℓ) {x y : A} (p : x ≡ y)
+  → {x′ : B x} {y′ : B y}
+  → (subst B p x′ ≡ y′) ≃ (x′ ≡ subst B (sym p) y′)
+substAdjointEquiv B {x} {y} p {x′} {y′} = invEquiv (equivAdjointEquiv (substEquiv' B p) {x′} {y′})
+
+private
+  variable
+    A′ : Type ℓ
+    
+Σ-map-fst : ∀ {B′ : A′ → Type ℓ} (f : A → A′) → (Σ A (B′ ∘ f)) → (Σ A′ B′)
+Σ-map-fst f (a , b′) = (f a , b′)
+
+module _ {ℓB ℓB′} {A : Type ℓ} {B : A → Type ℓB} {B′ : A → Type ℓB′} where
+  Σ-map-snd : (f : ∀ a → B a → B′ a) → (Σ A B) → (Σ A B′)
+  Σ-map-snd f (a , b) = (a , f a b)
+
+  Σ-map-snd-fiber-iso : ∀ {f : ∀ a → B a → B′ a} {a′ : A} {b′ : B′ a′} → Iso (fiber (Σ-map-snd f) (a′ , b′)) (fiber (f a′) b′)
+  Σ-map-snd-fiber-iso {f} {a′} {b′} = fiber-iso where
+      shuffle : Iso _ (Σ[ (a , p) ∈ singl a′ ] Σ[ b ∈ B a ] PathP (λ i → B′ (p (~ i))) (f a b) b′)
+      shuffle .Iso.fun ((a , b) , (p , q)) = (a , sym p) , b , q
+      shuffle .Iso.inv ((a , p) , b , q) = (a , b) , sym p , q
+      shuffle .Iso.rightInv _ = refl
+      shuffle .Iso.leftInv _ = refl
+
+      fiber-iso : Iso (fiber (Σ-map-snd f) (a′ , b′)) (fiber (f a′) b′)
+      fiber-iso =
+        _
+          Iso⟨ Σ-cong-iso-snd (λ (a , b) → invIso ΣPathPIsoPathPΣ) ⟩
+        Σ[ (a , b) ∈ Σ A B ] Σ[ p ∈ a ≡ a′ ] PathP (λ i → B′ (p i)) (f a b) b′
+          Iso⟨ shuffle ⟩
+        Σ[ (a , p) ∈ singl a′ ] Σ[ b ∈ B a ] PathP (λ i → B′ (p (~ i))) (f a b) b′
+          Iso⟨ Σ-contractFstIso (isContrSingl a′) ⟩
+        _
+          ∎Iso
+
+  isEquiv-Σ-map-snd : {f : ∀ a → B a → B′ a} → (∀ a → isEquiv (f a)) → isEquiv (Σ-map-snd f)
+  isEquiv-Σ-map-snd {f} is-equiv-f .equiv-proof (a′ , b′) = isOfHLevelRetractFromIso 0 Σ-map-snd-fiber-iso (is-equiv-f a′ .equiv-proof b′)
+
+  opaque
+    isEquiv-Σ-map-snd→isEquiv : {f : ∀ a → B a → B′ a} → isEquiv (Σ-map-snd f) → ∀ a → isEquiv (f a)
+    isEquiv-Σ-map-snd→isEquiv {f} is-equiv-Σ-map-snd a′ .equiv-proof b′ = isOfHLevelRetractFromIso 0
+      (invIso Σ-map-snd-fiber-iso)
+      (is-equiv-Σ-map-snd .equiv-proof (a′ , b′))
+
+Σ-map : ∀ {ℓB ℓB′} {B : A → Type ℓB} {B′ : A′ → Type ℓB′}
+  → (e : A → A′)
+  → (f : ∀ a → B a → B′ (e a))
+  → Σ A B → Σ A′ B′
+Σ-map e f (a , b) .fst = e a
+Σ-map e f (a , b) .snd = f a b

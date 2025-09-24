@@ -3,8 +3,10 @@ module Derivative.Container where
 open import Derivative.Prelude
 import      Derivative.Maybe as Maybe
 
+open import Cubical.Data.Empty as Empty using (⊥*)
 open import Cubical.Data.Sigma.Base
 open import Cubical.Data.Sum.Base as Sum using (_⊎_)
+import      Cubical.Data.Unit as Unit
 
 record Container (ℓS ℓP : Level) : Type (ℓ-suc (ℓ-max ℓS ℓP)) where
   no-eta-equality
@@ -15,13 +17,14 @@ record Container (ℓS ℓP : Level) : Type (ℓ-suc (ℓ-max ℓS ℓP)) where
 
 private
   variable
-    ℓS ℓP : Level
+    ℓS ℓP ℓ : Level
 
 open Container
 
 _⊗_ : (F G : Container ℓS ℓP) → Container _ _
 (F ⊗ G) .Shape = F .Shape × G .Shape
 (F ⊗ G) .Pos x = F .Pos (x .fst) ⊎ G .Pos (x .snd)
+infix 11 _⊗_
 
 Id : Container ℓS ℓP
 Id .Shape = ⊤ _
@@ -29,6 +32,16 @@ Id .Pos = const $ ⊤ _
 
 _⊗Id : Container ℓS ℓP → Container ℓS ℓP
 F ⊗Id = F ⊗ Id
+
+_⊕_ : (F G : Container ℓS ℓP) → Container _ _
+(F ⊕ G) .Shape = F .Shape ⊎ G .Shape
+(F ⊕ G) .Pos (Sum.inl s) = F .Pos s
+(F ⊕ G) .Pos (Sum.inr t) = G .Pos t
+infix 10 _⊕_
+
+Zero : Container ℓS ℓP
+Zero .Shape = Unit.Unit*
+Zero .Pos _ = ⊥*
 
 record Cart (F G : Container ℓS ℓP) : Type (ℓ-max ℓS ℓP) where
   constructor [_◁_]
@@ -79,3 +92,7 @@ record Equiv (F G : Container ℓS ℓP) : Type (ℓ-max ℓS ℓP) where
   field
     shape : F .Shape ≃ G .Shape
     pos : ∀ s → G .Pos (equivFun shape s) ≃ F .Pos s
+
+_[_] : (F G : Container ℓ ℓ) → Container ℓ ℓ
+(F [ G ]) .Shape = Σ[ s ∈ F .Shape ] (F .Pos s → G .Shape)
+(F [ G ]) .Pos (s , f) = Σ[ p ∈ F .Pos s ] G .Pos (f p)

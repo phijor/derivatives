@@ -5,6 +5,8 @@ open import Derivative.Decidable
 
 open import Cubical.Foundations.Equiv.Properties using (preCompEquiv ; equivAdjointEquiv)
 open import Cubical.Data.Sigma
+open import Cubical.Data.Unit as Unit using (Unit*)
+open import Cubical.Data.Empty as Empty using (⊥*)
 open import Cubical.Relation.Nullary using (isProp¬)
 
 private
@@ -26,3 +28,12 @@ RemoveRespectEquiv b e = Σ-cong-equiv e neq-equiv module RemoveRespectEquiv whe
   opaque
     neq-equiv : ∀ a → (invEq e b ≢ a) ≃ (b ≢ equivFun e a)
     neq-equiv a = preCompEquiv $ symEquiv ∙ₑ invEquiv (equivAdjointEquiv e) ∙ₑ symEquiv
+
+isContr→isEmptyRemove : isContr A → ∀ a₀ → ¬ (A ∖ a₀)
+isContr→isEmptyRemove is-contr a₀ (a , a₀≢a) = a₀≢a $ isContr→isProp is-contr _ _
+
+RemoveUnit : ¬ ((Unit* {ℓ}) ∖ tt*)
+RemoveUnit = isContr→isEmptyRemove Unit.isContrUnit* _
+
+RemoveUnitEquiv : ∀ {ℓ′} → ((Unit* {ℓ}) ∖ tt*) ≃ ⊥* {ℓ′}
+RemoveUnitEquiv = Empty.uninhabEquiv RemoveUnit lower
