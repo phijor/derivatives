@@ -18,8 +18,8 @@ Maybe {ℓ} A = A ⊎ ⊤ ℓ
 pattern nothing = inr tt*
 pattern just x = inl x
 
-map-equiv : A ≃ B → Maybe A ≃ Maybe B
-map-equiv e = Sum.⊎-equiv e $ invEquiv LiftEquiv ∙ₑ LiftEquiv
+maybe-equiv : A ≃ B → Maybe A ≃ Maybe B
+maybe-equiv e = Sum.⊎-equiv e $ invEquiv LiftEquiv ∙ₑ LiftEquiv
 
 nothing≢just : {a : A} → the (Maybe A) nothing ≢ (just a)
 nothing≢just nothing≡just = Sum.⊎Path.encode _ _ nothing≡just .lower
@@ -29,9 +29,8 @@ isIsolatedNothing (just a) = no nothing≢just
 isIsolatedNothing nothing = yes refl
 
 remove-nothing : Maybe A ∖ nothing → A
-remove-nothing = uncurry λ where
-  (just a) _ → a
-  nothing nothing≢nothing → ex-falso (nothing≢nothing refl)
+remove-nothing ((just a) , _) = a
+remove-nothing (nothing , nothing≢nothing) = ex-falso (nothing≢nothing refl)
 
 isEquivRemoveNothing : isEquiv (remove-nothing {A = A})
 isEquivRemoveNothing .equiv-proof a = contr-fib where
@@ -46,7 +45,7 @@ removeNothingEquiv : Maybe A ∖ nothing ≃ A
 removeNothingEquiv .fst = remove-nothing
 removeNothingEquiv .snd = isEquivRemoveNothing
 
-module _ (a₀ : A) (a₀≟_ : isIsolated a₀) where
+module _ {ℓ} {A : Type ℓ} (a₀ : A) (a₀≟_ : isIsolated a₀) where
   private
     replace? : (a : A) → Dec (a₀ ≡ a) → Maybe (A ∖ a₀)
     replace? a (yes _) = nothing
@@ -60,10 +59,33 @@ module _ (a₀ : A) (a₀≟_ : isIsolated a₀) where
     
   replace-isolated : A → Maybe (A ∖ a₀)
   replace-isolated a = replace? a (a₀≟ a)
+    
+  replace-isolated' : A → Maybe (A ∖ a₀)
+  replace-isolated' a with (a₀≟ a)
+  ... | (yes _) = nothing
+  ... | (no a₀≢a) = just (a , a₀≢a)
+
+  replace-isolated'-β-no : {a : A} → (a₀≢a : a₀ ≢ a) → replace-isolated' a ≡ just (a , a₀≢a)
+  replace-isolated'-β-no {a} a₀≢a with (a₀≟ a)
+  ... | (yes a₀≡a) = ex-falso $ a₀≢a a₀≡a
+  ... | (no a₀≢a) = congS just (Remove≡ (refl′ a))
 
   unreplace-isolated : Maybe (A ∖ a₀) → A
   unreplace-isolated (just (a , _)) = a
   unreplace-isolated nothing = a₀
+
+  replace-isolated'-Iso : Iso A (Maybe (A ∖ a₀))
+  replace-isolated'-Iso .Iso.fun = replace-isolated'
+  replace-isolated'-Iso .Iso.inv = unreplace-isolated
+  replace-isolated'-Iso .Iso.rightInv (just (a , a₀≢a)) with a₀≟ a
+  ... | (yes a₀≡a) = ex-falso (a₀≢a a₀≡a)
+  ... | (no a₀≢a') = congS just $ ΣPathP (refl′ a , isProp¬ _ a₀≢a' a₀≢a)
+  replace-isolated'-Iso .Iso.rightInv nothing with a₀≟ a₀
+  ... | (yes a₀≡a₀) = refl
+  ... | (no a₀≢a₀) = ex-falso $ a₀≢a₀ refl
+  replace-isolated'-Iso .Iso.leftInv a with (a₀≟ a)
+  ... | (yes a₀≡a) = a₀≡a
+  ... | (no  a₀≢a) = refl′ a
 
   replace-isolated-Iso : Iso A (Maybe (A ∖ a₀))
   replace-isolated-Iso .Iso.fun = replace-isolated
@@ -76,3 +98,6 @@ module _ (a₀ : A) (a₀≟_ : isIsolated a₀) where
 
   replace-isolated-equiv : A ≃ (Maybe (A ∖ a₀))
   replace-isolated-equiv = isoToEquiv replace-isolated-Iso
+
+  replace-isolated'-equiv : A ≃ (Maybe (A ∖ a₀))
+  replace-isolated'-equiv = isoToEquiv replace-isolated'-Iso

@@ -9,12 +9,14 @@ open import Cubical.Foundations.HLevels public
 open import Cubical.Reflection.StrictEquiv public
 open import Cubical.Data.Sigma using (_×_ ; ΣPathP ; Σ≡Prop) public
 open import Cubical.Data.Unit.Base using (tt*) public
+open import Cubical.Relation.Nullary.Base using (¬_) public
 
 open import Cubical.Foundations.Equiv.Properties
 open import Cubical.Foundations.Path
 open import Cubical.Foundations.Transport
 open import Cubical.Data.Sigma
 import      Cubical.Data.Empty as Empty
+open import Cubical.Data.Nat.Base
 open import Cubical.Data.Unit.Base
 
 private
@@ -31,6 +33,15 @@ refl′ a i = a
 the : (A : Type ℓ) → (a : A) → A
 the A a = a
 {-# INLINE the #-}
+
+_≢_ : (a b : A) → Type _
+a ≢ b = ¬ a ≡ b
+
+≢-rec : ∀ {ℓB} {B : Type ℓB} {a b : A} → a ≡ b → a ≢ b → B
+≢-rec eq neq = Empty.rec (neq eq)
+
+isProp≢ : ∀ {a b : A} → isProp (a ≢ b)
+isProp≢ {a} {b} p q i x = Empty.isProp⊥ (p x) (q x) i
 
 module PathReasoning where
   ≡⟨⟩∎-syntax : ∀ (x y : A) → x ≡ y → x ≡ y
@@ -92,6 +103,14 @@ substAdjointEquiv : (B : A → Type ℓ) {x y : A} (p : x ≡ y)
   → (subst B p x′ ≡ y′) ≃ (x′ ≡ subst B (sym p) y′)
 substAdjointEquiv B {x} {y} p {x′} {y′} = invEquiv (equivAdjointEquiv (substEquiv' B p) {x′} {y′})
 
+neqCongEquiv : {a b : A} {x y : B}
+  → (a ≡ b) ≃ (x ≡ y)
+  → (a ≢ b) ≃ (x ≢ y)
+neqCongEquiv e = preCompEquiv (invEquiv e)
+
+equivExt : {e f : A ≃ B} → (∀ x → equivFun e x ≡ equivFun f x) → e ≡ f
+equivExt = equivEq ∘ funExt
+
 private
   variable
     A′ : Type ℓ
@@ -137,3 +156,9 @@ module _ {ℓB ℓB′} {A : Type ℓ} {B : A → Type ℓB} {B′ : A → Type 
   → Σ A B → Σ A′ B′
 Σ-map e f (a , b) .fst = e a
 Σ-map e f (a , b) .snd = f a b
+
+isOfHLevelSucΣSndProp : ∀ {ℓB} {B : A → Type ℓB} (n : HLevel)
+  → isOfHLevel (suc n) A
+  → (∀ a → isProp (B a))
+  → isOfHLevel (suc n) (Σ A B)
+isOfHLevelSucΣSndProp n is-trunc-A is-prop-B = isOfHLevelΣ (suc n) is-trunc-A λ a → isProp→isOfHLevelSuc n (is-prop-B a)

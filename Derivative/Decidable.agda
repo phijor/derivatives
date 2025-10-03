@@ -20,18 +20,13 @@ open import Cubical.Relation.Nullary
     )
   renaming
     ( mapDec to map
+    ; decRec to rec
     )
 
 private
   variable
     ℓ : Level
     A B : Type ℓ
-
-_≢_ : (a b : A) → Type _
-a ≢ b = ¬ a ≡ b
-
-≢-rec : ∀ {ℓB} {B : Type ℓB} {a b : A} → a ≡ b → a ≢ b → B
-≢-rec eq neq = Empty.rec (neq eq)
 
 elim : ∀ {ℓB} {B : Dec A → Type ℓB}
   → (yes* : (a : A) → B (yes a))
@@ -50,6 +45,9 @@ decEquiv e = map (equivFun e) (_∘ invEq e)
 opaque
   Dec→Collapsible : Dec A → Collapsible A
   Dec→Collapsible = SplitSupport→Collapsible ∘ PStable→SplitSupport ∘ Stable→PStable ∘ Dec→Stable
+
+isProp→Discrete : isProp A → Discrete A
+isProp→Discrete is-prop x y = yes (is-prop x y)
 
 opaque
   locallyCollapsible→locallyIsPropPath : (a : A) → (∀ b → Collapsible (a ≡ b)) → (∀ b → isProp (a ≡ b))
