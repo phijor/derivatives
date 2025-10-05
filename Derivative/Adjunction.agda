@@ -93,7 +93,7 @@ zag G =
 
 zag≡ : (G : Container ℓ ℓ) → zag G ≡ id (∂ G)
 zag≡ G = Cart≡ (funExt shape-path) (funExt λ ∂s → equivExt (pos-path ∂s)) module zag≡ where
-  shape-path : ∀ s → ∂[ counit G ] .shape (unit-shape (∂ G) s) ≡ s
+  shape-path : (s : Σ[ s ∈ Shape G ] Pos G s °) → ∂[ counit G ] .shape (unit-shape (∂ G) s) ≡ s
   shape-path (s , (p₀ , _)) = ΣPathP λ where
     .fst → refl′ s
     .snd → Isolated≡ $ refl′ p₀

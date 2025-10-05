@@ -2,7 +2,7 @@ module Derivative.Maybe where
 
 open import Derivative.Prelude
 open import Derivative.Isolated
-open import Derivative.Decidable
+open import Derivative.Decidable as Dec
 open import Derivative.Remove
 
 open import Cubical.Data.Sum as Sum using (_⊎_ ; inl ; inr)
@@ -52,10 +52,23 @@ module _ {ℓ} {A : Type ℓ} (a₀ : A) (a₀≟_ : isIsolated a₀) where
     replace? a (no a₀≢a) = just (a , a₀≢a)
 
     replace?-yes : replace? a₀ (a₀≟ a₀) ≡ nothing
-    replace?-yes = cong (replace? a₀) $ isIsolated→isPropDecPath a₀ a₀≟_ a₀ (a₀≟ a₀) (yes refl)
+    replace?-yes = cong (replace? a₀) p where
+      p : (a₀≟ a₀) ≡ (yes refl)
+      p = isIsolated→isPropDecPath a₀ a₀≟_ a₀ (a₀≟ a₀) (yes refl)
 
     replace?-no : (a : A ∖ a₀) → replace? (a .fst) (a₀≟ a .fst) ≡ just a
     replace?-no (a , a₀≢a) = cong (replace? a) $ isIsolated→isPropDecPath a₀ a₀≟_ a (a₀≟ a) (no a₀≢a)
+
+    -- Fun fact: For (a₀ ≢ a), this always compute correctly, even if we
+    -- do not assume that a₀ is isolated (_≢_ is always a proposition).
+    replace?-no' : (a : A ∖ a₀) → replace? (a .fst) (a₀≟ a .fst) ≡ just a
+    replace?-no' (a , a₀≢a) = cong (replace? a) p where
+      p' : (d : Dec (a₀ ≡ a)) → d ≡ no a₀≢a
+      p' (yes a₀≡a) = ex-falso $ a₀≢a a₀≡a
+      p' (no h) = cong no $ isProp≢ h a₀≢a
+
+      p : (a₀≟ a) ≡ no a₀≢a
+      p = p' (a₀≟ a)
     
   replace-isolated : A → Maybe (A ∖ a₀)
   replace-isolated a = replace? a (a₀≟ a)

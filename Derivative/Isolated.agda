@@ -19,7 +19,8 @@ open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Path using (toPathP⁻)
 open import Cubical.Foundations.Transport using (subst⁻ ; subst⁻-filler)
 open import Cubical.Functions.Embedding
-open import Cubical.Relation.Nullary.Properties using (EquivPresDec)
+open import Cubical.Relation.Nullary.Properties using (EquivPresDec ; EquivPresDiscrete)
+open import Cubical.Relation.Nullary.HLevels using (isPropDiscrete)
 open import Cubical.Data.Unit as Unit using (Unit*)
 open import Cubical.HITs.PropositionalTruncation as PT using (∥_∥₁)
 
@@ -50,6 +51,9 @@ Isolated A = Σ[ a ∈ A ] isIsolated a
 
 _° : (A : Type ℓ) → Type ℓ
 A ° = Isolated A
+
+forget-isolated : A ° → A
+forget-isolated = fst
 
 module _ {ℓB : Level} {B : A → Type ℓB}
   ((a₀ , a₀≟_) : A °)
@@ -85,8 +89,20 @@ module _ (_≟_ : Discrete A) where
   Discrete→isIsolated : ∀ a → isIsolated a
   Discrete→isIsolated = _≟_
 
+  Discrete→isEquiv-forget-isolated : isEquiv {A = A °} forget-isolated
+  Discrete→isEquiv-forget-isolated = equivIsEquiv $ Σ-contractSnd λ a → inhProp→isContr (Discrete→isIsolated a) (isPropIsIsolated a)
+
   Discrete→IsolatedEquiv : A ° ≃ A
-  Discrete→IsolatedEquiv = Σ-contractSnd λ a → inhProp→isContr (Discrete→isIsolated a) (isPropIsIsolated a)
+  Discrete→IsolatedEquiv .fst = forget-isolated
+  Discrete→IsolatedEquiv .snd = Discrete→isEquiv-forget-isolated
+
+isEquiv-forget-isolated→Discrete : isEquiv {A = A °} forget-isolated → Discrete A
+isEquiv-forget-isolated→Discrete is-equiv-forget = EquivPresDiscrete (forget-isolated , is-equiv-forget) DiscreteIsolated
+
+isEquiv-forget-isolated≃Discrete : isEquiv {A = A °} forget-isolated ≃ Discrete A
+isEquiv-forget-isolated≃Discrete = propBiimpl→Equiv (isPropIsEquiv _) isPropDiscrete
+  isEquiv-forget-isolated→Discrete
+  Discrete→isEquiv-forget-isolated
 
 opaque
   isIsolatedRespectEquiv : (e : A ≃ B) → (b : B) → isIsolated b → isIsolated (invEq e b)
