@@ -1,0 +1,672 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{csquotes}
+\usepackage{tikz-cd}
+\usepackage{keytheorems}
+\usepackage{todonotes}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  % linkcolor=cyan,
+}
+
+\newkeytheoremstyle{proof}{
+  inherit-style=definition,
+  qed=$\lrcorner$,
+  numbered=false,
+}
+\newkeytheorem{theorem}[style=plain,parent=section]
+\newkeytheorem{
+  proposition,
+  lemma,
+  corollary,
+  problem,
+}[
+  style=plain,
+  sibling=theorem,
+]
+\newkeytheorem{definition}[style=definition,sibling=theorem]
+\newkeytheorem{construction}[style=proof,sibling=theorem]
+\newkeytheorem{remark}[style=remark,sibling=theorem]
+
+\title{Derivates of Containers without Decidable Equality}
+\author{Philipp Joram}
+\date{\today}
+
+\DeclareMathSymbol{\shortminus}{\mathbin}{AMSa}{"39}
+
+\newcommand*{\Op}[1]{\mathsf{#1}}
+\DeclareMathOperator{\Type}{\mathsf{Type}}
+\DeclareMathOperator{\Dec}{\mathsf{Dec}}
+\DeclareMathOperator{\DefEq}{\mathrel{\coloneq}}
+\DeclareMathOperator{\JudgeEq}{\mathrel{\doteq}}
+\NewDocumentCommand{\Inv}{}{{\shortminus 1}}
+
+\DeclareMathOperator{\SigmaRemove}{\Op{\Sigma-remove}}
+\DeclareMathOperator{\SigmaIsolate}{\Op{\Sigma-isolate}}
+
+\newcommand*{\Isolated}[1]{#1^{\circ}}
+
+\newcommand*{\MkCont}[2]{#1\mathbin{\triangleleft}#2}
+\DeclareMathOperator{\Sh}{\mathsf{Sh}}
+\DeclareMathOperator{\Ps}{\mathsf{Ps}}
+
+\DeclareMathOperator{\CTimes}{\mathbin{\otimes}}
+\DeclareMathOperator{\CPlus}{\mathbin{\oplus}}
+\newcommand*{\Subst}[2]{#1[#2]}
+
+\NewDocumentCommand{\SimMultiMap}{}{%
+  \mathrel{%
+    \vbox{%
+      \offinterlineskip%
+      \mathsurround=0pt
+      \ialign{%
+        \hfil##\hfil\cr
+        \normalfont\scalebox{0.9}{\kern-.33ex{$\sim$}}\cr
+        \noalign{\kern-.25ex}
+        $\scriptstyle\multimap$\cr%
+      }%
+    }%
+  }%
+}
+
+\newcommand*{\Cart}[2]{#1\mathrel{\multimap}#2}
+% \newcommand*{\CartIso}[2]{#1\SimMultiMap#2}
+\DeclareMathOperator{\CartEquiv}{\SimMultiMap}
+\newcommand*{\CartIso}[2]{#1\cong#2}
+
+\DeclareMathOperator{\Cont}{\mathsf{Cont}}
+\DeclareMathOperator{\ContCart}{\Cont^{\multimap}}
+
+\NewDocumentCommand{\Der}{}{\partial}
+\NewDocumentCommand{\Id}{}{\mathsf{Id}}
+
+\DeclareMathOperator{\Inl}{\mathsf{inl}}
+\DeclareMathOperator{\Inr}{\mathsf{inr}}
+
+\NewDocumentCommand{\Maybe}{m}{#1 \otimes \Id}
+\DeclareMathOperator{\Nothing}{\mathsf{nothing}}
+\DeclareMathOperator{\Just}{\mathsf{just}}
+
+\makeatletter
+\newcommand{\proofsubparagraph}{%
+  \@startsection{subparagraph}%
+  {5}%
+  {\z@}%
+  {3.25ex \@plus1ex \@minus .2ex}%
+  {-1em}%
+  {\sffamily\normalsize\bfseries}%
+}
+\makeatother
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  We introduce a derivative operation for containers whose positions lack decidable equality.
+\end{abstract}
+
+\section{Isolated Points and How to Remove Them}
+
+This section recalls the notion of isolated points of a type.
+This definition is not new\todo{figure out how to properly cite \texttt{TypeTopology}, or whatever primary source}.
+We are going to prove some properties that will be applied on \autoref{derivatives}
+to establish properties of derivatives of containers:
+Many of the laws of derivatives -- after some \emph{type-yoga} -- reduce directly to instances of statements in this section.
+
+\begin{definition}
+  A point \( a : A \) is \emph{isolated} if \( a = b \) is decidable for all \( b : A \).
+  We denote by \( \Isolated{A} \) the subtype of isolated points, that is
+  \(
+    \Isolated{A} \DefEq \sum_{a : A} \prod_{b : B} \Dec(a = b)
+  \).
+\end{definition}
+
+Asking for a point to be isolated trivializes the path spaces around it:
+\begin{lemma}\label{is-prop-isolated-path}
+  If \( a : A \) is isolated, then \( a = b \) is a proposition for all \( b : A \).
+  \begin{proof}
+    \todo[inline]{This follows from a \enquote{local} version of \emph{Hedberg's Lemma}.}
+  \end{proof}
+\end{lemma}
+
+\begin{corollary}\label{is-prop-isolated-dec-path}
+  If \( a : A \) is isolated, then \( \Dec{(a = b)} \) is a proposition for all \( b : A \).
+  \begin{proof}
+    For any type \( X \), \( \Dec(X) \) is a proposition whenever \( X \) is.
+  \end{proof}
+\end{corollary}
+
+\begin{corollary}\label{is-prop-is-isolated}
+  Being an isolated point is a proposition.
+\end{corollary}
+
+\begin{proposition}\label{is-set-isolated}
+  The type of isolated points \( \Isolated{A} \) is a set for any type \( A \).
+\end{proposition}
+
+\begin{proposition}\label{is-equiv-forget-isolated-iff-discrete}
+  The map \( \Op{fst} : \Isolated{A} \to A \) is an equivalence if and only if \( A \) is discrete.
+\end{proposition}
+
+Being an isolated point is stable under equivalence:
+\begin{lemma}\label{is-isolated-respect-equiv}
+  If \( e : A \simeq B \),
+  then \( a : A \) is isolated if and only iff \( e(a) : B \) is isolated.
+  We write \( \Isolated{e} : \Isolated{A} \simeq \Isolated{B} \) for the induced equivalence.
+\end{lemma}
+
+If a map \( f : A \to B \) is not an embedding,
+but still behaves \enquote{nicely} on path spaces, we can deduce its behavior on isolated points.
+Recall that \( f \) is an embedding if \( \Op{cong}_f : x = y \to f(x) = f(y) \) is an equivalence,
+written \( f : A \hookrightarrow B \).
+Such a map reflects isolated points:
+
+\begin{proposition}[note={Embeddings reflect isolated points}]\label{embedding-reflect-isolated}
+  Let \( f : A \hookrightarrow B \) and \( a : A \).
+  If \( f(a) \) is isolated in \( B \), then \( a \) is isolated in \( A \).
+  \begin{proof}
+    For all \( a^\prime : A \), we need to decide \( a = a^\prime \).
+    By assumption, we can decide whether \( f(a) = f(a^\prime) \) or not.
+    If \( f(a) \neq f(a^\prime) \), then necessarily \( a \neq a^\prime \).
+    If \( f(a) = f(a^\prime) \), we get \( a = a^\prime \) since \( f \) is an embedding, which we can cancel.
+  \end{proof}
+\end{proposition}
+
+From this we can deduce that the canonical embeddings \( \Inl : A \hookrightarrow A + B \) and \( \Inr : B \hookrightarrow A + B \)
+both reflect and create isolated points:
+
+\begin{proposition}\label{sum-embeddings-respect-isolated}
+  Let \( A, B : \Type \).
+  A point \( a : A \) is isolated if and only if \( \Inl{(a)} : A + B \) is isolated;
+  similarly for \( b : B \) and \( \Inr{(b)} : A + B \).
+  \begin{proof}
+    Let \( a : A \). In the forward direction, assume that \( a \) is isolated.
+    We need to show that for any \( x : A + B \), the type \( \Inl{a} = x \) is decidable.
+    Consider the case of \( x \JudgeEq \Inl{a^{\prime}} \).
+    We know that \( \Inl \) is an embedding, and as such there is an equivalence
+    of path spaces \( (\Inl{a} = \Inl{a^\prime}) \simeq (a = a^\prime) \).
+    But \( (a = a^\prime) \) is decidable by assumption,
+    hence \( (\Inl{a} = \Inl{a^\prime}) \) is decidable.
+    In case \( x \JudgeEq \Inr{b} \), the type \( \Inl{a} = \Inr{b} \) is empty, hence decidable.
+    For the converse, apply \autoref{embedding-reflect-isolated}:
+    The map \( \Inl \) is an embedding, and as such reflects isolated points.
+  \end{proof}
+\end{proposition}
+
+We see that isolated points distribute over sums:
+\begin{problem}
+  Construct an equivalence \( \Isolated{(A + B)} \simeq \Isolated{A} + \Isolated{B} \).
+  \begin{construction}
+    Define the obvious forward- and backward maps by case analysis,
+    and prove that points are isolated using \autoref{sum-embeddings-respect-isolated}.
+    That these maps are mutually inverse follows since being isolated is a proposition (\autoref{is-prop-is-isolated}).
+  \end{construction}
+\end{problem}
+
+From this we immediately see that \( \Nothing \DefEq \Inr{(\bullet)} : A + 1 \) is an isolated point, since \( \bullet : 1 \)
+is trivially isolated:
+
+\begin{corollary}\label{is-isolated-nothing}
+  The point \( \Nothing : A + 1 \) is isolated for any type \( A \),
+  and there is an equivalence \( \Isolated{(A + 1)} \simeq \Isolated{A} + 1 \).
+\end{corollary}
+
+Later on (\autoref{lax-chain-rule}),
+it will become necessary to investigate whether isolated points distribute over other type formers,
+in particular dependent sums.
+\begin{proposition}\label{is-isolated-pair}
+  Let \( A : \Type \) and \( B : A \to \Type \) with points \( a_0 : A \) and \( b_0 : B(a_0) \).
+  If both \( a_0 \) and \( b_0 \) are isolated, then \( (a_0 , b_0) \) is isolated in \( \sum_{a : A} B(a) \).
+  \begin{proof}
+    Let \( a : A \), \( b : B(a) \). Our goal is to decide whether \( (a_0 , b_0) = (a, b) \) or not.
+    By extensionality of path types of dependent sums
+    it suffices to decide the equivalent type \( \sum_{p : a_0 = a} b_0 = \Op{subst}_B(p^{\Inv}, b_0) \).
+    If \( a_0 \neq a \), then this type is empty.
+    Otherwise, we have some \( p : a_0 = a \), and the type is inhabited or empty
+    depending on whether \( b_0 = \Op{subst}_B(p^{\Inv}, b_0) \) or not.
+  \end{proof}
+\end{proposition}
+
+\begin{problem}\label{sigma-isolate}
+  Given \( A : \Type \) and \( B : A \to \Type \),
+  define a map
+  \[
+    \SigmaIsolate_{A,B} :
+      \sum\nolimits_{a_0 : \Isolated{A}} \Isolated{B(a_0)}
+        \to
+      \Isolated{%
+        \big(
+          \sum\nolimits_{a : A} B(a)
+        \big)
+      }
+  \]
+  \begin{construction}
+    Define \( \SigmaIsolate((a, \mathunderscore), (b, \mathunderscore)) \DefEq ((a, b), \mathunderscore) \);
+    the pair \( (a, b) \) is isolated by \autoref{is-isolated-pair}.
+  \end{construction}
+\end{problem}
+
+\begin{proposition}\label{discrete-is-equiv-sigma-isolated}
+  If \( A : \Type \) and \( B : A \to \Type \) are (pointwise) discrete types,
+  then \( \SigmaIsolate_{A,B} \) is an equivalence.
+  \begin{proof}
+    For discrete \( A \) and \( B \)
+    \autoref{is-equiv-forget-isolated-iff-discrete} yields a commutative triangle
+    \[
+      \begin{tikzcd}[column sep=small]
+          \sum_{a_0 : \Isolated{A}} \Isolated{B(a_0)}
+            &
+          %
+            &
+          \Isolated{\big(\sum_{a : A} B(a)\big)}
+        \\
+          %
+            &
+          {\sum_{a : A} B(a)}
+            &
+          %
+        \ar[from=1-1, to=1-3, "\SigmaIsolate"]
+        \ar[from=1-1, to=2-2, "\simeq"{description}]
+        \ar[from=2-2, to=1-3, "\simeq"{description}]
+      \end{tikzcd}
+    \]
+    hence \( \SigmaIsolate \) is an equivalence by the \emph{2-out-of-3}-property.
+  \end{proof}
+\end{proposition}
+
+
+\subsection{Removing points}
+
+
+For any type \( A \) and point \( a : A \) we define the subtype of \enquote{\( A \) with \( a \) removed}
+to be \( A \setminus a \DefEq \sum_{b : A} a \neq b \).
+Whenever \( a \) is isolated in \( A \), a number of useful properties hold:
+
+\begin{problem}\label{isolated-minus-plus-equiv}
+  For all \( a_0 : \Isolated{A} \), define an equivalence \( (A \setminus a_0) + 1 \simeq A \).
+  \begin{construction}
+    We define the equivalence from mutually inverse maps.
+    In the forward direction, we define \( f(\Just{(a , \mathunderscore)}) \DefEq a \) and \( f(\Nothing) \DefEq a_0 \).
+    In the other direction, we define \( \Op{r} : \prod_{a : A} \Dec{a_0 = a} \to (A \setminus a_0) + 1 \)
+    by
+    \[
+      \Op{r}(a, d) \DefEq
+      \begin{cases}
+        \Nothing & \text{if}\ d \JudgeEq \Op{yes}(\mathunderscore : a_0 = a) \\
+        \Just{(a, h)} & \text{if}\ d \JudgeEq \Op{no}(h : a_0 \neq a)
+      \end{cases}
+    \]
+    For \( i_0 : \Op{isIsolated}(a_0) \), let \( g(a) \DefEq \Op{r}(a, i_0(a)) \).
+    By \autoref{is-prop-isolated-dec-path}, \( i_0(a) : \Dec(a_0 = a) \) is a proposition for all \( a : A \);
+    we use this to ensure that \( g \) computes correctly:
+    \begin{align*}
+      g(a_0) &\JudgeEq \Op{r}(a_0, i_0(a_0)) \overset{\scriptstyle!}{=} \Op{r}(a_0, \Op{yes}(\Op{refl})) \JudgeEq \Nothing \\
+      g(a)   &\JudgeEq \Op{r}(a, i_0(a)) \overset{\scriptstyle!}{=} \Op{r}(a, \Op{no}(h)) \JudgeEq \Just{(a, h)}
+        \quad \forall (a, h) : A \setminus a_0
+    \end{align*}
+    From this we get that \( f \circ g = \Op{id} \) and \( g \circ f = \Op{id} \).
+  \end{construction}
+\end{problem}
+
+The above is only guaranteed to be an equivalence when the point being removed is isolated:
+Consider for example the circle \( S^1 \) with \( \mathsf{base} : S^1 \).
+Then \( S^1 \setminus \mathsf{base} \simeq 0 \),
+hence \( (S^1 \setminus \mathsf{base}) + 1 \not\simeq S^1 \):
+removing \( \mathsf{base} \) removes the entire circle, which is \emph{not} contractible.
+
+\begin{problem}\label{maybe-minus-nothing-equiv}
+  Define an equivalence \( (A + 1) \setminus \Nothing \simeq A \).
+  \begin{construction}
+    Define \( f : (A + 1) \setminus \Nothing \to A \) as \( f(\Just{a} , \mathunderscore) \DefEq a \);
+    the case \( f(\Nothing, h : \Nothing \neq \Nothing) \) is absurd.
+    It is straightforward to show that the fibers of \( f \) are contractible.
+  \end{construction}
+\end{problem}
+
+\begin{remark}
+  Alternatively, apply \autoref{isolated-minus-plus-equiv} to \( \Nothing : \Isolated{A + 1} \),
+  obtain an equivalence
+  \( e : ((A + 1) \setminus \Nothing) + 1 \simeq A + 1 \),
+  notice that \( e \) fixes the right summand,
+  and cancel to \( (A + 1) \setminus \Nothing \simeq A \).
+\end{remark}
+
+\begin{problem}\label{sigma-remove}
+  Let \( A : \Type \) and \( B : A \to \Type \)
+  with points \( a_0 : A \) and \( b_0 : B(a_0) \),
+  and assume \( p : \Op{isProp}(a_0 = a_0) \).
+  There is a map
+  \[
+    \operatorname{\Op{\Sigma-remove}}_p :
+    \big(\smashoperator{\sum_{a : A \setminus a_0}} B(a)\big) + \big(B(a_0) \setminus b_0\big)
+      \to
+    \big(\sum_{a : A} B(a) \big) \setminus (a_0 , b_0)
+  \]
+  \begin{construction}
+    We define \( \operatorname{\Op{\Sigma-remove}}_p(x) \) by cases.
+    Let
+    \[
+      \SigmaRemove_p(\Inl{(a, h_a, b)}) \DefEq ((a, b) , h^\prime_a),
+    \]
+    where \( h^\prime_a : (a_0 , b_0) = (a, b) \xrightarrow{\Op{cong}_{\Op{fst}}} a_0 = a \xrightarrow{h_a} \bot \).
+    In the other case, let
+    \[
+      \SigmaRemove_p(\Inr{(b, h_b)}) \DefEq ((a_0, b) , h^\prime_b),
+    \]
+    and show \( h^\prime_b : (a_0 , b_0) \neq (a_0 , b) \) as follows:
+    Assume to the contrary that \( p_b : (a_0 , b_0) = (a_0 , b) \).
+    From this we obtain (dependent) paths \( p_b^1 : a_0 = a_0 \) and \( p_b^2 : b_0 =_{p_b^1} b \).
+    Since \( a_0 = a_0 \) is a proposition, we know that \( p_b^1 = \Op{refl} \),
+    hence \( b_0 = b \).
+    This is contradictory since we are given \( h_b : b_0 \neq b \).
+  \end{construction}
+\end{problem}
+
+\begin{proposition}\label{is-equiv-sigma-remove}
+  Let \( A : \Type \), \( B : A \to \Type \) with \( a_0 : A \) and \( b_0 : B(a_0) \).
+  If \( a_0 \) is an isolated point of \( A \), then \( \SigmaRemove \) of \autoref{sigma-remove}
+  is an equivalence.
+  \begin{proof}
+    First note that \( a_0 = a_0 \) is a proposition by \autoref{is-prop-isolated-path},
+    thus the map is well-defined.
+    We construct an inverse
+    \[
+      \SigmaRemove^{\Inv}
+        :
+      \Big(\sum_{a : A} B(a) \Big) \setminus (a_0 , b_0)
+        \to
+      \Big(\smashoperator{\sum_{a : A \setminus a_0}} B(a)\Big) + \big(B(a_0) \setminus b_0\big)
+    \]
+    as follows:
+    Introduce \( a : A \), \( b : B(a) \) and \( h : (a_0 , b_0) \neq (a , b) \),
+    then decide whether \( a_0 = a \) or not.
+    If \( p : a_0 = a \), we map to \( \Inr{(\Op{subst}_B(p, a), h^\prime)} \),
+    where \( h^\prime : b_0 \neq \Op{subst}_B(p, a) \),
+    which we conclude from \( h \) and \( p \).
+    In case that \( h : a_0 \neq a \) we map to \( \Inl{((a, h), b)} \) directly.
+  \end{proof}
+\end{proposition}
+
+\subsection{Grafting}
+
+\todo[inline]{Yes, \emph{grafting} is the technical term that Abbott {et al.\@} use.}
+\todo[inline]{This is an recursion principle for isolated points.}
+
+\begin{problem}
+  For types \( A \) and \( B \), construct a function
+  \[
+    \Op{graft} : \prod_{\Isolated{a} : \Isolated{A}}
+      \big((A \setminus \Isolated{a} \to B) \times B \big)
+        \to
+      (A \to B)
+  \]
+  \begin{construction}
+    Let \( \Isolated{a} : \Isolated{A} \), \( f : A \setminus \Isolated{a} \to B \) and \( b_0 : B \).
+    Decide equality with \( \Isolated{a} \) to define \( \Op{graft}_{\Isolated{a}}(f, b_0) : A \to B \) as follows:
+    \[
+      \Op{graft}_{\Isolated{a}}(f, b_0) \DefEq
+      \lambda a.\,
+      \begin{cases}
+        f(a, h) & \text{if}\ (h : \Isolated{a} \neq a) \\
+        b_0 & \text{otherwise}
+      \end{cases}
+      \qedhere
+    \]
+  \end{construction}
+\end{problem}
+\begin{proposition}\label{graft-equiv}
+  For all \( \Isolated{a} : \Isolated{A} \),
+  \(
+    \Op{graft}_{\Isolated{a}} :
+    \big((A \setminus \Isolated{a} \to B) \times B \big)
+      \simeq
+    (A \to B)
+  \)
+  is an equivalence of types.
+\end{proposition}
+
+\section{Containers}
+
+\begin{definition}
+  A \emph{container} \( (\MkCont{S}{P}) \) consists of \emph{shapes} \( S : \Type \) and
+  a family \( P : S \to \Type \) of \emph{positions}.
+  We access shapes and positions via postfix projections
+  \( (\MkCont{S}{P})_{\Sh} \DefEq S \) and \( (\MkCont{S}{P})_{\Ps} \DefEq P \).
+\end{definition}
+
+\begin{definition}
+  Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
+  The type of \emph{cartesian morphisms} between \( F \) and \( G \) is
+  \[
+    \Cart{F}{G} \DefEq \sum_{f : S \to T} \prod_{s : S} Q_{fs} \simeq P_s
+  \]
+  A cartesian morphism \( (f, u) : \Cart{F}{G} \) is an \emph{equivalence} of containers
+  if \( f \) is an equivalence of types.
+\end{definition}
+
+\begin{definition}
+  Containers and cartesian morphisms form a wild category \( \ContCart \).
+\end{definition}
+
+\section{Derivatives}\label{derivatives}
+
+\begin{definition}
+  The derivative of a container \( \Der{(\MkCont{S}{P})} \DefEq (\MkCont{S'}{P'}) \)
+  has shapes \( S' \DefEq \sum_{s : S} \Isolated{P_s} \) and positions \( P'(s , p) \DefEq P_s \setminus p \).
+\end{definition}
+
+\begin{definition}
+  A container \( (\MkCont{S}{P}) \) is \( (n,k) \)-truncated if \( S \) is \( n \)-truncated,
+  and \( P_s \) is \( k \)-truncated for all \( s : S \).
+\end{definition}
+
+\begin{corollary}
+  For \( n \geq 0 \) and \( k \geq -1 \), the derivative of an \( (n, k) \)-truncated container is \( (n, k) \)-truncated.
+\end{corollary}
+\begin{proof}
+  Let \( (\MkCont{S}{P}) \) an \( (n, k) \)-truncated container.
+  By \autoref{is-set-isolated} \( \Isolated{P_s} \) is a 0-truncated type and \( S \) is \( n \)-truncated,
+  thus \( \Der{(\MkCont{S}{P})}_{\Sh} \JudgeEq \sum_{s : S} \Isolated{P_s} \) is \( n \)-truncated.
+  Positions are \( k \)-types since \( P_s \setminus p \) embeds into \( P_s \).
+\end{proof}
+
+The derivative acts on cartesian morphisms.
+\begin{problem}
+  Define a wild endofunctor \( \Der : \ContCart \to \ContCart \).
+  \begin{construction}
+    For any \( (f, u) : \Cart{(\MkCont{S}{P})}{(\MkCont{T}{Q})} \),
+    there is a canonical morphism \( \Der{(f, u)} \DefEq (f' , u') : \Cart{\Der{(\MkCont{S}{P})}}{\Der{(\MkCont{T}{Q})}} \)
+    obtained as follows:
+    On shapes, the map \( f' : \sum_{s : S} \Isolated{P_s} \to \sum_{t : T} \Isolated{G_t} \)
+    applies \( f \) to the first component and \( \Isolated{(u_s^\Inv)} : \Isolated{P_s} \simeq \Isolated{G_{fs}} \) to the second.
+    On positions, \( u'_{s,p} : G_{fs} \setminus u_s^\Inv(p) \simeq F_s \setminus p \) is obtained from \( u_s \), respecting the removed point
+    (cf.\@ \autoref{is-isolated-respect-equiv}).
+  \end{construction}
+\end{problem}
+
+
+\subsection{Linear adjunction}
+
+\begin{problem}
+  Define an adjunction \( (\eta, \varepsilon) : \Maybe{-} \vdash \Der{(-)} \).
+  \begin{construction}
+    Let \( F \JudgeEq (\MkCont{S}{P}) \) and define \( \eta_F : \Cart{F}{\Der{(\Maybe{F})}} \).
+    On shapes, \( {\eta_F^{\Sh}} : S \to \sum_{(s, \mathunderscore) : S \times 1} \Isolated{(P_s + 1)} \)
+    sends \( s \) to \( (s, \bullet) \) and \( \mathsf{nothing} \);
+    the latter is isolated by \autoref{is-isolated-nothing}.
+    On positions, define \( \eta_F^{\Ps} : \prod_{s : S} (P_s + 1) \setminus \Nothing \simeq P_s \)
+    as in \autoref{maybe-minus-nothing-equiv}.
+
+    Let \( G \JudgeEq (\MkCont{T}{Q}) \); define the counit \( \varepsilon_G : \Cart{\Maybe{(\Der{G})}}{G} \) as follows:
+    on shapes, \( \varepsilon_G^{\Sh} : \sum_{t : T} \Isolated{Q_t} \times 1 \to T \) is the first projection.
+    On positions the equivalence
+    \(
+      \varepsilon_G^{\Ps}(t , q) : Q_t \simeq (Q_t \setminus q) + 1
+    \)
+    is given by \autoref{isolated-minus-plus-equiv} for all \( t : T \) and \( q : \Isolated{Q_t} \).
+
+    It remains to prove the zigzag equations
+    \begin{align*}
+      &
+      \begin{tikzcd}[ampersand replacement=\&, column sep=small]
+        \Maybe{F} \& \& \Maybe{F} \\
+                  \& \Maybe{(\Der{(\Maybe{F})})} \& %
+        \ar[from=1-1, to=1-3, "\Op{id}"]
+        \ar[from=1-1, to=2-2, "\Maybe{{\eta_F}}"{'}]
+        \ar[from=2-2, to=1-3, "\varepsilon_{\Maybe{F}}"{'}]
+      \end{tikzcd}
+        &
+      &
+      \begin{tikzcd}[ampersand replacement=\&, column sep=small]
+                  \& \Der{(\Maybe{\Der{G}})} \& \\
+        \Der{G} \& \& \Der{G} %
+        \ar[from=2-1, to=2-3, "\Op{id}"]
+        \ar[from=2-1, to=1-2, "\eta_{\Der{G}}"]
+        \ar[from=1-2, to=2-3, "\Der{(\varepsilon_{G})}"]
+      \end{tikzcd}
+    \end{align*}
+    After applying the necessary extensionality principles
+    for functions, equivalences and sum types,
+    these hold almost definitionally.
+    Only some proofs of isolation and removal need to be compared up to propositional equality.
+  \end{construction}
+\end{problem}
+
+\subsection{Laws of Derivates}
+
+\begin{proposition}
+  For any proposition \( P \), there is an equivalence of containers
+  \[
+    \CartIso{ \Der{(\MkCont{1}{P})} }{ (\MkCont{P}{0}) }
+  \]
+  \begin{proof}
+    \begin{align*}
+      \Der{(\MkCont{1}{P})}
+        &\CartEquiv (\MkCont{((\mathunderscore, p) : 1 \times P)}{P \setminus p})
+          \\
+        &\CartEquiv (\MkCont{(p : P)}{P \setminus p})
+          \\
+        &\CartEquiv (\MkCont{P}{0})
+    \end{align*}
+  \end{proof}
+\end{proposition}
+
+\begin{corollary}
+  \[
+    \CartIso{\Der{(\Id)}}{\operatorname{\mathsf{K}}(1)}
+  \]
+\end{corollary}
+
+
+\begin{proposition}
+  \begin{itemize}
+    \item \( \CartIso{\Der{(\operatorname{\mathsf{K}}(S))}}{\operatorname{\mathsf{K}}(0)} \)
+    \item \( \CartIso{\Der{(F \oplus G)}}{\Der{F} \oplus \Der{G}} \)
+    \item \( \CartIso{\Der{(F \otimes G)}}{(\Der{F} \otimes G) \oplus (F \otimes \Der{G})} \)
+  \end{itemize}
+\end{proposition}
+
+\begin{problem}[note={The lax chain rule}]\label{lax-chain-rule}
+  For any two containers \( F, G \), define a morphism
+  \[
+    \Op{chain}_{F,G} :
+    \Cart%
+      { \Subst{(\Der{F})}{G} \CTimes \Der{G} }%
+      {\Der{(\Subst{F}{G})}}
+  \]
+\end{problem}
+\begin{construction}[note={for \autoref{lax-chain-rule}}]
+  Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
+  As usual, we have to construct a map on shapes and an equivalence of positions.
+  On shapes, our goal is a map
+  \[
+    \big(\sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} (P_s \setminus p \to T) \big)
+      \times
+    \sum_{t : T} \Isolated{Q_t}
+      \to
+    \Big(
+      \sum\nolimits_{(s, f) : \sum_{s : S} (P_s \to T)} \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)}
+    \Big)
+  \]
+  Let us first reshape the left side by some equivalences.
+  By re-associating the sums, we obtain
+  \begin{align*}
+      %
+    &\mathrel{\hphantom{\simeq}}
+      \big(\sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} P_s \setminus p \to T \big)
+        \times
+      \sum_{t : T} \Isolated{Q_t}
+    \\
+    &\simeq
+      \sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} \sum\nolimits_{(f, t) : (P_s \setminus p \to T \times T)} \Isolated{Q_t}
+  \intertext{%
+    By \autoref{graft-equiv}, the type \( (P_s \setminus p \to T \times T) \) is equivalent to \( P_s \to T \),
+    thus we simplify to
+  }
+    &\simeq
+      \sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} \sum\nolimits_{f : P_s \to T} \Isolated{Q_{fp}}
+  \intertext{%
+    By re-associating the sum yet again, we are left with
+  }
+    &\simeq
+      \sum\nolimits_{(s, f) : \sum_{s : S} (P_s \to T)} \big( \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})} \big)
+  \end{align*}
+  Denote this equivalence by \( \Op{chain}^{\Op{left}}_{F,G} \).
+  Now, the left and the right only differ in
+  \begin{align*}
+    \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})}
+      \qquad\text{vs.}\qquad
+    \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)}
+  \end{align*}
+  \Autoref{sigma-isolate} gives us a map
+  \(
+    \SigmaIsolate_{P_s,Q_{f(\shortminus)}} :
+      \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})}
+        \to
+      \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)}
+  \),
+  hence
+  \(
+    \cramped{
+      \Op{chain}_{F,G} \DefEq
+        \Op{\Sigma}(\Op{id}, \SigmaIsolate_{P_s,Q_{f(\shortminus)}}) \circ \Op{chain}^{\Op{left}}_{F,G}
+    }
+  \).
+\end{construction}
+
+\begin{theorem}
+  For discrete containers \( F, G \), \( \Op{chain}_{F,G} \) is an equivalence of containers.
+  \begin{proof}
+    By \autoref{discrete-is-equiv-sigma-isolated}
+    \( \SigmaIsolate_{P_s,Q_{f(\shortminus)}} \) is an equivalence,
+    therefore \( \Op{chain}_{F,G} \) is as well.
+  \end{proof}
+\end{theorem}
+
+\begin{theorem}
+  Assuming a strong chain rule implies that \emph{every} type is discrete.
+  Formally,
+  \[
+    \big( \smashoperator{\prod_{F, G : \Cont}} \Op{isEquiv}(\Op{chain}_{F,G}) \big)
+      \to
+    \prod_{A : \Type} \Op{Discrete}(A)
+  \]
+\end{theorem}
+
+\begin{corollary}
+  Assuming a strong chain rule is inconsistent in the presence of non-set types:
+  \[
+    \neg \big( \smashoperator{\prod_{F, G : \Cont}} \Op{isEquiv}(\Op{chain}_{F,G}) \big)
+  \]
+  \begin{proof}
+    The circle \( S^1 \) is provably not discrete: If it were, it would be a set.
+  \end{proof}
+\end{corollary}
+
+\end{document}

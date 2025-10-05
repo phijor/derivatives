@@ -49,6 +49,7 @@
             pkgs.cornelis
           ];
         };
+        devShells.latex = pkgs.callPackage ./doc/shell.nix { };
       }
     );
 }
