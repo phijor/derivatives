@@ -2,6 +2,7 @@ module Derivative.Sum where
 
 open import Derivative.Prelude
 
+open import Cubical.Data.Sigma
 open import Cubical.Data.Sum public
 open import Cubical.Functions.Embedding
 
@@ -12,6 +13,10 @@ private
     ℓ : Level
     A B : Type ℓ
     C D : A → Type ℓ
+
+congInlEquiv : {x y : A} → (x ≡ y) ≃ (inl {B = B} x ≡ inl y)
+congInlEquiv .fst = cong inl
+congInlEquiv .snd = Sum.isEmbedding-inl _ _
 
 inlInj : ∀ {x y : A} → inl {B = B} x ≡ inl y → x ≡ y
 inlInj = isEmbedding→Inj Sum.isEmbedding-inl _ _
@@ -65,4 +70,8 @@ inr≢inl p = Sum.⊎Path.encode _ _ p .lower
 ⊎-empty-left = isoToEquiv ∘ ⊎-empty-left-Iso
 
 ⊎-empty-right : (¬ B) → A ≃ (A ⊎ B)
-⊎-empty-right = {! !}
+⊎-empty-right ¬B .fst = inl
+⊎-empty-right ¬B .snd .equiv-proof (inl a) = isOfHLevelRespectEquiv 0 fiber-equiv (isContrSingl a) where
+  fiber-equiv : singl a ≃ fiber inl (inl a)
+  fiber-equiv = Σ-cong-equiv-snd λ a′ → symEquiv ∙ₑ congInlEquiv
+⊎-empty-right ¬B .snd .equiv-proof (inr b) = ex-falso (¬B b)
