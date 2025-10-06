@@ -280,6 +280,47 @@ in particular dependent sums.
   \end{proof}
 \end{proposition}
 
+\begin{lemma}\label{is-isolated-fst-discrete}
+  A type \( A : \Type \) is discrete if the following proposition holds:
+  \[
+    % \operatorname{\Op{\Sigma-isolate-fst}}_A :
+     \prod_{B : A \to \Type}
+      \prod_{a : A}
+      \prod_{b : B(a)}
+      \operatorname{\Op{isIsolated}}{(a, b)}
+      \to
+      \operatorname{\Op{isIsolated}} a
+  \]
+  \begin{proof}
+    It suffices to show that all points \( a_0 : A \) are isolated.
+    The type of singletons \( \sum_{a : A} a_0 = a \)
+    is contractible, hence all of its points are isolated.
+    We apply the assumption to \( B(a) \DefEq {(a_0 = a)} \),
+    \( a \DefEq a_0 \) and \( b \DefEq \Op{refl}_{a_0} \),
+    from which we conclude that \( a_0 \) is isolated.
+  \end{proof}
+\end{lemma}
+
+\begin{proposition}\label{is-equiv-sigma-isolate-discrete}
+  Let \( A : \Type \).
+  If \( \SigmaIsolate_{A,B} \) is an equivalence for all families \( B : A \to \Type \),
+  then \( A \) is discrete.
+  \begin{proof}
+    We prove discreteness of \( A \) by appealing to \autoref{is-isolated-fst-discrete}.
+    Let \( B : A \to \Type \),
+    and denote by \( u : \Isolated{\big(\sum_{a : A} B(a)\big)} \to \sum_{a : \Isolated{A}} \Isolated{B(a)} \)
+    the assumed inverse to \( \SigmaIsolate_{A,B} \).
+    For any \( a_0 : A \), \( b_0 : B(a_0) \), and \( p_0 : \Op{isIsolated}{(a_0, b_0)} \),
+    it remains to show that \( a_0 \) is isolated.
+    Let \( y \DefEq u((a_0 , b_0) , p_0) \),
+    where \( y \JudgeEq ((a, p_a), (b, p_b)) \)
+    and \( p_a \) is proof that \( a : A \) is isolated.
+    We are done if we can show that \( a_0 = a \).
+    We do so by noticing that both \( \SigmaIsolate(y) \JudgeEq ((a, b), \mathunderscore) \) and \( ((a_0, b_0), p_0) \)
+    lie in \( \Op{fiber}_u(y) \), which is necessarily contractible,
+    hence \( a = a_0 \).
+  \end{proof}
+\end{proposition}
 
 \subsection{Removing points}
 
@@ -643,6 +684,7 @@ The derivative acts on cartesian morphisms.
 \begin{theorem}
   For discrete containers \( F, G \), \( \Op{chain}_{F,G} \) is an equivalence of containers.
   \begin{proof}
+    Let \( F \JudgeEq (\MkCont{S}{P}), G \JudgeEq (\MkCont{T}{Q}) \).
     By \autoref{discrete-is-equiv-sigma-isolated}
     \( \SigmaIsolate_{P_s,Q_{f(\shortminus)}} \) is an equivalence,
     therefore \( \Op{chain}_{F,G} \) is as well.
@@ -657,6 +699,18 @@ The derivative acts on cartesian morphisms.
       \to
     \prod_{A : \Type} \Op{Discrete}(A)
   \]
+  \begin{proof}
+    First observe that for containers \( F \JudgeEq (\MkCont{S}{P}), G \JudgeEq (\MkCont{T}{Q}) \),
+    if \( \Op{chain}_{F,G} \) is an equivalence, then so is \( \SigmaIsolate_{P_s,Q_{f(\shortminus)}} \)
+    for all \( s : S \) and \( f : P_s \to T \).
+
+    Let \( A : \Type \).
+    We use \autoref{is-equiv-sigma-isolate-discrete} to show that \( A \) is discrete.
+    Thus, let \( B : A \to \Type \) and prove that \( \SigmaIsolate_{A,B} \) is an equivalence by
+    defining containers \( F \) and \( G \) so that the previous observation applies:
+    this is the case for \( F \DefEq (\MkCont{1}{A}) \) and \( G \DefEq (\MkCont{A}{B}) \)
+    when choosing \( s \DefEq \bullet : 1 \) and \( f \DefEq \Op{id} : A \to A \).
+  \end{proof}
 \end{theorem}
 
 \begin{corollary}
