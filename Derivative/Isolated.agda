@@ -231,16 +231,39 @@ isIsolatedΣSnd→Discrete {ℓ} A Σ-isolated-fst a₀ a₁ = goal where
 isEquiv-Σ-isolate→DiscreteFst : (A : Type ℓ)
   → ((B : A → Type ℓ) → isEquiv (Σ-isolate A B))
   → Discrete A
-isEquiv-Σ-isolate→DiscreteFst A is-equiv-Σ-isolate = isIsolatedΣSnd→Discrete A goal where
-  unisolate : (B : A → Type _) → (Σ[ a ∈ A ] B a) ° → (Σ[ a° ∈ A ° ] (B (a° .fst)) °)
-  unisolate B = invIsEq (is-equiv-Σ-isolate B)
+isEquiv-Σ-isolate→DiscreteFst {ℓ} A is-equiv-Σ-isolate = isIsolatedΣSnd→Discrete A (λ a₀ B → goal B a₀) where
+  module _ (B : A → Type ℓ) where
+    unisolate-equiv : (Σ[ a ∈ A ] B a) ° ≃ (Σ[ a° ∈ A ° ] (B (a° .fst)) °)
+    unisolate-equiv = invEquiv (_ , is-equiv-Σ-isolate B)
 
-  unisolate-β-fst : (B : A → Type _) → {a : A} → {b : B a} → (isolated-ab : isIsolated (a , b))
-    → unisolate B ((a , b) , isolated-ab) .fst .fst ≡ a
-  unisolate-β-fst B {a} {b} isolated-ab = sym (congS (fst ∘ fst) (invEq (equivAdjointEquiv (_ , is-equiv-Σ-isolate B)) (Isolated≡ refl)))
+    unisolate : (Σ[ a ∈ A ] B a) ° → (Σ[ a° ∈ A ° ] (B (a° .fst)) °)
+    unisolate = equivFun unisolate-equiv
 
-  goal : ∀ a₀ (B : A → Type _) (b₀ : B a₀) → isIsolated (a₀ , b₀) → isIsolated a₀
-  goal a₀ B b₀ isolated-ab = subst isIsolated (unisolate-β-fst B isolated-ab) (unisolate B (_ , isolated-ab) .fst .snd)
+    goal : ∀ a₀ (b₀ : B a₀) → isIsolated (a₀ , b₀) → isIsolated a₀
+    goal a₀ b₀ isolated-ab
+      using ab°@((a , isolated-a) , (b , _)) ← unisolate ((a₀ , b₀) , isolated-ab)
+      = isolated-a₀ where
+      help : Σ-isolate A B ab° ≡ Σ-isolate A B (unisolate ((a₀ , b₀) , isolated-ab))
+      help = Isolated≡ $ refl′ (a , b)
+
+      fib₀ : fiber unisolate ab°
+      fib₀ .fst = Σ-isolate A B ab°
+      fib₀ .snd = sym (invEq (equivAdjointEquiv (_ , is-equiv-Σ-isolate B)) help)
+
+      fib₁ : fiber unisolate ab°
+      fib₁ .fst = (a₀ , b₀) , isolated-ab
+      fib₁ .snd = refl
+
+      contr-fib = equivIsEquiv unisolate-equiv .equiv-proof ab°
+
+      fib₀≡fib₁ : fib₀ ≡ fib₁
+      fib₀≡fib₁ = isContr→isProp contr-fib _ _
+
+      a≡a₀ : a ≡ a₀
+      a≡a₀ = cong (fst ∘ fst ∘ fst) fib₀≡fib₁
+
+      isolated-a₀ : isIsolated a₀
+      isolated-a₀ = subst isIsolated a≡a₀ isolated-a
 
 Discrete→isEquiv-Σ-isolate : {A : Type ℓ} {B : A → Type ℓ}
   → Discrete A
