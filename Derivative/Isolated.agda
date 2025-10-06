@@ -213,7 +213,7 @@ isIsolatedΣ {B} {a} {b} isolated-a isolated-b (a′ , b′) = discrete (isolate
 
 isIsolatedΣSnd→Discrete : {ℓ : Level}
   → (A : Type ℓ)
-  → ((a₀ : A) → (B : A → Type ℓ) → (b₀ : B a₀) → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀)
+  → ((B : A → Type ℓ) → (a₀ : A) → (b₀ : B a₀) → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀)
   → Discrete A
 isIsolatedΣSnd→Discrete {ℓ} A Σ-isolated-fst a₀ a₁ = goal where
   B' : A → Type ℓ
@@ -226,12 +226,12 @@ isIsolatedΣSnd→Discrete {ℓ} A Σ-isolated-fst a₀ a₁ = goal where
   is-isolated-pair = isContr→isIsolatedCenter (isContrSingl a₀) (a₀ , b₀)
 
   goal : Dec (a₀ ≡ a₁)
-  goal = Σ-isolated-fst a₀ B' b₀ is-isolated-pair a₁
+  goal = Σ-isolated-fst B' a₀ b₀ is-isolated-pair a₁
 
 isEquiv-Σ-isolate→DiscreteFst : (A : Type ℓ)
   → ((B : A → Type ℓ) → isEquiv (Σ-isolate A B))
   → Discrete A
-isEquiv-Σ-isolate→DiscreteFst {ℓ} A is-equiv-Σ-isolate = isIsolatedΣSnd→Discrete A (λ a₀ B → goal B a₀) where
+isEquiv-Σ-isolate→DiscreteFst {ℓ} A is-equiv-Σ-isolate = isIsolatedΣSnd→Discrete A goal where
   module _ (B : A → Type ℓ) where
     unisolate-equiv : (Σ[ a ∈ A ] B a) ° ≃ (Σ[ a° ∈ A ° ] (B (a° .fst)) °)
     unisolate-equiv = invEquiv (_ , is-equiv-Σ-isolate B)
