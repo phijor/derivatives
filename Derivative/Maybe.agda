@@ -45,6 +45,10 @@ removeNothingEquiv : Maybe A ∖ nothing ≃ A
 removeNothingEquiv .fst = remove-nothing
 removeNothingEquiv .snd = isEquivRemoveNothing
 
+unreplace-isolated : (a₀ : A) → Maybe (A ∖ a₀) → A
+unreplace-isolated a₀ (just (a , _)) = a
+unreplace-isolated a₀ nothing = a₀
+
 module _ {ℓ} {A : Type ℓ} (a₀ : A) (a₀≟_ : isIsolated a₀) where
   private
     replace? : (a : A) → Dec (a₀ ≡ a) → Maybe (A ∖ a₀)
@@ -83,13 +87,9 @@ module _ {ℓ} {A : Type ℓ} (a₀ : A) (a₀≟_ : isIsolated a₀) where
   ... | (yes a₀≡a) = ex-falso $ a₀≢a a₀≡a
   ... | (no a₀≢a) = congS just (Remove≡ (refl′ a))
 
-  unreplace-isolated : Maybe (A ∖ a₀) → A
-  unreplace-isolated (just (a , _)) = a
-  unreplace-isolated nothing = a₀
-
   replace-isolated'-Iso : Iso A (Maybe (A ∖ a₀))
   replace-isolated'-Iso .Iso.fun = replace-isolated'
-  replace-isolated'-Iso .Iso.inv = unreplace-isolated
+  replace-isolated'-Iso .Iso.inv = unreplace-isolated a₀
   replace-isolated'-Iso .Iso.rightInv (just (a , a₀≢a)) with a₀≟ a
   ... | (yes a₀≡a) = ex-falso (a₀≢a a₀≡a)
   ... | (no a₀≢a') = congS just $ ΣPathP (refl′ a , isProp¬ _ a₀≢a' a₀≢a)
@@ -102,15 +102,35 @@ module _ {ℓ} {A : Type ℓ} (a₀ : A) (a₀≟_ : isIsolated a₀) where
 
   replace-isolated-Iso : Iso A (Maybe (A ∖ a₀))
   replace-isolated-Iso .Iso.fun = replace-isolated
-  replace-isolated-Iso .Iso.inv = unreplace-isolated
+  replace-isolated-Iso .Iso.inv = unreplace-isolated a₀
   replace-isolated-Iso .Iso.rightInv (just a) = replace?-no a
   replace-isolated-Iso .Iso.rightInv nothing = replace?-yes
   replace-isolated-Iso .Iso.leftInv a with (a₀≟ a)
   ... | (yes a₀≡a) = a₀≡a
   ... | (no  a₀≢a) = refl′ a
 
+  unreplace-isolated-equiv : Maybe (A ∖ a₀) ≃ A
+  unreplace-isolated-equiv = isoToEquiv $ invIso $ replace-isolated-Iso
+
   replace-isolated-equiv : A ≃ (Maybe (A ∖ a₀))
   replace-isolated-equiv = isoToEquiv replace-isolated-Iso
 
   replace-isolated'-equiv : A ≃ (Maybe (A ∖ a₀))
   replace-isolated'-equiv = isoToEquiv replace-isolated'-Iso
+
+isEquiv-unreplace-isolated→isIsolated : (a₀ : A)
+  → isEquiv (unreplace-isolated a₀)
+  → isIsolated a₀
+isEquiv-unreplace-isolated→isIsolated {A} a₀ is-equiv = is-isolated-a₀ where
+  equiv : A ≃ Maybe (A ∖ a₀)
+  equiv = invEquiv (unreplace-isolated a₀ , is-equiv)
+
+  is-isolated-a₀ : isIsolated a₀
+  is-isolated-a₀ = isIsolatedRespectEquiv equiv nothing isIsolatedNothing
+
+isIsolated≃isEquiv-unreplace-isolated : (a₀ : A)
+  → isIsolated a₀ ≃ isEquiv (unreplace-isolated a₀)
+isIsolated≃isEquiv-unreplace-isolated a₀ = propBiimpl→Equiv
+  (isPropIsIsolated a₀) (isPropIsEquiv (unreplace-isolated a₀))
+  (equivIsEquiv ∘ unreplace-isolated-equiv a₀)
+  (isEquiv-unreplace-isolated→isIsolated a₀)

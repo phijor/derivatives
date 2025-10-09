@@ -46,6 +46,8 @@
 \DeclareMathOperator{\JudgeEq}{\mathrel{\doteq}}
 \NewDocumentCommand{\Inv}{}{{\shortminus 1}}
 
+\DeclareMathOperator{\Isolate}{\Op{isolate}}
+\DeclareMathOperator{\Replace}{\Op{replace}}
 \DeclareMathOperator{\SigmaRemove}{\Op{\Sigma-remove}}
 \DeclareMathOperator{\SigmaIsolate}{\Op{\Sigma-isolate}}
 
@@ -325,16 +327,37 @@ in particular dependent sums.
 \subsection{Removing points}
 
 
-For any type \( A \) and point \( a : A \) we define the subtype of \enquote{\( A \) with \( a \) removed}
-to be \( A \setminus a \DefEq \sum_{b : A} a \neq b \).
-Whenever \( a \) is isolated in \( A \), a number of useful properties hold:
+For any type \( A \) and point \( a_0 : A \) we define the subtype of \enquote{\( A \) with \( a_0 \) removed}
+to be \( A \setminus a_0 \DefEq \sum_{a : A} a_0 \neq a \).
+Whenever \( a_0 \) is isolated in \( A \), a number of useful properties hold.
+There is an obvious map \( \Replace_{a_0} : (A \setminus a_0) + 1 \to A \), defined by cases
+as
+\(
+  \Replace_{a_0}(\Just{(a, \mathunderscore)}) \DefEq a
+\)
+and
+\(
+  \Replace_{a_0}(\Nothing) \DefEq a_0
+\)
+Classically, this map is an isomorphism of sets;
+the inverse simply replaces \( a_0 \) with a fresh element.
+In a univalent setting however, \( a_0 \) might have interesting (higher) loop spaces \( \Omega^n(a_0) \),
+which too are removed by this construction.
+Consider for example the circle \( S^1 \) with \( \mathsf{base} : S^1 \).
+Then \( S^1 \setminus \mathsf{base} \simeq 0 \),
+hence \( (S^1 \setminus \mathsf{base}) + 1 \not\simeq S^1 \):
+removing \( \mathsf{base} \) removes the entire circle, which is \emph{not} contractible.
 
-\begin{problem}\label{isolated-minus-plus-equiv}
-  For all \( a_0 : \Isolated{A} \), define an equivalence \( (A \setminus a_0) + 1 \simeq A \).
-  \begin{construction}
-    We define the equivalence from mutually inverse maps.
-    In the forward direction, we define \( f(\Just{(a , \mathunderscore)}) \DefEq a \) and \( f(\Nothing) \DefEq a_0 \).
-    In the other direction, we define \( \Op{r} : \prod_{a : A} \Dec{a_0 = a} \to (A \setminus a_0) + 1 \)
+We observe that we can replicate the classical behaviour only when \( a_0 \) is an isolated point:
+
+\begin{proposition}\label{isolated-minus-plus-equiv}
+  Let \( a_0 : A \).
+  The map \( \Replace_{a_0} \) is an equivalence typed \( (A \setminus a_0) + 1 \simeq A \)
+  if and only if \( a_0 \) is isolated in \( A \).
+  \begin{proof}
+    First, assume that \( a_0 \) is isolated.
+    We construct an two-sided inverse \( g : A \to (A \setminus a_0) + 1 \) as follows.
+    Define \( \Op{r} : \prod_{a : A} \Dec{a_0 = a} \to (A \setminus a_0) + 1 \)
     by
     \[
       \Op{r}(a, d) \DefEq
@@ -351,15 +374,13 @@ Whenever \( a \) is isolated in \( A \), a number of useful properties hold:
       g(a)   &\JudgeEq \Op{r}(a, i_0(a)) \overset{\scriptstyle!}{=} \Op{r}(a, \Op{no}(h)) \JudgeEq \Just{(a, h)}
         \quad \forall (a, h) : A \setminus a_0
     \end{align*}
-    From this we get that \( f \circ g = \Op{id} \) and \( g \circ f = \Op{id} \).
-  \end{construction}
-\end{problem}
+    Hence \( {\Replace_{a_0}} \circ g = \Op{id} \) and \( g \circ {\Replace_{a_0}} = \Op{id} \).
 
-The above is only guaranteed to be an equivalence when the point being removed is isolated:
-Consider for example the circle \( S^1 \) with \( \mathsf{base} : S^1 \).
-Then \( S^1 \setminus \mathsf{base} \simeq 0 \),
-hence \( (S^1 \setminus \mathsf{base}) + 1 \not\simeq S^1 \):
-removing \( \mathsf{base} \) removes the entire circle, which is \emph{not} contractible.
+    For the converse, assume that \( \Replace_{a_0} \) is an equivalence.
+    By \autoref{is-isolated-nothing}, \( \Nothing \) is isolated in \( (A \setminus a_0 ) + 1 \),
+    so \autoref{is-isolated-respect-equiv} tells us that \( \Replace_{a_0}(\Nothing) \JudgeEq a_0 \) is isolated as well.
+  \end{proof}
+\end{proposition}
 
 \begin{problem}\label{maybe-minus-nothing-equiv}
   Define an equivalence \( (A + 1) \setminus \Nothing \simeq A \).

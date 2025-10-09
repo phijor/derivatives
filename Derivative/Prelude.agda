@@ -7,7 +7,7 @@ open import Cubical.Foundations.Isomorphism hiding (iso) public
 open import Cubical.Foundations.Equiv renaming (_■ to _≃∎) public
 open import Cubical.Foundations.HLevels public
 open import Cubical.Reflection.StrictEquiv public
-open import Cubical.Data.Sigma using (_×_ ; ΣPathP ; Σ≡Prop) public
+open import Cubical.Data.Sigma using (_×_ ; ΣPathP ; Σ≡Prop ; ∃-syntax) public
 open import Cubical.Data.Unit.Base using (tt*) public
 open import Cubical.Relation.Nullary.Base using (¬_) public
 
@@ -67,6 +67,7 @@ symEquiv = strictEquiv sym sym
 -- Diagrammatic composition of functions (non-dependent)
 _⨟_ : (f : A → B) (g : B → C) → A → C
 f ⨟ g = λ a → g (f a)
+infixl 9 _⨟_
 
 {- "Composition reasoning":
 
@@ -162,3 +163,6 @@ isOfHLevelSucΣSndProp : ∀ {ℓB} {B : A → Type ℓB} (n : HLevel)
   → (∀ a → isProp (B a))
   → isOfHLevel (suc n) (Σ A B)
 isOfHLevelSucΣSndProp n is-trunc-A is-prop-B = isOfHLevelΣ (suc n) is-trunc-A λ a → isProp→isOfHLevelSuc n (is-prop-B a)
+
+hSet≡ : ∀ {X Y : hSet ℓ} → ⟨ X ⟩ ≡ ⟨ Y ⟩ → X ≡ Y
+hSet≡ = Σ≡Prop (λ X → isPropIsSet)
