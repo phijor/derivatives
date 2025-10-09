@@ -52,6 +52,8 @@
 \DeclareMathOperator{\SigmaIsolate}{\Op{\Sigma-isolate}}
 
 \newcommand*{\Isolated}[1]{#1^{\circ}}
+\DeclareMathOperator{\Graft}{\Op{graft}}
+\DeclarePairedDelimiterX{\GraftSyntax}[2]{[}{]}{#2 \delimsize\vert #1}
 
 \newcommand*{\MkCont}[2]{#1\mathbin{\triangleleft}#2}
 \DeclareMathOperator{\Sh}{\mathsf{Sh}}
@@ -463,16 +465,16 @@ We observe that we can replicate the classical behaviour only when \( a_0 \) is 
 \begin{problem}
   For types \( A \) and \( B \), construct a function
   \[
-    \Op{graft} : \prod_{\Isolated{a} : \Isolated{A}}
+    \Graft : \prod_{\Isolated{a} : \Isolated{A}}
       \big((A \setminus \Isolated{a} \to B) \times B \big)
         \to
       (A \to B)
   \]
   \begin{construction}
     Let \( \Isolated{a} : \Isolated{A} \), \( f : A \setminus \Isolated{a} \to B \) and \( b_0 : B \).
-    Decide equality with \( \Isolated{a} \) to define \( \Op{graft}_{\Isolated{a}}(f, b_0) : A \to B \) as follows:
+    Decide equality with \( \Isolated{a} \) to define \( \Graft_{\Isolated{a}}(f, b_0) : A \to B \) as follows:
     \[
-      \Op{graft}_{\Isolated{a}}(f, b_0) \DefEq
+      \Graft_{\Isolated{a}}(f, b_0) \DefEq
       \lambda a.\,
       \begin{cases}
         f(a, h) & \text{if}\ (h : \Isolated{a} \neq a) \\
@@ -482,10 +484,13 @@ We observe that we can replicate the classical behaviour only when \( a_0 \) is 
     \]
   \end{construction}
 \end{problem}
+
+If \( \Isolated{a} : \Isolated{A} \) is understood from context, write \( \GraftSyntax{f}{b} \DefEq \Graft_{\Isolated{a}}(f, b) \).
+
 \begin{proposition}\label{graft-equiv}
   For all \( \Isolated{a} : \Isolated{A} \),
   \(
-    \Op{graft}_{\Isolated{a}} :
+    \Graft_{\Isolated{a}} :
     \big((A \setminus \Isolated{a} \to B) \times B \big)
       \simeq
     (A \to B)
@@ -710,10 +715,26 @@ together with its forgetful map \( \Op{El} \DefEq \Op{fst} : \Op{FinSet} \to \Ty
   hence
   \(
     \cramped{
-      \Op{chain}_{F,G} \DefEq
+      \Op{chain}_{F,G}^{\Sh} \DefEq
         \Op{\Sigma}(\Op{id}, \SigmaIsolate_{P_s,Q_{f(\shortminus)}}) \circ \Op{chain}^{\Op{left}}_{F,G}
     }
   \).
+
+  To construct the equivalence on positions,
+  let \( s : S \), \( p_0 : \Isolated{P_s} \), \( f : P_s \setminus p_0 \to T \), \( t : T \) and \( q_0 : \Isolated{Q_t} \).
+  Our goal becomes to construct an equivalence
+  \[
+      \big(
+        \sum_{p : P_s} Q_{\GraftSyntax{f}{t}(p)}
+      \big) \setminus (p_0 , q_0)
+    \simeq
+      \big(
+        \smashoperator{\sum_{p : P_s \setminus p_0}} Q_{f(p)}
+      \big)
+        +
+      (Q_t \setminus q_0),
+  \]
+  which we obtain from \autoref{is-equiv-sigma-remove}.
 \end{construction}
 
 \begin{theorem}
