@@ -634,6 +634,20 @@ The derivative acts on cartesian morphisms.
   \end{itemize}
 \end{proposition}
 
+Let \( \Op{FinSet} \DefEq \sum_{X : \Type} \exists n : \mathbb{N}.\, X \simeq \Op{Fin}(n) \) be the universe of Bishop-finite sets,
+together with its forgetful map \( \Op{El} \DefEq \Op{fst} : \Op{FinSet} \to \Type \).
+\begin{definition}
+  The (large) container of \emph{bags} is
+  \( \Op{Bag} \DefEq (\MkCont{\Op{FinSet}}{\Op{El}}) \).
+\end{definition}
+
+\begin{proposition}
+  The bag-container is a fixed-point of deriviation:
+  there is an equivalence \( \CartIso{\Der{\Op{Bag}}}{\Op{Bag}} \).
+\end{proposition}
+
+\subsection{The Chain Rule}
+
 \begin{problem}[note={The lax chain rule}]\label{lax-chain-rule}
   For any two containers \( F, G \), define a morphism
   \[
