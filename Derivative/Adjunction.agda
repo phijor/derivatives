@@ -75,12 +75,12 @@ zig F =
   (∂ (F ⊗Id) ⊗Id) ⊸⟨ counit (F ⊗Id) ⟩
   F ⊗Id           ⊸∎
 
-zig≡ : (F : Container ℓ ℓ) → zig F ≡ id (F ⊗Id)
+zig≡ : (F : Container ℓ ℓ) → [ unit F ]⊗Id ⋆ counit (F ⊗Id) ≡ id (F ⊗Id)
 zig≡ F = Cart≡ refl (funExt pos-path) module zig≡ where
   opaque
     unfolding isIsolatedRespectEquiv
 
-    pos-path : ∀ s → (idEquiv _ ∙ₑ counit-pos (F ⊗Id) s nothing isIsolatedNothing) ∙ₑ maybe-equiv (unit-pos F (s .fst)) ≡ idEquiv _
+    pos-path : ∀ s → (counit-pos (F ⊗Id) s nothing isIsolatedNothing) ∙ₑ maybe-equiv (unit-pos F (s .fst)) ≡ idEquiv _
     pos-path s = equivExt λ where
       (just p) → refl′ (just p)
       nothing → refl′ nothing
@@ -91,7 +91,7 @@ zag G =
   ∂ (∂ G ⊗Id) ⊸⟨ ∂[ counit G ] ⟩
   ∂ G         ⊸∎
 
-zag≡ : (G : Container ℓ ℓ) → zag G ≡ id (∂ G)
+zag≡ : (G : Container ℓ ℓ) → unit (∂ G) ⋆ ∂[ counit G ] ≡ id (∂ G)
 zag≡ G = Cart≡ (funExt shape-path) (funExt λ ∂s → equivExt (pos-path ∂s)) module zag≡ where
   shape-path : (s : Σ[ s ∈ Shape G ] Pos G s °) → ∂[ counit G ] .shape (unit-shape (∂ G) s) ≡ s
   shape-path (s , (p₀ , _)) = ΣPathP λ where
@@ -110,3 +110,34 @@ zag≡ G = Cart≡ (funExt shape-path) (funExt λ ∂s → equivExt (pos-path �
           ≡⟨⟩
         p
           ∎
+
+cart-Iso : (F G : Container ℓ ℓ) → Iso (Cart (F ⊗Id) G) (Cart F (∂ G))
+cart-Iso F G = go where
+  Φ : (f : Cart (F ⊗Id) G) → Cart F (∂ G)
+  Φ f = unit F ⋆ ∂[ f ]
+
+  Ψ : (g : Cart F (∂ G)) → Cart (F ⊗Id) G
+  Ψ g = [ g ]⊗Id ⋆ counit G
+
+  rinv : section Φ Ψ
+  rinv g =
+    unit F ⋆ ∂[ [ g ]⊗Id ⋆ counit G ]
+      ≡⟨ {! !} ⟩
+    unit F ⋆ (∂[ [ g ]⊗Id ] ⋆ ∂[ counit G ])
+      ≡⟨ {! !} ⟩
+    (unit F ⋆ ∂[ [ g ]⊗Id ]) ⋆ ∂[ counit G ]
+      ≡⟨ {! !} ⟩
+    (g ⋆ unit (∂ G)) ⋆ ∂[ counit G ]
+      ≡⟨ {! !} ⟩
+    g ⋆ (unit (∂ G) ⋆ ∂[ counit G ])
+      ≡⟨ cong (g ⋆_) (zag≡ G) ⟩
+    g ⋆ id (∂ G)
+      ≡⟨ {! !} ⟩
+    g
+      ∎
+
+  go : Iso _ _
+  go .Iso.fun = Φ
+  go .Iso.inv = Ψ
+  go .Iso.rightInv = rinv
+  go .Iso.leftInv = {! !}

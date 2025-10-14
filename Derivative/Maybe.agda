@@ -4,8 +4,7 @@ open import Derivative.Prelude
 open import Derivative.Isolated
 open import Derivative.Decidable as Dec
 open import Derivative.Remove
-
-open import Cubical.Data.Sum as Sum using (_⊎_ ; inl ; inr)
+open import Derivative.Sum as Sum using (_⊎_ ; inl ; inr)
 
 private
   variable
@@ -27,6 +26,18 @@ nothing≢just nothing≡just = Sum.⊎Path.encode _ _ nothing≡just .lower
 isIsolatedNothing : isIsolated {A = Maybe A} nothing
 isIsolatedNothing (just a) = no nothing≢just
 isIsolatedNothing nothing = yes refl
+
+nothing° : (Maybe A) °
+nothing° .fst = nothing
+nothing° .snd = isIsolatedNothing
+
+isIsolatedJust : ∀ {a : A} → isIsolated a → isIsolated (the (Maybe A) $ just a)
+isIsolatedJust {a = a} a≟_ (just b) = Dec.map (cong just) (_∘ Sum.inlInj) (a≟ b)
+isIsolatedJust {a = a} a≟_ nothing = no (nothing≢just ∘ sym)
+
+just° : A ° → (Maybe A) °
+just° (a , a≟_) .fst = just a
+just° (a , a≟_) .snd = isIsolatedJust a≟_
 
 remove-nothing : Maybe A ∖ nothing → A
 remove-nothing ((just a) , _) = a

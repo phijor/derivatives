@@ -14,7 +14,7 @@ open import Derivative.Sum as Sum using (_⊎_ ; inl ; inr)
 
 
 open import Cubical.Data.Sigma
-open import Cubical.Foundations.Equiv.Properties using (equivAdjointEquiv ; hasRetract ; hasSection)
+open import Cubical.Foundations.Equiv.Properties using (equivAdjointEquiv ; hasRetract ; hasSection ; congEquiv)
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Path using (toPathP⁻)
 open import Cubical.Foundations.Transport using (subst⁻ ; subst⁻-filler)
@@ -111,6 +111,17 @@ opaque
       eqv : (b ≡ equivFun e a) ≃ (invEq e b ≡ a)
       eqv = symEquiv ∙ₑ invEquiv (equivAdjointEquiv e) ∙ₑ symEquiv
 
+  isIsolatedPreserveEquiv : (e : A ≃ B) → (a : A) → isIsolated a → isIsolated (equivFun e a)
+  isIsolatedPreserveEquiv e a isolated b = EquivPresDec (equivAdjointEquiv e) (isolated (invEq e b))
+
+  isIsolatedPreserveEquiv' : (e : A ≃ B) → (a : A) → isIsolated (equivFun e a) → isIsolated a
+  isIsolatedPreserveEquiv' e a isolated a′ = EquivPresDec (invEquiv (congEquiv e)) (isolated (equivFun e a′))
+
+IsolatedSubstEquiv : (e : A ≃ B) → A ° ≃ B °
+IsolatedSubstEquiv e = Σ-cong-equiv e lemma where
+  lemma : ∀ a → isIsolated a ≃ isIsolated (equivFun e a)
+  lemma a = propBiimpl→Equiv (isPropIsIsolated _) (isPropIsIsolated _) (isIsolatedPreserveEquiv e a) (isIsolatedPreserveEquiv' e a)
+
 opaque
   EmbeddingReflectIsolated : (f : A → B) → isEmbedding f → ∀ {a} → isIsolated (f a) → isIsolated a
   EmbeddingReflectIsolated f emb-f {a} isolated-fa a′ =
@@ -176,6 +187,12 @@ opaque
   isIsolatedTransport : (a : A) (p : A ≡ B) → isIsolated a → isIsolated (transport p a)
   isIsolatedTransport a = J (λ B p → isIsolated a → isIsolated (transport p a)) λ where
     isolated-a a′ → subst (λ - → Dec (- ≡ a′)) (sym $ transportRefl a) (isolated-a a′)
+
+  isIsolatedSubst : (B : A → Type ℓ) {x y : A} (p : x ≡ y)
+    → {b : B x}
+    → isIsolated b
+    → isIsolated (subst B p b)
+  isIsolatedSubst B p {b} = isIsolatedTransport b (cong B p)
 
 isProp→isIsolated : isProp A → (a : A) → isIsolated a
 isProp→isIsolated prop-A a b = yes $ prop-A a b

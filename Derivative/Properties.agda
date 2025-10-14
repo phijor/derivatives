@@ -88,3 +88,13 @@ module _ (F G : Container ℓ ℓ) where
   prod-rule .Equiv.pos = uncurry λ where
     (s , t) (inl p , iso-p) → remove-left-equiv (isIsolatedFromInl iso-p)
     (s , t) (inr q , iso-q) → remove-right-equiv (isIsolatedFromInr iso-q)
+
+module _ {Ix : Type ℓ} (F : Ix → Container ℓ ℓ) where
+  ∑ : Container ℓ ℓ
+  ∑ .Shape = Σ[ ix ∈ Ix ] F ix .Shape
+  ∑ .Pos (ix , s) = F ix .Pos s
+
+module _ {Ix : Type ℓ} (F : Ix → Container ℓ ℓ) where
+  sum'-rule : Equiv (∂ (∑ F)) (∑ (∂ ∘ F))
+  sum'-rule .Equiv.shape = Σ-assoc-≃
+  sum'-rule .Equiv.pos ((ix , s) , p , _) = idEquiv $ F ix .Pos s ∖ p

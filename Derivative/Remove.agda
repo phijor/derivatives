@@ -4,7 +4,7 @@ open import Derivative.Prelude
 open import Derivative.Decidable
 open import Derivative.Sum
 
-open import Cubical.Foundations.Equiv.Properties using (preCompEquiv ; equivAdjointEquiv)
+open import Cubical.Foundations.Equiv.Properties using (preCompEquiv ; equivAdjointEquiv ; congEquiv)
 open import Cubical.Data.Nat.Base
 open import Cubical.Data.Sigma
 open import Cubical.Data.Unit as Unit using (Unit*)
@@ -33,6 +33,9 @@ RemoveRespectEquiv b e = Σ-cong-equiv e neq-equiv module RemoveRespectEquiv whe
   opaque
     neq-equiv : ∀ a → (invEq e b ≢ a) ≃ (b ≢ equivFun e a)
     neq-equiv a = preCompEquiv $ symEquiv ∙ₑ invEquiv (equivAdjointEquiv e) ∙ₑ symEquiv
+
+RemoveRespectEquiv' : (a : A) (e : A ≃ B) → (A ∖ a) ≃ B ∖ equivFun e a
+RemoveRespectEquiv' a e = Σ-cong-equiv e λ a → neqCongEquiv (congEquiv e)
 
 isProp→isEmptyRemove : isProp A → ∀ a₀ → ¬ (A ∖ a₀)
 isProp→isEmptyRemove is-prop a₀ (a , a₀≢a) = a₀≢a (is-prop a₀ a)

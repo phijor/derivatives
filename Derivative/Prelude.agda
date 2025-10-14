@@ -164,5 +164,9 @@ isOfHLevelSucΣSndProp : ∀ {ℓB} {B : A → Type ℓB} (n : HLevel)
   → isOfHLevel (suc n) (Σ A B)
 isOfHLevelSucΣSndProp n is-trunc-A is-prop-B = isOfHLevelΣ (suc n) is-trunc-A λ a → isProp→isOfHLevelSuc n (is-prop-B a)
 
+Σ-swap-fst-≃ : ∀ {ℓA ℓB ℓC} {A : Type ℓA} {B : Type ℓB} {C : A → B → Type ℓC}
+  → (Σ[ a ∈ A ] Σ[ b ∈ B ] C a b) ≃(Σ[ b ∈ B ] Σ[ a ∈ A ] C a b)
+Σ-swap-fst-≃ = strictEquiv (λ (a , b , c) → (b , a , c)) (λ (b , a , c) → (a , b , c))
+
 hSet≡ : ∀ {X Y : hSet ℓ} → ⟨ X ⟩ ≡ ⟨ Y ⟩ → X ≡ Y
 hSet≡ = Σ≡Prop (λ X → isPropIsSet)
