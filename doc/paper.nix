@@ -15,6 +15,7 @@
         inherit (texlive)
           scheme-medium
 
+          bussproofs
           csquotes
           tikz-cd
           todonotes

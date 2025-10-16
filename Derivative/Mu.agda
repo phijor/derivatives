@@ -8,12 +8,12 @@ open import Derivative.Decidable as Dec
 open import Derivative.Isolated
 open import Derivative.Remove
 
-open import Cubical.Data.Unit.Base using (tt) renaming (Unit to 𝟙)
+open import Cubical.Data.Unit as Unit using (tt) renaming (Unit to 𝟙)
 open import Cubical.Data.Bool.Base using (Bool* ; true ; false)
 open import Cubical.Data.Sigma
 open import Cubical.Data.W.W
 open import Cubical.Data.Empty as Empty using (⊥*) renaming (⊥ to 𝟘)
-open import Cubical.Foundations.Transport using (substEquiv ; subst⁻)
+open import Cubical.Foundations.Transport using (substEquiv ; substEquiv' ; subst⁻)
 
 private
   pattern true* = lift true
@@ -240,6 +240,16 @@ record Equiv (F G : Container ℓ Ix) : Type ℓ where
   inv : Equiv G F
   inv .shape = invEquiv shape
   inv .pos i t = invEquiv $ substEquiv (G .Pos i) (sym (secEq shape t)) ∙ₑ pos i (invEq shape t)
+
+module _ where
+  private
+    variable
+      F G H : Container ℓ Ix
+
+  _⊸≃⟨_⟩_ : (F : Container ℓ Ix) → (Equiv F G) → (G ⊸ H) → (F ⊸ H)
+  _⊸≃⟨_⟩_ {G} {H} F e g = _⋆_ {F = F} {G = G} {H = H} (Equiv.as-⊸ e) g
+
+  infixr 0 _⊸≃⟨_⟩_
 
 _∘[_]_ : (F : Container ℓ Ix) → (i : Ix) → (G : Container ℓ (Ix ∖ i)) → Container ℓ (Ix ∖ i)
 _∘[_]_ {Ix} F i G = shape ◁ pos module ∘[-] where
@@ -519,6 +529,115 @@ binary-chain-rule F G = [ shape ⊸ pos ] module binary-chain-rule where
   pos tt (inl ((s , p°) , f)) = pos₀ s p° f
   pos tt (inr (((s , p°) , f) , t , q°)) = pos₁ s p° f t q°
 
+binary-chain-rule' :
+  ∀ (F : Container _ 𝟚)
+  → (G : Container _ 𝟙)
+  → ((∂ ₀° F [ G ]) ⊕ ((∂ ₁° F [ G ]) ⊗ ∂ tt° G)) ⊸ ∂ tt° (F [ G ])
+binary-chain-rule' F G = goal module binary-chain-rule' where
+  open Container F renaming (Shape to S ; Pos to P)
+  open Container G renaming (Shape to T ; Pos to Q')
+
+  Q = Q' tt
+
+
+  L : Container _ _
+  L = (∂ ₀° F [ G ]) ⊕ ((∂ ₁° F [ G ]) ⊗ ∂ tt° G)
+
+  R : Container _ _
+  R = ∂ tt° (F [ G ])
+
+  U₁ : Type _
+  U₁ = (Σ[ s ∈ S ] Σ[ f ∈ (P ₁ s → T) ] ((P ₀ s °) ⊎ (Σ[ (p , _) ∈ P ₁ s ° ] (Q (f p) °))))
+
+  f₁ :
+    ((Σ[ (s , _) ∈ Σ[ s ∈ S ] P ₀ s ° ] (P ₁ s → T)) ⊎ ((Σ[ (s , p , _) ∈ Σ[ s ∈ S ] P ₁ s ° ] (P ₁ s ∖ p → T)) × (Σ[ t ∈ T ] Q t °)))
+      ≃
+    U₁
+  f₁ =
+    ((Σ[ (s , _) ∈ Σ[ s ∈ S ] P ₀ s ° ] (P ₁ s → T)) ⊎ ((Σ[ (s , p , _) ∈ Σ[ s ∈ S ] P ₁ s ° ] (P ₁ s ∖ p → T)) × (Σ[ t ∈ T ] Q t °)))
+      ≃⟨ ⊎-equiv Σ-assoc-≃ shuffle-right ⟩
+    ((Σ[ s ∈ S ] P ₀ s ° × (P ₁ s → T)) ⊎ (Σ[ s ∈ S ] Σ[ (p , _) ∈ P ₁ s ° ] Σ[ (_ , t) ∈ (P ₁ s ∖ p → T) × T ] (Q t °)))
+      ≃⟨ invEquiv Σ-⊎-snd-≃ ⟩
+    Σ[ s ∈ S ] (P ₀ s ° × (P ₁ s → T)) ⊎ (Σ[ (p , _) ∈ P ₁ s ° ] Σ[ (_ , t) ∈ (P ₁ s ∖ p → T) × T ] (Q t °))
+      ≃⟨ Σ-cong-equiv-snd (λ s → ⊎-right-≃ $ Σ-cong-equiv-snd λ p° → invEquiv $ Σ-cong-equiv-fst $ unstitchEquiv p°) ⟩
+    Σ[ s ∈ S ] (P ₀ s ° × (P ₁ s → T)) ⊎ (Σ[ (p , _) ∈ P ₁ s ° ] Σ[ f ∈ (P ₁ s → T) ] (Q (f p) °))
+      ≃⟨ Σ-cong-equiv-snd (λ s → ⊎-equiv Σ-swap-≃ Σ-swap-fst-≃) ⟩
+    Σ[ s ∈ S ] ((P ₁ s → T) × P ₀ s °) ⊎ (Σ[ f ∈ (P ₁ s → T) ] Σ[ (p , _) ∈ P ₁ s ° ] (Q (f p) °))
+      ≃⟨ Σ-cong-equiv-snd (λ s → invEquiv Σ-⊎-snd-≃) ⟩
+    Σ[ s ∈ S ] Σ[ f ∈ (P ₁ s → T) ] ((P ₀ s °) ⊎ (Σ[ (p , _) ∈ P ₁ s ° ] (Q (f p) °)))
+      ≃∎
+      where
+        shuffle-right : _ ≃ _
+        shuffle-right = strictEquiv
+          (λ (((s , p°) , f) , (t , q)) → (s , p° , (f , t) , q))
+          (λ (s , p° , (f , t) , q) → (((s , p°) , f) , (t , q)))
+
+  R₁ : 𝟙 → U₁ → Type
+  R₁ i u₁ = L .Pos i (invEq f₁ u₁)
+
+  H₁ : Container _ _
+  H₁ .Shape = U₁
+  H₁ .Pos = R₁
+
+  U₂ : Type _
+  U₂ = Σ[ s ∈ S ] Σ[ f ∈ (P ₁ s → T) ] (P ₀ s °) ⊎ ((Σ[ p ∈ P ₁ s ] Q (f p)) °)
+
+  f₂ : U₂ ≃ (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P ₁ s → T) ] (P ₀ s ⊎ (Σ[ p₁ ∈ P ₁ s ] Q (f p₁))) °)
+  f₂ = invEquiv Σ-assoc-≃ ∙ₑ Σ-cong-equiv-snd (λ { (s , f) → invEquiv IsolatedSumEquiv })
+
+  R₂ : 𝟙 → U₂ → Type
+  R₂ i u₂ = R .Pos i (equivFun f₂ u₂)
+
+  H₂ : Container _ _
+  H₂ .Shape = U₂
+  H₂ .Pos = R₂
+
+  module _ (s : S) (f : P ₁ s → T) where
+    η₀ : ((p₀ , _) : P ₀ s °)
+      → (P ₀ s ⊎ (Σ[ p₁ ∈ P ₁ s ] Q (f p₁))) ∖ (inl p₀)
+          ≃
+        ((P ₀ s ∖ p₀) ⊎ (Σ[ p₁ ∈ P ₁ s ] Q (f p₁)))
+    η₀ (p₀ , is-isolated-p₀) = invEquiv (remove-left-equiv is-isolated-p₀)
+
+    η₁ : ((p₁ , _) : P ₁ s °) ((q , _) : Q (f p₁) °)
+      → (P ₀ s ⊎ (Σ[ p ∈ P ₁ s ] Q (f p))) ∖ inr (p₁ , q)
+        ≃
+        (P ₀ s ⊎ (Σ[ (p , _) ∈ (P ₁ s) ∖ p₁ ] Q (f p))) ⊎ (Q (f p₁) ∖ q)
+    η₁ (p₁ , is-isolated-p₁) (q , is-isolated-q)
+      using is-isolated-pq ← isIsolatedΣ is-isolated-p₁ is-isolated-q
+      =
+      (P ₀ s ⊎ (Σ[ p ∈ P ₁ s ] Q (f p))) ∖ inr (p₁ , q)
+        ≃⟨ invEquiv (remove-right-equiv is-isolated-pq) ⟩
+      (P ₀ s ⊎ ((Σ[ p ∈ P ₁ s ] Q (f p)) ∖ (p₁ , q)))
+        ≃⟨ ⊎-right-≃ $ invEquiv $ isIsolatedFst→Σ-remove-equiv is-isolated-p₁ ⟩
+      P ₀ s ⊎ ((Σ[ (p , _) ∈ (P ₁ s) ∖ p₁ ] Q (f p)) ⊎ (Q (f p₁) ∖ q))
+        ≃⟨ invEquiv ⊎-assoc-≃ ⟩
+      (P ₀ s ⊎ (Σ[ (p , _) ∈ (P ₁ s) ∖ p₁ ] Q (f p))) ⊎ (Q (f p₁) ∖ q)
+        ≃∎
+
+  η : H₁ ⊸ H₂
+  η ._⊸_.shape = Σ-map-snd λ s → Σ-map-snd λ f → ⊎-map-right (Σ-isolate (P ₁ s) (Q ∘ f))
+  η ._⊸_.pos i (s , f , inl p₀) = η₀ s f p₀
+  η ._⊸_.pos i (s , f , inr (p₁ , q)) = η₁ s f p₁ q
+
+  e₁ : Equiv L H₁
+  e₁ .Equiv.shape = f₁
+  e₁ .Equiv.pos i u₁ = substEquiv' {A = Shape L} (L .Pos i) cancel where
+    opaque
+      cancel : invEq f₁ (equivFun f₁ u₁) ≡ u₁
+      cancel = retEq f₁ u₁
+
+  e₂ : Equiv H₂ R
+  e₂ .Equiv.shape = f₂
+  e₂ .Equiv.pos i u₂ = idEquiv (Pos H₂ i u₂)
+
+  goal : L ⊸ R
+  goal =
+    L   ⊸≃⟨ e₁ ⟩
+    H₁  ⊸⟨ η ⟩
+    H₂  ⊸≃⟨ e₂ ⟩
+    R   ⊸∎
+
 {-
 chain-rule : ∀ {Ix : Type ℓ}
   → (F : Container ℓ (Maybe Ix))
@@ -582,51 +701,86 @@ chain-rule'' {Ix} F G (j , j≟_) = [ shape ⊸ {! !} ] module chain-rule'' wher
 ↑ F .Pos (just i) = F .Pos i
 ↑ F .Pos nothing _ = ⊥*
 
-Id : Container ℓ-zero Ix
-Id .Shape = 𝟙
-Id .Pos i _ = 𝟙
+π₁ : Container _ 𝟚
+π₁ .Shape = 𝟙
+π₁ .Pos ₀ _ = 𝟘
+π₁ .Pos ₁ _ = 𝟙
+
+subst-⊗-right : (F G : Container _ 𝟙) → Equiv (((↑ F) ⊗ π₁) [ G ]) (F ⊗ G)
+subst-⊗-right F G = [ shape ◁≃ {! !} ] where
+  open Container F renaming (Shape to S ; Pos to P)
+  open Container G renaming (Shape to T ; Pos to Q)
+
+  shape : {! !} ≃ S × T
+  shape = {! !}
+
+-- This is well-behaved for isolated (i : Ix):
+π : (i : Ix) → Container ℓ Ix
+π i .Shape = Lift 𝟙
+π i .Pos j _ = i ≡ j
 
 μ-rule : ∀ (F : Container _ 𝟚) →
-  μ ((↑ (∂ ₀° F [ μ F ])) ⊕ ((↑ (∂ ₁° F [ μ F ])) ⊗ Id))
+  μ ((↑ (∂ ₀° F [ μ F ])) ⊕ ((↑ (∂ ₁° F [ μ F ])) ⊗ π₁))
     ⊸
   ∂ tt° (μ F)
-μ-rule F = μ-rec F′ _ goal where
+μ-rule F = μ-rec G (∂ tt° (μ F)) goal where
   open Container F renaming (Shape to S ; Pos to P)
 
-  F′ : Container _ 𝟚
-  F′ = (↑ (∂ ₀° F [ μ F ])) ⊕ ((↑ (∂ ₁° F [ μ F ])) ⊗ Id)
+  G : Container _ 𝟚
+  G = (↑ (∂ ₀° F [ μ F ])) ⊕ ((↑ (∂ ₁° F [ μ F ])) ⊗ π₁)
+
+  G[_] : Container _ 𝟙 → Container _ 𝟙
+  G[ Y ] = (∂ ₀° F [ μ F ]) ⊕ ((∂ ₁° F [ μ F ]) ⊗ Y)
+
+  G-subst : ∀ Y → Equiv (G [ Y ]) (G[ Y ])
+  G-subst Y = [ shape ◁≃ pos ] where
+    shape-Iso : Iso (Shape (G [ Y ])) (Shape G[ Y ])
+    shape-Iso .Iso.fun (inl s , _) = inl s
+    shape-Iso .Iso.fun (inr (s , _) , f) = inr (s , f (inr tt))
+    shape-Iso .Iso.inv (inl s) = inl s , λ ()
+    shape-Iso .Iso.inv (inr (s , y)) = inr (s , tt) , λ { (inr tt) → y }
+    shape-Iso .Iso.rightInv (inl s) = refl
+    shape-Iso .Iso.rightInv (inr (s , y)) = refl
+    shape-Iso .Iso.leftInv (inl s , 0→Y) = ΣPathP (refl , λ { i () })
+    shape-Iso .Iso.leftInv (inr (s , tt) , f) = ΣPathP (refl , funExt λ { (inr tt) → refl′ (f _) })
+
+    shape = isoToEquiv shape-Iso
+
+    pos₀ : (s : S) (p° : P ₀ s °) (f₁ : P ₁ s → W S (P ₁)) (f₀ : ⊥* → Shape Y)
+      →
+        (P ₀ s - p°) ⊎ (Σ[ p ∈ P ₁ s ] Wᴰ S (P ₀) (P ₁) (f₁ p))
+          ≃
+        ((P ₀ s - p°) ⊎ (Σ[ p ∈ P ₁ s ] Wᴰ S (P ₀) (P ₁) (f₁ p))) ⊎ (Σ[ x ∈ ⊥* ] Pos Y tt (f₀ x))
+    pos₀ _ _ _ _ = ⊎-empty-right (λ ())
+
+    pos₁ : (s : S) (p° : P ₁ s °) (f₁ : (P ₁ s - p°) → W S (P ₁)) (f₀ : Lift 𝟘 ⊎ 𝟙 → Shape Y)
+      → (P ₀ s ⊎ (Σ[ p ∈ (P ₁ s) - p° ] Wᴰ S (P ₀) (P ₁) (f₁ p))) ⊎ (Pos Y _ (f₀ (inr tt)))
+          ≃
+        ((P ₀ s ⊎ (Σ[ p ∈ (P ₁ s) - p° ] Wᴰ S (P ₀) (P ₁) (f₁ p))) ⊎ 𝟘) ⊎ (Σ[ i ∈ Lift 𝟘 ⊎ 𝟙 ] Pos Y _ (f₀ i))
+    pos₁ s p° f₁ f₀ =
+      let X = P ₀ s
+          W = (Σ[ p ∈ (P ₁ s) - p° ] Wᴰ S (P ₀) (P ₁) (f₁ p))
+          Z : Lift 𝟘 ⊎ 𝟙 → Type _
+          Z i = Pos Y tt (f₀ i)
+      in
+      (X ⊎ W) ⊎ (Z (inr tt))
+        ≃⟨ ⊎-left-≃ (⊎-empty-right λ ()) ⟩
+      ((X ⊎ W) ⊎ 𝟘) ⊎ (Z (inr tt))
+        ≃⟨ ⊎-right-≃ $ invEquiv (Σ-contractFst (isOfHLevelRespectEquiv 0 (⊎-empty-left λ ()) Unit.isContrUnit)) ⟩
+      ((X ⊎ W) ⊎ 𝟘) ⊎ (Σ[ i ∈ Lift 𝟘 ⊎ 𝟙 ] Z i)
+        ≃∎
+
+    pos : (i : 𝟙) → (s : Shape $ G [ Y ]) → Pos G[ Y ] i (equivFun shape s) ≃ Pos (G [ Y ]) i s
+    pos tt (inl ((s , p°) , f₁) , f₀) = pos₀ s p° f₁ f₀
+    pos tt (inr (((s , p°) , f₁) , tt) , f₀) = pos₁ s p° f₁ f₀
 
   F″ : Container _ 𝟙
-  F″ = (∂ ₀° F [ μ F ]) ⊕ ((∂ ₁° F [ μ F ]) ⊗ ∂ tt° (μ F))
+  F″ = G[ ∂ tt° (μ F) ]
 
-  shape-Iso : Iso (Shape (F′ [ ∂ tt° (μ F) ])) (Shape F″)
-  shape-Iso .Iso.fun (inl ∂₀s , _) = inl ∂₀s
-  shape-Iso .Iso.fun (inr (∂₁s , _) , f) = inr (∂₁s , f (inr tt))
-  shape-Iso .Iso.inv (inl ∂₀s) = inl ∂₀s , λ ()
-  shape-Iso .Iso.inv (inr (∂₁s , ∂μs)) = inr (∂₁s , tt) , λ { (inr tt) → ∂μs }
-  shape-Iso .Iso.rightInv (inl ∂₀s) = refl
-  shape-Iso .Iso.rightInv (inr (∂₁s , ∂μs)) = refl
-  shape-Iso .Iso.leftInv (inl ∂₀s , 0→∂μs) = ΣPathP (refl , λ { i () })
-  shape-Iso .Iso.leftInv (inr (∂₁s , tt) , f) = ΣPathP (refl , funExt λ { (inr tt) → refl′ (f _) })
-
-  shape : Shape (F′ [ ∂ tt° (μ F) ]) ≃ Shape F″
-  shape = isoToEquiv shape-Iso
-
-  pos₀ : (s : S) (p° : P ₀ s °) (μs : P ₁ s → Shape (μ F)) (f : ⊥* → Shape (∂ tt° (μ F)))
-    →
-      (P ₀ s - p°) ⊎ (Σ[ p ∈ P ₁ s ] Wᴰ S (P ₀) (P ₁) (μs p))
-        ≃
-      ((P ₀ s - p°) ⊎ (Σ[ p ∈ P ₁ s ] Wᴰ S (P ₀) (P ₁) (μs p))) ⊎ (Σ[ x ∈ ⊥* ] (Pos (μ F) tt (f x .fst)) ∖ f x .snd .fst)
-  pos₀ s p° μs f = ⊎-empty-right (λ ())
-
-  pos : (i : 𝟙) → (s : Shape $ F′ [ ∂ tt° (μ F) ]) → Pos F″ i (equivFun shape s) ≃ Pos (F′ [ ∂ tt° (μ F) ]) i s
-  pos _ (just ((s , p°) , μs) , f) = pos₀ s p° μs f
-  pos _ (inr ∂₁s , f) = {! !}
-
-  goal : (F′ [ ∂ tt° (μ F) ]) ⊸ ∂ tt° (μ F)
+  goal : (G [ ∂ tt° (μ F) ]) ⊸ ∂ tt° (μ F)
   goal =
-    (F′ [ ∂ tt° (μ F) ])
-      ⊸⟨ Equiv.as-⊸ [ shape ◁≃ pos ] ⟩
+    (G [ ∂ tt° (μ F) ])
+      ⊸≃⟨ G-subst (∂ tt° (μ F)) ⟩
     ((∂ ₀° F [ μ F ]) ⊕ ((∂ ₁° F [ μ F ]) ⊗ ∂ tt° (μ F)))
       ⊸⟨ binary-chain-rule F (μ F) ⟩
     ∂ tt° (F [ μ F ])

@@ -3,6 +3,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{mathtools}
+\usepackage{bussproofs}
 \usepackage{csquotes}
 \usepackage{tikz-cd}
 \usepackage{keytheorems}
@@ -25,6 +26,7 @@
   lemma,
   corollary,
   problem,
+  conjecture,
 }[
   style=plain,
   sibling=theorem,
@@ -32,6 +34,12 @@
 \newkeytheorem{definition}[style=definition,sibling=theorem]
 \newkeytheorem{construction}[style=proof,sibling=theorem]
 \newkeytheorem{remark}[style=remark,sibling=theorem]
+
+% A custom tikzcd arrowtip, a lollipop (⊸).
+% See section 4.4 ("Glyph arrow tips") of the tikzcd manual.
+\tikzset{
+  multimap/.tip={Glyph[glyph math command=circ, glyph length=1.03ex, glyph shorten=-0.2ex]},
+}
 
 \title{Derivates of Containers without Decidable Equality}
 \author{Philipp Joram}
@@ -41,6 +49,8 @@
 
 \newcommand*{\Op}[1]{\mathsf{#1}}
 \DeclareMathOperator{\Type}{\mathsf{Type}}
+\DeclareMathOperator{\W}{\mathsf{W}}
+\DeclareMathOperator{\Sup}{\mathsf{sup}}
 \DeclareMathOperator{\Dec}{\mathsf{Dec}}
 \DeclareMathOperator{\DefEq}{\mathrel{\coloneq}}
 \DeclareMathOperator{\JudgeEq}{\mathrel{\doteq}}
@@ -59,8 +69,14 @@
 \DeclareMathOperator{\Sh}{\mathsf{Sh}}
 \DeclareMathOperator{\Ps}{\mathsf{Ps}}
 
-\DeclareMathOperator{\CTimes}{\mathbin{\otimes}}
-\DeclareMathOperator{\CPlus}{\mathbin{\oplus}}
+\NewDocumentCommand{\CTimes}{}{\mathbin{\otimes}}
+\NewDocumentCommand{\CPlus}{}{\mathbin{\oplus}}
+\DeclarePairedDelimiterXPP{\Wk}[1]%
+  {} % pre-code
+  {\langle} % left
+  {\rangle} % right
+  {^{\uparrow}} % post-code
+  {#1} % body
 \newcommand*{\Subst}[2]{#1[#2]}
 
 \NewDocumentCommand{\SimMultiMap}{}{%
@@ -79,8 +95,7 @@
 }
 
 \newcommand*{\Cart}[2]{#1\mathrel{\multimap}#2}
-% \newcommand*{\CartIso}[2]{#1\SimMultiMap#2}
-\DeclareMathOperator{\CartEquiv}{\SimMultiMap}
+\NewDocumentCommand{\CartEquiv}{}{\SimMultiMap}
 \newcommand*{\CartIso}[2]{#1\cong#2}
 
 \DeclareMathOperator{\Cont}{\mathsf{Cont}}
@@ -88,6 +103,7 @@
 
 \NewDocumentCommand{\Der}{}{\partial}
 \NewDocumentCommand{\Id}{}{\mathsf{Id}}
+\NewDocumentCommand{\Proj}{m}{\pi_{#1}}
 
 \DeclareMathOperator{\Inl}{\mathsf{inl}}
 \DeclareMathOperator{\Inr}{\mathsf{inr}}
@@ -401,6 +417,15 @@ We observe that we can replicate the classical behaviour only when \( a_0 \) is 
   and cancel to \( (A + 1) \setminus \Nothing \simeq A \).
 \end{remark}
 
+\begin{problem}\label{sum-remove-equiv}
+  Given \( A, B : \Type \), define equivalences
+  \begin{align*}
+    (A \setminus a_0) + B &\simeq (A + B) \setminus \Inl(a_0) \\
+    A + (B \setminus b_0) &\simeq (A + B) \setminus \Inr(b_0)
+  \end{align*}
+  for isolated points \( a_0 : \Isolated{A} \) and \( b_0 : \Isolated{B} \), respectively.
+\end{problem}
+
 \begin{problem}\label{sigma-remove}
   Let \( A : \Type \) and \( B : A \to \Type \)
   with points \( a_0 : A \) and \( b_0 : B(a_0) \),
@@ -516,6 +541,21 @@ If \( \Isolated{a} : \Isolated{A} \) is understood from context, write \( \Graft
   A cartesian morphism \( (f, u) : \Cart{F}{G} \) is an \emph{equivalence} of containers
   if \( f \) is an equivalence of types.
 \end{definition}
+
+When constructing a morphism \( f : \Cart{F}{G} \), we will oftentimes factor it
+through (equivalent) auxiliary containers
+\begin{equation*}
+  \begin{tikzcd}
+    F \ar[r, -multimap, "f"] & G \\
+    {F'} \ar[r, -multimap, "f'"] & {G'}
+    \ar[from=1-1,to=2-1, -multimap, "\sim"{swap}]
+    \ar[from=2-2,to=1-2, -multimap, "\sim"{swap}]
+  \end{tikzcd}
+\end{equation*}
+This lets us separate the bureaucracy of bringing \( F \) and \( G \) into a comparable shape
+from the act of defining an interesting map \( f' : F' \to G' \).
+As a consequence, \( f \) is an equivalence of containers if and only if \( f' \) is,
+which is often easier to characterize.
 
 \begin{definition}
   Containers and cartesian morphisms form a wild category \( \ContCart \).
@@ -651,6 +691,11 @@ together with its forgetful map \( \Op{El} \DefEq \Op{fst} : \Op{FinSet} \to \Ty
   there is an equivalence \( \CartIso{\Der{\Op{Bag}}}{\Op{Bag}} \).
 \end{proposition}
 
+\begin{proposition}
+  Let \( \Op{Cyc} \) the container of cyclic sets.
+  Then \( \CartIso{\Der{\Op{Cyc}}}{\Op{List}} \).
+\end{proposition}
+
 \subsection{The Chain Rule}
 
 \begin{problem}[note={The lax chain rule}]\label{lax-chain-rule}
@@ -753,7 +798,7 @@ together with its forgetful map \( \Op{El} \DefEq \Op{fst} : \Op{FinSet} \to \Ty
   \[
     \big( \smashoperator{\prod_{F, G : \Cont}} \Op{isEquiv}(\Op{chain}_{F,G}) \big)
       \to
-    \prod_{A : \Type} \Op{Discrete}(A)
+    \smashoperator{\prod_{A : \Type}} \Op{Discrete}(A)
   \]
   \begin{proof}
     First observe that for containers \( F \JudgeEq (\MkCont{S}{P}), G \JudgeEq (\MkCont{T}{Q}) \),
@@ -778,5 +823,285 @@ together with its forgetful map \( \Op{El} \DefEq \Op{fst} : \Op{FinSet} \to \Ty
     The circle \( S^1 \) is provably not discrete: If it were, it would be a set.
   \end{proof}
 \end{corollary}
+
+\subsection{Derivatives of Fixed Points}
+
+If we interpret containers as blueprints for polymorphic types in a single variable,
+we can readily generalize to containers in \( I \) variables, for any \( I : \Type \):
+\[
+  \Cont_{I} \DefEq \sum_{S : \Type} (I \to S \to \Type)
+\]
+Ordinary containers correspond to unary containers \( \Cont_{1} \).
+Substitution generalizes to an operation \( {-}[{-}] : \Cont_{I+1} \to \Cont_{I} \to \Cont_{I} \).
+For any fixed \( F : \Cont_{I+1} \), \( F[-] \) is a wild endofunctor of \( I \)-ary containers.
+We encode inductive types as smallest fixed points of substitution.
+For some \( F : \Cont_2 \), the container \( {\mu F} : \Cont_1 \) comes with a dedicated
+equivalence of containers \( {\mu F} \CartEquiv F \).
+This corresponds to \( F \) satisfying the functional equation
+\[
+  {\mu F}(X) \simeq F(X, {\mu F}(X))
+\]
+Assuming we have access to \( \W \)-types, recall that we can define a (smallest) fixed point container.
+For \( A : \Type \) and \( B : A \to \Type \), \( \W(A, B) : \Type \) has the single constructor
+\[
+  \Sup : \prod_{a : A} (B(a) \to W(A, B)) \to \W(A, B)
+\]
+A cursor to a position into a \( \W(A, B) \)-tree, labelled by some \( C : A \to \Type \) can be defined as an inductive family
+\( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \) with constructors
+\begin{align*}
+  \Op{top} &: \prod_{a : A} \prod_{f : B(a) \to \W(A, B)} C(a) \to \bar{\W}_{A,B,C}(\Sup(s, f)) \\
+  \Op{below} &: \prod_{a : A} \prod_{f : B(a) \to \W(A, B)} \prod_{b : B(a)} \bar{\W}_{A,B,C}(f(b)) \to \bar{\W}_{A,B,C}(\Sup(s, f))
+\end{align*}
+
+
+\begin{definition}
+  Let \( F \JudgeEq (\MkCont{S}{P}) : \Cont_{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \Cont_I \):
+  \begin{align*}
+    S^\mu &\DefEq \W(S, P_{\Nothing}) \\
+    P^\mu_i & \DefEq \bar{\W}_{S,P(\Nothing),P(\Just i)}
+  \end{align*}
+\end{definition}
+\begin{problem}
+  Define an equivalence of containers \( \Op{in}_F : F[{\mu F}] \CartEquiv {\mu F} \).
+\end{problem}
+\begin{problem}\label{mu-rec}
+  Define an induction principle for morphisms out of \( \mu \)-containers:
+  \begin{center}
+    \hspace*{\fill}
+    {
+      \AxiomC{\( F : \Cont_{I+1} \)}
+      \AxiomC{\( G : \Cont_I \)}
+      \AxiomC{\( \alpha : \Cart{F[G]}{G} \)}
+      \TrinaryInfC{\( \Op{rec}_{F}(\alpha) : \Cart{\mu F}{G} \)}
+      \DisplayProof
+    }
+    \hspace*{\fill}
+  \end{center}
+\end{problem}
+
+\begin{definition}[note={Derivative of \( I \)-ary containers}]
+  Let \( F \JudgeEq (\MkCont{S}{P}) : \Cont_I \) and \( i : \Isolated{I} \).
+  The \( i \)th derivative \( {\Der_i}F \DefEq (\MkCont{S'}{P'}) : \Cont_I \) is defined as follows:
+  \begin{align*}
+    S' &\DefEq \sum_{s : S} \Isolated{P_i(s)} \\
+    P'(j, s, p) &\DefEq
+      \begin{cases}
+        P_i(s) \setminus p & \text{if } i = j \\
+        P_j(s) & \text{otherwise}
+      \end{cases}
+  \end{align*}
+\end{definition}
+
+\begin{remark}
+  For an \( I+1 \)-ary container \( F \), the index \( \Nothing : I + 1 \)
+  is always isolated, so we will tacitly write \( \Der{F} \)
+  for \( \Der_{\Nothing}(F) : \Cont_I \).
+\end{remark}
+
+\begin{problem}
+  Construct an action on morphisms
+  \[
+    \Der_{i} : (\Cart{F}{G}) \to (\Cart{\Der_i{F}}{\Der_i{G}})
+  \]
+\end{problem}
+
+\begin{proposition}[note={Lax chain rule for binary containers}]\label{binary-chain-rule}
+  Let \( F : \Cont_2 \) and \( G : \Cont_1 \).
+  There exists a cartesian morphism
+  \[
+    \Op{chain}_{F,G}
+      :
+    \Cart%
+      {{\Der_0{F}}[G] \CPlus \big( {\Der_1{F}}[G] \CTimes \Der{G} \big)}%
+      {\Der{(F[G])}}
+  \]
+  \begin{construction}
+    \renewcommand*{\L}{\Op{L}}
+    \newcommand*{\R}{\Op{R}}
+    Let \( F \JudgeEq (\MkCont{S}{P}) \), \( G \JudgeEq (\MkCont{T}{Q}) \).
+    We define auxiliary containers \( H_1, H_2 \) and factor the morphism into the following:
+    \[
+      \begin{tikzcd}
+        \L \DefEq {{\Der_0{F}}[G] \CPlus \big( {\Der_1{F}}[G] \CTimes \Der{G} \big)}
+          \ar[r, -multimap, "\sim"] &
+        H_1
+          \ar[r, -multimap, "\eta"] &
+        H_2
+          \ar[r, -multimap, "\sim"] &
+        {\Der{(F[G])}}
+        \eqcolon \R
+      \end{tikzcd}
+    \]
+    Following the argument in \autoref{lax-chain-rule} and some type yoga,
+    we see that type of shapes of the container to the left is equivalent to
+    \begin{align}
+      U_1 \DefEq
+        \sum_{s : S} \sum_{f : P_1(s) \to T} \Isolated{P_0(s)} + \smashoperator{\sum_{p : \Isolated{P_1(s)}}} \Isolated{Q(fp)}
+          \label{binary-chain-rule-shape-equiv}
+    \end{align}
+    Let \( f_1 : {\L}_{\Sh} \simeq U_1 \) be this equivalence, and define \( H_1 \DefEq (\MkCont{U_1}{R_1}) \),
+    where \( R_1 \DefEq {\L}_{\Ps} \circ f_1^{\Inv}\).
+
+    On the other side we obtain an equivalence \( f_2 : U_2 \simeq {\R}_{\Sh} \)
+    by distributing \( \Isolated{(-)} \) over binary sums:
+    \begin{align*}
+      U_2
+      &\DefEq
+      \sum_{s : S} \sum_{f : P_1(s) \to T}
+        \Isolated{P_0(s)} + \Isolated{\big( \smashoperator{\sum_{p : P_1(s)}} Q(fp) \big)}
+        \\
+      &\simeq
+      \sum_{s : S} \sum_{f : P_1(s) \to T}
+        \Isolated{\big( P_0(s) + \smashoperator{\sum_{p : {P_1(s)}}} Q(fp) \big)}
+        \\
+      &\simeq
+        {\R}_{\Sh}
+    \end{align*}
+    Again, let \( H_2 \DefEq (\MkCont{U_2}{R_2}) \) where \( R_2 \DefEq {\R}_{\Ps} \circ f_2 \).
+
+    Let us now define \( \eta : H_1 \multimap H_2 \).
+    As in \autoref{lax-chain-rule}, construct \( \eta_{\Sh} : U_1 \to U_2 \) from \( \SigmaIsolate_{P_1(s),Q(f\shortminus)} \).
+    On positions,
+    \(
+      \eta_{\Ps}(u) : R_2(\eta_{\Sh}(u)) \simeq R_1(u)
+    \)
+    is defined by cases, depending on which side of the sum \( u : U_1 \) falls.
+    Let \( s : S \), \( f : P_1(s) \to T \).
+    In case of \( u \JudgeEq (s, f, \Inl{p_0}) \) for \( p_0 : \Isolated{P_0(s)} \), our goal is to give
+    \[
+      ( \Isolated{P_0(s)} + B ) \setminus \Inl(p_0)
+        \simeq
+      ( \Isolated{P_0(s)} \setminus p_0 ) + B
+      \quad
+      (\text{where } B \DefEq {\textstyle \sum_{p : P_1(s)} Q(fp) })
+    \]
+    Since \( p_0 \) is isolated, this is an instance of \autoref{sum-remove-equiv}.
+
+    When \( u \JudgeEq (s, f, \Inr(p_1, q)) \) for some \( p_1 : \Isolated{P_1(s)} \) and \( q : \Isolated{Q(fp)} \),
+    we rewrite as follows:
+    \begin{align}
+      R_2(f_2(s , f , \Inr(p_1, q)))
+        &\mathrel{\JudgeEq}
+          \big( P_0(s) + \smashoperator{\sum_{p : P_1(s)}} Q(f p) \big) \setminus \Inr(p_1, q)
+          \notag
+          \\
+        &\simeq
+          P_0(s) + \big( \smashoperator{\sum_{p : P_1(s)}} Q(f p) \big) \setminus (p_1, q)
+          \label{binary-chain-rule-pos-equiv-sum-minus}
+          \\
+        &\simeq
+          P_0(s) + \smashoperator{\sum_{p : P_1(s) \setminus p}} Q(f p) + (Q(f\,p_1) \setminus q)
+          \label{binary-chain-rule-pos-equiv-sigma-minus}
+          \\
+        &\mathrel{\JudgeEq}
+          R_1(s, f, \Inr{(p_1, q)})
+          \notag
+    \end{align}
+    This again is justified since both \( p_1 \) and \( q \) are isolated points:
+    together, the pair \( (p_1, q) \) is isolated in \( \sum_{p : P_1(s)} Q(f p) \) (cf. \autoref{is-isolated-pair}),
+    thus in \eqref{binary-chain-rule-pos-equiv-sum-minus}, we move it to the right of the sum (\autoref{sum-remove-equiv}),
+    and in \eqref{binary-chain-rule-pos-equiv-sigma-minus} we split the \( \Sigma \)-type (\autoref{is-equiv-sigma-remove}).
+  \end{construction}
+\end{proposition}
+
+For \( F : \Cont_I \), denote by \( \Wk{F} : \Cont_{I+1} \) the inclusion into containers with one more variable.
+For \( i : I \), the \( i \)th projection container is \( \pi_i \DefEq (\MkCont{1}{\mathord{i = {\mathunderscore}}}) : \Cont_I \)
+
+\begin{problem}[note={\( \mu \)-rule}]
+  For \( F : \Cont_2 \), define a cartesian morphism
+  \[
+    \Cart%
+      {
+        \mu(
+          { \Wk{\Der_0{F}[ {\mu F} ]} }
+            \CPlus
+          (
+            \Wk{\Der_1{F}[ {\mu F} ]}
+              \CTimes
+            \Proj{1}
+          )
+        )
+      }%
+      {\Der(\mu F)}
+  \]
+\end{problem}
+  \begin{construction}
+    We define the morphism using the induction principle (\autoref{mu-rec}).
+    Our goal is to provide some
+    \[
+      \alpha : \Cart{G[\Der(\mu F)]}{\Der(\mu F)}
+    \]
+    where \( G \DefEq { \Wk{\Der_0{F}[ {\mu F} ]} } \CPlus ( \Wk{\Der_1{F}[ {\mu F} ]} \CTimes \Proj{1} ) \).
+    First note that substitution into \( G \) replaces \( \Proj{1} \), i.e.\@ there is an equivalence
+    \[
+      \gamma_{\textcolor{cyan}{Y}} :
+      G[\textcolor{cyan}{Y}]
+        \mathrel{\CartEquiv}
+      { \Der_0{F}[ {\mu F} ] } \CPlus ( {\Der_1{F}[ {\mu F} ]} \CTimes \textcolor{cyan}{Y} )
+    \]
+    Equipped with this knowledge, we use the chain rule to define \( \alpha \) as the following composite:
+    \begin{equation*}
+      \begin{tikzcd}[column sep=large]
+        {G[\textcolor{cyan}{\Der(\mu F)}]}
+          &
+        {\Der(\mu F)}
+          \\
+        {
+          { \Der_0{F}[ {\mu F} ] }
+            \CPlus
+          (
+            {\Der_1{F}[ {\mu F} ]}
+              \CTimes
+            \textcolor{cyan}{\Der(\mu F)}
+          )
+        }
+          &
+        \Der(F[\mu F])
+        \ar[from=1-1, to=2-1, -multimap, "\gamma_{\textcolor{cyan}{\Der(\mu F)}}"{swap}, "\sim"]
+        \ar[from=2-1, to=2-2, -multimap, "\Op{chain}_{F,{\mu\!F}}"{swap}]
+        \ar[from=2-2, to=1-2, -multimap, "\Der(\Op{in}_F)"{swap}, "\sim"]
+        \ar[from=1-1, to=1-2, dashed, -multimap, "\alpha"]
+      \end{tikzcd}
+      \qedhere
+    \end{equation*}
+  \end{construction}
+\begin{remark}
+  Written in variable style:
+  \[
+    \Cart%
+      {\mu Y.\, \Der_0{F(\mu F(X))} \CPlus (\Der_1{F(\mu F(X))} \CTimes Y)}%
+      {\Der(\mu Y. F(X, Y))}%
+  \]
+\end{remark}
+
+\begin{conjecture}
+  The \( \mu \)-rule is an equivalence for \emph{any} container.
+  \begin{proof}[Idea]
+    Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
+    The morphism \( \Op{chain}_{F,G} \) is an equivalence if and only if \( \Op{\SigmaIsolate}_{P_1(s),Q(f \shortminus)} \) is an equivalence for all \( s : S \), \( f : P_1(s) \to T \).
+
+    In the \( \mu \)-rule we instantiate the chain rule for \( F \) and \( \mu F \),
+    so the resulting morphism \( \alpha \) is an equivalence of containers iff \( \Op{chain}_{F, {\mu F}} \) is,
+    which is equivalent to
+    \[
+      \prod_{s : S} \prod_{f : P_1(s) \to \W(S, P_1)} \Op{isEquiv}(\SigmaIsolate_{P_1(s), \bar{\W}(S, P_1, P_0) \circ f})
+    \]
+    Curry this\ldots
+    \[
+      \prod\nolimits_{(s , f) : \sum_{s : S} P_1(s) \to \W(S, P_1)} \Op{isEquiv}(\SigmaIsolate_{P_1(s), \bar{\W}(S, P_1, P_0) \circ f})
+    \]
+    Apply \( \Op{in}_{\W} \):
+    \[
+      \prod_{w : \W(S, P_1)} \Op{isEquiv}(\SigmaIsolate_{P_1(s), \bar{\W}(S, P_1, P_0) \circ \Op{sup}^{\Inv}(w)})
+    \]
+    Can we prove (by recursion on \( \W \)) that this is always the case?
+    After all, \( \W \) and \( \bar{\W} \) are just big iterated \( \Sigma \)-types,
+    perhaps we can bootstrap this by characterizing their isolated points.
+
+    If that's not the case, maybe that works exactly for discrete containers?
+
+    Even still, this characterizes when \( \alpha \) is an equivalence; is that preserved by \( \Op{rec} \)?
+  \end{proof}
+\end{conjecture}
 
 \end{document}
