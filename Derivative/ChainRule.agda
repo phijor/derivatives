@@ -13,6 +13,7 @@ open import Cubical.Foundations.Path using (congPathIso)
 open import Cubical.Foundations.Transport using (substEquiv ; isSet-subst ; subst⁻)
 open import Cubical.Data.Sigma
 open import Cubical.Data.Unit
+open import Cubical.Relation.Nullary.HLevels using (isPropDiscrete)
 
 private
   variable
@@ -73,9 +74,29 @@ module _ (F G : Container ℓ ℓ) where
       neq-III : (q : Q (f' p₀)) → (subst⁻ Q (stitch-β p° f) q₀ ≢ q) ≃ (q₀ ≢ subst Q (stitch-β p° f) q)
       neq-III q = neqCongEquiv $ substAdjointEquiv Q (sym $ stitch-β p° f) {x′ = q₀} {y′ = q}
     
+  chain-rule' : Cart (((∂ F) [ G ]) ⊗ ∂ G) (∂ (F [ G ]))
+  chain-rule' .Cart.shape = chain-map
+  chain-rule' .pos (((s , p°) , f) , t , q°) = chain-pos s p° f t q°
+
   chain-rule : Cart (((∂ F) [ G ]) ⊗ ∂ G) (∂ (F [ G ]))
-  chain-rule .Cart.shape = chain-map
-  chain-rule .pos (((s , p°) , f) , t , q°) = chain-pos s p° f t q°
+  chain-rule =
+    (((∂ F) [ G ]) ⊗ ∂ G)
+      ⊸⟨ Equiv→Cart η₀ ⟩
+    H
+      ⊸⟨ η₁ ⟩
+    (∂ (F [ G ]))
+      ⊸∎
+    where
+      H : Container _ _
+      H .Shape = Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p° ∈ (P s) ° ] Q (f (p° .fst)) °)
+      H .Pos ((s , f) , (p° , q°)) = (Σ[ (p , _) ∈ P s - p° ] Q (f p)) ⊎ (Q (f (p° .fst)) - q°)
+
+      η₀ : Equiv (((∂ F) [ G ]) ⊗ ∂ G) H
+      η₀ = Equiv-inv $ Equiv-fst $ invEquiv chain-shape-equiv-left
+
+      η₁ : Cart H (∂ (F [ G ]))
+      η₁ .shape = Σ-map-snd λ (s , f) → Σ-isolate (P s) (Q ∘ f)
+      η₁ .pos ((s , f) , (p° , q°)) = invEquiv (isIsolatedFst→Σ-remove-equiv (p° .snd))
 
 DiscreteContainer : (ℓS ℓP : Level) → Type _
 DiscreteContainer ℓS ℓP = Σ[ F ∈ Container ℓS ℓP ] ∀ s → Discrete (F .Pos s)
