@@ -2,8 +2,10 @@
 
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage[backend=biber,style=alphabetic]{biblatex}
 \usepackage{mathtools}
 \usepackage{bussproofs}
+\usepackage{cmll}
 \usepackage{csquotes}
 \usepackage{tikz-cd}
 \usepackage{keytheorems}
@@ -35,21 +37,27 @@
 \newkeytheorem{construction}[style=proof,sibling=theorem]
 \newkeytheorem{remark}[style=remark,sibling=theorem]
 
-% A custom tikzcd arrowtip, a lollipop (⊸).
-% See section 4.4 ("Glyph arrow tips") of the tikzcd manual.
+% A custom tikzcd arrow tip, a lollipop (⊸).
+% https://tex.stackexchange.com/a/730357
 \tikzset{
-  multimap/.tip={Glyph[glyph math command=circ, glyph length=1.03ex, glyph shorten=-0.2ex]},
+  % See section 4.4 ("Glyph arrow tips") of the tikzcd manual.
+  % multimap/.tip={Glyph[glyph math command=circ, glyph length=1.03ex, glyph shorten=-0.2ex]},
+  multimap/.tip={Circle[open]},
 }
 
 \title{Derivates of Containers without Decidable Equality}
 \author{Philipp Joram}
 \date{\today}
 
+\addbibresource{bibliography.bib}
+
 \DeclareMathSymbol{\shortminus}{\mathbin}{AMSa}{"39}
 
 \newcommand*{\Op}[1]{\mathsf{#1}}
 \DeclareMathOperator{\Type}{\mathsf{Type}}
 \DeclareMathOperator{\W}{\mathsf{W}}
+\DeclareMathOperator{\FinSet}{\Op{FinSet}}
+\DeclareMathOperator{\El}{\Op{El}}
 \DeclareMathOperator{\Sup}{\mathsf{sup}}
 \DeclareMathOperator{\Dec}{\mathsf{Dec}}
 \DeclareMathOperator{\DefEq}{\mathrel{\coloneq}}
@@ -71,6 +79,7 @@
 
 \NewDocumentCommand{\CTimes}{}{\mathbin{\otimes}}
 \NewDocumentCommand{\CPlus}{}{\mathbin{\oplus}}
+\DeclareMathOperator{\CConst}{\Op{K}}
 \DeclarePairedDelimiterXPP{\Wk}[1]%
   {} % pre-code
   {\langle} % left
@@ -95,8 +104,8 @@
 }
 
 \newcommand*{\Cart}[2]{#1\mathrel{\multimap}#2}
-\NewDocumentCommand{\CartEquiv}{}{\SimMultiMap}
-\newcommand*{\CartIso}[2]{#1\cong#2}
+\NewDocumentCommand{\CartEquiv}{}{\multimapboth}
+\newcommand*{\CartIso}[2]{#1 \mathrel{\CartEquiv} #2}
 
 \DeclareMathOperator{\Cont}{\mathsf{Cont}}
 \DeclareMathOperator{\ContCart}{\Cont^{\multimap}}
@@ -104,6 +113,7 @@
 \NewDocumentCommand{\Der}{}{\partial}
 \NewDocumentCommand{\Id}{}{\mathsf{Id}}
 \NewDocumentCommand{\Proj}{m}{\pi_{#1}}
+\DeclareMathOperator{\MuRule}{\Op{\mu-rule}}
 
 \DeclareMathOperator{\Inl}{\mathsf{inl}}
 \DeclareMathOperator{\Inr}{\mathsf{inr}}
@@ -134,7 +144,7 @@
 \section{Isolated Points and How to Remove Them}
 
 This section recalls the notion of isolated points of a type.
-This definition is not new\todo{figure out how to properly cite \texttt{TypeTopology}, or whatever primary source}.
+This definition is not new\todo{figure out how to properly cite \texttt{TypeTopology} \cite{EscardocontributorsTypeTopology}, or whatever primary source}.
 We are going to prove some properties that will be applied on \autoref{derivatives}
 to establish properties of derivatives of containers:
 Many of the laws of derivatives -- after some \emph{type-yoga} -- reduce directly to instances of statements in this section.
@@ -181,7 +191,7 @@ Being an isolated point is stable under equivalence:
   We write \( \Isolated{e} : \Isolated{A} \simeq \Isolated{B} \) for the induced equivalence.
 \end{lemma}
 
-If a map \( f : A \to B \) is not an embedding,
+If a map \( f : A \to B \) is not an equivalence,
 but still behaves \enquote{nicely} on path spaces, we can deduce its behavior on isolated points.
 Recall that \( f \) is an embedding if \( \Op{cong}_f : x = y \to f(x) = f(y) \) is an equivalence,
 written \( f : A \hookrightarrow B \).
@@ -220,7 +230,7 @@ both reflect and create isolated points:
 \end{proposition}
 
 We see that isolated points distribute over sums:
-\begin{problem}
+\begin{problem}\label{isolated-sum-equiv}
   Construct an equivalence \( \Isolated{(A + B)} \simeq \Isolated{A} + \Isolated{B} \).
   \begin{construction}
     Define the obvious forward- and backward maps by case analysis,
@@ -296,49 +306,97 @@ in particular dependent sums.
         \ar[from=2-2, to=1-3, "\simeq"{description}]
       \end{tikzcd}
     \]
-    hence \( \SigmaIsolate \) is an equivalence by the \emph{2-out-of-3}-property.
+    hence \( \SigmaIsolate \) is an equivalence by the \emph{3-for-2}-property.
   \end{proof}
 \end{proposition}
 
-\begin{lemma}\label{is-isolated-fst-discrete}
-  A type \( A : \Type \) is discrete if the following proposition holds:
-  \[
-    % \operatorname{\Op{\Sigma-isolate-fst}}_A :
-     \prod_{B : A \to \Type}
-      \prod_{a : A}
-      \prod_{b : B(a)}
-      \operatorname{\Op{isIsolated}}{(a, b)}
-      \to
-      \operatorname{\Op{isIsolated}} a
-  \]
+\Autoref{is-isolated-pair} tells us that a pair is isolated if its components are.
+It turns out that the converse is true exactly when \( \SigmaIsolate \) is an equivalence:
+
+\begin{lemma}\label{is-equiv-sigma-isolate-iff-isolated-pair}
+  Let \( A : \Type \) and \( B : A \to \Type \).
+  The following are equivalent:
+  \begin{enumerate}
+    \item \( \SigmaIsolate_{A,B} \) is an equivalence.
+    \item For all \( a_0 : A \) and \( b_0 : B(a_0) \),
+      if \( (a_0 , b_0) \) is isolated in \( \Sigma_{A} B \),
+      then both \( a_0 \) and \( b_0 \) are isolated.
+  \end{enumerate}
   \begin{proof}
-    It suffices to show that all points \( a_0 : A \) are isolated.
-    The type of singletons \( \sum_{a : A} a_0 = a \)
-    is contractible, hence all of its points are isolated.
-    We apply the assumption to \( B(a) \DefEq {(a_0 = a)} \),
-    \( a \DefEq a_0 \) and \( b \DefEq \Op{refl}_{a_0} \),
-    from which we conclude that \( a_0 \) is isolated.
+    The first implies the second as follows:
+    Assume that \( \SigmaIsolate_{A,B} \) is an equivalence with inverse
+    \( u : \Isolated{\big(\sum_{a : A} B(a)\big)} \to \sum_{a : \Isolated{A}} \Isolated{B(a)} \).
+    Let \( a_0 : A \), \( b_0 : B(a_0) \), and \( h_0 : \Op{isIsolated}{(a_0, b_0)} \).
+    Apply \( u \) to get some \( y \DefEq u((a_0 , b_0) , h_0) \)
+    with components \( y \JudgeEq ((a, h_a), (b, h_b)) \).
+    Note that \( h_a \) and \( h_b \) are proofs that \( a \) and \( b \) are isolated, respectively.
+    We are done if we can show that \( p : a_0 = a \) and \( \cramped{b_0 =_{p} b} \),
+    since transport along these paths preserves isolated points.
+    Indeed, both \( \SigmaIsolate(y) \JudgeEq ((a, b), \mathunderscore) \) and \( ((a_0, b_0), p_0) \)
+    lie in \( \Op{fiber}_u(y) \), which is necessarily contractible,
+    hence \( (a_0 , b_0) = (a, b) \) as desired.
+
+    In the other direction, the assumption provides the missing properties to define a tentative inverse to \( \SigmaIsolate \);
+    that this is the correct inverse follows as being isolated is a proposition (cf.~\autoref{is-prop-is-isolated}).
   \end{proof}
 \end{lemma}
 
-\begin{proposition}\label{is-equiv-sigma-isolate-discrete}
-  Let \( A : \Type \).
-  If \( \SigmaIsolate_{A,B} \) is an equivalence for all families \( B : A \to \Type \),
-  then \( A \) is discrete.
+% However, globally assuming that isolated points of dependent pairs can be characterized this
+% way is a very classical property.
+% Indeed, we can use the following lemma to show that any type \( A : \Type \) for which this holds,
+% is necessarily discrete:
+% \begin{lemma}\label{is-isolated-fst-discrete}
+%   A type \( A : \Type \) is discrete if the following proposition holds:
+%   \[
+%     % \operatorname{\Op{\Sigma-isolate-fst}}_A :
+%      \prod_{B : A \to \Type}
+%       \prod_{a : A}
+%       \prod_{b : B(a)}
+%       \operatorname{\Op{isIsolated}}{(a, b)}
+%       \to
+%       \operatorname{\Op{isIsolated}} a
+%   \]
+%   \begin{proof}
+%     It suffices to show that all points \( a_0 : A \) are isolated.
+%     The type of singletons \( \sum_{a : A} a_0 = a \)
+%     is contractible, hence all of its points are isolated.
+%     We apply the assumption to \( B(a) \DefEq {(a_0 = a)} \),
+%     \( a \DefEq a_0 \) and \( b \DefEq \Op{refl}_{a_0} \),
+%     from which we conclude that \( a_0 \) is isolated.
+%   \end{proof}
+% \end{lemma}
+
+% \begin{proposition}\label{is-equiv-sigma-isolate-discrete}
+%   Let \( A : \Type \).
+%   If \( \SigmaIsolate_{A,B} \) is an equivalence for all families \( B : A \to \Type \),
+%   then \( A \) is discrete.
+%   \begin{proof}
+%     We prove discreteness of \( A \) by appealing to \autoref{is-isolated-fst-discrete}.
+%     Let \( B : A \to \Type \), \( a_0 : A \), \( b_0 : B(a_0) \).
+%     It remains to show that, if \( (a_0, b_0) \) is isolated, so is \( a_0 \).
+%     But this we can conclude from \autoref{is-equiv-sigma-isolate-pair}.
+%   \end{proof}
+% \end{proposition}
+
+Taking these results together,
+we obtain a way to characterize when a type is discrete in terms of \( \SigmaIsolate \) being an equivalence.
+This will be useful in situations in which we have control over the types at which index \( \SigmaIsolate \).
+
+\begin{proposition}\label{discrete-iff-is-equiv-singl-isolate}
+  For all types \( A \), following are equivalent:
+  \begin{enumerate}
+    \item \( A \) is discrete.
+    \item For all \( a_0 : A \), the map
+      \(
+        \SigmaIsolate_{A, a_0 = {(\shortminus)}} : \sum_{a : \Isolated{A}} \Isolated{(a_0 = a)} \to \Isolated{\Op{singl}(a_0)}
+      \)
+      is an equivalence.
+  \end{enumerate}
   \begin{proof}
-    We prove discreteness of \( A \) by appealing to \autoref{is-isolated-fst-discrete}.
-    Let \( B : A \to \Type \),
-    and denote by \( u : \Isolated{\big(\sum_{a : A} B(a)\big)} \to \sum_{a : \Isolated{A}} \Isolated{B(a)} \)
-    the assumed inverse to \( \SigmaIsolate_{A,B} \).
-    For any \( a_0 : A \), \( b_0 : B(a_0) \), and \( p_0 : \Op{isIsolated}{(a_0, b_0)} \),
-    it remains to show that \( a_0 \) is isolated.
-    Let \( y \DefEq u((a_0 , b_0) , p_0) \),
-    where \( y \JudgeEq ((a, p_a), (b, p_b)) \)
-    and \( p_a \) is proof that \( a : A \) is isolated.
-    We are done if we can show that \( a_0 = a \).
-    We do so by noticing that both \( \SigmaIsolate(y) \JudgeEq ((a, b), \mathunderscore) \) and \( ((a_0, b_0), p_0) \)
-    lie in \( \Op{fiber}_u(y) \), which is necessarily contractible,
-    hence \( a = a_0 \).
+    If \( A \) is discrete, then so are its path types, hence \( \SigmaIsolate_{A, a_0 = (\shortminus)} \) is an equivalence by \autoref{discrete-is-equiv-sigma-isolated}.
+    In the other direction, we can show that every \( a_0 : A \) is isolated:
+    Since \( \Op{singl}(a_0) \) is a contractible type, its center \( (a_0, \Op{refl}) \) is isolated.
+    Thus, by \autoref{is-equiv-sigma-isolate-iff-isolated-pair}, the first component \( a_0 \) must be isolated.
   \end{proof}
 \end{proposition}
 
@@ -358,15 +416,15 @@ and
   \Replace_{a_0}(\Nothing) \DefEq a_0
 \)
 Classically, this map is an isomorphism of sets;
-the inverse simply replaces \( a_0 \) with a fresh element.
-In a univalent setting however, \( a_0 \) might have interesting (higher) loop spaces \( \Omega^n(a_0) \),
+the inverse simply maps \( a_0 \) to some fresh element.
+In a univalent setting however, \( a_0 \) might have interesting (higher) path spaces,
 which too are removed by this construction.
 Consider for example the circle \( S^1 \) with \( \mathsf{base} : S^1 \).
 Then \( S^1 \setminus \mathsf{base} \simeq 0 \),
-hence \( (S^1 \setminus \mathsf{base}) + 1 \not\simeq S^1 \):
+hence \( (S^1 \setminus \mathsf{base}) + 1 \simeq 1 \not\simeq S^1 \):
 removing \( \mathsf{base} \) removes the entire circle, which is \emph{not} contractible.
 
-We observe that we can replicate the classical behaviour only when \( a_0 \) is an isolated point:
+We observe that we can replicate the classical behavior only when \( a_0 \) is an isolated point:
 
 \begin{proposition}\label{isolated-minus-plus-equiv}
   Let \( a_0 : A \).
@@ -647,49 +705,107 @@ The derivative acts on cartesian morphisms.
 
 \subsection{Laws of Derivates}
 
-\begin{proposition}
-  For any proposition \( P \), there is an equivalence of containers
+\begin{proposition}\label{derivative-prop-trunc}
+  Let \( S : \Type \) and \( P : S \to \Op{Prop} \).
+  There is an equivalence of containers
   \[
-    \CartIso{ \Der{(\MkCont{1}{P})} }{ (\MkCont{P}{0}) }
+    { \Der{(\MkCont{S}{P})} }
+      \CartEquiv
+    { (\MkCont{{\textstyle \sum_{S} P }}{0}) }
   \]
+  In particular, we have \( \Der{(\MkCont{1}{P})} \CartEquiv (\MkCont{P}{0}) \) and
+  \( \Der{(\Id)} \CartEquiv (\MkCont{1}{0}) \).
   \begin{proof}
+    Since \( P_s \) is a proposition, we know that \( \Isolated{P_s} \simeq P_s \) and \( P_s \setminus p \simeq 0 \).
+    Thus,
     \begin{align*}
-      \Der{(\MkCont{1}{P})}
-        &\CartEquiv (\MkCont{((\mathunderscore, p) : 1 \times P)}{P \setminus p})
+      \Der{(\MkCont{S}{P})}
+        &\CartEquiv (\MkCont{((s, p) : \textstyle\sum_{s : S} \Isolated{P_s})}{P_s \setminus p})
           \\
-        &\CartEquiv (\MkCont{(p : P)}{P \setminus p})
-          \\
-        &\CartEquiv (\MkCont{P}{0})
+        &\CartEquiv (\MkCont{((s, p) : \textstyle\sum_{s : S} P_s)}{0})
+          \qedhere
     \end{align*}
   \end{proof}
 \end{proposition}
 
-\begin{corollary}
-  \[
-    \CartIso{\Der{(\Id)}}{\operatorname{\mathsf{K}}(1)}
-  \]
-\end{corollary}
-
-
-\begin{proposition}
-  \begin{itemize}
-    \item \( \CartIso{\Der{(\operatorname{\mathsf{K}}(S))}}{\operatorname{\mathsf{K}}(0)} \)
-    \item \( \CartIso{\Der{(F \oplus G)}}{\Der{F} \oplus \Der{G}} \)
-    \item \( \CartIso{\Der{(F \otimes G)}}{(\Der{F} \otimes G) \oplus (F \otimes \Der{G})} \)
-  \end{itemize}
+\begin{proposition}\label{sum-product-rule}\label{sum-rule}\label{leibniz-rule}
+  For containers \( F, G \), the following hold:
+  \begin{enumerate}
+    \item Sum rule: \( {\Der{(F \oplus G)}} \CartEquiv {\Der{F} \oplus \Der{G}} \)
+    \item Leibniz rule: \( {\Der{(F \otimes G)}} \CartEquiv {(\Der{F} \otimes G) \oplus (F \otimes \Der{G})} \)
+  \end{enumerate}
+  \begin{proof}
+    Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
+    Both properties are proved like in the discrete setting
+    (cf.~\cite[{Proposition 6.3 and 6.4}]{AbbottEtAl2005DataDifferentiating}),
+    with one exception:
+    % The sum rule is proved entirely like in the discrete setting \cite[{Proposition~6.3}]{AbbottEtAl2005DataDifferentiating}.
+    % The Leibniz rule almost follows the traditional proof (\cite[{Proposition~6.4}]{AbbottEtAl2005DataDifferentiating}),
+    for the Leibniz rule,
+    one needs to show that isolated points distribute over binary sums in
+    \[
+      \sum_{s : S} \sum_{t : T} \Isolated{(P_s + Q_t)}
+        \simeq
+      \sum_{s : S} \sum_{t : T} \Isolated{P_s} + \Isolated{Q_t}
+    \]
+    This is done via \autoref{isolated-sum-equiv}.
+  \end{proof}
 \end{proposition}
 
-Let \( \Op{FinSet} \DefEq \sum_{X : \Type} \exists n : \mathbb{N}.\, X \simeq \Op{Fin}(n) \) be the universe of Bishop-finite sets,
-together with its forgetful map \( \Op{El} \DefEq \Op{fst} : \Op{FinSet} \to \Type \).
-\begin{definition}
-  The (large) container of \emph{bags} is
-  \( \Op{Bag} \DefEq (\MkCont{\Op{FinSet}}{\Op{El}}) \).
-\end{definition}
+\todo[inline]{%
+  Say something about fixed-points of \( \Der \):
+  We expect a trivial fixed-point \( \Der{0} \CartEquiv 0 \),
+  but also an analouge of \( \Der{e^x} = e^x \).
+  The latter is done in \autoref{bag-fixed-point}.
+  But in general, these fixed points are probably not unique,
+  given that we can express combinatorial species as containers over \( \FinSet \)
+  (thanks Brent, \cite{Yorgey2014CombinatorialSpeciesLabelled}),
+  and that for species, differential equations have a lot of solutions \cite{Labelle1986combinatorialdifferentialequations}.
+}
 
-\begin{proposition}
+Let \( \FinSet \DefEq \sum_{X : \Type} \exists n : \mathbb{N}.\, X \simeq \Op{Fin}(n) \) be the universe of Bishop-finite sets,
+together with its forgetful map \( \El \DefEq \Op{fst} : \FinSet \to \Type \).
+The container of \emph{bags} is \( \Op{Bag} \DefEq (\MkCont{\FinSet}{\El}) \).
+As written, the shapes of this container quantify over all types, hence live in a higher universe.
+There are however equivalent small replacements of this type,
+such as the one given by \emph{Finster et al.} in \cite[Theorem~25]{FinsterEtAl2021CartesianBicategoryPolynomial}.
+
+\begin{proposition}\label{bag-fixed-point}
   The bag-container is a fixed-point of deriviation:
   there is an equivalence \( \CartIso{\Der{\Op{Bag}}}{\Op{Bag}} \).
+  \begin{proof}
+    First, note that finite sets are closed under addition and removal of points:
+    if \( X \) is finite, then so are \( X + 1 \) and \( X \setminus x \) for all \( x : X \).
+    On shapes, we construct an equivalence
+    \(
+      \sum_{X : \FinSet} \Isolated{\El(X)} \simeq \FinSet
+    \)
+    from mutually inverse functions \( f \) and \( g \).
+    From left to right, define \( f(X, x_0) \DefEq X \setminus x_0 \);
+    the other way let \( g(X) \DefEq (X + 1 , \Nothing) \).
+    By univalence, finite sets are equal if their carrier types are equivalent,
+    so \( f \) and \( g \) are inverses by \autoref{isolated-minus-plus-equiv} and \autoref{maybe-minus-nothing-equiv}.
+    Given \( X : \FinSet \) and \( x_0 : \El(X) \), positions are related by the identity equivalence,
+    that is
+    \(
+      \Op{Bag}_{\Ps}(f(X, x_0)) = \El(f(X, x_0)) = X \setminus x_0 = \Der{\Op{Bag}}_{\Ps}(X, x_0)
+    \).
+  \end{proof}
 \end{proposition}
+
+Unlike in classical analysis, where the exponential function is the unique solution to
+the differential equation \( f^{\prime} = f \) such that \( f(0) = 1 \),
+the situation for containers is more nuanced:
+While \( \Op{Bag} \) is a fixed-point of \( \Der \) for which \( { F[\CConst{0}] \CartEquiv \CConst{1} } \),
+it is by far the only one:
+modulo size issues, the proof of \autoref{bag-fixed-point} goes through for any subuniverse
+of types closed under addition and removal of single points
+-- for example, type-theoretic ordinals.\todo{Or cardinals???}
+This is not entirely unexpected:
+containers are closely related to Joyal's \emph{combinatorial species}
+(as discussed e.g.~in Yorgey's thesis \cite[67]{Yorgey2014CombinatorialSpeciesLabelled}),
+and these are known to have many non-isomorphic solutions even for simple differential equations,
+as shown by Labelle in~\cite{Labelle1986combinatorialdifferentialequations}.
 
 \begin{proposition}
   Let \( \Op{Cyc} \) the container of cyclic sets.
@@ -697,6 +813,12 @@ together with its forgetful map \( \Op{El} \DefEq \Op{fst} : \Op{FinSet} \to \Ty
 \end{proposition}
 
 \subsection{The Chain Rule}
+
+Stretching the analogy with a derivative of functions further,
+we might expect \( \Der \) to satisfy a version of the chain rule
+\( (f \circ g)^{\prime} = (f^{\prime} \circ g) \cdot g^{\prime} \).
+In our setting, substitution \( \Subst{-}{-} \) takes on the role of composition,
+and 
 
 \begin{problem}[note={The lax chain rule}]\label{lax-chain-rule}
   For any two containers \( F, G \), define a morphism
@@ -782,40 +904,81 @@ together with its forgetful map \( \Op{El} \DefEq \Op{fst} : \Op{FinSet} \to \Ty
   which we obtain from \autoref{is-equiv-sigma-remove}.
 \end{construction}
 
-\begin{theorem}
-  For discrete containers \( F, G \), \( \Op{chain}_{F,G} \) is an equivalence of containers.
+Note that the above proof essentially factors \( \Op{chain}_{F,G} \) into
+\[
+  \begin{tikzcd}[column sep=large]
+    { \Subst{(\Der{F})}{G} \CTimes \Der{G} }%
+      \ar[r, -multimap, "\Op{chain}_{F,G}"]
+      \ar[d, -multimap, "\sim"{swap}]
+      &
+    {\Der{(\Subst{F}{G})}}
+      \\
+    H_0
+      \ar[r, -multimap, "\eta"{swap}]
+      &
+    H_1
+      \ar[u, -multimap, "\sim"{swap}]
+  \end{tikzcd}
+\]
+in which
+\(
+  \eta_{\Sh} :
+    \Cart%
+      { \sum_{s : S} \sum_{f : P_s \to T} \sum_{p : \Isolated{P_s}} \Isolated{Q_{fp}} }%
+      { \sum_{s : S} \sum_{f : P_s \to T} \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)} }
+\)
+applies \( \SigmaIsolate_{P_s,Q_{f(\shortminus)}} \).
+We will make this factorization explicit in the derivation of the chain rule for indexed containers (\autoref{binary-chain-rule}),
+but for now we can record the following fact:
+\begin{proposition}\label{strong-chain-rule-iff-is-equiv-sigma-isolate}
+  Let \( F = (\MkCont{S}{P}) \) and \( G = (\MkCont{T}{Q}) \).
+  The following are equivalent propositions:
+  \begin{enumerate}
+    \item \( \Op{chain}_{F,G} \) is an equivalence of containers
+    \item \( \SigmaIsolate_{P_s,Q_{f(\shortminus)}} \) is an equivalence for all \( s : S \) and \( f : P_s \to T \)
+  \end{enumerate}
+\end{proposition}
+
+This characterization lets us immediately see in which cases we can and cannot expect a strong chain rule.
+Firstly, we recover a strong chain rule for \emph{discrete} containers, as expected by
+\cite[{Proposition~6.6}]{AbbottEtAl2005DataDifferentiating}:
+\begin{theorem}\label{discrete-strong-chain-rule}
+  For discrete containers \( F, G \), \( \Op{chain}_{F,G} \) is an equivalence.
   \begin{proof}
-    Let \( F \JudgeEq (\MkCont{S}{P}), G \JudgeEq (\MkCont{T}{Q}) \).
-    By \autoref{discrete-is-equiv-sigma-isolated}
-    \( \SigmaIsolate_{P_s,Q_{f(\shortminus)}} \) is an equivalence,
-    therefore \( \Op{chain}_{F,G} \) is as well.
+    The positions of \( F \) and \( G \) are discrete,
+    so by \autoref{discrete-is-equiv-sigma-isolated}
+    \( \SigmaIsolate \) is an equivalence,
+    hence is \( \Op{chain}_{F,G} \).
   \end{proof}
 \end{theorem}
 
+Secondly, we conclude that globally having a strong chain rule is an inherently classical property:
 \begin{theorem}
-  Assuming a strong chain rule implies that \emph{every} type is discrete.
-  Formally,
-  \[
-    \big( \smashoperator{\prod_{F, G : \Cont}} \Op{isEquiv}(\Op{chain}_{F,G}) \big)
-      \to
-    \smashoperator{\prod_{A : \Type}} \Op{Discrete}(A)
-  \]
+  The following are equivalent propositions:
+  \begin{enumerate}
+    \item \emph{every} type is discrete
+    \item for all containers \( F \) and \( G\), \( \Op{chain}_{F,G} \) is an equivalence
+  \end{enumerate}
   \begin{proof}
-    First observe that for containers \( F \JudgeEq (\MkCont{S}{P}), G \JudgeEq (\MkCont{T}{Q}) \),
-    if \( \Op{chain}_{F,G} \) is an equivalence, then so is \( \SigmaIsolate_{P_s,Q_{f(\shortminus)}} \)
-    for all \( s : S \) and \( f : P_s \to T \).
-
-    Let \( A : \Type \).
-    We use \autoref{is-equiv-sigma-isolate-discrete} to show that \( A \) is discrete.
-    Thus, let \( B : A \to \Type \) and prove that \( \SigmaIsolate_{A,B} \) is an equivalence by
-    defining containers \( F \) and \( G \) so that the previous observation applies:
-    this is the case for \( F \DefEq (\MkCont{1}{A}) \) and \( G \DefEq (\MkCont{A}{B}) \)
-    when choosing \( s \DefEq \bullet : 1 \) and \( f \DefEq \Op{id} : A \to A \).
+    If every type is discrete, then so is every container, hence the chain rule is always an equivalence by \autoref{discrete-strong-chain-rule}.
+    In the other direction,
+    use \autoref{discrete-iff-is-equiv-singl-isolate} to show that any given type \( A \) is discrete
+    ---
+    that is, given some \( a_0 : A \), prove that \( \SigmaIsolate_{A, {a_0 = (\shortminus)}} \) is an equivalence.
+    We do so by applying \autoref{strong-chain-rule-iff-is-equiv-sigma-isolate} to containers
+    \( F \DefEq (\MkCont{1}{A}) \) and \( G \DefEq (\MkCont{(a_0 : A)}{a_0 = (\shortminus)}) \).
+    % In the other direction,
+    % use \autoref{is-equiv-sigma-isolate-discrete} to show that any given type \( A \) is discrete
+    % ---
+    % that is, given some \( B : A \to \Type \), prove that \( \SigmaIsolate_{A,B} \) is an equivalence.
+    % We do so by applying \autoref{strong-chain-rule-iff-is-equiv-sigma-isolate} to containers
+    % \( F \DefEq (\MkCont{1}{A}) \) and \( G \DefEq (\MkCont{A}{B}) \),
+    % and \( s \DefEq \bullet : 1 \) and \( f \DefEq \Op{id} : A \to A \).
   \end{proof}
 \end{theorem}
 
 \begin{corollary}
-  Assuming a strong chain rule is inconsistent in the presence of non-set types:
+  Assuming a strong chain rule is inconsistent in the presence of non-discrete types:
   \[
     \neg \big( \smashoperator{\prod_{F, G : \Cont}} \Op{isEquiv}(\Op{chain}_{F,G}) \big)
   \]
@@ -823,6 +986,15 @@ together with its forgetful map \( \Op{El} \DefEq \Op{fst} : \Op{FinSet} \to \Ty
     The circle \( S^1 \) is provably not discrete: If it were, it would be a set.
   \end{proof}
 \end{corollary}
+
+We have seen that our definition of derivative behaves nicely even in the presence of non-discrete types,
+in that we retain the ways it interacts with sums and products (\autoref{sum-product-rule}).
+Its interaction with substitution, however, is more subtle.
+While we do obtain a chain rule, it is now \emph{directed} or \emph{lax} (\autoref{lax-chain-rule}),
+and whether we can strengthen it to an equivalence depends on the pair of containers involved (\autoref{strong-chain-rule-iff-is-equiv-sigma-isolate}).
+Indeed, assuming the latter for any pair of containers is inconsistent in the presence of non-discrete types such
+as HITs like the circle \( S^1 \).
+
 
 \subsection{Derivatives of Fixed Points}
 
@@ -843,15 +1015,45 @@ This corresponds to \( F \) satisfying the functional equation
 \]
 Assuming we have access to \( \W \)-types, recall that we can define a (smallest) fixed point container.
 For \( A : \Type \) and \( B : A \to \Type \), \( \W(A, B) : \Type \) has the single constructor
-\[
-  \Sup : \prod_{a : A} (B(a) \to W(A, B)) \to \W(A, B)
-\]
-A cursor to a position into a \( \W(A, B) \)-tree, labelled by some \( C : A \to \Type \) can be defined as an inductive family
-\( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \) with constructors
-\begin{align*}
-  \Op{top} &: \prod_{a : A} \prod_{f : B(a) \to \W(A, B)} C(a) \to \bar{\W}_{A,B,C}(\Sup(s, f)) \\
-  \Op{below} &: \prod_{a : A} \prod_{f : B(a) \to \W(A, B)} \prod_{b : B(a)} \bar{\W}_{A,B,C}(f(b)) \to \bar{\W}_{A,B,C}(\Sup(s, f))
-\end{align*}
+\begin{center}
+  \hspace*{\fill}
+  {
+    \AxiomC{\( a : A \)}
+    \AxiomC{\( f : B(a) \to \W(A, B) \)}
+    \BinaryInfC{\( \Sup(a, f) : \W(A, B) \)}
+    \DisplayProof
+  }
+  \hspace*{\fill}
+\end{center}
+A cursor to a position into a \( \W(A, B) \)-tree,
+labelled by some \( C : A \to \Type \),
+can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \) with two constructors, namely
+\begin{center}
+  \hspace*{\fill}
+  {
+    \AxiomC{\( c : C(a) \)}
+    \UnaryInfC{\( \Op{top}(c) : \bar{\W}_{A, B, C}(\Sup(s, f)) \)}
+    \DisplayProof
+  }
+  \hfill%
+  and
+  \hfill%
+  % \hspace*{\fill}
+  % \\[1em]
+  % \hspace*{\fill}
+  {
+    \AxiomC{\( b : B(a) \)}
+    \AxiomC{\( w : \bar{\W}_{A,B,C}(f(b)) \)}
+    \BinaryInfC{\( \Op{below}(b, w) : \bar{\W}_{A, B, C}(\Sup(s, f)) \)}
+    \DisplayProof
+  }
+  \hspace*{\fill}
+\end{center}
+
+% \begin{align*}
+%   \Op{top} &: \prod_{a : A} \prod_{f : B(a) \to \W(A, B)} C(a) \to \bar{\W}_{A,B,C}(\Sup(s, f)) \\
+%   \Op{below} &: \prod_{a : A} \prod_{f : B(a) \to \W(A, B)} \prod_{b : B(a)} \bar{\W}_{A,B,C}(f(b)) \to \bar{\W}_{A,B,C}(\Sup(s, f))
+% \end{align*}
 
 
 \begin{definition}
@@ -879,6 +1081,26 @@ A cursor to a position into a \( \W(A, B) \)-tree, labelled by some \( C : A \to
   \end{center}
 \end{problem}
 
+\begin{lemma}\label{is-equiv-from-mu-rec}
+  Let \( \alpha : \Cart{\Subst{F}{G}}{G} \).
+  If \( \Op{rec}_{F}(\alpha) \) is an equivalence, then so is \( \alpha \).
+  \begin{proof}
+    Substitution \( \Subst{F}{-} \) preserves equivalences,
+    so by 3-for-2 for equivalences of containers, \( \alpha \) on the right is an equivalence:
+    \[
+      \begin{tikzcd}[column sep=huge]
+        \Subst{F}{\mu F} & \Subst{F}{G} \\
+        {\mu F}          & G
+        \ar[from=1-1, to=1-2, multimap-multimap, "\Subst{F}{\Op{rec}_F(\alpha)}"]
+        \ar[from=1-1, to=2-1, multimap-multimap, "\Op{in}_F"{swap}]
+        \ar[from=2-1, to=2-2, multimap-multimap, "\Op{rec}_F(\alpha)"{swap}]
+        \ar[from=1-2, to=2-2, -multimap, "\alpha"]
+      \end{tikzcd}
+      \qedhere
+    \]
+  \end{proof}
+\end{lemma}
+
 \begin{definition}[note={Derivative of \( I \)-ary containers}]
   Let \( F \JudgeEq (\MkCont{S}{P}) : \Cont_I \) and \( i : \Isolated{I} \).
   The \( i \)th derivative \( {\Der_i}F \DefEq (\MkCont{S'}{P'}) : \Cont_I \) is defined as follows:
@@ -893,9 +1115,10 @@ A cursor to a position into a \( \W(A, B) \)-tree, labelled by some \( C : A \to
 \end{definition}
 
 \begin{remark}
-  For an \( I+1 \)-ary container \( F \), the index \( \Nothing : I + 1 \)
+  For an \( (I+1) \)-ary container \( F \), the index \( \Nothing : I + 1 \)
   is always isolated, so we will tacitly write \( \Der{F} \)
-  for \( \Der_{\Nothing}(F) : \Cont_I \).
+  for \( \Der_{\Nothing}(F) : \Cont_I \);
+  and similarly in the unary case.
 \end{remark}
 
 \begin{problem}
@@ -960,8 +1183,8 @@ A cursor to a position into a \( \W(A, B) \)-tree, labelled by some \( C : A \to
     Again, let \( H_2 \DefEq (\MkCont{U_2}{R_2}) \) where \( R_2 \DefEq {\R}_{\Ps} \circ f_2 \).
 
     Let us now define \( \eta : H_1 \multimap H_2 \).
-    As in \autoref{lax-chain-rule}, construct \( \eta_{\Sh} : U_1 \to U_2 \) from \( \SigmaIsolate_{P_1(s),Q(f\shortminus)} \).
-    On positions,
+    As in \autoref{lax-chain-rule}, define the shape map \( \eta_{\Sh} : U_1 \to U_2 \) using \( \SigmaIsolate_{P_1(s),Q(f\shortminus)} \).
+    On positions, the equivalence
     \(
       \eta_{\Ps}(u) : R_2(\eta_{\Sh}(u)) \simeq R_1(u)
     \)
@@ -1004,12 +1227,21 @@ A cursor to a position into a \( \W(A, B) \)-tree, labelled by some \( C : A \to
   \end{construction}
 \end{proposition}
 
-For \( F : \Cont_I \), denote by \( \Wk{F} : \Cont_{I+1} \) the inclusion into containers with one more variable.
-For \( i : I \), the \( i \)th projection container is \( \pi_i \DefEq (\MkCont{1}{\mathord{i = {\mathunderscore}}}) : \Cont_I \)
+For \( F : \Cont_I \), denote by \( \Wk{F} : \Cont_{I+1} \) the inclusion into containers with one more variable
+given by
+\[
+  \Wk{F}_{\Ps}(\Just{i}) \DefEq F_{\Ps}(i), \quad \Wk{F}_{\Ps}(\Nothing) \DefEq 0
+\]
+For \( i : I \), the \( i \)th projection container is \( \pi_i \DefEq (\MkCont{1}{\mathord{i = {\mathunderscore}}}) : \Cont_I \).
+If \( i \) is isolated, the \( i = j \) is a decidable proposition for any \( j : I \);
+in this case \( \pi_i \) is equivalent to a container whose \( i \)th type of positions is \( 1 \),
+and \( 0 \) for any other direction.
 
-\begin{problem}[note={\( \mu \)-rule}]
+\begin{problem}[note={\( \mu \)-rule}]\label{mu-rule}
   For \( F : \Cont_2 \), define a cartesian morphism
   \[
+    \MuRule_F
+      :
     \Cart%
       {
         \mu(
@@ -1065,14 +1297,16 @@ For \( i : I \), the \( i \)th projection container is \( \pi_i \DefEq (\MkCont{
       \qedhere
     \end{equation*}
   \end{construction}
-\begin{remark}
-  Written in variable style:
-  \[
-    \Cart%
-      {\mu Y.\, \Der_0{F(\mu F(X))} \CPlus (\Der_1{F(\mu F(X))} \CTimes Y)}%
-      {\Der(\mu Y. F(X, Y))}%
-  \]
-\end{remark}
+
+\begin{proposition}
+  If \( \MuRule_F \) is an equivalence, then so is \( \Op{chain}_{F,{\mu F}} \).
+  \begin{proof}
+    In \autoref{mu-rule}, \( \MuRule_F \) is defined by recursion from some \( \alpha \),
+    hence \( \alpha \) is an equivalence by \autoref{is-equiv-from-mu-rec}.
+    But \( \alpha \) is just \( \Op{chain}_{F, {\mu F}} \) wedged between two equivalences,
+    so the latter is an equivalence as well.
+  \end{proof}
+\end{proposition}
 
 \begin{conjecture}
   The \( \mu \)-rule is an equivalence for \emph{any} container.
@@ -1103,5 +1337,7 @@ For \( i : I \), the \( i \)th projection container is \( \pi_i \DefEq (\MkCont{
     Even still, this characterizes when \( \alpha \) is an equivalence; is that preserved by \( \Op{rec} \)?
   \end{proof}
 \end{conjecture}
+
+\printbibliography
 
 \end{document}

@@ -14,8 +14,12 @@
       packages.texlive = texlive.combine {
         inherit (texlive)
           scheme-medium
+          latex-bin
+          latexmk
 
+          biblatex
           bussproofs
+          cmll
           csquotes
           tikz-cd
           todonotes
