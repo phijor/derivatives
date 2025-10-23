@@ -4,6 +4,7 @@ open import Derivative.Prelude
 
 open import Cubical.Data.Sum as Sum using (_⊎_ ; inl ; inr)
 import      Cubical.Data.Empty as Empty
+import      Cubical.Data.Unit as Unit
 open import Cubical.Relation.Nullary
 open import Cubical.Foundations.GroupoidLaws using (lCancel)
 open import Cubical.Functions.Embedding
@@ -21,6 +22,11 @@ open import Cubical.Relation.Nullary
   renaming
     ( mapDec to map
     ; decRec to rec
+    )
+open import Cubical.Relation.Nullary.HLevels
+  public
+  using
+    ( isPropDiscrete
     )
 
 private
@@ -42,12 +48,23 @@ decNot (no ¬p) = yes ¬p
 decEquiv : (e : A ≃ B) → Dec A → Dec B
 decEquiv e = map (equivFun e) (_∘ invEq e)
 
+Dec→Type : Dec A → Type
+Dec→Type (yes _) = Unit.Unit
+Dec→Type (no  _) = Empty.⊥
+
+Dec→Type* : Dec A → Type ℓ
+Dec→Type* (yes _) = Unit.Unit*
+Dec→Type* (no  _) = Empty.⊥*
+
 opaque
   Dec→Collapsible : Dec A → Collapsible A
   Dec→Collapsible = SplitSupport→Collapsible ∘ PStable→SplitSupport ∘ Stable→PStable ∘ Dec→Stable
 
 isProp→Discrete : isProp A → Discrete A
 isProp→Discrete is-prop x y = yes (is-prop x y)
+
+Discrete→DiscretePath : Discrete A → (a b : A) → Discrete (a ≡ b)
+Discrete→DiscretePath disc-A a b = isProp→Discrete (Discrete→isSet disc-A a b)
 
 opaque
   locallyCollapsible→locallyIsPropPath : (a : A) → (∀ b → Collapsible (a ≡ b)) → (∀ b → isProp (a ≡ b))
