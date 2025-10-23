@@ -3,6 +3,7 @@ module Derivative.Container where
 open import Derivative.Prelude
 import      Derivative.Maybe as Maybe
 
+open import Cubical.Foundations.Transport using (substEquiv)
 open import Cubical.Data.Empty as Empty using (⊥*)
 open import Cubical.Data.Sigma.Base
 open import Cubical.Data.Sum.Base as Sum using (_⊎_)
@@ -103,6 +104,10 @@ record Equiv (F G : Container ℓS ℓP) : Type (ℓ-max ℓS ℓP) where
     shape : F .Shape ≃ G .Shape
     pos : ∀ s → G .Pos (equivFun shape s) ≃ F .Pos s
 
+Equiv→Cart : {F G : Container ℓS ℓP} → Equiv F G → Cart F G
+Equiv→Cart [ shape ◁≃ pos ] .shape = equivFun shape
+Equiv→Cart [ shape ◁≃ pos ] .pos = pos
+
 _⋆ₑ_ : ∀ {F G H : Container ℓS ℓP} → Equiv F G → Equiv G H → Equiv F H
 (f ⋆ₑ g) .Equiv.shape = f .Equiv.shape ∙ₑ g .Equiv.shape
 (f ⋆ₑ g) .Equiv.pos s = g .Equiv.pos (equivFun (f .Equiv.shape) s) ∙ₑ f .Equiv.pos s
@@ -111,6 +116,7 @@ idₑ : (F : Container ℓS ℓP) → Equiv F F
 idₑ F .Equiv.shape = idEquiv _
 idₑ F .Equiv.pos _ = idEquiv _
 
+-- TODO: Rename to Equiv-shape and Equiv-pos
 Equiv-fst : ∀ {S S′ : Type ℓS} {P : S′ → Type ℓP}
   → (e : S ≃ S′)
   → Equiv (S ◁ (P ∘ equivFun e)) (S′ ◁ P)
@@ -122,6 +128,10 @@ Equiv-snd : ∀ {S : Type ℓS} {P P′ : S → Type ℓP}
   → Equiv (S ◁ P) (S ◁ P′)
 Equiv-snd {S} e .Equiv.shape = idEquiv S
 Equiv-snd {S} e .Equiv.pos = e
+
+Equiv-inv : {F G : Container ℓS ℓ} → Equiv F G → Equiv G F
+Equiv-inv {F} {G} [ shape ◁≃ pos ] .Equiv.shape = invEquiv shape
+Equiv-inv {F} {G} [ shape ◁≃ pos ] .Equiv.pos t = invEquiv $ substEquiv (G .Pos) (sym (secEq shape t)) ∙ₑ pos (invEq shape t)
 
 module EquivReasoning where
   private
