@@ -16,7 +16,7 @@ open import Cubical.Foundations.Path
 open import Cubical.Foundations.Transport
 open import Cubical.Data.Sigma
 import      Cubical.Data.Empty as Empty
-open import Cubical.Data.Nat.Base
+open import Cubical.Data.Nat.Base using (ℕ ; zero ; suc)
 open import Cubical.Data.Unit.Base
 
 private
@@ -118,6 +118,12 @@ private
     
 Σ-map-fst : ∀ {B′ : A′ → Type ℓ} (f : A → A′) → (Σ A (B′ ∘ f)) → (Σ A′ B′)
 Σ-map-fst f (a , b′) = (f a , b′)
+
+isEquiv-∘ : ∀ {f : A → B} {g : B → C}
+  → isEquiv g
+  → isEquiv f
+  → isEquiv (g ∘ f)
+isEquiv-∘ {f} {g} is-equiv-g is-equiv-f = equivIsEquiv (compEquiv (f , is-equiv-f) (g , is-equiv-g))
 
 module _ {ℓB ℓB′} {A : Type ℓ} {B : A → Type ℓB} {B′ : A → Type ℓB′} where
   Σ-map-snd : (f : ∀ a → B a → B′ a) → (Σ A B) → (Σ A B′)
