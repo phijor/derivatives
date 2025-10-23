@@ -32,21 +32,46 @@ open Cart
 ∂-Const S .Equiv.shape = Empty.uninhabEquiv (λ ()) lower
 ∂-Const S .Equiv.pos ()
 
+∂-prop-trunc : (S : Type ℓ) {P : S → Type ℓ} → (∀ s → isProp (P s))
+  → Equiv (∂ (S ◁ P)) (Σ S P ◁ const (𝟘 _))
+∂-prop-trunc S {P} is-prop-P =
+  ∂ (S ◁ P)
+    ⊸≃⟨⟩
+  [ (s , p , _) ∈ Σ[ s ∈ S ] (P s) ° ]◁ (P s ∖ p)
+    ⊸≃⟨ Equiv-fst $ Σ-cong-equiv-snd (λ s → isProp→IsolatedEquiv (is-prop-P s)) ⟩
+  [ (s , p) ∈ Σ S P ]◁ (P s ∖ p)
+    ⊸≃⟨ Equiv-snd (λ (s , p) → Empty.uninhabEquiv (λ ()) (isProp→isEmptyRemove (is-prop-P s) p)) ⟩
+  [ (s , p) ∈ Σ S P ]◁ (𝟘 _)
+    ⊸≃∎
+
 ∂-prop : (P : Type ℓ) → isProp P → Equiv (∂ (𝟙 ℓ ◁ const P)) (P ◁ const (𝟘 _))
 ∂-prop {ℓ} P is-prop-P =
-  ∂ ([ _ ∈ 𝟙 ℓ ]◁ P)
-    ⊸≃⟨⟩
-  [ (_ , p , _) ∈ 𝟙 _ × P ° ]◁ (P ∖ p)
+  ∂ (𝟙 ℓ ◁ const P)
+    ⊸≃⟨ ∂-prop-trunc (𝟙 _) {P = const P} (const is-prop-P) ⟩
+  ((𝟙 ℓ × P) ◁ const (𝟘 _))
     ⊸≃⟨ Equiv-fst (isoToEquiv lUnit*×Iso) ⟩
-  [ (p , _) ∈ P ° ]◁ (P ∖ p)
-    ⊸≃⟨ Equiv-fst (isProp→IsolatedEquiv is-prop-P) ⟩
-  [ p ∈ P ]◁ (P ∖ p)
-    ⊸≃⟨ Equiv-snd (λ p → Empty.uninhabEquiv (λ ()) (isProp→isEmptyRemove is-prop-P p)) ⟩
-  [ p ∈ P ]◁ (𝟘 _)
+  (P ◁ const (𝟘 _))
     ⊸≃∎
 
 ∂-Id : Equiv (∂ Id) (Const (𝟙 ℓ))
 ∂-Id = ∂-prop (𝟙 _) isPropUnit*
+
+𝕂 : (A : Type ℓ) → Container ℓ ℓ
+𝕂 A .Shape = A
+𝕂 A .Pos = const (𝟘 _)
+
+𝕪[_] : (A : Type ℓ) → Container ℓ ℓ
+𝕪[ A ] .Shape = 𝟙 _
+𝕪[ A ] .Pos = const A
+
+∂-𝕪° : (A : Type ℓ) → (a° : A °) → Equiv (∂ 𝕪[ A ]) ([ a ∈ A ° ]◁ (A - a))
+∂-𝕪° {ℓ} A a°@(a₀ , a₀≟_) =
+  ∂ (𝟙 _ ◁ const A)
+    ⊸≃⟨⟩
+  ([ (_ , a) ∈ 𝟙 ℓ × (A °) ]◁ (A - a))
+    ⊸≃⟨ Equiv-fst (isoToEquiv lUnit*×Iso) ⟩
+  ([ a ∈ A ° ]◁ (A - a))
+    ⊸≃∎
 
 module _ (F G : Container ℓ ℓ) where
   open Container F renaming (Shape to S ; Pos to P)
