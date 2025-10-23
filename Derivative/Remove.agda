@@ -5,6 +5,7 @@ open import Derivative.Decidable
 open import Derivative.Sum
 
 open import Cubical.Foundations.Equiv.Properties using (preCompEquiv ; equivAdjointEquiv ; congEquiv)
+open import Cubical.Functions.Embedding using (_↪_ ; EmbeddingΣProp)
 open import Cubical.Data.Nat.Base
 open import Cubical.Data.Sigma
 open import Cubical.Data.Unit as Unit using (Unit*)
@@ -21,6 +22,10 @@ Remove A a = Σ[ b ∈ A ] (a ≢ b)
 
 _∖_ : (A : Type ℓ) (a : A) → Type ℓ
 _∖_ = Remove
+
+
+remove-embedding : (a : A) → (A ∖ a) ↪ A
+remove-embedding a = EmbeddingΣProp λ a → isProp≢
 
 Remove≡ : {a : A} {x y : A ∖ a} → x .fst ≡ y .fst → x ≡ y
 Remove≡ {a} = Σ≡Prop λ a′ → isProp¬ (a ≡ a′)
