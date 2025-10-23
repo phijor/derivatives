@@ -55,6 +55,10 @@ A ° = Isolated A
 forget-isolated : A ° → A
 forget-isolated = fst
 
+_-_ : (A : Type ℓ) (a : A °) → Type ℓ
+A - a = A ∖ (a .fst)
+
+
 module _ {ℓB : Level} {B : A → Type ℓB}
   ((a₀ , a₀≟_) : A °)
   (eq* : ∀ a → a₀ ≡ a → B a)
@@ -74,6 +78,13 @@ module _ {ℓB : Level} {B : A → Type ℓB}
 
 Isolated≡ : ∀ {a b : A °} → a .fst ≡ b .fst → a ≡ b
 Isolated≡ = Σ≡Prop isPropIsIsolated
+
+IsolatedPathP : ∀ {B : A → Type ℓ} {a₀ a₁ : A} {p : a₀ ≡ a₁}
+  → {b₀ : B a₀ °} {b₁ : B a₁ °}
+  → PathP (λ i → B (p i)) (b₀ .fst) (b₁ .fst)
+  → PathP (λ i → B (p i) °) b₀ b₁
+IsolatedPathP q i .fst = q i
+IsolatedPathP {b₀} {b₁} q i .snd = isProp→PathP {B = λ i → isIsolated (q i)} (λ i → isPropIsIsolated (q i)) (b₀ .snd) (b₁ .snd) i
 
 Isolated≢ : ∀ {a b : A °} → a .fst ≢ b .fst → a ≢ b
 Isolated≢ a≢b p = a≢b $ cong fst p
@@ -219,7 +230,7 @@ isIsolatedΣ {B} {a} {b} isolated-a isolated-b (a′ , b′) = discrete (isolate
 
     discrete-b : Dec (b ≡ subst B (sym p) b′) → Dec (Σ[ p ∈ a ≡ a′ ] subst B p b ≡ b′)
     discrete-b (yes q) = yes (p , invEq adj q)
-    discrete-b (no ¬q) = no λ { (p , q) → ¬q (equivFun adj $ cong (λ - → subst B - b) (isIsolated→isPropPath a isolated-a a′ _ _) ∙ q) }
+    discrete-b (no ¬q) = no λ { (p , q) → ¬q (equivFun adj $ cong (λ p → subst B p b) (isIsolated→isPropPath a isolated-a a′ _ _) ∙ q) }
     
   discrete (no ¬p) = no λ r → ¬p (cong fst r)
 
@@ -245,27 +256,24 @@ isIsolatedΣSnd→Discrete {ℓ} A Σ-isolated-fst a₀ a₁ = goal where
   goal : Dec (a₀ ≡ a₁)
   goal = Σ-isolated-fst B' a₀ b₀ is-isolated-pair a₁
 
-isEquiv-Σ-isolate→DiscreteFst : (A : Type ℓ)
-  → ((B : A → Type ℓ) → isEquiv (Σ-isolate A B))
-  → Discrete A
-isEquiv-Σ-isolate→DiscreteFst {ℓ} A is-equiv-Σ-isolate = isIsolatedΣSnd→Discrete A goal where
-  module _ (B : A → Type ℓ) where
+module _ {A : Type ℓ} {B : A → Type ℓ} (is-equiv-Σ-isolate : isEquiv (Σ-isolate A B)) where
+  private
     unisolate-equiv : (Σ[ a ∈ A ] B a) ° ≃ (Σ[ a° ∈ A ° ] (B (a° .fst)) °)
-    unisolate-equiv = invEquiv (_ , is-equiv-Σ-isolate B)
+    unisolate-equiv = invEquiv (_ , is-equiv-Σ-isolate)
 
     unisolate : (Σ[ a ∈ A ] B a) ° → (Σ[ a° ∈ A ° ] (B (a° .fst)) °)
     unisolate = equivFun unisolate-equiv
 
-    goal : ∀ a₀ (b₀ : B a₀) → isIsolated (a₀ , b₀) → isIsolated a₀
-    goal a₀ b₀ isolated-ab
-      using ab°@((a , isolated-a) , (b , _)) ← unisolate ((a₀ , b₀) , isolated-ab)
-      = isolated-a₀ where
+  isEquiv-Σ-isolate→isIsolatedPair : {a₀ : A} {b₀ : B a₀} → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀ × isIsolated b₀
+  isEquiv-Σ-isolate→isIsolatedPair {a₀} {b₀} isolated-ab
+    using ab°@((a , isolated-a) , (b , isolated-b)) ← unisolate ((a₀ , b₀) , isolated-ab)
+    = isolated-a₀ , isolated-b₀ where
       help : Σ-isolate A B ab° ≡ Σ-isolate A B (unisolate ((a₀ , b₀) , isolated-ab))
       help = Isolated≡ $ refl′ (a , b)
 
       fib₀ : fiber unisolate ab°
       fib₀ .fst = Σ-isolate A B ab°
-      fib₀ .snd = sym (invEq (equivAdjointEquiv (_ , is-equiv-Σ-isolate B)) help)
+      fib₀ .snd = sym (invEq (equivAdjointEquiv (_ , is-equiv-Σ-isolate)) help)
 
       fib₁ : fiber unisolate ab°
       fib₁ .fst = (a₀ , b₀) , isolated-ab
@@ -281,6 +289,45 @@ isEquiv-Σ-isolate→DiscreteFst {ℓ} A is-equiv-Σ-isolate = isIsolatedΣSnd�
 
       isolated-a₀ : isIsolated a₀
       isolated-a₀ = subst isIsolated a≡a₀ isolated-a
+
+      b≡b₀ : PathP (λ i → B (a≡a₀ i)) b b₀
+      b≡b₀ = cong (snd ∘ fst ∘ fst) fib₀≡fib₁
+
+      isolated-b₀ : isIsolated b₀
+      isolated-b₀ = transport (λ i → (b : B (a≡a₀ i)) → Dec (b≡b₀ i ≡ b)) isolated-b
+
+  isEquiv-Σ-isolate→isIsolatedFst : {a₀ : A} {b₀ : B a₀} → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀
+  isEquiv-Σ-isolate→isIsolatedFst = fst ∘ isEquiv-Σ-isolate→isIsolatedPair
+
+isIsolatedPair→isEquiv-Σ-isolated : {A : Type ℓ} {B : A → Type ℓ}
+  → (∀ {a₀ : A} {b₀ : B a₀} → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀ × isIsolated b₀)
+  → isEquiv (Σ-isolate A B)
+isIsolatedPair→isEquiv-Σ-isolated {A} {B} is-isolated-pair = isoToIsEquiv Σ-isolate-Iso where
+  Σ-isolate⁻¹ : (Σ[ a ∈ A ] B a) ° → (Σ[ a° ∈ A ° ] (B (a° .fst)) °)
+  Σ-isolate⁻¹ ((a , b) , isolated-ab)
+    using (isolated-a , isolated-b) ← is-isolated-pair isolated-ab
+    = (a , isolated-a) , (b , isolated-b)
+
+  Σ-isolate-Iso : Iso (Σ[ a° ∈ A ° ] (B (a° .fst)) °) ((Σ[ a ∈ A ] B a) °)
+  Σ-isolate-Iso .Iso.fun = Σ-isolate A B
+  Σ-isolate-Iso .Iso.inv = Σ-isolate⁻¹
+  Σ-isolate-Iso .Iso.rightInv _ = Isolated≡ refl
+  Σ-isolate-Iso .Iso.leftInv _ = ΣPathP (Isolated≡ refl , Isolated≡ refl)
+
+isEquiv-Σ-isolate≃isIsolatedPair : (A : Type ℓ) (B : A → Type ℓ)
+ → isEquiv (Σ-isolate A B) ≃ (∀ {a₀ : A} {b₀ : B a₀} → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀ × isIsolated b₀)
+isEquiv-Σ-isolate≃isIsolatedPair A B = propBiimpl→Equiv
+  (isPropIsEquiv _)
+  (isPropImplicitΠ2 λ a₀ b₀ → isProp→ (isProp× (isPropIsIsolated a₀) (isPropIsIsolated b₀)))
+  isEquiv-Σ-isolate→isIsolatedPair
+  isIsolatedPair→isEquiv-Σ-isolated
+
+isEquiv-Σ-isolate→DiscreteFst : (A : Type ℓ)
+  → ((B : A → Type ℓ) → isEquiv (Σ-isolate A B))
+  → Discrete A
+isEquiv-Σ-isolate→DiscreteFst {ℓ} A is-equiv-Σ-isolate = isIsolatedΣSnd→Discrete A goal where
+  goal : ∀ (B : A → Type ℓ) a₀ (b₀ : B a₀) → isIsolated (a₀ , b₀) → isIsolated a₀
+  goal B a₀ b₀ isolated-ab = isEquiv-Σ-isolate→isIsolatedFst (is-equiv-Σ-isolate B) isolated-ab
 
 Discrete→isEquiv-Σ-isolate : {A : Type ℓ} {B : A → Type ℓ}
   → Discrete A
@@ -298,6 +345,26 @@ Discrete→isEquiv-Σ-isolate {A} {B} disc-A disc-B = subst isEquiv compute (equ
 
   compute : equivFun e ≡ Σ-isolate A B
   compute = funExt λ _ → Isolated≡ refl
+
+Discrete→isEquiv-Σ-isolate-singl : Discrete A → (a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_))
+Discrete→isEquiv-Σ-isolate-singl {A} disc-A a₀ = Discrete→isEquiv-Σ-isolate disc-A disc-a₀≡a where
+  disc-a₀≡a : (a : A) → Discrete (a₀ ≡ a)
+  disc-a₀≡a = Dec.Discrete→DiscretePath disc-A a₀
+
+isEquiv-Σ-isolate-singl→Discrete : (∀ a₀ → isEquiv (Σ-isolate A (a₀ ≡_))) → Discrete A
+isEquiv-Σ-isolate-singl→Discrete is-equiv-Σ-isolate a₀ = isolated-a₀ where
+  is-isolated-center : isIsolated {A = singl a₀} (a₀ , refl)
+  is-isolated-center = isContr→isIsolatedCenter (isContrSingl a₀) (a₀ , refl)
+
+  isolated-a₀ : isIsolated a₀
+  isolated-a₀ = isEquiv-Σ-isolate→isIsolatedFst (is-equiv-Σ-isolate a₀) is-isolated-center
+
+Discrete≃isEquiv-Σ-isolate-singl : Discrete A ≃ ((a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_)))
+Discrete≃isEquiv-Σ-isolate-singl = propBiimpl→Equiv
+  isPropDiscrete
+  (isPropΠ λ a₀ → isPropIsEquiv _)
+  Discrete→isEquiv-Σ-isolate-singl
+  isEquiv-Σ-isolate-singl→Discrete
 
 module _ {B : A → Type ℓ} {a₀ : A} {b₀ : B a₀}
   (a₀≟_ : isIsolated a₀)
