@@ -1,3 +1,4 @@
+{-# OPTIONS -WnoUnsupportedIndexedMatch #-}
 module Derivative.Isolated where
 
 open import Derivative.Prelude
@@ -11,7 +12,7 @@ open import Derivative.Decidable
     )
 open import Derivative.Remove
 open import Derivative.Sum as Sum using (_⊎_ ; inl ; inr)
-
+open import Derivative.W as W
 
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.Properties using (equivAdjointEquiv ; hasRetract ; hasSection ; congEquiv)
@@ -216,6 +217,33 @@ isContr→isIsolatedCenter = isProp→isIsolated ∘ isContr→isProp
 
 remove-emb : (a : A) → A ∖ a → A
 remove-emb a = fst
+
+module _ {ℓS ℓP ℓQ} {S : Type ℓS} {P : S → Type ℓP} {Q : S → Type ℓQ} where
+  private
+    variable
+      s : S
+      f : P s → W S P
+
+  isIsolatedTop : ∀ {q : Q s} → isIsolated q → isIsolated {A = Wᴰ S P Q (sup s f)} (top q)
+  isIsolatedTop {s} {f} {q} isolated-q (top q′) = {! EmbeddingReflectIsolated !}
+  isIsolatedTop {s} {f} {q} isolated-q (below p b) = {! !}
+
+  isIsolatedFromTop : ∀ {q : Q s} → isIsolated {A = Wᴰ S P Q (sup s f)} (top q) → isIsolated q
+  isIsolatedFromTop {s} {f} {q} isolated-top = isIsolatedFromInl isolated-inl where
+    isolated-inl : isIsolated {A = Q s ⊎ (Σ[ p ∈ P s ] (Wᴰ S P Q (f p)))} (inl q)
+    isolated-inl = isIsolatedPreserveEquiv (Wᴰ-out-equiv _ _ _ s f) (top q) isolated-top
+
+  isIsolatedBelow : ∀ {p : P s} {wᴰ : Wᴰ S P Q (f p)}
+    → isIsolated {A = Σ[ p ∈ P s ] Wᴰ S P Q (f p)} (p , wᴰ)
+    → isIsolated {A = Wᴰ S P Q (sup s f)} (below p wᴰ)
+  isIsolatedBelow = {! !}
+
+  isIsolatedFromBelow : ∀ {p : P s} {wᴰ : Wᴰ S P Q (f p)}
+    → isIsolated {A = Wᴰ S P Q (sup s f)} (below p wᴰ)
+    → isIsolated {A = Σ[ p ∈ P s ] Wᴰ S P Q (f p)} (p , wᴰ)
+  isIsolatedFromBelow {s} {f} {p} {wᴰ} isolated-below = isIsolatedFromInr isolated-inr where
+    isolated-inr : isIsolated {A = Q s ⊎ (Σ[ p ∈ P s ] (Wᴰ S P Q (f p)))} (inr (p , wᴰ))
+    isolated-inr = isIsolatedPreserveEquiv (Wᴰ-out-equiv _ _ _ s f) (below p wᴰ) isolated-below
 
 isIsolatedΣ : ∀ {ℓB} {B : A → Type ℓB}
   → {a : A} {b : B a}
