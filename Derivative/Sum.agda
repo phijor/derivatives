@@ -6,7 +6,8 @@ open import Cubical.Data.Sigma
 open import Cubical.Data.Sum public
 open import Cubical.Functions.Embedding
 
-module Sum = Cubical.Data.Sum
+private
+  module Sum = Cubical.Data.Sum
 
 private
   variable
@@ -68,6 +69,34 @@ inr≢inl p = Sum.⊎Path.encode _ _ p .lower
 
 ⊎-right-≃ : ∀ {C : Type ℓ} → (e : B ≃ C) → (A ⊎ B) ≃ (A ⊎ C)
 ⊎-right-≃ e = isoToEquiv (⊎-right-Iso (equivToIso e))
+
+isEquiv→isEquiv-⊎-map-right : ∀ {C : Type ℓ} {f : B → C}
+  → isEquiv f
+  → isEquiv (⊎-map-right {A = A} f)
+isEquiv→isEquiv-⊎-map-right {C} {f} is-equiv-f = equivIsEquiv (⊎-right-≃ (f , is-equiv-f))
+
+⊎-right-≃' : ∀ {C : Type ℓ} → (e : B ≃ C) → (A ⊎ B) ≃ (A ⊎ C)
+⊎-right-≃' e .fst = ⊎-map-right (equivFun e)
+⊎-right-≃' {B} {A} {C} e .snd .equiv-proof = goal where
+  goal : (y : A ⊎ C) → isContr (fiber (⊎-map-right {B = B} (equivFun e)) y)
+  goal (inl a) = isContrRetract {B = singl a}
+    (const (a , refl))
+    (λ (a′ , p) → inl a′ , cong inl (sym p))
+    (λ { (inl a′ , p) → ΣPathP (sym {!p!} , {! !}) ; (inr b , x) → {! !} })
+    {! !}
+  goal (inr c) = {! !}
+
+isEquiv-⊎-map-right→isEquiv : ∀ {C : Type ℓ}
+  → (f : B → C)
+  → isEquiv (⊎-map-right {A = A} f)
+  → isEquiv f
+isEquiv-⊎-map-right→isEquiv {A} {C} f is-equiv-map .equiv-proof = goal where
+
+  fiber-equiv : (c : C) → fiber (⊎-map-right {A = A} f) (inr c) ≃ fiber f c
+  fiber-equiv c = {! !}
+
+  goal : (c : C) → isContr (fiber f c)
+  goal c = isOfHLevelRespectEquiv 0 {! !} (is-equiv-map .equiv-proof (inr c))
 
 ⊎-empty-left-Iso : (¬ A) → Iso B (A ⊎ B)
 ⊎-empty-left-Iso ¬A .Iso.fun = inr
