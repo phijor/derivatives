@@ -104,6 +104,9 @@ DiscreteContainer ℓS ℓP = Σ[ F ∈ Container ℓS ℓP ] ∀ s → Discrete
 hasChainEquiv : (ℓ : Level) → Type (ℓ-suc ℓ)
 hasChainEquiv ℓ = (F G : Container ℓ ℓ) → isEquiv (chain-map F G)
 
+isPropHasChainEquiv : isProp (hasChainEquiv ℓ)
+isPropHasChainEquiv = isPropΠ2 λ F G → isPropIsEquiv _
+
 DiscreteContainer→isEquivChainMap : (F G : DiscreteContainer ℓ ℓ) → isEquiv (chain-map (F .fst) (G .fst))
 DiscreteContainer→isEquivChainMap (F , disc-F) (G , disc-G) = equivIsEquiv chain-equiv where
   open Container F renaming (Shape to S ; Pos to P)
@@ -138,15 +141,23 @@ isEquivChainMap→AllTypesDiscrete {ℓ} is-equiv-chain-map A = discrete-A where
   F .Shape = Unit*
   F .Pos _ = A
 
-  G : (B : A → Type ℓ) → Container ℓ ℓ
-  G B .Shape = A
-  G B .Pos = B
+  G : (a₀ : A) → Container ℓ ℓ
+  G a₀ .Shape = A
+  G a₀ .Pos = a₀ ≡_
 
-  is-equiv-Σ-isolate : ∀ B → isEquiv (Σ-isolate A B)
-  is-equiv-Σ-isolate B = lemma F (G B) tt* (λ a → a)
+  is-equiv-Σ-isolate-singl : (a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_))
+  is-equiv-Σ-isolate-singl a₀ = lemma F (G a₀) tt* (λ a → a)
 
   discrete-A : Discrete A
-  discrete-A = isEquiv-Σ-isolate→DiscreteFst A is-equiv-Σ-isolate
+  discrete-A = isEquiv-Σ-isolate-singl→Discrete is-equiv-Σ-isolate-singl
+
+AllTypesDiscrete→isEquivChainMap : ((A : Type ℓ) → Discrete A) → hasChainEquiv ℓ
+AllTypesDiscrete→isEquivChainMap discrete F G = DiscreteContainer→isEquivChainMap (F , discrete ∘ Pos F) (G , discrete ∘ Pos G)
+
+isEquivChainMap≃AllTypesDiscrete : hasChainEquiv ℓ ≃ ((A : Type ℓ) → Discrete A)
+isEquivChainMap≃AllTypesDiscrete = propBiimpl→Equiv isPropHasChainEquiv (isPropΠ λ A → isPropDiscrete)
+  isEquivChainMap→AllTypesDiscrete
+  AllTypesDiscrete→isEquivChainMap
 
 ¬hasChainEquiv : ¬ hasChainEquiv ℓ-zero
 ¬hasChainEquiv is-equiv-chain-map = S1.¬isIsolated-base $ Discrete→isIsolated discrete-S¹ base where
