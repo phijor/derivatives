@@ -10,6 +10,7 @@
 \usepackage{tikz-cd}
 \usepackage{keytheorems}
 \usepackage{todonotes}
+\usepackage{xcolor}
 \usepackage{hyperref}
 
 \hypersetup{
@@ -44,6 +45,9 @@
   % multimap/.tip={Glyph[glyph math command=circ, glyph length=1.03ex, glyph shorten=-0.2ex]},
   multimap/.tip={Circle[open]},
 }
+
+\colorlet{Highlight}{purple!80!gray}
+\NewDocumentCommand{\Highlight}{m}{\textcolor{Highlight}{#1}}
 
 \title{Derivates of Containers without Decidable Equality}
 \author{Philipp Joram}
@@ -1267,15 +1271,15 @@ and \( 0 \) for any other direction.
     where \( G \DefEq { \Wk{\Der_0{F}[ {\mu F} ]} } \CPlus ( \Wk{\Der_1{F}[ {\mu F} ]} \CTimes \Proj{1} ) \).
     First note that substitution into \( G \) replaces \( \Proj{1} \), i.e.\@ there is an equivalence
     \[
-      \gamma_{\textcolor{cyan}{Y}} :
-      G[\textcolor{cyan}{Y}]
+      \gamma_{\Highlight{Y}} :
+      G[\Highlight{Y}]
         \mathrel{\CartEquiv}
-      { \Der_0{F}[ {\mu F} ] } \CPlus ( {\Der_1{F}[ {\mu F} ]} \CTimes \textcolor{cyan}{Y} )
+      { \Der_0{F}[ {\mu F} ] } \CPlus ( {\Der_1{F}[ {\mu F} ]} \CTimes \Highlight{Y} )
     \]
     Equipped with this knowledge, we use the chain rule to define \( \alpha \) as the following composite:
     \begin{equation*}
       \begin{tikzcd}[column sep=large]
-        {G[\textcolor{cyan}{\Der(\mu F)}]}
+        {G[\Highlight{\Der(\mu F)}]}
           &
         {\Der(\mu F)}
           \\
@@ -1285,12 +1289,12 @@ and \( 0 \) for any other direction.
           (
             {\Der_1{F}[ {\mu F} ]}
               \CTimes
-            \textcolor{cyan}{\Der(\mu F)}
+            \Highlight{\Der(\mu F)}
           )
         }
           &
         \Der(F[\mu F])
-        \ar[from=1-1, to=2-1, -multimap, "\gamma_{\textcolor{cyan}{\Der(\mu F)}}"{swap}, "\sim"]
+        \ar[from=1-1, to=2-1, -multimap, "\gamma_{\Highlight{\Der(\mu F)}}"{swap}, "\sim"]
         \ar[from=2-1, to=2-2, -multimap, "\Op{chain}_{F,{\mu\!F}}"{swap}]
         \ar[from=2-2, to=1-2, -multimap, "\Der(\Op{in}_F)"{swap}, "\sim"]
         \ar[from=1-1, to=1-2, dashed, -multimap, "\alpha"]
