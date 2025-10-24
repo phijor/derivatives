@@ -111,8 +111,8 @@ module _ (F G : Container ℓ ℓ) where
   prod-rule : Equiv (∂ (F ⊗ G)) ((∂ F ⊗ G) ⊕ (F ⊗ ∂ G))
   prod-rule .Equiv.shape = prod-shape
   prod-rule .Equiv.pos = uncurry λ where
-    (s , t) (inl p , iso-p) → remove-left-equiv (isIsolatedFromInl iso-p)
-    (s , t) (inr q , iso-q) → remove-right-equiv (isIsolatedFromInr iso-q)
+    (s , t) (inl p , _) → remove-left-equiv
+    (s , t) (inr q , _) → remove-right-equiv
 
 module _ {Ix : Type ℓ} (F : Ix → Container ℓ ℓ) where
   ∑ : Container ℓ ℓ

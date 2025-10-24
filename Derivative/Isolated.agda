@@ -169,32 +169,6 @@ IsolatedSumIso .Iso.leftInv (inr b , _) = Isolated≡ $ refl′ $ inr b
 IsolatedSumEquiv : (A ⊎ B) ° ≃ (A °) ⊎ (B °)
 IsolatedSumEquiv = isoToEquiv IsolatedSumIso
 
-remove-left-Iso : ∀ {a : A} → isIsolated a → Iso ((A ∖ a) ⊎ B) ((A ⊎ B) ∖ (inl a))
-remove-left-Iso {a = a} isolated-a .Iso.fun (inl (a′ , neq)) = inl a′ , neq ∘ Sum.inlInj
-remove-left-Iso {a = a} isolated-a .Iso.fun (inr b) = inr b , Sum.inr≢inl ∘ sym
-remove-left-Iso {a = a} isolated-a .Iso.inv (inl a′ , neq) = inl (a′ , neq ∘ cong inl)
-remove-left-Iso {a = a} isolated-a .Iso.inv (inr b , _) = inr b
-remove-left-Iso {a = a} isolated-a .Iso.rightInv (inl a′ , _) = Remove≡ refl
-remove-left-Iso {a = a} isolated-a .Iso.rightInv (inr b , _) = Remove≡ refl
-remove-left-Iso {a = a} isolated-a .Iso.leftInv (inl (a′ , neq)) = cong inl (Remove≡ refl)
-remove-left-Iso {a = a} isolated-a .Iso.leftInv (inr b) = refl
-
-remove-left-equiv : ∀ {a : A} → isIsolated a → ((A ∖ a) ⊎ B) ≃ ((A ⊎ B) ∖ (inl a))
-remove-left-equiv = isoToEquiv ∘ remove-left-Iso
-
-remove-right-Iso : ∀ {b : B} → isIsolated b → Iso (A ⊎ (B ∖ b)) ((A ⊎ B) ∖ (inr b))
-remove-right-Iso isolated-b .Iso.fun (inl a) = inl a , Sum.inr≢inl
-remove-right-Iso isolated-b .Iso.fun (inr (b′ , b′≢b)) = inr b′ , b′≢b ∘ Sum.inrInj
-remove-right-Iso isolated-b .Iso.inv (inl a , _) = inl a
-remove-right-Iso isolated-b .Iso.inv (inr b′ , inr-b′≢inr-b) = inr (b′ , inr-b′≢inr-b ∘ cong inr)
-remove-right-Iso isolated-b .Iso.rightInv (inl a , _) = Remove≡ (refl′ (inl a))
-remove-right-Iso isolated-b .Iso.rightInv (inr b′ , _) = Remove≡ (refl′ (inr b′))
-remove-right-Iso isolated-b .Iso.leftInv (inl a) = refl′ (inl a)
-remove-right-Iso isolated-b .Iso.leftInv (inr (b′ , _)) = cong inr $ Remove≡ $ refl′ b′
-
-remove-right-equiv : ∀ {b : B} → isIsolated b → (A ⊎ (B ∖ b)) ≃ ((A ⊎ B) ∖ (inr b))
-remove-right-equiv = isoToEquiv ∘ remove-right-Iso
-
 opaque
   isIsolatedTransport : (a : A) (p : A ≡ B) → isIsolated a → isIsolated (transport p a)
   isIsolatedTransport a = J (λ B p → isIsolated a → isIsolated (transport p a)) λ where

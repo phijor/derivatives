@@ -2,7 +2,7 @@ module Derivative.Remove where
 
 open import Derivative.Prelude
 open import Derivative.Decidable
-open import Derivative.Sum
+open import Derivative.Sum as Sum
 
 open import Cubical.Foundations.Equiv.Properties using (preCompEquiv ; equivAdjointEquiv ; congEquiv)
 open import Cubical.Functions.Embedding using (_↪_ ; EmbeddingΣProp)
@@ -53,6 +53,33 @@ RemoveUnit = isContr→isEmptyRemove Unit.isContrUnit* _
 
 RemoveUnitEquiv : ∀ {ℓ′} → ((Unit* {ℓ}) ∖ tt*) ≃ ⊥* {ℓ′}
 RemoveUnitEquiv = Empty.uninhabEquiv RemoveUnit lower
+
+remove-left-Iso : ∀ {a : A} → Iso ((A ∖ a) ⊎ B) ((A ⊎ B) ∖ (inl a))
+remove-left-Iso .Iso.fun (inl (a′ , neq)) = inl a′ , neq ∘ Sum.inlInj
+remove-left-Iso .Iso.fun (inr b) = inr b , Sum.inr≢inl ∘ sym
+remove-left-Iso .Iso.inv (inl a′ , neq) = inl (a′ , neq ∘ cong inl)
+remove-left-Iso .Iso.inv (inr b , _) = inr b
+remove-left-Iso .Iso.rightInv (inl a′ , _) = Remove≡ refl
+remove-left-Iso .Iso.rightInv (inr b , _) = Remove≡ refl
+remove-left-Iso .Iso.leftInv (inl (a′ , neq)) = cong inl (Remove≡ refl)
+remove-left-Iso .Iso.leftInv (inr b) = refl
+
+remove-left-equiv : ∀ {a : A} → ((A ∖ a) ⊎ B) ≃ ((A ⊎ B) ∖ (inl a))
+remove-left-equiv = isoToEquiv remove-left-Iso
+
+remove-right-Iso : ∀ {b : B} → Iso (A ⊎ (B ∖ b)) ((A ⊎ B) ∖ (inr b))
+remove-right-Iso .Iso.fun (inl a) = inl a , Sum.inr≢inl
+remove-right-Iso .Iso.fun (inr (b′ , b′≢b)) = inr b′ , b′≢b ∘ Sum.inrInj
+remove-right-Iso .Iso.inv (inl a , _) = inl a
+remove-right-Iso .Iso.inv (inr b′ , inr-b′≢inr-b) = inr (b′ , inr-b′≢inr-b ∘ cong inr)
+remove-right-Iso .Iso.rightInv (inl a , _) = Remove≡ (refl′ (inl a))
+remove-right-Iso .Iso.rightInv (inr b′ , _) = Remove≡ (refl′ (inr b′))
+remove-right-Iso .Iso.leftInv (inl a) = refl′ (inl a)
+remove-right-Iso .Iso.leftInv (inr (b′ , _)) = cong inr $ Remove≡ $ refl′ b′
+
+remove-right-equiv : ∀ {b : B} → (A ⊎ (B ∖ b)) ≃ ((A ⊎ B) ∖ (inr b))
+remove-right-equiv = isoToEquiv remove-right-Iso
+
 
 module _ {B : A → Type ℓ} (a₀ : A) (b₀ : B a₀) (is-prop-a₀-loop : isProp (a₀ ≡ a₀)) where
   Σ-remove : (Σ[ (a , _) ∈ A ∖ a₀ ] B a) ⊎ (B a₀ ∖ b₀) → (Σ A B ∖ (a₀ , b₀))

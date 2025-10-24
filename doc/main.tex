@@ -481,7 +481,7 @@ We observe that we can replicate the classical behavior only when \( a_0 \) is a
     (A \setminus a_0) + B &\simeq (A + B) \setminus \Inl(a_0) \\
     A + (B \setminus b_0) &\simeq (A + B) \setminus \Inr(b_0)
   \end{align*}
-  for isolated points \( a_0 : \Isolated{A} \) and \( b_0 : \Isolated{B} \), respectively.
+  for all points \( a_0 : A \) and \( b_0 : B \), respectively.
 \end{problem}
 
 \begin{problem}\label{sigma-remove}
@@ -1196,9 +1196,9 @@ can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \)
         \simeq
       ( \Isolated{P_0(s)} \setminus p_0 ) + B
       \quad
-      (\text{where } B \DefEq {\textstyle \sum_{p : P_1(s)} Q(fp) })
+      (\text{where } B \DefEq {\textstyle \sum_{p : P_1(s)} Q(fp) }),
     \]
-    Since \( p_0 \) is isolated, this is an instance of \autoref{sum-remove-equiv}.
+    which is an instance of \autoref{sum-remove-equiv}.
 
     When \( u \JudgeEq (s, f, \Inr(p_1, q)) \) for some \( p_1 : \Isolated{P_1(s)} \) and \( q : \Isolated{Q(fp)} \),
     we rewrite as follows:
@@ -1220,10 +1220,11 @@ can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \)
           R_1(s, f, \Inr{(p_1, q)})
           \notag
     \end{align}
-    This again is justified since both \( p_1 \) and \( q \) are isolated points:
-    together, the pair \( (p_1, q) \) is isolated in \( \sum_{p : P_1(s)} Q(f p) \) (cf. \autoref{is-isolated-pair}),
-    thus in \eqref{binary-chain-rule-pos-equiv-sum-minus}, we move it to the right of the sum (\autoref{sum-remove-equiv}),
-    and in \eqref{binary-chain-rule-pos-equiv-sigma-minus} we split the \( \Sigma \)-type (\autoref{is-equiv-sigma-remove}).
+    In \eqref{binary-chain-rule-pos-equiv-sum-minus}, we move the pair \( (p_1, q) \) to the right of the sum (\autoref{sum-remove-equiv}).
+    For \eqref{binary-chain-rule-pos-equiv-sigma-minus},
+    we split the \( \Sigma \)-type by applying \autoref{is-equiv-sigma-remove}.
+    This is justified since both \( p_1 \) and \( q \) are isolated points,
+    and together, the pair \( (p_1, q) \) is isolated in \( \sum_{p : P_1(s)} Q(f p) \) by \autoref{is-isolated-pair}.
   \end{construction}
 \end{proposition}
 

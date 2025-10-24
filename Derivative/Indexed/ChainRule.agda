@@ -91,17 +91,16 @@ binary-chain-rule F G =
       → (P ₀ s ⊎ (Σ[ p₁ ∈ P ₁ s ] Q (f p₁))) ∖ (inl p₀)
           ≃
         ((P ₀ s ∖ p₀) ⊎ (Σ[ p₁ ∈ P ₁ s ] Q (f p₁)))
-    η₀ (p₀ , is-isolated-p₀) = invEquiv (remove-left-equiv is-isolated-p₀)
+    η₀ _ = invEquiv remove-left-equiv
 
     η₁ : ((p₁ , _) : P ₁ s °) ((q , _) : Q (f p₁) °)
       → (P ₀ s ⊎ (Σ[ p ∈ P ₁ s ] Q (f p))) ∖ inr (p₁ , q)
         ≃
         (P ₀ s ⊎ (Σ[ (p , _) ∈ (P ₁ s) ∖ p₁ ] Q (f p))) ⊎ (Q (f p₁) ∖ q)
-    η₁ (p₁ , is-isolated-p₁) (q , is-isolated-q)
-      using is-isolated-pq ← isIsolatedΣ is-isolated-p₁ is-isolated-q
+    η₁ (p₁ , is-isolated-p₁) (q , _)
       =
       (P ₀ s ⊎ (Σ[ p ∈ P ₁ s ] Q (f p))) ∖ inr (p₁ , q)
-        ≃⟨ invEquiv (remove-right-equiv is-isolated-pq) ⟩
+        ≃⟨ invEquiv remove-right-equiv ⟩
       (P ₀ s ⊎ ((Σ[ p ∈ P ₁ s ] Q (f p)) ∖ (p₁ , q)))
         ≃⟨ ⊎-right-≃ $ invEquiv $ isIsolatedFst→Σ-remove-equiv is-isolated-p₁ ⟩
       P ₀ s ⊎ ((Σ[ (p , _) ∈ (P ₁ s) ∖ p₁ ] Q (f p)) ⊎ (Q (f p₁) ∖ q))
