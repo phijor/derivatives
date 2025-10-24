@@ -75,6 +75,12 @@
 
 \newcommand*{\Isolated}[1]{#1^{\circ}}
 \DeclareMathOperator{\Graft}{\Op{graft}}
+\DeclarePairedDelimiterXPP{\GraftSyntaxX}[3]%
+  {}%
+  {[}%
+  {]}%
+  {_{#3}}%
+  {#2 \delimsize\vert #1}
 \DeclarePairedDelimiterX{\GraftSyntax}[2]{[}{]}{#2 \delimsize\vert #1}
 
 \newcommand*{\MkCont}[2]{#1\mathbin{\triangleleft}#2}
@@ -409,7 +415,33 @@ This will be useful in situations in which we have control over the types at whi
 
 For any type \( A \) and point \( a_0 : A \) we define the subtype of \enquote{\( A \) with \( a_0 \) removed}
 to be \( A \setminus a_0 \DefEq \sum_{a : A} a_0 \neq a \).
-Whenever \( a_0 \) is isolated in \( A \), a number of useful properties hold.
+Adding a point to a type \( A \) and then removing it again yields an equivalence, as expected:
+\begin{problem}\label{maybe-minus-nothing-equiv}
+  Define an equivalence \( (A + 1) \setminus \Nothing \simeq A \).
+  % \begin{construction}
+  %   Define \( f : (A + 1) \setminus \Nothing \to A \) as \( f(\Just{a} , \mathunderscore) \DefEq a \);
+  %   the case \( f(\Nothing, h : \Nothing \neq \Nothing) \) is absurd.
+  %   It is straightforward to show that the fibers of \( f \) are contractible.
+  % \end{construction}
+\end{problem}
+
+This is an instance of the more general case where removing a point from a sum
+is the same as removing it from either side, and then taking the sum:
+\begin{problem}\label{sum-remove-equiv}
+  Given \( A, B : \Type \), define equivalences
+  \begin{align*}
+    (A + B) \setminus \Inl(a_0) &\simeq (A \setminus a_0) + B \\
+    (A + B) \setminus \Inr(b_0) &\simeq A + (B \setminus b_0)
+  \end{align*}
+  for all points \( a_0 : A \) and \( b_0 : B \), respectively.
+  \begin{construction}
+    Define the obvious maps in either direction by case-analysis.
+    These preserve inequalities since \( \Inl \) and \( \Inr \) are embeddings,
+    and are inverses of each other as inequalities are always propositions.
+  \end{construction}
+\end{problem}
+
+If we would like to \emph{first remove} a point \( a_0 : A \), and \emph{then add} it back into the type,
 There is an obvious map \( \Replace_{a_0} : (A \setminus a_0) + 1 \to A \), defined by cases
 as
 \(
@@ -418,7 +450,7 @@ as
 and
 \(
   \Replace_{a_0}(\Nothing) \DefEq a_0
-\)
+\).
 Classically, this map is an isomorphism of sets;
 the inverse simply maps \( a_0 \) to some fresh element.
 In a univalent setting however, \( a_0 \) might have interesting (higher) path spaces,
@@ -428,7 +460,7 @@ Then \( S^1 \setminus \mathsf{base} \simeq 0 \),
 hence \( (S^1 \setminus \mathsf{base}) + 1 \simeq 1 \not\simeq S^1 \):
 removing \( \mathsf{base} \) removes the entire circle, which is \emph{not} contractible.
 
-We observe that we can replicate the classical behavior only when \( a_0 \) is an isolated point:
+We observe that we can replicate the classical behavior exactly when \( a_0 \) is an isolated point:
 
 \begin{proposition}\label{isolated-minus-plus-equiv}
   Let \( a_0 : A \).
@@ -436,7 +468,7 @@ We observe that we can replicate the classical behavior only when \( a_0 \) is a
   if and only if \( a_0 \) is isolated in \( A \).
   \begin{proof}
     First, assume that \( a_0 \) is isolated.
-    We construct an two-sided inverse \( g : A \to (A \setminus a_0) + 1 \) as follows.
+    We give a two-sided inverse \( g : A \to (A \setminus a_0) + 1 \) as follows.
     Define \( \Op{r} : \prod_{a : A} \Dec{a_0 = a} \to (A \setminus a_0) + 1 \)
     by
     \[
@@ -447,12 +479,12 @@ We observe that we can replicate the classical behavior only when \( a_0 \) is a
       \end{cases}
     \]
     For \( i_0 : \Op{isIsolated}(a_0) \), let \( g(a) \DefEq \Op{r}(a, i_0(a)) \).
-    By \autoref{is-prop-isolated-dec-path}, \( i_0(a) : \Dec(a_0 = a) \) is a proposition for all \( a : A \);
+    By \autoref{is-prop-isolated-dec-path}, \( \Dec(a_0 = a) \) (the type of \( i_0(a) \)) is a proposition for all \( a : A \);
     we use this to ensure that \( g \) computes correctly:
     \begin{align*}
-      g(a_0) &\JudgeEq \Op{r}(a_0, i_0(a_0)) \overset{\scriptstyle!}{=} \Op{r}(a_0, \Op{yes}(\Op{refl})) \JudgeEq \Nothing \\
-      g(a)   &\JudgeEq \Op{r}(a, i_0(a)) \overset{\scriptstyle!}{=} \Op{r}(a, \Op{no}(h)) \JudgeEq \Just{(a, h)}
-        \quad \forall (a, h) : A \setminus a_0
+      g(a_0) &\JudgeEq \Op{r}(a_0, \Highlight{i_0(a_0)}) = \Op{r}(a_0, \Highlight{\Op{yes}(\Op{refl})}) \JudgeEq \Nothing \\
+      g(a)   &\JudgeEq \Op{r}(a, \Highlight{i_0(a)}) = \Op{r}(a, \Highlight{\Op{no}(h))} \JudgeEq \Just{(a, h)}
+        \quad \text{where}~h : a_0 \neq a
     \end{align*}
     Hence \( {\Replace_{a_0}} \circ g = \Op{id} \) and \( g \circ {\Replace_{a_0}} = \Op{id} \).
 
@@ -462,32 +494,9 @@ We observe that we can replicate the classical behavior only when \( a_0 \) is a
   \end{proof}
 \end{proposition}
 
-\begin{problem}\label{maybe-minus-nothing-equiv}
-  Define an equivalence \( (A + 1) \setminus \Nothing \simeq A \).
-  \begin{construction}
-    Define \( f : (A + 1) \setminus \Nothing \to A \) as \( f(\Just{a} , \mathunderscore) \DefEq a \);
-    the case \( f(\Nothing, h : \Nothing \neq \Nothing) \) is absurd.
-    It is straightforward to show that the fibers of \( f \) are contractible.
-  \end{construction}
-\end{problem}
-
-\begin{remark}
-  Alternatively, apply \autoref{isolated-minus-plus-equiv} to \( \Nothing : \Isolated{A + 1} \),
-  obtain an equivalence
-  \( e : ((A + 1) \setminus \Nothing) + 1 \simeq A + 1 \),
-  notice that \( e \) fixes the right summand,
-  and cancel to \( (A + 1) \setminus \Nothing \simeq A \).
-\end{remark}
-
-\begin{problem}\label{sum-remove-equiv}
-  Given \( A, B : \Type \), define equivalences
-  \begin{align*}
-    (A \setminus a_0) + B &\simeq (A + B) \setminus \Inl(a_0) \\
-    A + (B \setminus b_0) &\simeq (A + B) \setminus \Inr(b_0)
-  \end{align*}
-  for all points \( a_0 : A \) and \( b_0 : B \), respectively.
-\end{problem}
-
+If we think of \( (+) \) as the binary version of an \( A \)-indexed sum \( \sum_{a : A} B(a) \),
+removal of points from the latter behaves similarly,
+except that we have to put some restrictions on the paths of the indexing type \( A \):
 \begin{problem}\label{sigma-remove}
   Let \( A : \Type \) and \( B : A \to \Type \)
   with points \( a_0 : A \) and \( b_0 : B(a_0) \),
@@ -519,6 +528,7 @@ We observe that we can replicate the classical behavior only when \( a_0 \) is a
   \end{construction}
 \end{problem}
 
+This map is an equivalence whenever we can decide if we are removing from a chosen index \( a_0 \):
 \begin{proposition}\label{is-equiv-sigma-remove}
   Let \( A : \Type \), \( B : A \to \Type \) with \( a_0 : A \) and \( b_0 : B(a_0) \).
   If \( a_0 \) is an isolated point of \( A \), then \( \SigmaRemove \) of \autoref{sigma-remove}
@@ -546,43 +556,70 @@ We observe that we can replicate the classical behavior only when \( a_0 \) is a
 
 \subsection{Grafting}
 
-\todo[inline]{Yes, \emph{grafting} is the technical term that Abbott {et al.\@} use.}
-\todo[inline]{This is an recursion principle for isolated points.}
-
+In order to derive the chain rule for derivatives,
+\citeauthor{AbbottEtAl2005DataDifferentiating} investigate functions missing an input \( f : A \setminus a \to B \).
+They call the process of extend their domain to all of \( A \) \emph{grafting}.
+We have seen that in the presence of higher types, removal is only well-behaved for isolated points.
+We adjust the definitions accordingly, and show that this yields an induction principle for types
+\( A \) with a chosen isolated point \( a_0 : \Isolated{A} \):
+Functions out of \( A \) are exactly those out of \( A \setminus a_0 \), plus a chosen point \( b_0 : B \).
+First, we define \emph{grafting}:
 \begin{problem}
   For types \( A \) and \( B \), construct a function
   \[
-    \Graft : \prod_{\Isolated{a} : \Isolated{A}}
-      \big((A \setminus \Isolated{a} \to B) \times B \big)
+    \Graft : \prod_{a_0 : \Isolated{A}}
+      \big((A \setminus a_0 \to B) \times B \big)
         \to
       (A \to B)
   \]
-  \begin{construction}
-    Let \( \Isolated{a} : \Isolated{A} \), \( f : A \setminus \Isolated{a} \to B \) and \( b_0 : B \).
-    Decide equality with \( \Isolated{a} \) to define \( \Graft_{\Isolated{a}}(f, b_0) : A \to B \) as follows:
-    \[
-      \Graft_{\Isolated{a}}(f, b_0) \DefEq
-      \lambda a.\,
-      \begin{cases}
-        f(a, h) & \text{if}\ (h : \Isolated{a} \neq a) \\
-        b_0 & \text{otherwise}
-      \end{cases}
-      \qedhere
-    \]
-  \end{construction}
 \end{problem}
+\begin{construction}
+  Let \( a_0 : \Isolated{A} \), \( f : A \setminus a_0 \to B \) and \( b_0 : B \).
+  Decide equality with \( a_0 \) to define \( \Graft_{a_0}(f, b_0) : A \to B \) as follows:
+  \[
+    \Graft_{a_0}(f, b_0) \DefEq
+    \lambda a.\,
+    \begin{cases}
+      f(a, h) & \text{if}\ (h : a_0 \neq a) \\
+      b_0 & \text{otherwise}
+    \end{cases}
+    \qedhere
+  \]
+\end{construction}
 
-If \( \Isolated{a} : \Isolated{A} \) is understood from context, write \( \GraftSyntax{f}{b} \DefEq \Graft_{\Isolated{a}}(f, b) \).
+We adopt the notation
+\( \GraftSyntaxX{f}{b_0}{a_0} \DefEq \Graft_{a_0}(f, b_0) \)
+of \citeauthor{AbbottEtAl2005DataDifferentiating},
+or simply \( \GraftSyntax{f}{b_0} \) if \( a_0 : \Isolated{A} \) is understood from context.
 
 \begin{proposition}\label{graft-equiv}
-  For all \( \Isolated{a} : \Isolated{A} \),
-  \(
-    \Graft_{\Isolated{a}} :
-    \big((A \setminus \Isolated{a} \to B) \times B \big)
-      \simeq
-    (A \to B)
-  \)
-  is an equivalence of types.
+  For \( A : \Type \) with \( a_0 : \Isolated{A} \),
+  grafting has the following hold:
+  \begin{enumerate}
+    \item Computation rules for all \( f : A \setminus a_0 \to B \) and \( b_0 : B \):
+      \begin{align*}
+        \GraftSyntaxX{f}{b_0}{a_0}(a_0) &= b_0
+          &
+        &\text{and}
+          &
+        \adjustlimits \prod_{a : A} \prod_{h : a_0 \neq a} \GraftSyntaxX{f}{b_0}{a_0}(a) &= f(a, h)
+      \end{align*}
+    \item
+      \(
+        \Graft_{a_0} :
+        \big((A \setminus a_0 \to B) \times B \big)
+          \simeq
+        (A \to B)
+      \)
+      is an equivalence of types.
+  \end{enumerate}
+  \begin{proof}
+    The computation rules are straightforward, but crucially make use of \autoref{is-prop-isolated-dec-path}:
+    the type \( \Dec(a_0 = a) \) is a proposition for all \( a \), and \( \Graft \) is defined by induction on this type.
+    To show that \( \Graft \) is an equivalence, consider that any \( f : A \to B \) can be split
+    into \( f \circ \Op{fst} : A \setminus a_0 \to B \) and \( f(a_0) : B \);
+    the computation rules ensure that this is an inverse to \( \Graft \).
+  \end{proof}
 \end{proposition}
 
 \section{Containers}
