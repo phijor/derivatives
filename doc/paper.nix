@@ -21,6 +21,7 @@
           bussproofs
           cmll
           csquotes
+          enumitem
           tikz-cd
           todonotes
           translations

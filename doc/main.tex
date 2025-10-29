@@ -87,8 +87,8 @@
 \DeclareMathOperator{\Sh}{\mathsf{Sh}}
 \DeclareMathOperator{\Ps}{\mathsf{Ps}}
 
-\NewDocumentCommand{\CTimes}{}{\mathbin{\otimes}}
-\NewDocumentCommand{\CPlus}{}{\mathbin{\oplus}}
+\NewDocumentCommand{\CTimes}{}{\mathbin{\times}}
+\NewDocumentCommand{\CPlus}{}{\mathbin{+}}
 \DeclareMathOperator{\CConst}{\Op{K}}
 \DeclarePairedDelimiterXPP{\Wk}[1]%
   {} % pre-code
@@ -123,12 +123,13 @@
 \NewDocumentCommand{\Der}{}{\partial}
 \NewDocumentCommand{\Id}{}{\mathsf{Id}}
 \NewDocumentCommand{\Proj}{m}{\pi_{#1}}
+\DeclareMathOperator{\Chain}{\Op{chain}}
 \DeclareMathOperator{\MuRule}{\Op{\mu-rule}}
 
 \DeclareMathOperator{\Inl}{\mathsf{inl}}
 \DeclareMathOperator{\Inr}{\mathsf{inr}}
 
-\NewDocumentCommand{\Maybe}{m}{#1 \otimes \Id}
+\NewDocumentCommand{\Maybe}{m}{#1 \CTimes \Id}
 \DeclareMathOperator{\Nothing}{\mathsf{nothing}}
 \DeclareMathOperator{\Just}{\mathsf{just}}
 
@@ -155,7 +156,7 @@
 
 This section recalls the notion of isolated points of a type.
 This definition is not new\todo{figure out how to properly cite \texttt{TypeTopology} \cite{EscardocontributorsTypeTopology}, or whatever primary source}.
-We are going to prove some properties that will be applied on \autoref{derivatives}
+We are going to prove some properties that will be applied in \autoref{derivatives}
 to establish properties of derivatives of containers:
 Many of the laws of derivatives -- after some \emph{type-yoga} -- reduce directly to instances of statements in this section.
 
@@ -168,7 +169,7 @@ Many of the laws of derivatives -- after some \emph{type-yoga} -- reduce directl
 \end{definition}
 
 Asking for a point to be isolated trivializes the path spaces around it:
-\begin{lemma}\label{is-prop-isolated-path}
+\begin{lemma}[note={\cite[Theorem~3.12]{KrausEtAl2017NotionsAnonymousExistence}}]\label{is-prop-isolated-path}
   If \( a : A \) is isolated, then \( a = b \) is a proposition for all \( b : A \).
   \begin{proof}
     \todo[inline]{This follows from a \enquote{local} version of \emph{Hedberg's Lemma}.}
@@ -205,7 +206,7 @@ If a map \( f : A \to B \) is not an equivalence,
 but still behaves \enquote{nicely} on path spaces, we can deduce its behavior on isolated points.
 Recall that \( f \) is an embedding if \( \Op{cong}_f : x = y \to f(x) = f(y) \) is an equivalence,
 written \( f : A \hookrightarrow B \).
-Such a map reflects isolated points:
+Such maps reflect isolated points:
 
 \begin{proposition}[note={Embeddings reflect isolated points}]\label{embedding-reflect-isolated}
   Let \( f : A \hookrightarrow B \) and \( a : A \).
@@ -217,8 +218,13 @@ Such a map reflects isolated points:
     If \( f(a) = f(a^\prime) \), we get \( a = a^\prime \) since \( f \) is an embedding, which we can cancel.
   \end{proof}
 \end{proposition}
+In principle, we can weaken the assumptions of the previous proposition to a function \( f : A \to B \)
+for which \emph{some} \( \prod_{x,y} f(x) = f(y) \to x = y \) exists -- not necessarily an inverse to \( \Op{cong}_f \):
+the proof works no matter which path we pick.
+\emph{Post hoc} this path has to be unique, since it originates from an isolated point.
 
-From this we can deduce that the canonical embeddings \( \Inl : A \hookrightarrow A + B \) and \( \Inr : B \hookrightarrow A + B \)
+In the remainder, however, we will, apply \autoref{embedding-reflect-isolated} exclusively to embeddings.
+In particular, we deduce that the canonical embeddings \( \Inl : A \hookrightarrow A + B \) and \( \Inr : B \hookrightarrow A + B \)
 both reflect and create isolated points:
 
 \begin{proposition}\label{sum-embeddings-respect-isolated}
@@ -260,9 +266,21 @@ is trivially isolated:
 Later on (\autoref{lax-chain-rule}),
 it will become necessary to investigate whether isolated points distribute over other type formers,
 in particular dependent sums.
+First, observe that any dependent pair of isolated points defines an isolated point in the corresponding \( \Sigma \)-type:
 \begin{proposition}\label{is-isolated-pair}
   Let \( A : \Type \) and \( B : A \to \Type \) with points \( a_0 : A \) and \( b_0 : B(a_0) \).
   If both \( a_0 \) and \( b_0 \) are isolated, then \( (a_0 , b_0) \) is isolated in \( \sum_{a : A} B(a) \).
+  This defines a map
+  \[
+    \SigmaIsolate_{A,B} :
+      \sum\nolimits_{a_0 : \Isolated{A}} \Isolated{B(a_0)}
+        \to
+      \Isolated{%
+        \big(
+          \sum\nolimits_{a : A} B(a)
+        \big)
+      }.
+  \]
   \begin{proof}
     Let \( a : A \), \( b : B(a) \). Our goal is to decide whether \( (a_0 , b_0) = (a, b) \) or not.
     By extensionality of path types of dependent sums
@@ -273,62 +291,19 @@ in particular dependent sums.
   \end{proof}
 \end{proposition}
 
-\begin{problem}\label{sigma-isolate}
-  Given \( A : \Type \) and \( B : A \to \Type \),
-  define a map
-  \[
-    \SigmaIsolate_{A,B} :
-      \sum\nolimits_{a_0 : \Isolated{A}} \Isolated{B(a_0)}
-        \to
-      \Isolated{%
-        \big(
-          \sum\nolimits_{a : A} B(a)
-        \big)
-      }
-  \]
-  \begin{construction}
-    Define \( \SigmaIsolate((a, \mathunderscore), (b, \mathunderscore)) \DefEq ((a, b), \mathunderscore) \);
-    the pair \( (a, b) \) is isolated by \autoref{is-isolated-pair}.
-  \end{construction}
-\end{problem}
-
-\begin{proposition}\label{discrete-is-equiv-sigma-isolated}
-  If \( A : \Type \) and \( B : A \to \Type \) are (pointwise) discrete types,
-  then \( \SigmaIsolate_{A,B} \) is an equivalence.
-  \begin{proof}
-    For discrete \( A \) and \( B \)
-    \autoref{is-equiv-forget-isolated-iff-discrete} yields a commutative triangle
-    \[
-      \begin{tikzcd}[column sep=small]
-          \sum_{a_0 : \Isolated{A}} \Isolated{B(a_0)}
-            &
-          %
-            &
-          \Isolated{\big(\sum_{a : A} B(a)\big)}
-        \\
-          %
-            &
-          {\sum_{a : A} B(a)}
-            &
-          %
-        \ar[from=1-1, to=1-3, "\SigmaIsolate"]
-        \ar[from=1-1, to=2-2, "\simeq"{description}]
-        \ar[from=2-2, to=1-3, "\simeq"{description}]
-      \end{tikzcd}
-    \]
-    hence \( \SigmaIsolate \) is an equivalence by the \emph{3-for-2}-property.
-  \end{proof}
-\end{proposition}
-
-\Autoref{is-isolated-pair} tells us that a pair is isolated if its components are.
-It turns out that the converse is true exactly when \( \SigmaIsolate \) is an equivalence:
+We would like to characterize the isolated points of \( \Sigma \)-types.
+\Autoref{is-isolated-pair} tells us that a pair is isolated if its components are,
+and if we had an inverse to \( \SigmaIsolate \), then the converse would hold as well.
+It turns out that this requirement is not only sufficient, but also necessary:
 
 \begin{lemma}\label{is-equiv-sigma-isolate-iff-isolated-pair}
   Let \( A : \Type \) and \( B : A \to \Type \).
   The following are equivalent:
   \begin{enumerate}
-    \item \( \SigmaIsolate_{A,B} \) is an equivalence.
-    \item For all \( a_0 : A \) and \( b_0 : B(a_0) \),
+    \item \label{is-equiv-sigma-isolate-iff-isolated-pair-is-equiv}
+      \( \SigmaIsolate_{A,B} \) is an equivalence.
+    \item \label{is-equiv-sigma-isolate-iff-isolated-pair-pair}
+      For all \( a_0 : A \) and \( b_0 : B(a_0) \),
       if \( (a_0 , b_0) \) is isolated in \( \Sigma_{A} B \),
       then both \( a_0 \) and \( b_0 \) are isolated.
   \end{enumerate}
@@ -351,47 +326,23 @@ It turns out that the converse is true exactly when \( \SigmaIsolate \) is an eq
   \end{proof}
 \end{lemma}
 
-% However, globally assuming that isolated points of dependent pairs can be characterized this
-% way is a very classical property.
-% Indeed, we can use the following lemma to show that any type \( A : \Type \) for which this holds,
-% is necessarily discrete:
-% \begin{lemma}\label{is-isolated-fst-discrete}
-%   A type \( A : \Type \) is discrete if the following proposition holds:
-%   \[
-%     % \operatorname{\Op{\Sigma-isolate-fst}}_A :
-%      \prod_{B : A \to \Type}
-%       \prod_{a : A}
-%       \prod_{b : B(a)}
-%       \operatorname{\Op{isIsolated}}{(a, b)}
-%       \to
-%       \operatorname{\Op{isIsolated}} a
-%   \]
-%   \begin{proof}
-%     It suffices to show that all points \( a_0 : A \) are isolated.
-%     The type of singletons \( \sum_{a : A} a_0 = a \)
-%     is contractible, hence all of its points are isolated.
-%     We apply the assumption to \( B(a) \DefEq {(a_0 = a)} \),
-%     \( a \DefEq a_0 \) and \( b \DefEq \Op{refl}_{a_0} \),
-%     from which we conclude that \( a_0 \) is isolated.
-%   \end{proof}
-% \end{lemma}
+For discrete \( A : \Type \) and \( B : A \to \Type \),
+\autoref{is-equiv-forget-isolated-iff-discrete} tells us that isolated points trivially distribute over sums;
+there is an equivalence
+\( \sum_{a_0 : \Isolated{A}} \Isolated{B(a_0)} \simeq \sum_{a : A} B(a) \simeq \cramped{ \Isolated{\big(\sum_{a : A} B(a)\big)} } \).
+The previous result confirms that the map underlying this equivalence is \( \SigmaIsolate \):
 
-% \begin{proposition}\label{is-equiv-sigma-isolate-discrete}
-%   Let \( A : \Type \).
-%   If \( \SigmaIsolate_{A,B} \) is an equivalence for all families \( B : A \to \Type \),
-%   then \( A \) is discrete.
-%   \begin{proof}
-%     We prove discreteness of \( A \) by appealing to \autoref{is-isolated-fst-discrete}.
-%     Let \( B : A \to \Type \), \( a_0 : A \), \( b_0 : B(a_0) \).
-%     It remains to show that, if \( (a_0, b_0) \) is isolated, so is \( a_0 \).
-%     But this we can conclude from \autoref{is-equiv-sigma-isolate-pair}.
-%   \end{proof}
-% \end{proposition}
+\begin{corollary}\label{discrete-is-equiv-sigma-isolated}
+  If \( A : \Type \) and \( B : A \to \Type \) are (pointwise) discrete types,
+  then \( \SigmaIsolate_{A,B} \) is an equivalence.
+  \begin{proof}
+    Condition \ref{is-equiv-sigma-isolate-iff-isolated-pair-pair} of \autoref{is-equiv-sigma-isolate-iff-isolated-pair} is vacuously satisfied for discrete types.
+  \end{proof}
+\end{corollary}
 
-Taking these results together,
-we obtain a way to characterize when a type is discrete in terms of \( \SigmaIsolate \) being an equivalence.
-This will be useful in situations in which we have control over the types at which index \( \SigmaIsolate \).
-
+In general, however, it seems difficult to describe exactly when isolated points distribute this way.
+In extreme cases, both \( A \) and \( B \) can be complicated types, whereas their sum \( \sum_A B \) is entirely trivial.
+This applies in particular to the type of singletons, \( \Op{singl}(a_0) \DefEq \sum_{a : A} a_0 = a \):
 \begin{proposition}\label{discrete-iff-is-equiv-singl-isolate}
   For all types \( A \), following are equivalent:
   \begin{enumerate}
@@ -409,6 +360,8 @@ This will be useful in situations in which we have control over the types at whi
     Thus, by \autoref{is-equiv-sigma-isolate-iff-isolated-pair}, the first component \( a_0 \) must be isolated.
   \end{proof}
 \end{proposition}
+This lets us describe whether a type is discrete purely in terms of \( \SigmaIsolate \),
+which will be useful in situations in which we have control over the types indexing \( \SigmaIsolate \).
 
 \subsection{Removing points}
 
@@ -441,8 +394,14 @@ is the same as removing it from either side, and then taking the sum:
   \end{construction}
 \end{problem}
 
+\begin{construction}[note={for \autoref{maybe-minus-nothing-equiv}}]
+  The type \( (1 \setminus \bullet) \) is empty,
+  so by \autoref{sum-remove-equiv}, \( (A + 1) \setminus \Nothing \simeq A + (1 \setminus \bullet) \simeq A \).
+\end{construction}
+
 If we would like to \emph{first remove} a point \( a_0 : A \), and \emph{then add} it back into the type,
-There is an obvious map \( \Replace_{a_0} : (A \setminus a_0) + 1 \to A \), defined by cases
+there is an obvious map \( \Replace_{a_0} : (A \setminus a_0) + 1 \to A \);
+it is defined by cases
 as
 \(
   \Replace_{a_0}(\Just{(a, \mathunderscore)}) \DefEq a
@@ -452,13 +411,14 @@ and
   \Replace_{a_0}(\Nothing) \DefEq a_0
 \).
 Classically, this map is an isomorphism of sets;
-the inverse simply maps \( a_0 \) to some fresh element.
+the inverse simply maps \( a_0 \) to \( \bullet \).
 In a univalent setting however, \( a_0 \) might have interesting (higher) path spaces,
 which too are removed by this construction.
 Consider for example the circle \( S^1 \) with \( \mathsf{base} : S^1 \).
 Then \( S^1 \setminus \mathsf{base} \simeq 0 \),
 hence \( (S^1 \setminus \mathsf{base}) + 1 \simeq 1 \not\simeq S^1 \):
 removing \( \mathsf{base} \) removes the entire circle, which is \emph{not} contractible.
+% This intui
 
 We observe that we can replicate the classical behavior exactly when \( a_0 \) is an isolated point:
 
@@ -554,13 +514,35 @@ This map is an equivalence whenever we can decide if we are removing from a chos
   \end{proof}
 \end{proposition}
 
+\begin{tikzpicture}
+  % \filldraw[
+  %   rounded corners=10pt,
+  %   fill=blue!30,
+  %   draw=blue!80!black,
+  %   thick,
+  % ]
+  %   (0,0) rectangle (7,4);
+
+  \coordinate (O) at (-0.5,-0.5);
+
+  \draw[->] (O) -- ++(0,1) node[above] {\( b : B(a) \)};
+  \draw[->] (O) -- ++(1,0) node[right] {\( a : A \)};
+
+  \foreach \x/\X in {0/6, 1/3, 2/5, 3/1, 4/4, 5/7} {
+    \foreach \y in {1,...,\X} {
+      \fill[black] (0.5+\x, \y*0.5) circle (2pt);
+    }
+  }
+\end{tikzpicture}
+
 \subsection{Grafting}
 
 In order to derive the chain rule for derivatives,
-\citeauthor{AbbottEtAl2005DataDifferentiating} investigate functions missing an input \( f : A \setminus a \to B \).
-They call the process of extend their domain to all of \( A \) \emph{grafting}.
+\citeauthor{AbbottEtAl2005DataDifferentiating}~\cite{AbbottEtAl2005DataDifferentiating} investigate functions \( f : A \setminus a \to B \) that are defined on all but one inputs.
+They call the process of extending \( f \) to all of \( A \) \emph{grafting}.
 We have seen that in the presence of higher types, removal is only well-behaved for isolated points.
-We adjust the definitions accordingly, and show that this yields an induction principle for types
+In order to obtain a good notion of grafting, we have to adjust the definitions accordingly.
+In particular, we derive an induction principle for types
 \( A \) with a chosen isolated point \( a_0 : \Isolated{A} \):
 Functions out of \( A \) are exactly those out of \( A \setminus a_0 \), plus a chosen point \( b_0 : B \).
 First, we define \emph{grafting}:
@@ -592,11 +574,11 @@ We adopt the notation
 of \citeauthor{AbbottEtAl2005DataDifferentiating},
 or simply \( \GraftSyntax{f}{b_0} \) if \( a_0 : \Isolated{A} \) is understood from context.
 
-\begin{proposition}\label{graft-equiv}
+\begin{proposition}[note={\( \Graft \)-induction}]\label{graft-equiv}
   For \( A : \Type \) with \( a_0 : \Isolated{A} \),
-  grafting has the following hold:
+  grafting has the following properties:
   \begin{enumerate}
-    \item Computation rules for all \( f : A \setminus a_0 \to B \) and \( b_0 : B \):
+    \item (Computation rules). For all \( f : A \setminus a_0 \to B \) and \( b_0 : B \):
       \begin{align*}
         \GraftSyntaxX{f}{b_0}{a_0}(a_0) &= b_0
           &
@@ -622,7 +604,7 @@ or simply \( \GraftSyntax{f}{b_0} \) if \( a_0 : \Isolated{A} \) is understood f
   \end{proof}
 \end{proposition}
 
-\section{Containers}
+\section{Derivatives of Containers}\label{derivatives}
 
 \begin{definition}
   A \emph{container} \( (\MkCont{S}{P}) \) consists of \emph{shapes} \( S : \Type \) and
@@ -637,39 +619,58 @@ or simply \( \GraftSyntax{f}{b_0} \) if \( a_0 : \Isolated{A} \) is understood f
   \[
     \Cart{F}{G} \DefEq \sum_{f : S \to T} \prod_{s : S} Q_{fs} \simeq P_s
   \]
-  A cartesian morphism \( (f, u) : \Cart{F}{G} \) is an \emph{equivalence} of containers
-  if \( f \) is an equivalence of types.
 \end{definition}
+
+In the remainder of this paper we will only consider cartesian morphisms.
+We are going to drop \enquote{cartesian} in writing, but retain the notation \( \Cart{F}{G} \).
+Morphisms of containers compose as expected, and together with an identity morphism \( \Op{id}_F : \Cart{F}{F} \)
+they form a wild category:
+composition is associative and unital, but we make no assumption on the truncation level of the hom-types \( \Cart{F}{G} \).
+Note that this wild category is \emph{not} univalent in the na{\"i}ve sense:
+The canonical map taking identifications of containers \( F = G \) to (categorical) isomorphisms
+(i.e. pairs \( f : \Cart{F}{G}, g : \Cart{G}{F} \) with chosen identifications \( fg = \Op{id}_F \) and \( gf = \Op{id}_G \)),
+is \emph{not} an equivalence, unless shapes and positions of the involved containers are sets.
+Instead, we are going to use the following definition when comparing containers:
+
+\begin{definition}
+  A cartesian morphism \( (f, u) : \Cart{F}{G} \) is an \emph{equivalence} of containers
+  if \( f : F_{\Sh} \to G_{\Sh} \) is an equivalence of types.
+  We write \( F \CartEquiv G \) for the type of equivalences of containers.
+\end{definition}
+By an application of univalence, the type of equivalences \( F \CartEquiv G \) is equivalent to the type of identifications, \( F = G \).
+While we cannot prove this internally, we think of the wild category of containers as \( (\infty,1) \)-category
+in which \( F \CartEquiv G \) is the \enquote{correct} notion of weak equivalence,
+representing the \( \infty \)-groupoid of paths \( F = G \).
+
+In cases where we do care about the truncation level of shapes and positions,
+we define the following subtypes of containers:
+\begin{definition}
+  A container \( (\MkCont{S}{P}) \) is \( (n,k) \)-truncated if \( S \) is \( n \)-truncated,
+  and \( P_s \) is \( k \)-truncated for all \( s : S \).
+\end{definition}
+Traditional set-based containers are \( (0,0) \)-truncated, whereas \citeauthor{Gylterud2011}'s \emph{symmetric containers}~\cite{Gylterud2011} are \( (1,0) \)-truncated.
+In particular, \( (0,0) \)-truncated containers form a univalent 1-category.
 
 When constructing a morphism \( f : \Cart{F}{G} \), we will oftentimes factor it
 through (equivalent) auxiliary containers
 \begin{equation*}
   \begin{tikzcd}
     F \ar[r, -multimap, "f"] & G \\
-    {F'} \ar[r, -multimap, "f'"] & {G'}
+    {F'} \ar[r, -multimap, "f'"{swap}] & {G'}
     \ar[from=1-1,to=2-1, -multimap, "\sim"{swap}]
     \ar[from=2-2,to=1-2, -multimap, "\sim"{swap}]
   \end{tikzcd}
 \end{equation*}
 This lets us separate the bureaucracy of bringing \( F \) and \( G \) into a comparable shape
-from the act of defining an interesting map \( f' : F' \to G' \).
+from the act of defining an interesting morphism \( f' : \Cart{F'}{G'} \).
 As a consequence, \( f \) is an equivalence of containers if and only if \( f' \) is,
 which is often easier to characterize.
 
-\begin{definition}
-  Containers and cartesian morphisms form a wild category \( \ContCart \).
-\end{definition}
-
-\section{Derivatives}\label{derivatives}
+\subsection{Derivatives}
 
 \begin{definition}
   The derivative of a container \( \Der{(\MkCont{S}{P})} \DefEq (\MkCont{S'}{P'}) \)
   has shapes \( S' \DefEq \sum_{s : S} \Isolated{P_s} \) and positions \( P'(s , p) \DefEq P_s \setminus p \).
-\end{definition}
-
-\begin{definition}
-  A container \( (\MkCont{S}{P}) \) is \( (n,k) \)-truncated if \( S \) is \( n \)-truncated,
-  and \( P_s \) is \( k \)-truncated for all \( s : S \).
 \end{definition}
 
 \begin{corollary}
@@ -685,13 +686,16 @@ which is often easier to characterize.
 The derivative acts on cartesian morphisms.
 \begin{problem}
   Define a wild endofunctor \( \Der : \ContCart \to \ContCart \).
+  That is,
+  for all \( f : \Cart{F}{G} \), a morphisms \( \Der{f} : \Cart{\Der{F}}{\Der{G}} \),
+  such that \( \Der(\Id_F) = \Id_{\Der{F}} \) and \(\Der(fg) = (\Der{f})(\Der{g}) \).
   \begin{construction}
     For any \( (f, u) : \Cart{(\MkCont{S}{P})}{(\MkCont{T}{Q})} \),
     there is a canonical morphism \( \Der{(f, u)} \DefEq (f' , u') : \Cart{\Der{(\MkCont{S}{P})}}{\Der{(\MkCont{T}{Q})}} \)
     obtained as follows:
     On shapes, the map \( f' : \sum_{s : S} \Isolated{P_s} \to \sum_{t : T} \Isolated{G_t} \)
     applies \( f \) to the first component and \( \Isolated{(u_s^\Inv)} : \Isolated{P_s} \simeq \Isolated{G_{fs}} \) to the second.
-    On positions, \( u'_{s,p} : G_{fs} \setminus u_s^\Inv(p) \simeq F_s \setminus p \) is obtained from \( u_s \), respecting the removed point
+    On positions, \( u'_{s,p} : G_{fs} \setminus u_s^\Inv(p) \simeq F_s \setminus p \) is obtained from \( u_s \), which respects the removed point \( p \).
     (cf.\@ \autoref{is-isolated-respect-equiv}).
   \end{construction}
 \end{problem}
@@ -700,7 +704,44 @@ The derivative acts on cartesian morphisms.
 \subsection{Linear adjunction}
 
 \begin{problem}
-  Define an adjunction \( (\eta, \varepsilon) : \Maybe{-} \vdash \Der{(-)} \).
+  Define a wild adjunction \( (\eta, \varepsilon) : (\Maybe{-}) \vdash \Der{(-)} \),
+  that is:
+  \begin{enumerate}
+    \item
+      Two families of morphisms
+      \[
+        \eta : \prod_{F : \Cont} \Cart{F}{\Der{(G \CTimes \Id)}}
+        \quad\text{and}\quad
+        \varepsilon : \prod_{G : \Cont} \Cart{\Der{G} \CTimes \Id}{G}
+      \]
+    \item with identifications for all \( f : \Cart{F}{G} \), showing naturality
+      \[
+        \operatorname{\Op{isNat}}_{\eta}(f) : \eta_F ; \Der{(f \CTimes \Id)} = f ; \eta_G
+        \quad\text{and}\quad
+        \operatorname{\Op{isNat}}_{\varepsilon}(f) : (\Der{f} \CTimes \Id) ; \varepsilon_G = \varepsilon_F ; f
+      \]
+    \item for which the zigzag-equations
+      \begin{align*}
+        &
+        \begin{tikzcd}[ampersand replacement=\&, column sep=tiny, row sep=large]
+          \Maybe{F} \& \& \Maybe{F} \\
+                    \& \Maybe{(\Der{(\Maybe{F})})} \& %
+          \ar[from=1-1, to=1-3, -multimap, "\Op{id}"]
+          \ar[from=1-1, to=2-2, -multimap, "\Maybe{{\eta_F}}"{'}]
+          \ar[from=2-2, to=1-3, -multimap, "\varepsilon_{\Maybe{F}}"{'}]
+        \end{tikzcd}
+          &\text{and}
+        &
+        \begin{tikzcd}[ampersand replacement=\&, column sep=tiny, row sep=large]
+                    \& \Der{(\Maybe{\Der{G}})} \& \\
+          \Der{G} \& \& \Der{G} %
+          \ar[from=2-1, to=2-3, -multimap, "\Op{id}"]
+          \ar[from=2-1, to=1-2, -multimap, "\eta_{\Der{G}}"]
+          \ar[from=1-2, to=2-3, -multimap, "\Der{(\varepsilon_{G})}"]
+        \end{tikzcd}
+      \end{align*}
+      hold.
+  \end{enumerate}
   \begin{construction}
     Let \( F \JudgeEq (\MkCont{S}{P}) \) and define \( \eta_F : \Cart{F}{\Der{(\Maybe{F})}} \).
     On shapes, \( {\eta_F^{\Sh}} : S \to \sum_{(s, \mathunderscore) : S \times 1} \Isolated{(P_s + 1)} \)
@@ -717,32 +758,19 @@ The derivative acts on cartesian morphisms.
     \)
     is given by \autoref{isolated-minus-plus-equiv} for all \( t : T \) and \( q : \Isolated{Q_t} \).
 
-    It remains to prove the zigzag equations
-    \begin{align*}
-      &
-      \begin{tikzcd}[ampersand replacement=\&, column sep=small]
-        \Maybe{F} \& \& \Maybe{F} \\
-                  \& \Maybe{(\Der{(\Maybe{F})})} \& %
-        \ar[from=1-1, to=1-3, "\Op{id}"]
-        \ar[from=1-1, to=2-2, "\Maybe{{\eta_F}}"{'}]
-        \ar[from=2-2, to=1-3, "\varepsilon_{\Maybe{F}}"{'}]
-      \end{tikzcd}
-        &
-      &
-      \begin{tikzcd}[ampersand replacement=\&, column sep=small]
-                  \& \Der{(\Maybe{\Der{G}})} \& \\
-        \Der{G} \& \& \Der{G} %
-        \ar[from=2-1, to=2-3, "\Op{id}"]
-        \ar[from=2-1, to=1-2, "\eta_{\Der{G}}"]
-        \ar[from=1-2, to=2-3, "\Der{(\varepsilon_{G})}"]
-      \end{tikzcd}
-    \end{align*}
-    After applying the necessary extensionality principles
-    for functions, equivalences and sum types,
-    these hold almost definitionally.
-    Only some proofs of isolation and removal need to be compared up to propositional equality.
+    To construct the identifications for the zigzag equations,
+    we apply the necessary extensionality principles for functions, equivalences and sum types.
+    We are left to construct paths that are almost \( \Op{refl} \);
+    only some proofs of isolation and removal need to be compared up to propositional equality.
   \end{construction}
 \end{problem}
+
+If we restrict the above to set-truncated containers, we can solve a problem left open by \citeauthor{AbbottEtAl2005DataDifferentiating}:
+they \enquote{leave it to future work to identify the subcategory of differentiable containers}~\cite[14]{AbbottEtAl2005DataDifferentiating};
+indeed, \emph{every} container is differentiable in this sense, as long as we define derivatives in terms of isolated positions:
+\begin{theorem}
+  In the 1-category of set-truncated containers, \( \Der \) is right-adjoint to tensoring with \( \Id \).
+\end{theorem}
 
 \subsection{Laws of Derivates}
 
@@ -773,7 +801,7 @@ The derivative acts on cartesian morphisms.
   For containers \( F, G \), the following hold:
   \begin{enumerate}
     \item Sum rule: \( {\Der{(F \oplus G)}} \CartEquiv {\Der{F} \oplus \Der{G}} \)
-    \item Leibniz rule: \( {\Der{(F \otimes G)}} \CartEquiv {(\Der{F} \otimes G) \oplus (F \otimes \Der{G})} \)
+    \item Leibniz rule: \( {\Der{(F \CTimes G)}} \CartEquiv {(\Der{F} \CTimes G) \oplus (F \CTimes \Der{G})} \)
   \end{enumerate}
   \begin{proof}
     Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
@@ -975,9 +1003,18 @@ but for now we can record the following fact:
   Let \( F = (\MkCont{S}{P}) \) and \( G = (\MkCont{T}{Q}) \).
   The following are equivalent propositions:
   \begin{enumerate}
-    \item \( \Op{chain}_{F,G} \) is an equivalence of containers
-    \item \( \SigmaIsolate_{P_s,Q_{f(\shortminus)}} \) is an equivalence for all \( s : S \) and \( f : P_s \to T \)
+    \item \label{strong-chain-rule-iff-is-equiv-sigma-isolate-1}
+      \( \Op{chain}_{F,G} \) is an equivalence of containers
+    \item \label{strong-chain-rule-iff-is-equiv-sigma-isolate-2}
+        \( \SigmaIsolate_{P_s,Q_{f(\shortminus)}} \) is an equivalence for all \( s : S \) and \( f : P_s \to T \)
+    \item \label{strong-chain-rule-iff-is-equiv-sigma-isolate-3}
+      For all \( s : S \) and \( f : P_s \to T \), if \( (p, q) : \sum_{p : P_s} Q_{fp} \) is isolated,
+      then both \( p \) and \( q \) are isolated.
   \end{enumerate}
+  \begin{proof}
+    Equivalence of the first two points follows from inspection of the definition of \( \Op{chain} \) in terms of \( \SigmaIsolate \).
+    Equivalence with the last point is \autoref{is-equiv-sigma-isolate-iff-isolated-pair}.
+  \end{proof}
 \end{proposition}
 
 This characterization lets us immediately see in which cases we can and cannot expect a strong chain rule.
@@ -994,7 +1031,7 @@ Firstly, we recover a strong chain rule for \emph{discrete} containers, as expec
 \end{theorem}
 
 Secondly, we conclude that globally having a strong chain rule is an inherently classical property:
-\begin{theorem}
+\begin{theorem}\label{globally-discrete-iff-strong-chain-rule}
   The following are equivalent propositions:
   \begin{enumerate}
     \item \emph{every} type is discrete
@@ -1025,6 +1062,23 @@ Secondly, we conclude that globally having a strong chain rule is an inherently 
   \]
   \begin{proof}
     The circle \( S^1 \) is provably not discrete: If it were, it would be a set.
+  \end{proof}
+\end{corollary}
+
+\begin{corollary}
+  The following are equivalent:
+  \begin{enumerate}
+    \item Every set is discrete.
+    \item In the 1-category of set-truncated containers, \( \Chain_{F,G} \) is an isomorphism
+      for all pairs of containers \( F \) and \( G \).
+  \end{enumerate}
+  \begin{proof}
+    In a 1-category, being an isomorphism is a proposition,
+    which
+    --- in the category of set-truncated containers ---
+    is equivalent to being an equivalence.
+    The claim follows by inspection of the proof of \autoref{globally-discrete-iff-strong-chain-rule},
+    and ensuring that the same argument applies even when all types involved are 0-truncated.
   \end{proof}
 \end{corollary}
 
@@ -1306,7 +1360,8 @@ and \( 0 \) for any other direction.
       \alpha : \Cart{G[\Der(\mu F)]}{\Der(\mu F)}
     \]
     where \( G \DefEq { \Wk{\Der_0{F}[ {\mu F} ]} } \CPlus ( \Wk{\Der_1{F}[ {\mu F} ]} \CTimes \Proj{1} ) \).
-    First note that substitution into \( G \) replaces \( \Proj{1} \), i.e.\@ there is an equivalence
+    First note that \( G \) is a container in two variables,
+    and substitution into the second replaces \( \Proj{1} \), i.e.\@ there is an equivalence
     \[
       \gamma_{\Highlight{Y}} :
       G[\Highlight{Y}]
@@ -1336,49 +1391,30 @@ and \( 0 \) for any other direction.
         \ar[from=2-2, to=1-2, -multimap, "\Der(\Op{in}_F)"{swap}, "\sim"]
         \ar[from=1-1, to=1-2, dashed, -multimap, "\alpha"]
       \end{tikzcd}
-      \qedhere
     \end{equation*}
+    Lastly, define \( \MuRule_F \DefEq \Op{rec}_{G}(\alpha) : \Cart{ \mu G }{ \Der{(\mu F)} } \).
   \end{construction}
 
 \begin{proposition}
-  If \( \MuRule_F \) is an equivalence, then so is \( \Op{chain}_{F,{\mu F}} \).
+  For any container \( F \),
+  \( \MuRule_F \) is an equivalence if and only if \( \Op{chain}_{F,{\mu F}} \) is an equivalence.
   \begin{proof}
+    Assume that \( \MuRule_F \) is an equivalence.
     In \autoref{mu-rule}, \( \MuRule_F \) is defined by recursion from some \( \alpha \),
     hence \( \alpha \) is an equivalence by \autoref{is-equiv-from-mu-rec}.
     But \( \alpha \) is just \( \Op{chain}_{F, {\mu F}} \) wedged between two equivalences,
     so the latter is an equivalence as well.
+    Conversely, assume \( \Op{chain}_{F,{\mu F}} \) to be an equivalence.
+    By \autoref{strong-chain-rule-iff-is-equiv-sigma-isolate}, this is equivalent to isolated pairs
+    \( (p_1, \bar{w}) \)
+    having isolated components \( p_1 : P_1(s) \) and \( \bar{w} : \bar{\W}(f{p_1}) \),
+    for all \( s : S \) and \( f : P_1(s) \to \W_{\!S}(P_1) \).
+    This property is exactly what is needed to define a putative inverse on shapes,
+    i.e.\@ a map \( \Der{(\mu F)}_{\Sh} \to {(\mu G)}_{\Sh} \).
+    That this defines an equivalence of shapes follows by a somewhat tedious,
+    but straightforward argument.\todo{The argument is not fully straightforward, one needs has to mix \( \W \)-induction with \( \Graft \)-induction.}
   \end{proof}
 \end{proposition}
-
-\begin{conjecture}
-  The \( \mu \)-rule is an equivalence for \emph{any} container.
-  \begin{proof}[Idea]
-    Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
-    The morphism \( \Op{chain}_{F,G} \) is an equivalence if and only if \( \Op{\SigmaIsolate}_{P_1(s),Q(f \shortminus)} \) is an equivalence for all \( s : S \), \( f : P_1(s) \to T \).
-
-    In the \( \mu \)-rule we instantiate the chain rule for \( F \) and \( \mu F \),
-    so the resulting morphism \( \alpha \) is an equivalence of containers iff \( \Op{chain}_{F, {\mu F}} \) is,
-    which is equivalent to
-    \[
-      \prod_{s : S} \prod_{f : P_1(s) \to \W(S, P_1)} \Op{isEquiv}(\SigmaIsolate_{P_1(s), \bar{\W}(S, P_1, P_0) \circ f})
-    \]
-    Curry this\ldots
-    \[
-      \prod\nolimits_{(s , f) : \sum_{s : S} P_1(s) \to \W(S, P_1)} \Op{isEquiv}(\SigmaIsolate_{P_1(s), \bar{\W}(S, P_1, P_0) \circ f})
-    \]
-    Apply \( \Op{in}_{\W} \):
-    \[
-      \prod_{w : \W(S, P_1)} \Op{isEquiv}(\SigmaIsolate_{P_1(s), \bar{\W}(S, P_1, P_0) \circ \Op{sup}^{\Inv}(w)})
-    \]
-    Can we prove (by recursion on \( \W \)) that this is always the case?
-    After all, \( \W \) and \( \bar{\W} \) are just big iterated \( \Sigma \)-types,
-    perhaps we can bootstrap this by characterizing their isolated points.
-
-    If that's not the case, maybe that works exactly for discrete containers?
-
-    Even still, this characterizes when \( \alpha \) is an equivalence; is that preserved by \( \Op{rec} \)?
-  \end{proof}
-\end{conjecture}
 
 \printbibliography
 
