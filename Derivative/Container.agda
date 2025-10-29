@@ -27,6 +27,18 @@ syntax Container-syntax S (λ s → P) = [ s ∈ S ]◁ P
 
 open Container
 
+isTruncatedContainer : (n k : HLevel) → Container ℓS ℓP → Type _
+isTruncatedContainer n k (S ◁ P) = isOfHLevel n S × ∀ s → isOfHLevel k (P s)
+
+isSetContainer : Container ℓS ℓP → Type _
+isSetContainer = isTruncatedContainer 2 2
+
+TruncatedContainer : (n k : HLevel) (ℓS ℓP : Level) → Type (ℓ-suc (ℓ-max ℓS ℓP))
+TruncatedContainer n k ℓS ℓP = Σ (Container ℓS ℓP) (isTruncatedContainer n k)
+
+SetContainer : (ℓS ℓP : Level) → Type (ℓ-suc (ℓ-max ℓS ℓP))
+SetContainer = TruncatedContainer 2 2
+
 _⊗_ : (F G : Container ℓS ℓP) → Container _ _
 (F ⊗ G) .Shape = F .Shape × G .Shape
 (F ⊗ G) .Pos x = F .Pos (x .fst) ⊎ G .Pos (x .snd)
@@ -76,6 +88,16 @@ _⋆_ : ∀ {F G H : Container ℓS ℓP} → Cart F G → Cart G H → Cart F H
 id : (F : Container ℓS ℓP) → Cart F F
 id F .shape s = s
 id F .pos s = idEquiv _
+
+TruncatedCart : {n k : HLevel} → (F G : TruncatedContainer n k ℓS ℓP) → Type _
+TruncatedCart F G = Cart (F .fst) (G .fst)
+{-# INJECTIVE_FOR_INFERENCE TruncatedCart #-}
+
+SetCart : (F G : TruncatedContainer 2 2 ℓS ℓP) → Type _
+SetCart = TruncatedCart {n = 2} {k = 2}
+
+isOfHLevelCart : (n : HLevel) → {F G : TruncatedContainer n n ℓS ℓP} → isOfHLevel n (TruncatedCart F G)
+isOfHLevelCart n {F} {G} = {! isOfHLevelΣ !}
 
 module CartReasoning where
   private
