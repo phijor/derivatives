@@ -152,6 +152,20 @@
   We introduce a derivative operation for containers whose positions lack decidable equality.
 \end{abstract}
 
+\section{Introduction}
+
+\begin{itemize}
+  \item
+    Two perspectives:
+      \begin{itemize}
+        \item \emph{(Reverse mathematics)}.
+          What are the minimal assumptions on decidability that we can make such
+          that a derivative is still well-defined?
+        \item \emph{(Topology)}.
+          If we think of types as spaces, which points can we remove in a \emph{continuous} manner?
+      \end{itemize}
+\end{itemize}
+
 \section{Isolated Points and How to Remove Them}
 
 This section recalls the notion of isolated points of a type.
@@ -171,34 +185,44 @@ Many of the laws of derivatives -- after some \emph{type-yoga} -- reduce directl
 Asking for a point to be isolated trivializes the path spaces around it:
 \begin{lemma}[note={\cite[Theorem~3.12]{KrausEtAl2017NotionsAnonymousExistence}}]\label{is-prop-isolated-path}
   If \( a : A \) is isolated, then \( a = b \) is a proposition for all \( b : A \).
-  \begin{proof}
-    \todo[inline]{This follows from a \enquote{local} version of \emph{Hedberg's Lemma}.}
-  \end{proof}
 \end{lemma}
 
+This has a number of direct consequences which we are going to be useful in a number of constructions:
 \begin{corollary}\label{is-prop-isolated-dec-path}
   If \( a : A \) is isolated, then \( \Dec{(a = b)} \) is a proposition for all \( b : A \).
-  \begin{proof}
-    For any type \( X \), \( \Dec(X) \) is a proposition whenever \( X \) is.
-  \end{proof}
 \end{corollary}
 
 \begin{corollary}\label{is-prop-is-isolated}
   Being an isolated point is a proposition.
 \end{corollary}
 
+In \cite{KrausEtAl2017NotionsAnonymousExistence}, \citeauthor{KrausEtAl2017NotionsAnonymousExistence}
+state the proof of \autoref{is-prop-isolated-path} as a \enquote{local} version of Hedberg's theorem.\todo{\cite{Kraus2015TruncationLevelsHomotopy} has a nice discussion in \S 3.2.}
+Perhaps, if we change our perspective, we can see Hedberg's theorem as a \emph{global} version of this:
+A type whose points are all isolated is always a (homotopy) set.
+This corresponds to the intuition that
+a space consisting entirely of isolated points is necessarily (topologically) discrete.
+In a univalent setting, however, a type can have interesting, non-trivial path types.
+Its subtype of isolated points then carves out points lacking any interesting path structure:
+
 \begin{proposition}\label{is-set-isolated}
-  The type of isolated points \( \Isolated{A} \) is a set for any type \( A \).
+  For any type \( A \), its type of isolated points \( \Isolated{A} \) is discrete, hence a set.
+  \begin{proof}
+    \( \Isolated{A} \) is vacuously discrete
+    --- after all, any point comes with a way to decide equality ---
+    hence its path types must be propositions.
+  \end{proof}
 \end{proposition}
 
-\begin{proposition}\label{is-equiv-forget-isolated-iff-discrete}
+The forgetful map \( \Isolated{A} \to A \) classifies discrete types:
+\begin{lemma}\label{is-equiv-forget-isolated-iff-discrete}
   The map \( \Op{fst} : \Isolated{A} \to A \) is an equivalence if and only if \( A \) is discrete.
-\end{proposition}
+\end{lemma}
 
 Being an isolated point is stable under equivalence:
 \begin{lemma}\label{is-isolated-respect-equiv}
   If \( e : A \simeq B \),
-  then \( a : A \) is isolated if and only iff \( e(a) : B \) is isolated.
+  then \( a : A \) is isolated if and only if \( e(a) : B \) is isolated.
   We write \( \Isolated{e} : \Isolated{A} \simeq \Isolated{B} \) for the induced equivalence.
 \end{lemma}
 
@@ -220,8 +244,8 @@ Such maps reflect isolated points:
 \end{proposition}
 In principle, we can weaken the assumptions of the previous proposition to a function \( f : A \to B \)
 for which \emph{some} \( \prod_{x,y} f(x) = f(y) \to x = y \) exists -- not necessarily an inverse to \( \Op{cong}_f \):
-the proof works no matter which path we pick.
-\emph{Post hoc} this path has to be unique, since it originates from an isolated point.
+the proof works no matter which path we pick,
+and \emph{post hoc} this choice of path is unique, since it originates from an isolated point.
 
 In the remainder, however, we will, apply \autoref{embedding-reflect-isolated} exclusively to embeddings.
 In particular, we deduce that the canonical embeddings \( \Inl : A \hookrightarrow A + B \) and \( \Inr : B \hookrightarrow A + B \)
@@ -263,9 +287,11 @@ is trivially isolated:
   and there is an equivalence \( \Isolated{(A + 1)} \simeq \Isolated{A} + 1 \).
 \end{corollary}
 
+While it may seem obvious that the isolated points of a disjoint sum are a sum of isolated points,
+describing the isolated points of \( \Sigma \)-types is a more subtle affair.
 Later on (\autoref{lax-chain-rule}),
 it will become necessary to investigate whether isolated points distribute over other type formers,
-in particular dependent sums.
+in particular dependent sums.\todo{Put this sentence into the introduction}
 First, observe that any dependent pair of isolated points defines an isolated point in the corresponding \( \Sigma \)-type:
 \begin{proposition}\label{is-isolated-pair}
   Let \( A : \Type \) and \( B : A \to \Type \) with points \( a_0 : A \) and \( b_0 : B(a_0) \).
@@ -291,9 +317,7 @@ First, observe that any dependent pair of isolated points defines an isolated po
   \end{proof}
 \end{proposition}
 
-We would like to characterize the isolated points of \( \Sigma \)-types.
-\Autoref{is-isolated-pair} tells us that a pair is isolated if its components are,
-and if we had an inverse to \( \SigmaIsolate \), then the converse would hold as well.
+If we had an inverse to \( \SigmaIsolate \), then the converse would hold as well.
 It turns out that this requirement is not only sufficient, but also necessary:
 
 \begin{lemma}\label{is-equiv-sigma-isolate-iff-isolated-pair}
@@ -362,6 +386,12 @@ This applies in particular to the type of singletons, \( \Op{singl}(a_0) \DefEq 
 \end{proposition}
 This lets us describe whether a type is discrete purely in terms of \( \SigmaIsolate \),
 which will be useful in situations in which we have control over the types indexing \( \SigmaIsolate \).
+
+\todo[inline]{This result is not used anywhere, but might be of independent interest.}
+\begin{proposition}
+  Let \( A : \Type \), \( B : A \to \Type \), and \( a : \Isolated{A} \).
+  Then any \( b : B(a) \) is isolated if and only if \( (a, b) : \sum_{A} B \) is isolated.
+\end{proposition}
 
 \subsection{Removing points}
 
