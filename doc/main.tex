@@ -197,27 +197,26 @@ This has a number of direct consequences which we are going to be useful in a nu
 \end{corollary}
 
 In \cite{KrausEtAl2017NotionsAnonymousExistence}, \citeauthor{KrausEtAl2017NotionsAnonymousExistence}
-state the proof of \autoref{is-prop-isolated-path} as a \enquote{local} version of Hedberg's theorem.\todo{\cite{Kraus2015TruncationLevelsHomotopy} has a nice discussion in \S 3.2.}
-Perhaps, if we change our perspective, we can see Hedberg's theorem as a \emph{global} version of this:
+describe Hedberg's theorem as a global version of \autoref{is-prop-isolated-path}\todo{\cite{Kraus2015TruncationLevelsHomotopy} has a nice discussion in \S 3.2.}:
 A type whose points are all isolated is always a (homotopy) set.
-This corresponds to the intuition that
+This corresponds to the intuition that, classically,
 a space consisting entirely of isolated points is necessarily (topologically) discrete.
-In a univalent setting, however, a type can have interesting, non-trivial path types.
-Its subtype of isolated points then carves out points lacking any interesting path structure:
+In a univalent setting, however, types can have interesting, non-trivial path types.
+The subtype of isolated points then carves out the topologically discrete part of a type:
 
-\begin{proposition}\label{is-set-isolated}
+\begin{proposition}[note={Isolated points form a set}]\label{is-set-isolated}
   For any type \( A \), its type of isolated points \( \Isolated{A} \) is discrete, hence a set.
   \begin{proof}
     \( \Isolated{A} \) is vacuously discrete
-    --- after all, any point comes with a way to decide equality ---
+    --- after all, its points come with a way to decide equality ---
     hence its path types must be propositions.
   \end{proof}
 \end{proposition}
 
-The forgetful map \( \Isolated{A} \to A \) classifies discrete types:
-\begin{lemma}\label{is-equiv-forget-isolated-iff-discrete}
-  The map \( \Op{fst} : \Isolated{A} \to A \) is an equivalence if and only if \( A \) is discrete.
-\end{lemma}
+% Alternatively, we can use the forgetful map \( \Isolated{A} \to A \) to classify discrete types:
+% \begin{lemma}\label{is-equiv-forget-isolated-iff-discrete}
+%   A type \( A \) is discrete if and only if \( \Op{fst} : \Isolated{A} \to A \) is an equivalence.
+% \end{lemma}
 
 Being an isolated point is stable under equivalence:
 \begin{lemma}\label{is-isolated-respect-equiv}
@@ -350,19 +349,32 @@ It turns out that this requirement is not only sufficient, but also necessary:
   \end{proof}
 \end{lemma}
 
-For discrete \( A : \Type \) and \( B : A \to \Type \),
-\autoref{is-equiv-forget-isolated-iff-discrete} tells us that isolated points trivially distribute over sums;
-there is an equivalence
-\( \sum_{a_0 : \Isolated{A}} \Isolated{B(a_0)} \simeq \sum_{a : A} B(a) \simeq \cramped{ \Isolated{\big(\sum_{a : A} B(a)\big)} } \).
-The previous result confirms that the map underlying this equivalence is \( \SigmaIsolate \):
-
+% For discrete \( A : \Type \) and \( B : A \to \Type \),
+% \autoref{is-equiv-forget-isolated-iff-discrete} tells us that isolated points trivially distribute over sums;
+% there is an equivalence
+% \( \sum_{a_0 : \Isolated{A}} \Isolated{B(a_0)} \simeq \sum_{a : A} B(a) \simeq \cramped{ \Isolated{\big(\sum_{a : A} B(a)\big)} } \).
+% The previous result confirms that the map underlying this equivalence is \( \SigmaIsolate \):
+For sums of discrete types over a discrete base, we can always trivially separate isolated pairs into isolated components:
 \begin{corollary}\label{discrete-is-equiv-sigma-isolated}
-  If \( A : \Type \) and \( B : A \to \Type \) are (pointwise) discrete types,
+  If \( A : \Type \) is discrete, and \( B : A \to \Type \) is a family of discrete types,
   then \( \SigmaIsolate_{A,B} \) is an equivalence.
   \begin{proof}
     Condition \ref{is-equiv-sigma-isolate-iff-isolated-pair-pair} of \autoref{is-equiv-sigma-isolate-iff-isolated-pair} is vacuously satisfied for discrete types.
   \end{proof}
 \end{corollary}
+
+Less trivially, we can state this locally for an isolated point in the base,
+and obtain a generalization of \autoref{sum-embeddings-respect-isolated} from binary-
+to arbitrary sums:
+\begin{proposition}
+  Let \( A : \Type \), \( B : A \to \Type \), and \( a : \Isolated{A} \).
+  Then any \( b : B(a) \) is isolated if and only if \( (a, b) : \sum_{A} B \) is isolated.
+  \begin{proof}
+    Only the backward direction is non-trivial,
+    and follows from \autoref{embedding-reflect-isolated}:
+    \( \lambda b.\, (a, b) \) is an embedding, which necessarily reflects isolated points.
+  \end{proof}
+\end{proposition}
 
 In general, however, it seems difficult to describe exactly when isolated points distribute this way.
 In extreme cases, both \( A \) and \( B \) can be complicated types, whereas their sum \( \sum_A B \) is entirely trivial.
@@ -386,12 +398,6 @@ This applies in particular to the type of singletons, \( \Op{singl}(a_0) \DefEq 
 \end{proposition}
 This lets us describe whether a type is discrete purely in terms of \( \SigmaIsolate \),
 which will be useful in situations in which we have control over the types indexing \( \SigmaIsolate \).
-
-\todo[inline]{This result is not used anywhere, but might be of independent interest.}
-\begin{proposition}
-  Let \( A : \Type \), \( B : A \to \Type \), and \( a : \Isolated{A} \).
-  Then any \( b : B(a) \) is isolated if and only if \( (a, b) : \sum_{A} B \) is isolated.
-\end{proposition}
 
 \subsection{Removing points}
 
@@ -486,7 +492,9 @@ We observe that we can replicate the classical behavior exactly when \( a_0 \) i
 
 If we think of \( (+) \) as the binary version of an \( A \)-indexed sum \( \sum_{a : A} B(a) \),
 removal of points from the latter behaves similarly,
-except that we have to put some restrictions on the paths of the indexing type \( A \):
+except that we have to put some restrictions%
+\footnote{In~\cite[\href{https://www.cs.bham.ac.uk/~mhe/TypeTopology/UF.Sets.html\#is-h-isolated}{UF.Sets}]{EscardocontributorsTypeTopology}, \( a_0 \) is called \emph{\( h \)-isolated} if \( a_0 = a_0 \) is a proposition.}
+on the paths of the indexing type \( A \):
 \begin{problem}\label{sigma-remove}
   Let \( A : \Type \) and \( B : A \to \Type \)
   with points \( a_0 : A \) and \( b_0 : B(a_0) \),
@@ -517,7 +525,6 @@ except that we have to put some restrictions on the paths of the indexing type \
     This is contradictory since we are given \( h_b : b_0 \neq b \).
   \end{construction}
 \end{problem}
-\todo[inline]{The assumption \( \Op{isProp}(a_0 = a_0) \) is called \enquote{\( h \)-isolated} in \cite[\texttt{UF.Sets}]{EscardocontributorsTypeTopology}.}
 
 This map is an equivalence whenever we can decide if we are removing from a chosen index \( a_0 \):
 \begin{proposition}\label{is-equiv-sigma-remove}
@@ -669,7 +676,7 @@ Instead, we are going to use the following definition when comparing containers:
   We write \( F \CartEquiv G \) for the type of equivalences of containers.
 \end{definition}
 By an application of univalence, the type of equivalences \( F \CartEquiv G \) is equivalent to the type of identifications, \( F = G \).
-While we cannot prove this internally, we think of the wild category of containers as \( (\infty,1) \)-category
+While we cannot prove it internally, we think of the wild category of containers as \( (\infty,1) \)-category
 in which \( F \CartEquiv G \) is the \enquote{correct} notion of weak equivalence,
 representing the \( \infty \)-groupoid of paths \( F = G \).
 
@@ -735,17 +742,7 @@ which is often easier to characterize.
   has shapes \( S' \DefEq \sum_{s : S} \Isolated{P_s} \) and positions \( P'(s , p) \DefEq P_s \setminus p \).
 \end{definition}
 
-\begin{corollary}
-  For \( n \geq 0 \) and \( k \geq -1 \), the derivative of an \( (n, k) \)-truncated container is \( (n, k) \)-truncated.
-\end{corollary}
-\begin{proof}
-  Let \( (\MkCont{S}{P}) \) an \( (n, k) \)-truncated container.
-  By \autoref{is-set-isolated} \( \Isolated{P_s} \) is a 0-truncated type and \( S \) is \( n \)-truncated,
-  thus \( \Der{(\MkCont{S}{P})}_{\Sh} \JudgeEq \sum_{s : S} \Isolated{P_s} \) is \( n \)-truncated.
-  Positions are \( k \)-types since \( P_s \setminus p \) embeds into \( P_s \).
-\end{proof}
-
-The derivative acts on cartesian morphisms.
+We can not only take the derivative of a container, but also act functorially on morphisms:
 \begin{problem}
   Define a wild endofunctor \( \Der : \ContCart \to \ContCart \).
   That is,
@@ -762,6 +759,26 @@ The derivative acts on cartesian morphisms.
   \end{construction}
 \end{problem}
 
+Since isolated points always form a set, taking the derivative of a container preserves its truncation level
+as long as shapes are at least sets, and positions are at least propositions:
+\begin{proposition}
+  For \( n \geq 0 \) and \( k \geq -1 \), the derivative of an \( (n, k) \)-truncated container is \( (n, k) \)-truncated.
+  \begin{proof}
+    Let \( (\MkCont{S}{P}) \) an \( (n, k) \)-truncated container.
+    By \autoref{is-set-isolated} \( \Isolated{P_s} \) is a 0-truncated type and \( S \) is \( n \)-truncated,
+    thus \( \Der{(\MkCont{S}{P})}_{\Sh} \JudgeEq \sum_{s : S} \Isolated{P_s} \) is \( n \)-truncated.
+    Positions are \( k \)-types since \( P_s \setminus p \) embeds into \( P_s \).
+  \end{proof}
+\end{proposition}
+
+Importantly, this turns \( \Der \) into an endofunctor on the 1-category of set-truncated containers,
+without having to assume that the containers are discrete:
+\begin{corollary}
+  Taking derivatives is an endofunctor \( \Der : \ContCart_{0,0} \to \ContCart_{0,0} \).
+\end{corollary}
+We believe that analouges of this hold for higher truncation levels.
+Symmetric containers, for example, form a bicategory \( \ContCart_{1,0} \),
+and we believe that it should be straightforward (albeit tedious) to show that \( \Der \) restricts to a pseudo\-functor on this bicategory.
 
 \subsection{Linear adjunction}
 
