@@ -118,7 +118,7 @@
 \newcommand*{\CartIso}[2]{#1 \mathrel{\CartEquiv} #2}
 
 \DeclareMathOperator{\Cont}{\mathsf{Cont}}
-\DeclareMathOperator{\ContCart}{\Cont^{\multimap}}
+\NewDocumentCommand{\ContCart}{}{\operatorname{\Cont}^{{\scriptscriptstyle\multimap}}}
 
 \NewDocumentCommand{\Der}{}{\partial}
 \NewDocumentCommand{\Id}{}{\mathsf{Id}}
@@ -517,6 +517,7 @@ except that we have to put some restrictions on the paths of the indexing type \
     This is contradictory since we are given \( h_b : b_0 \neq b \).
   \end{construction}
 \end{problem}
+\todo[inline]{The assumption \( \Op{isProp}(a_0 = a_0) \) is called \enquote{\( h \)-isolated} in \cite[\texttt{UF.Sets}]{EscardocontributorsTypeTopology}.}
 
 This map is an equivalence whenever we can decide if we are removing from a chosen index \( a_0 \):
 \begin{proposition}\label{is-equiv-sigma-remove}
@@ -654,7 +655,7 @@ or simply \( \GraftSyntax{f}{b_0} \) if \( a_0 : \Isolated{A} \) is understood f
 In the remainder of this paper we will only consider cartesian morphisms.
 We are going to drop \enquote{cartesian} in writing, but retain the notation \( \Cart{F}{G} \).
 Morphisms of containers compose as expected, and together with an identity morphism \( \Op{id}_F : \Cart{F}{F} \)
-they form a wild category:
+they form a wild category \( \ContCart \):
 composition is associative and unital, but we make no assumption on the truncation level of the hom-types \( \Cart{F}{G} \).
 Note that this wild category is \emph{not} univalent in the na{\"i}ve sense:
 The canonical map taking identifications of containers \( F = G \) to (categorical) isomorphisms
@@ -677,6 +678,7 @@ we define the following subtypes of containers:
 \begin{definition}
   A container \( (\MkCont{S}{P}) \) is \( (n,k) \)-truncated if \( S \) is \( n \)-truncated,
   and \( P_s \) is \( k \)-truncated for all \( s : S \).
+  Write \( \ContCart_{n,k} \) for the wild subcategory of \( (n,k) \)-truncated containers.
 \end{definition}
 Traditional set-based containers are \( (0,0) \)-truncated, whereas \citeauthor{Gylterud2011}'s \emph{symmetric containers}~\cite{Gylterud2011} are \( (1,0) \)-truncated.
 In particular, \( (0,0) \)-truncated containers form a univalent 1-category.
@@ -697,6 +699,36 @@ As a consequence, \( f \) is an equivalence of containers if and only if \( f' \
 which is often easier to characterize.
 
 \subsection{Derivatives}
+
+\begin{itemize}
+  \item
+    Introduce derivative by its universal property:
+    The derivative of \( G \) represents \enquote{\( G \) with a position removed, for each shape},
+    so cartesian morphisms into \( \Der{G} \) should correspond to morphisms into \( G \) that \enquote{avoid}
+    these positions.
+    Traditionally, this is done by looking for adjunction \( \Maybe{(-)} \dashv \Der \):
+    If such an adjunction exists, then morphisms \( \Cart{F}{\Der{G}} \) are in 1-to-1 correspondence with morphisms of shape \( (f, u) : \Cart{\Maybe{F}}{G} \).
+    On positions, these are equivalences \( u_s : G_{\Ps}(fs) \simeq F_{\Ps}(s) + 1 \),
+    i.e.\@ linear maps that \enquote{avoid} the chosen position \( u_s^{\Inv}(\Inr(\bullet)) : G_{\Ps}(fs) \).
+  \item
+    In a univalent setting, \enquote{avoiding a position} becomes more subtle:
+    a position \( q : G_{\Ps}(t) \) is no longer a discrete point, but comes with a potentially complicated type of paths around it.
+    If we wanted to encode morphisms into \( \Der{G} \) the same way, we would have to avoid the entire connected component around \( q \),
+    that is, find some type of \enquote{hole} \( H(q) \) such that \( G_{\Ps}(fs) \simeq F_{\Ps}(s) + H(q) \).
+    But this type now depends on \( q \) and its higher path structure,
+    and can no longer be expressed uniformly as a simple tensoring with the fixed container \( \Id \).
+  \item
+    Two solutions: derivatives are no longer adjoints to tensoring with \( \Id \),
+    or we only take derivatives with respect to positions that are more homogeneous.
+  \item
+    We take the second approach, and define a derivative in terms of \emph{isolated} positions.
+  \item
+    \emph{(For the conclusion)}.
+    In \cite{AbbottEtAl2003DerivativesContainers}, \citeauthor{AbbottEtAl2003DerivativesContainers} consider the general adjunction \( - \CTimes H \dashv [H, -] \),
+    perhaps we can make more progress towards that? By iterating ours, it should be possible to derive \( - \CTimes \Op{K}(n) \dashv \Der^n \).
+    For combinatorial species, this is enough to derive the fully general adjunction, since (1) the \( \Op{K}(n) \) are exactly the representables
+    \( \Op{y}(n) \), (2) every species is a colimit of some \( \Op{y}(n_i) \)'s, and (3) the product (in this case, Day-convolution) is co-continuous.
+\end{itemize}
 
 \begin{definition}
   The derivative of a container \( \Der{(\MkCont{S}{P})} \DefEq (\MkCont{S'}{P'}) \)
@@ -734,7 +766,7 @@ The derivative acts on cartesian morphisms.
 \subsection{Linear adjunction}
 
 \begin{problem}
-  Define a wild adjunction \( (\eta, \varepsilon) : (\Maybe{-}) \vdash \Der{(-)} \),
+  Define a wild adjunction \( (\eta, \varepsilon) : (\Maybe{-}) \dashv \Der{(-)} \),
   that is:
   \begin{enumerate}
     \item
@@ -792,6 +824,7 @@ The derivative acts on cartesian morphisms.
     we apply the necessary extensionality principles for functions, equivalences and sum types.
     We are left to construct paths that are almost \( \Op{refl} \);
     only some proofs of isolation and removal need to be compared up to propositional equality.
+    Construction of the naturality squares for \( \eta \) and \( \varepsilon \) is done similarly.
   \end{construction}
 \end{problem}
 
@@ -799,7 +832,7 @@ If we restrict the above to set-truncated containers, we can solve a problem lef
 they \enquote{leave it to future work to identify the subcategory of differentiable containers}~\cite[14]{AbbottEtAl2005DataDifferentiating};
 indeed, \emph{every} container is differentiable in this sense, as long as we define derivatives in terms of isolated positions:
 \begin{theorem}
-  In the 1-category of set-truncated containers, \( \Der \) is right-adjoint to tensoring with \( \Id \).
+  In the 1-category of set-truncated containers \( \ContCart_{0,0} \), \( \Der \) is right-adjoint to tensoring with \( \Id \).
 \end{theorem}
 
 \subsection{Laws of Derivates}
