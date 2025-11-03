@@ -18,6 +18,8 @@
   % linkcolor=cyan,
 }
 
+\NewDocumentCommand{\TypeTopology}{m O{}}{\href{https://www.cs.bham.ac.uk/~mhe/TypeTopology/#1.html\IfValueT{#2}{\##2}}{\texttt{#1}}}
+
 \newkeytheoremstyle{proof}{
   inherit-style=definition,
   qed=$\lrcorner$,
@@ -67,6 +69,7 @@
 \DeclareMathOperator{\DefEq}{\mathrel{\coloneq}}
 \DeclareMathOperator{\JudgeEq}{\mathrel{\doteq}}
 \NewDocumentCommand{\Inv}{}{{\shortminus 1}}
+\NewDocumentCommand{\Blank}{}{\shortminus}
 
 \DeclareMathOperator{\Isolate}{\Op{isolate}}
 \DeclareMathOperator{\Replace}{\Op{replace}}
@@ -164,16 +167,38 @@
         \item \emph{(Topology)}.
           If we think of types as spaces, which points can we remove in a \emph{continuous} manner?
       \end{itemize}
+    \item
+      Recall notion of isolated points
+      \begin{itemize}
+        \item not a new notion (\cite{EscardocontributorsTypeTopology}, \cite{KrausEtAl2013GeneralizationsHedberg’sTheorem})
+        \item used to define derivatives of arbitrary containers
+        \item laws of containers reduce to properties of isolated points
+        \item
+          Later on (\autoref{lax-chain-rule}),
+          it will become necessary to investigate whether isolated points distribute over other type formers,
+          in particular dependent sums.
+      \end{itemize}
+\end{itemize}
+
+\subsection*{Notation}
+
+\begin{itemize}
+  \item Use \enquote{filler} for paths of morphism in a wild category
+    (since in general, there can be many distinct paths)
 \end{itemize}
 
 \section{Isolated Points and How to Remove Them}
 
-This section recalls the notion of isolated points of a type.
-This definition is not new\todo{figure out how to properly cite \texttt{TypeTopology} \cite{EscardocontributorsTypeTopology}, or whatever primary source}.
-We are going to prove some properties that will be applied in \autoref{derivatives}
-to establish properties of derivatives of containers:
-Many of the laws of derivatives -- after some \emph{type-yoga} -- reduce directly to instances of statements in this section.
-
+Recall that a type is \emph{discrete} if equality of any pair of its points is decidable.
+In a univalent world, this is a rather strong property --- by Hedberg's Theorem, any such type forms a (homotopy) set,
+and can thus not have any interesting path structure.
+In some cases a type might have this property locally, however.
+Consider for example the sum \( A + 1 \) for an arbitrary type \( A \).
+Even if equality in this type is not decidable without further assumptions on \( A \),
+it should at least be possible to decide \( x = \Inr(\bullet) \), no matter which \( x : A + 1 \) we are given.
+After all, the constructors \( \Inl \) and \( \Inr \) are injective,
+so case-analysis should yield a decision procedure, even without looking at points of \( A \).
+We call such points \emph{isolated}:
 \begin{definition}
   A point \( a : A \) is \emph{isolated} if \( a = b \) is decidable for all \( b : A \).
   We denote by \( \Isolated{A} \) the subtype of isolated points, that is
@@ -181,56 +206,56 @@ Many of the laws of derivatives -- after some \emph{type-yoga} -- reduce directl
     \Isolated{A} \DefEq \sum_{a : A} \prod_{b : B} \Dec(a = b)
   \).
 \end{definition}
-
-Asking for a point to be isolated trivializes the path spaces around it:
+\begin{remark}[note={Where does this go?}]
+  In \cite[\TypeTopology{Factorial.Law}]{EscardocontributorsTypeTopology}, \citeauthor{EscardocontributorsTypeTopology}
+  prove a \enquote{factorial law} for arbitrary types: if \( X! \) denotes the type of autormorphisms \( X \simeq X \),
+  then \( (X + 1)! \simeq \Isolated{(X + 1)} \times X! \).
+\end{remark}
+Note that, \emph{a priori}, the type of proofs that some point is isolated might not be a proposition.
+Take for example the circle \( S^1 \): there are \( \mathbb{Z} \)-many proofs of \( \Op{Dec}(\Op{base} =_{S^1} \Op{base}) \).\footnote{In fact \( S^1 \) is \emph{perfect}, i.e.\@ has no isolated points at all.}
+However, since equality has to be decidable uniformly for a point to be isolated, this does not happen:
+isolated points \emph{do} have trivial path spaces.
+To prove this, \citeauthor{KrausEtAl2017NotionsAnonymousExistence} give the following
+\enquote{local} version of Hedberg's Theorem:\todo{\cite{Kraus2015TruncationLevelsHomotopy} has a nice discussion in \S 3.2.}
 \begin{lemma}[note={\cite[Theorem~3.12]{KrausEtAl2017NotionsAnonymousExistence}}]\label{is-prop-isolated-path}
   If \( a : A \) is isolated, then \( a = b \) is a proposition for all \( b : A \).
 \end{lemma}
-
-This has a number of direct consequences which we are going to be useful in a number of constructions:
-\begin{corollary}\label{is-prop-isolated-dec-path}
+This has a number of important consequences:
+\begin{corollary}\label{is-prop-isolated-dec-path}\label{is-prop-is-isolated}
   If \( a : A \) is isolated, then \( \Dec{(a = b)} \) is a proposition for all \( b : A \).
+  In particular, being isolated is a proposition.
 \end{corollary}
 
-\begin{corollary}\label{is-prop-is-isolated}
-  Being an isolated point is a proposition.
-\end{corollary}
-
-In \cite{KrausEtAl2017NotionsAnonymousExistence}, \citeauthor{KrausEtAl2017NotionsAnonymousExistence}
-describe Hedberg's theorem as a global version of \autoref{is-prop-isolated-path}\todo{\cite{Kraus2015TruncationLevelsHomotopy} has a nice discussion in \S 3.2.}:
-A type whose points are all isolated is always a (homotopy) set.
-This corresponds to the intuition that, classically,
-a space consisting entirely of isolated points is necessarily (topologically) discrete.
-In a univalent setting, however, types can have interesting, non-trivial path types.
-The subtype of isolated points then carves out the topologically discrete part of a type:
-
+Taking all of this together, we see that the subtype of isolated points carves out a discrete part of a type:
 \begin{proposition}[note={Isolated points form a set}]\label{is-set-isolated}
   For any type \( A \), its type of isolated points \( \Isolated{A} \) is discrete, hence a set.
   \begin{proof}
-    \( \Isolated{A} \) is vacuously discrete
-    --- after all, its points come with a way to decide equality ---
-    hence its path types must be propositions.
+    Given \( (a, h_a), (b , h_b) : \Isolated{A} \), it suffices to show that
+    \( \sum_{p : a = b} h_a =_{p} h_b \) is a proposition.
+    By \autoref{is-prop-isolated-path}, \( a = b \) is a proposition.
+    By \autoref{is-prop-is-isolated}, both \( h_a \) and \( h_b \) are propositions,
+    hence is the dependent path type \( h_a =_{p} h_b \).
   \end{proof}
 \end{proposition}
 
-% Alternatively, we can use the forgetful map \( \Isolated{A} \to A \) to classify discrete types:
-% \begin{lemma}\label{is-equiv-forget-isolated-iff-discrete}
-%   A type \( A \) is discrete if and only if \( \Op{fst} : \Isolated{A} \to A \) is an equivalence.
-% \end{lemma}
 
-Being an isolated point is stable under equivalence:
+% A type whose points are all isolated is always a (homotopy) set.
+% This corresponds to the intuition that, classically,
+% a space consisting entirely of isolated points is necessarily (topologically) discrete.
+% In a univalent setting, however, types can have interesting, non-trivial path types.
+% The subtype of isolated points then carves out the topologically discrete part of a type:
+
+As expected, being an isolated point is stable under equivalence:
 \begin{lemma}\label{is-isolated-respect-equiv}
   If \( e : A \simeq B \),
   then \( a : A \) is isolated if and only if \( e(a) : B \) is isolated.
   We write \( \Isolated{e} : \Isolated{A} \simeq \Isolated{B} \) for the induced equivalence.
 \end{lemma}
-
-If a map \( f : A \to B \) is not an equivalence,
-but still behaves \enquote{nicely} on path spaces, we can deduce its behavior on isolated points.
+In cases where a map \( f : A \to B \) is not an equivalence,
+we might deduce its behavior on isolated points given that it behaves \enquote{nicely} on path spaces.
 Recall that \( f \) is an embedding if \( \Op{cong}_f : x = y \to f(x) = f(y) \) is an equivalence,
 written \( f : A \hookrightarrow B \).
 Such maps reflect isolated points:
-
 \begin{proposition}[note={Embeddings reflect isolated points}]\label{embedding-reflect-isolated}
   Let \( f : A \hookrightarrow B \) and \( a : A \).
   If \( f(a) \) is isolated in \( B \), then \( a \) is isolated in \( A \).
@@ -280,17 +305,14 @@ We see that isolated points distribute over sums:
 
 From this we immediately see that \( \Nothing \DefEq \Inr{(\bullet)} : A + 1 \) is an isolated point, since \( \bullet : 1 \)
 is trivially isolated:
-
 \begin{corollary}\label{is-isolated-nothing}
   The point \( \Nothing : A + 1 \) is isolated for any type \( A \),
   and there is an equivalence \( \Isolated{(A + 1)} \simeq \Isolated{A} + 1 \).
 \end{corollary}
+This yields the decision procedure for \( \prod_{x : A + 1} \Op{Dec}(x = \Nothing) \) that we alluded to earlier.
 
 While it may seem obvious that the isolated points of a disjoint sum are a sum of isolated points,
 describing the isolated points of \( \Sigma \)-types is a more subtle affair.
-Later on (\autoref{lax-chain-rule}),
-it will become necessary to investigate whether isolated points distribute over other type formers,
-in particular dependent sums.\todo{Put this sentence into the introduction}
 First, observe that any dependent pair of isolated points defines an isolated point in the corresponding \( \Sigma \)-type:
 \begin{proposition}\label{is-isolated-pair}
   Let \( A : \Type \) and \( B : A \to \Type \) with points \( a_0 : A \) and \( b_0 : B(a_0) \).
@@ -435,9 +457,10 @@ is the same as removing it from either side, and then taking the sum:
   so by \autoref{sum-remove-equiv}, \( (A + 1) \setminus \Nothing \simeq A + (1 \setminus \bullet) \simeq A \).
 \end{construction}
 
-If we would like to \emph{first remove} a point \( a_0 : A \), and \emph{then add} it back into the type,
-there is an obvious map \( \Replace_{a_0} : (A \setminus a_0) + 1 \to A \);
-it is defined by cases
+Let us now consider the converse problem:
+\emph{first remove} a point \( a_0 : A \), and \emph{then adding} it back into the type.
+There is an obvious map \( \Replace_{a_0} : (A \setminus a_0) + 1 \to A \);
+defined by cases
 as
 \(
   \Replace_{a_0}(\Just{(a, \mathunderscore)}) \DefEq a
@@ -778,28 +801,65 @@ without having to assume that the containers are discrete:
 \end{corollary}
 We believe that analouges of this hold for higher truncation levels.
 Symmetric containers, for example, form a bicategory \( \ContCart_{1,0} \),
-and we believe that it should be straightforward (albeit tedious) to show that \( \Der \) restricts to a pseudo\-functor on this bicategory.
+and it should be straightforward (albeit tedious) to show that \( \Der \) restricts to a pseudo\-functor on this bicategory.
 
 \subsection{Linear adjunction}
 
-\begin{problem}
+\begin{itemize}
+  \item Unlike \cite{AbbottEtAl2005DataDifferentiating}, we define the adjunction
+    via unit and counit, not as a natural hom-set isomorphism.
+  \item
+    Mostly do this because it is easier,
+    but also because it yields an equivalence of hom-types more directly.
+\end{itemize}
+
+\begin{problem}\label{derivative-adjunction}
   Define a wild adjunction \( (\eta, \varepsilon) : (\Maybe{-}) \dashv \Der{(-)} \),
   that is:
   \begin{enumerate}
     \item
       Two families of morphisms
       \[
-        \eta : \prod_{F : \Cont} \Cart{F}{\Der{(G \CTimes \Id)}}
+        \eta : \prod_{F : \Cont} \Cart{F}{\Der{(F \CTimes \Id)}}
         \quad\text{and}\quad
         \varepsilon : \prod_{G : \Cont} \Cart{\Der{G} \CTimes \Id}{G}
       \]
-    \item with identifications for all \( f : \Cart{F}{G} \), showing naturality
-      \[
-        \operatorname{\Op{isNat}}_{\eta}(f) : \eta_F ; \Der{(f \CTimes \Id)} = f ; \eta_G
-        \quad\text{and}\quad
-        \operatorname{\Op{isNat}}_{\varepsilon}(f) : (\Der{f} \CTimes \Id) ; \varepsilon_G = \varepsilon_F ; f
-      \]
-    \item for which the zigzag-equations
+    \item with fillers of naturality squares
+      \begin{align*}
+        &
+          \begin{tikzcd}[ampersand replacement=\&]
+            F
+              \ar[r, -multimap, "\eta_F"]
+              \ar[d, -multimap, "f"{swap}]
+              \&
+            \Der(\Maybe{F})
+              \ar[d, -multimap, "\Der(\Maybe{f})"]
+              \\
+            G
+              \ar[r, -multimap, "\eta_G"{swap}]
+              \&
+            \Der(\Maybe{G})
+          \end{tikzcd}
+        &
+          &\text{and}
+        &
+        &
+          \begin{tikzcd}[ampersand replacement=\&]
+            \Maybe{\Der{F}}
+              \ar[r, -multimap, "\varepsilon_F"]
+              \ar[d, -multimap, "\Maybe{\Der{f}}"{swap}]
+              \&
+            F
+              \ar[d, -multimap, "f"]
+              \\
+            \Maybe{\Der{G}}
+              \ar[r, -multimap, "\varepsilon_G"{swap}]
+              \&
+            G
+          \end{tikzcd}%
+      \end{align*}
+      for all \( f : \Cart{F}{G} \),
+    \item and zigzag-diagrams
       \begin{align*}
         &
         \begin{tikzcd}[ampersand replacement=\&, column sep=tiny, row sep=large]
@@ -809,7 +869,9 @@ and we believe that it should be straightforward (albeit tedious) to show that \
           \ar[from=1-1, to=2-2, -multimap, "\Maybe{{\eta_F}}"{'}]
           \ar[from=2-2, to=1-3, -multimap, "\varepsilon_{\Maybe{F}}"{'}]
         \end{tikzcd}
+        &
           &\text{and}
+        &
         &
         \begin{tikzcd}[ampersand replacement=\&, column sep=tiny, row sep=large]
                     \& \Der{(\Maybe{\Der{G}})} \& \\
@@ -819,7 +881,6 @@ and we believe that it should be straightforward (albeit tedious) to show that \
           \ar[from=1-2, to=2-3, -multimap, "\Der{(\varepsilon_{G})}"]
         \end{tikzcd}
       \end{align*}
-      hold.
   \end{enumerate}
   \begin{construction}
     Let \( F \JudgeEq (\MkCont{S}{P}) \) and define \( \eta_F : \Cart{F}{\Der{(\Maybe{F})}} \).
@@ -837,7 +898,7 @@ and we believe that it should be straightforward (albeit tedious) to show that \
     \)
     is given by \autoref{isolated-minus-plus-equiv} for all \( t : T \) and \( q : \Isolated{Q_t} \).
 
-    To construct the identifications for the zigzag equations,
+    To construct the zigzag-fillers,
     we apply the necessary extensionality principles for functions, equivalences and sum types.
     We are left to construct paths that are almost \( \Op{refl} \);
     only some proofs of isolation and removal need to be compared up to propositional equality.
@@ -852,8 +913,38 @@ indeed, \emph{every} container is differentiable in this sense, as long as we de
   In the 1-category of set-truncated containers \( \ContCart_{0,0} \), \( \Der \) is right-adjoint to tensoring with \( \Id \).
 \end{theorem}
 
+Presenting the above wild adjunction in terms of unit and counit natural transformations
+has two advantages:
+Firstly, this data yields the desired equivalence of hom-types
+\begin{align*}
+  {\Blank}^\sharp &: (\Cart{F}{\Der{G}}) \simeq (\Cart{\Maybe{F}}{G}) \\
+  f^{\sharp} &\DefEq \varepsilon_G \circ (\Maybe{f})
+\end{align*}
+as it would for an 1-categorical adjunction,
+which otherwise would be somewhat tedious to establish.
+Secondly, \( {\Blank}^{\sharp} \) being an equivalence
+means that for all \( g : \Cart{\Maybe{F}}{G} \)
+the type of fibers
+\(
+  \sum_{f : \Cart{F}{\Der{G}}} \varepsilon_G \circ (\Maybe{f}) = g
+\) is contractible.
+This expresses the \emph{property} of \( \varepsilon_G \) being a universal arrow from \( \Maybe{\Blank} \) to \( G \):
+any \( g \) factors uniquely through \( \varepsilon_G \).
+Hence, the data of the wild adjunction in \autoref{derivative-adjunction} is uniquely determined, up to our choice of counit.
+
 \subsection{Laws of Derivates}
 
+\begin{itemize}
+  \item
+    derivative of a container enjoys a number of desirable properties
+  \item
+    ensure that our generalization still respects those
+\end{itemize}
+
+Recall that the \emph{constant container} at a type \( A \) is \( \CConst(A) \DefEq (\MkCont{A}{0}) \).
+The derivative of a constant is always the zero-container \( \CConst(0) \),
+and that of the identity \( \Id \) is the constant \( \CConst(1) \).
+Both facts factor through the following observation:
 \begin{proposition}\label{derivative-prop-trunc}
   Let \( S : \Type \) and \( P : S \to \Op{Prop} \).
   There is an equivalence of containers
@@ -862,8 +953,9 @@ indeed, \emph{every} container is differentiable in this sense, as long as we de
       \CartEquiv
     { (\MkCont{{\textstyle \sum_{S} P }}{0}) }
   \]
-  In particular, we have \( \Der{(\MkCont{1}{P})} \CartEquiv (\MkCont{P}{0}) \) and
-  \( \Der{(\Id)} \CartEquiv (\MkCont{1}{0}) \).
+  In particular, we have
+  \( \Der{(\Id)} \CartEquiv \CConst(1) \)
+  and \( \Der(\CConst(A)) \CartEquiv \CConst(0) \).
   \begin{proof}
     Since \( P_s \) is a proposition, we know that \( \Isolated{P_s} \simeq P_s \) and \( P_s \setminus p \simeq 0 \).
     Thus,
@@ -877,6 +969,8 @@ indeed, \emph{every} container is differentiable in this sense, as long as we de
   \end{proof}
 \end{proposition}
 
+Similarly, we convince ourselves that \( \Der \) distributes over (binary) sums,
+and that for products it obeys a Leibniz rule:
 \begin{proposition}\label{sum-product-rule}\label{sum-rule}\label{leibniz-rule}
   For containers \( F, G \), the following hold:
   \begin{enumerate}
@@ -946,7 +1040,7 @@ Unlike in classical analysis, where the exponential function is the unique solut
 the differential equation \( f^{\prime} = f \) such that \( f(0) = 1 \),
 the situation for containers is more nuanced:
 While \( \Op{Bag} \) is a fixed-point of \( \Der \) for which \( { F[\CConst{0}] \CartEquiv \CConst{1} } \),
-it is by far the only one:
+it is far from the only one:
 modulo size issues, the proof of \autoref{bag-fixed-point} goes through for any subuniverse
 of types closed under addition and removal of single points
 -- for example, type-theoretic ordinals.\todo{Or cardinals???}
