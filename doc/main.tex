@@ -7,6 +7,7 @@
 \usepackage{bussproofs}
 \usepackage{cmll}
 \usepackage{csquotes}
+\usepackage{enumitem}
 \usepackage{tikz-cd}
 \usepackage{keytheorems}
 \usepackage{todonotes}
@@ -92,7 +93,7 @@
 
 \NewDocumentCommand{\CTimes}{}{\mathbin{\times}}
 \NewDocumentCommand{\CPlus}{}{\mathbin{+}}
-\DeclareMathOperator{\CConst}{\Op{K}}
+\NewDocumentCommand{\CConst}{}{\Op{k}}
 \DeclarePairedDelimiterXPP{\Wk}[1]%
   {} % pre-code
   {\langle} % left
@@ -429,11 +430,6 @@ to be \( A \setminus a_0 \DefEq \sum_{a : A} a_0 \neq a \).
 Adding a point to a type \( A \) and then removing it again yields an equivalence, as expected:
 \begin{problem}\label{maybe-minus-nothing-equiv}
   Define an equivalence \( (A + 1) \setminus \Nothing \simeq A \).
-  % \begin{construction}
-  %   Define \( f : (A + 1) \setminus \Nothing \to A \) as \( f(\Just{a} , \mathunderscore) \DefEq a \);
-  %   the case \( f(\Nothing, h : \Nothing \neq \Nothing) \) is absurd.
-  %   It is straightforward to show that the fibers of \( f \) are contractible.
-  % \end{construction}
 \end{problem}
 
 This is an instance of the more general case where removing a point from a sum
@@ -458,7 +454,8 @@ is the same as removing it from either side, and then taking the sum:
 \end{construction}
 
 Let us now consider the converse problem:
-\emph{first remove} a point \( a_0 : A \), and \emph{then adding} it back into the type.
+\emph{first} removing a point \( a_0 : A \), \emph{then} adding it back into the type.
+Does this yield a type equivalent to \( A \)?
 There is an obvious map \( \Replace_{a_0} : (A \setminus a_0) + 1 \to A \);
 defined by cases
 as
@@ -471,8 +468,8 @@ and
 \).
 Classically, this map is an isomorphism of sets;
 the inverse simply maps \( a_0 \) to \( \bullet \).
-In a univalent setting however, \( a_0 \) might have interesting (higher) path spaces,
-which too are removed by this construction.
+In a univalent setting however, this replaces the higher path spaces of \( a_0 \)
+with the trivial ones of \( \bullet \).
 Consider for example the circle \( S^1 \) with \( \mathsf{base} : S^1 \).
 Then \( S^1 \setminus \mathsf{base} \simeq 0 \),
 hence \( (S^1 \setminus \mathsf{base}) + 1 \simeq 1 \not\simeq S^1 \):
@@ -488,7 +485,7 @@ We observe that we can replicate the classical behavior exactly when \( a_0 \) i
   \begin{proof}
     First, assume that \( a_0 \) is isolated.
     We give a two-sided inverse \( g : A \to (A \setminus a_0) + 1 \) as follows.
-    Define \( \Op{r} : \prod_{a : A} \Dec{a_0 = a} \to (A \setminus a_0) + 1 \)
+    Define \( \Op{r} : \prod_{a : A} \Dec{(a_0 = a)} \to (A \setminus a_0) + 1 \)
     by
     \[
       \Op{r}(a, d) \DefEq
@@ -513,9 +510,12 @@ We observe that we can replicate the classical behavior exactly when \( a_0 \) i
   \end{proof}
 \end{proposition}
 
-If we think of \( (+) \) as the binary version of an \( A \)-indexed sum \( \sum_{a : A} B(a) \),
-removal of points from the latter behaves similarly,
-except that we have to put some restrictions%
+Later on, it will become necessary to understand how to remove points from \( \Sigma \)-types.
+If we think of an \( A \)-indexed sum \( \sum_{a : A} B(a) \) as a generalization of binary sums \( B_0 + B_1 \),
+then we expect removal to behave similarly:
+Removing some \( (a, b) \) should remove \( b : B(a) \) from the \( a \)\textsuperscript{th}
+summand, leaving all other summands unchanged.
+This is indeed the case, as long as we put some restrictions%
 \footnote{In~\cite[\href{https://www.cs.bham.ac.uk/~mhe/TypeTopology/UF.Sets.html\#is-h-isolated}{UF.Sets}]{EscardocontributorsTypeTopology}, \( a_0 \) is called \emph{\( h \)-isolated} if \( a_0 = a_0 \) is a proposition.}
 on the paths of the indexing type \( A \):
 \begin{problem}\label{sigma-remove}
@@ -572,6 +572,7 @@ This map is an equivalence whenever we can decide if we are removing from a chos
     where \( h^\prime : b_0 \neq \Op{subst}_B(p, a) \),
     which we conclude from \( h \) and \( p \).
     In case that \( h : a_0 \neq a \) we map to \( \Inl{((a, h), b)} \) directly.
+    It is straightforward to verify that these maps are inverses of each other.
   \end{proof}
 \end{proposition}
 
@@ -667,12 +668,49 @@ or simply \( \GraftSyntax{f}{b_0} \) if \( a_0 : \Isolated{A} \) is understood f
 
 \section{Derivatives of Containers}\label{derivatives}
 
+Let us recall the notion of a container in type theory:
 \begin{definition}
   A \emph{container} \( (\MkCont{S}{P}) \) consists of \emph{shapes} \( S : \Type \) and
   a family \( P : S \to \Type \) of \emph{positions}.
   We access shapes and positions via postfix projections
   \( (\MkCont{S}{P})_{\Sh} \DefEq S \) and \( (\MkCont{S}{P})_{\Ps} \DefEq P \).
 \end{definition}
+
+Containers were introduced to model polymorphic data types,
+hence they are closed under products \( \times \), sums \( + \) and substitution \( \Blank[\Blank] \),
+see \autoref{container-operations}.
+The constant container at a type \( S \) is \( \CConst{S} \DefEq (\MkCont{S}{0}) \);
+products and sums are monoidal with units \( \CConst{1} \) and \( \CConst{0} \).
+The identity container \( \Id \DefEq (\MkCont{1}{1}) \)
+is a unit for substitution, which is a non-symmetric monoidal product.
+
+\begin{figure}
+  \begin{align*}
+    % Products
+    (F \CTimes G)_{\Sh} &\DefEq S \times T
+      &
+    (F \CTimes G)_{\Ps} &\DefEq \lambda (s, t).\, P_s + Q_t
+      \\
+    % Sums
+    (F \CPlus G)_{\Sh} &\DefEq S + T
+      &
+    (F \CPlus G)_{\Ps} &\DefEq
+      \lambda
+      \begin{cases}
+        \Inl(s).\, P_s \\
+        \Inr(t).\, Q_t
+      \end{cases}
+      \\
+    % Substitution
+    (\Subst{F}{G})_{\Sh} &\DefEq \sum_{s : S} (P_s \to T)
+      &
+    (\Subst{F}{G})_{\Ps} &\DefEq \lambda (s, f).\, \sum_{p : P_s} Q_{fp}
+  \end{align*}
+  \caption{%
+    Operations on containers \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
+  }%
+  \label{container-operations}
+\end{figure}
 
 \begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
@@ -688,8 +726,8 @@ Morphisms of containers compose as expected, and together with an identity morph
 they form a wild category \( \ContCart \):
 composition is associative and unital, but we make no assumption on the truncation level of the hom-types \( \Cart{F}{G} \).
 Note that this wild category is \emph{not} univalent in the na{\"i}ve sense:
-The canonical map taking identifications of containers \( F = G \) to (categorical) isomorphisms
-(i.e. pairs \( f : \Cart{F}{G}, g : \Cart{G}{F} \) with chosen identifications \( fg = \Op{id}_F \) and \( gf = \Op{id}_G \)),
+The canonical map taking paths of containers \( F = G \) to (categorical) isomorphisms
+(i.e. pairs \( f : \Cart{F}{G}, g : \Cart{G}{F} \) with chosen paths \( fg = \Op{id}_F \) and \( gf = \Op{id}_G \)),
 is \emph{not} an equivalence, unless shapes and positions of the involved containers are sets.
 Instead, we are going to use the following definition when comparing containers:
 
@@ -698,8 +736,8 @@ Instead, we are going to use the following definition when comparing containers:
   if \( f : F_{\Sh} \to G_{\Sh} \) is an equivalence of types.
   We write \( F \CartEquiv G \) for the type of equivalences of containers.
 \end{definition}
-By an application of univalence, the type of equivalences \( F \CartEquiv G \) is equivalent to the type of identifications, \( F = G \).
-While we cannot prove it internally, we think of the wild category of containers as \( (\infty,1) \)-category
+By an application of univalence, the type of equivalences \( F \CartEquiv G \) is equivalent to the type of paths, \( F = G \).
+While we cannot prove it internally, we think of the wild category of containers as an \( (\infty,1) \)-category
 in which \( F \CartEquiv G \) is the \enquote{correct} notion of weak equivalence,
 representing the \( \infty \)-groupoid of paths \( F = G \).
 
