@@ -666,6 +666,15 @@ or simply \( \GraftSyntax{f}{b_0} \) if \( a_0 : \Isolated{A} \) is understood f
   \end{proof}
 \end{proposition}
 
+As presented here, \( \Graft \) characterizes non-dependent functions out of types with an isolated point.
+This generalizes to a dependent induction principle, i.e.\@ an equivalence
+\(
+  \big( (\prod_{a : A \setminus a_0} B(a)) \times B(a_0) \big) \simeq \big(\prod_{a : A} B(a) \big)
+\)
+for families \( B \) over \( A \).
+Although not necessary for later results in this paper,
+we include the construction of the dependent induction principle in our formalization of the results.
+
 \section{Derivatives of Containers}\label{derivatives}
 
 Let us recall the notion of a container in type theory:
