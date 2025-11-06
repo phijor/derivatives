@@ -777,36 +777,33 @@ which is often easier to characterize.
 
 \subsection{Derivatives}
 
-\begin{itemize}
-  \item
-    Introduce derivative by its universal property:
-    The derivative of \( G \) represents \enquote{\( G \) with a position removed, for each shape},
-    so cartesian morphisms into \( \Der{G} \) should correspond to morphisms into \( G \) that \enquote{avoid}
-    these positions.
-    Traditionally, this is done by looking for adjunction \( \Maybe{(-)} \dashv \Der \):
-    If such an adjunction exists, then morphisms \( \Cart{F}{\Der{G}} \) are in 1-to-1 correspondence with morphisms of shape \( (f, u) : \Cart{\Maybe{F}}{G} \).
-    On positions, these are equivalences \( u_s : G_{\Ps}(fs) \simeq F_{\Ps}(s) + 1 \),
-    i.e.\@ linear maps that \enquote{avoid} the chosen position \( u_s^{\Inv}(\Inr(\bullet)) : G_{\Ps}(fs) \).
-  \item
-    In a univalent setting, \enquote{avoiding a position} becomes more subtle:
-    a position \( q : G_{\Ps}(t) \) is no longer a discrete point, but comes with a potentially complicated type of paths around it.
-    If we wanted to encode morphisms into \( \Der{G} \) the same way, we would have to avoid the entire connected component around \( q \),
-    that is, find some type of \enquote{hole} \( H(q) \) such that \( G_{\Ps}(fs) \simeq F_{\Ps}(s) + H(q) \).
-    But this type now depends on \( q \) and its higher path structure,
-    and can no longer be expressed uniformly as a simple tensoring with the fixed container \( \Id \).
-  \item
-    Two solutions: derivatives are no longer adjoints to tensoring with \( \Id \),
-    or we only take derivatives with respect to positions that are more homogeneous.
-  \item
-    We take the second approach, and define a derivative in terms of \emph{isolated} positions.
-  \item
-    \emph{(For the conclusion)}.
-    In \cite{AbbottEtAl2003DerivativesContainers}, \citeauthor{AbbottEtAl2003DerivativesContainers} consider the general adjunction \( - \CTimes H \dashv [H, -] \),
-    perhaps we can make more progress towards that? By iterating ours, it should be possible to derive \( - \CTimes \Op{K}(n) \dashv \Der^n \).
-    For combinatorial species, this is enough to derive the fully general adjunction, since (1) the \( \Op{K}(n) \) are exactly the representables
-    \( \Op{y}(n) \), (2) every species is a colimit of some \( \Op{y}(n_i) \)'s, and (3) the product (in this case, Day-convolution) is co-continuous.
-\end{itemize}
+The derivative of a containers \( G \) represents a type of
+\( G \)-shaped trees in which a chosen subtree has been removed.
+For traditional containers, this can be implemented as an operation \( G \mapsto \Der{G} \) by removing a chosen position over each shape:
+Given \( G \JudgeEq (\MkCont{T}{Q}) \), \citeauthor{AbbottEtAl2005DataDifferentiating} define \( \Der{G} \)
+to have as shapes pairs \( (t , q) : \sum_{T} Q \), over which the positions are \( Q_t \setminus q \).
+To ensure that \( \Der \) is well-behaved, it is characterized by a universal property:
+\( \Der \) extends to an endofunctor on containers,
+and one is interested in finding --- perhaps on a suitable subcategory --- an adjunction \( \Maybe{(-)} \dashv \Der \)
+that describes morphisms into \( \Der{G} \):
+If such an adjunction exists, then morphisms \( \Cart{F}{\Der{G}} \) are in 1-to-1 correspondence with morphisms of shape \( (f, u) : \Cart{\Maybe{F}}{G} \).
+On positions, such morphisms are equivalences \( u_s : G_{\Ps}(fs) \simeq F_{\Ps}(s) + 1 \),
+i.e.\@ maps that \enquote{avoid} the removed position \( u_s^{\Inv}(\Inr(\bullet)) : G_{\Ps}(fs) \).
 
+As we have seen in the previous section, removing points from a type is a subtle process in a univalent setting:
+a position \( q : G_{\Ps}(t) \) is no longer a discrete point, but comes with a potentially complicated type of paths around it.
+If we wanted to encode morphisms into \( \Der{G} \) by the same universal property,
+we would have to avoid the entire connected component around \( q \),
+that is, find some type of \enquote{hole} \( H(q) \) such that \( G_{\Ps}(fs) \simeq F_{\Ps}(s) + H(q) \).
+But this type now depends on \( q \) and its higher path structure,
+and can no longer be expressed uniformly as a simple product with the fixed container \( \Id \).
+
+From this, we can devise two ways forward:
+Either we characterize the derivative in terms of a more fine-grained universal property
+that takes the dependency on higher paths into account,
+or we only take derivatives with respect to positions whose path types are more uniform.
+For the purpose of this paper we take the second approach,
+and define a derivative in terms of \emph{isolated} positions:
 \begin{definition}
   The derivative of a container \( \Der{(\MkCont{S}{P})} \DefEq (\MkCont{S'}{P'}) \)
   has shapes \( S' \DefEq \sum_{s : S} \Isolated{P_s} \) and positions \( P'(s , p) \DefEq P_s \setminus p \).
@@ -1636,6 +1633,16 @@ and \( 0 \) for any other direction.
     but straightforward argument.\todo{The argument is not fully straightforward, one needs has to mix \( \W \)-induction with \( \Graft \)-induction.}
   \end{proof}
 \end{proposition}
+
+\section*{Conclusion}
+
+\begin{itemize}
+  \item
+    In \cite{AbbottEtAl2003DerivativesContainers}, \citeauthor{AbbottEtAl2003DerivativesContainers} consider the general adjunction \( - \CTimes H \dashv [H, -] \),
+    perhaps we can make more progress towards that? By iterating ours, it should be possible to derive \( - \CTimes \Op{K}(n) \dashv \Der^n \).
+    For combinatorial species, this is enough to derive the fully general adjunction, since (1) the \( \Op{K}(n) \) are exactly the representables
+    \( \Op{y}(n) \), (2) every species is a colimit of some \( \Op{y}(n_i) \)'s, and (3) the product (in this case, Day-convolution) is co-continuous.
+\end{itemize}
 
 \printbibliography
 
