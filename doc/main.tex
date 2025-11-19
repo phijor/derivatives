@@ -960,14 +960,16 @@ indeed, \emph{every} container is differentiable in this sense, as long as we de
 Presenting the above wild adjunction in terms of unit and counit natural transformations
 has two advantages:
 Firstly, this data yields the desired equivalence of hom-types
+\( (\Cart{F}{\Der{G}}) \simeq (\Cart{\Maybe{F}}{G}) \),
+with underlying map
 \begin{align*}
-  {\Blank}^\sharp &: (\Cart{F}{\Der{G}}) \simeq (\Cart{\Maybe{F}}{G}) \\
+  {\Blank}^\sharp &: (\Cart{F}{\Der{G}}) \to (\Cart{\Maybe{F}}{G}) \\
   f^{\sharp} &\DefEq \varepsilon_G \circ (\Maybe{f})
 \end{align*}
 as it would for an 1-categorical adjunction,
 which otherwise would be somewhat tedious to establish.
 Secondly, \( {\Blank}^{\sharp} \) being an equivalence
-means that for all \( g : \Cart{\Maybe{F}}{G} \)
+means that for all \( { g : \Cart{\Maybe{F}}{G} } \)
 the type of fibers
 \(
   \sum_{f : \Cart{F}{\Der{G}}} \varepsilon_G \circ (\Maybe{f}) = g
