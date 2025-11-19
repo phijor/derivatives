@@ -1,0 +1,961 @@
+\section{Derivatives of Containers}\label{derivatives}
+
+Let us recall the notion of a container in type theory:
+\begin{definition}
+  A \emph{container} \( (\MkCont{S}{P}) \) consists of \emph{shapes} \( S : \Type \) and
+  a family \( P : S \to \Type \) of \emph{positions}.
+  We access shapes and positions via postfix projections
+  \( (\MkCont{S}{P})_{\Sh} \DefEq S \) and \( (\MkCont{S}{P})_{\Ps} \DefEq P \).
+\end{definition}
+
+Containers were introduced to model polymorphic data types,
+hence they are closed under products \( \times \), sums \( + \) and substitution \( \Blank[\Blank] \),
+see \autoref{container-operations}.
+The constant container at a type \( S \) is \( \CConst{S} \DefEq (\MkCont{S}{0}) \);
+products and sums are monoidal with units \( \CConst{1} \) and \( \CConst{0} \).
+The identity container \( \Id \DefEq (\MkCont{1}{1}) \)
+is a unit for substitution, which is a non-symmetric monoidal product.
+
+\begin{figure}
+  \begin{align*}
+    % Products
+    (F \CTimes G)_{\Sh} &\DefEq S \times T
+      &
+    (F \CTimes G)_{\Ps} &\DefEq \lambda (s, t).\, P_s + Q_t
+      \\
+    % Sums
+    (F \CPlus G)_{\Sh} &\DefEq S + T
+      &
+    (F \CPlus G)_{\Ps} &\DefEq
+      \lambda
+      \begin{cases}
+        \Inl(s).\, P_s \\
+        \Inr(t).\, Q_t
+      \end{cases}
+      \\
+    % Substitution
+    (\Subst{F}{G})_{\Sh} &\DefEq \sum_{s : S} (P_s \to T)
+      &
+    (\Subst{F}{G})_{\Ps} &\DefEq \lambda (s, f).\, \sum_{p : P_s} Q_{fp}
+  \end{align*}
+  \caption{%
+    Operations on containers \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
+  }%
+  \label{container-operations}
+\end{figure}
+
+\begin{definition}
+  Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
+  The type of \emph{cartesian morphisms} between \( F \) and \( G \) is
+  \[
+    \Cart{F}{G} \DefEq \sum_{f : S \to T} \prod_{s : S} Q_{fs} \simeq P_s
+  \]
+\end{definition}
+
+In the remainder of this paper we will only consider cartesian morphisms.
+We are going to drop \enquote{cartesian} in writing, but retain the notation \( \Cart{F}{G} \).
+Morphisms of containers compose as expected, and together with an identity morphism \( \Op{id}_F : \Cart{F}{F} \)
+they form a wild category \( \ContCart \):
+composition is associative and unital, but we make no assumption on the truncation level of the hom-types \( \Cart{F}{G} \).
+Note that this wild category is \emph{not} univalent in the na{\"i}ve sense:
+The canonical map taking paths of containers \( F = G \) to (categorical) isomorphisms
+(i.e. pairs \( f : \Cart{F}{G}, g : \Cart{G}{F} \) with chosen paths \( fg = \Op{id}_F \) and \( gf = \Op{id}_G \)),
+is \emph{not} an equivalence, unless shapes and positions of the involved containers are sets.
+Instead, we are going to use the following definition when comparing containers:
+
+\begin{definition}
+  A cartesian morphism \( (f, u) : \Cart{F}{G} \) is an \emph{equivalence} of containers
+  if \( f : F_{\Sh} \to G_{\Sh} \) is an equivalence of types.
+  We write \( F \CartEquiv G \) for the type of equivalences of containers.
+\end{definition}
+By an application of univalence, the type of equivalences \( F \CartEquiv G \) is equivalent to the type of paths, \( F = G \).
+While we cannot prove it internally, we think of the wild category of containers as an \( (\infty,1) \)-category
+in which \( F \CartEquiv G \) is the \enquote{correct} notion of weak equivalence,
+representing the \( \infty \)-groupoid of paths \( F = G \).
+
+In cases where we do care about the truncation level of shapes and positions,
+we define the following subtypes of containers:
+\begin{definition}
+  A container \( (\MkCont{S}{P}) \) is \( (n,k) \)-truncated if \( S \) is \( n \)-truncated,
+  and \( P_s \) is \( k \)-truncated for all \( s : S \).
+  Write \( \ContCart_{n,k} \) for the wild subcategory of \( (n,k) \)-truncated containers.
+\end{definition}
+Traditional set-based containers are \( (0,0) \)-truncated, whereas \citeauthor{Gylterud2011}'s \emph{symmetric containers}~\cite{Gylterud2011} are \( (1,0) \)-truncated.
+In particular, \( (0,0) \)-truncated containers form a univalent 1-category.
+
+When constructing a morphism \( f : \Cart{F}{G} \), we will oftentimes factor it
+through (equivalent) auxiliary containers
+\begin{equation*}
+  \begin{tikzcd}
+    F \ar[r, -multimap, "f"] & G \\
+    {F'} \ar[r, -multimap, "f'"{swap}] & {G'}
+    \ar[from=1-1,to=2-1, -multimap, "\sim"{swap}]
+    \ar[from=2-2,to=1-2, -multimap, "\sim"{swap}]
+  \end{tikzcd}
+\end{equation*}
+This lets us separate the bureaucracy of bringing \( F \) and \( G \) into a comparable shape
+from the act of defining an interesting morphism \( f' : \Cart{F'}{G'} \).
+As a consequence, \( f \) is an equivalence of containers if and only if \( f' \) is,
+which is often easier to characterize.
+
+\subsection{Derivatives}
+
+The derivative of a containers \( G \) represents a type of
+\( G \)-shaped trees in which a chosen subtree has been removed.
+For traditional containers, this can be implemented as an operation \( G \mapsto \Der{G} \) by removing a chosen position over each shape:
+Given \( G \JudgeEq (\MkCont{T}{Q}) \), \citeauthor{AbbottEtAl2005DataDifferentiating} define \( \Der{G} \)
+to have as shapes pairs \( (t , q) : \sum_{T} Q \), over which the positions are \( Q_t \setminus q \).
+To ensure that \( \Der \) is well-behaved, it is characterized by a universal property:
+\( \Der \) extends to an endofunctor on containers,
+and one is interested in finding --- perhaps on a suitable subcategory --- an adjunction \( \Maybe{(-)} \dashv \Der \)
+that describes morphisms into \( \Der{G} \):
+If such an adjunction exists, then morphisms \( \Cart{F}{\Der{G}} \) are in 1-to-1 correspondence with morphisms of shape \( (f, u) : \Cart{\Maybe{F}}{G} \).
+On positions, such morphisms are equivalences \( u_s : G_{\Ps}(fs) \simeq F_{\Ps}(s) + 1 \),
+i.e.\@ maps that \enquote{avoid} the removed position \( u_s^{\Inv}(\Inr(\bullet)) : G_{\Ps}(fs) \).
+
+As we have seen in the previous section, removing points from a type is a subtle process in a univalent setting:
+a position \( q : G_{\Ps}(t) \) is no longer a discrete point, but comes with a potentially complicated type of paths around it.
+If we wanted to encode morphisms into \( \Der{G} \) by the same universal property,
+we would have to avoid the entire connected component around \( q \),
+that is, find some type of \enquote{hole} \( H(q) \) such that \( G_{\Ps}(fs) \simeq F_{\Ps}(s) + H(q) \).
+But this type now depends on \( q \) and its higher path structure,
+and can no longer be expressed uniformly as a simple product with the fixed container \( \Id \).
+
+From this, we can devise two ways forward:
+Either we characterize the derivative in terms of a more fine-grained universal property
+that takes the dependency on higher paths into account,
+or we only take derivatives with respect to positions whose path types are more uniform.
+For the purpose of this paper we take the second approach,
+and define a derivative in terms of \emph{isolated} positions:
+\begin{definition}
+  The derivative of a container \( \Der{(\MkCont{S}{P})} \DefEq (\MkCont{S'}{P'}) \)
+  has shapes \( S' \DefEq \sum_{s : S} \Isolated{P_s} \) and positions \( P'(s , p) \DefEq P_s \setminus p \).
+\end{definition}
+
+We can not only take the derivative of a container, but also act functorially on morphisms:
+\begin{problem}
+  Define a wild endofunctor \( \Der : \ContCart \to \ContCart \).
+  That is,
+  for all \( f : \Cart{F}{G} \), a morphisms \( \Der{f} : \Cart{\Der{F}}{\Der{G}} \),
+  such that \( \Der(\Id_F) = \Id_{\Der{F}} \) and \(\Der(fg) = (\Der{f})(\Der{g}) \).
+  \begin{construction}
+    For any \( (f, u) : \Cart{(\MkCont{S}{P})}{(\MkCont{T}{Q})} \),
+    there is a canonical morphism \( \Der{(f, u)} \DefEq (f' , u') : \Cart{\Der{(\MkCont{S}{P})}}{\Der{(\MkCont{T}{Q})}} \)
+    obtained as follows:
+    On shapes, the map \( f' : \sum_{s : S} \Isolated{P_s} \to \sum_{t : T} \Isolated{G_t} \)
+    applies \( f \) to the first component and \( \Isolated{(u_s^\Inv)} : \Isolated{P_s} \simeq \Isolated{G_{fs}} \) to the second.
+    On positions, \( u'_{s,p} : G_{fs} \setminus u_s^\Inv(p) \simeq F_s \setminus p \) is obtained from \( u_s \), which respects the removed point \( p \).
+    (cf.\@ \autoref{is-isolated-respect-equiv}).
+  \end{construction}
+\end{problem}
+
+Since isolated points always form a set, taking the derivative of a container preserves its truncation level
+as long as shapes are at least sets, and positions are at least propositions:
+\begin{proposition}
+  For \( n \geq 0 \) and \( k \geq -1 \), the derivative of an \( (n, k) \)-truncated container is \( (n, k) \)-truncated.
+  \begin{proof}
+    Let \( (\MkCont{S}{P}) \) an \( (n, k) \)-truncated container.
+    By \autoref{is-set-isolated} \( \Isolated{P_s} \) is a 0-truncated type and \( S \) is \( n \)-truncated,
+    thus \( \Der{(\MkCont{S}{P})}_{\Sh} \JudgeEq \sum_{s : S} \Isolated{P_s} \) is \( n \)-truncated.
+    Positions are \( k \)-types since \( P_s \setminus p \) embeds into \( P_s \).
+  \end{proof}
+\end{proposition}
+
+Importantly, this turns \( \Der \) into an endofunctor on the 1-category of set-truncated containers,
+without having to assume that the containers are discrete:
+\begin{corollary}
+  Taking derivatives is an endofunctor \( \Der : \ContCart_{0,0} \to \ContCart_{0,0} \).
+\end{corollary}
+We believe that analouges of this hold for higher truncation levels.
+Symmetric containers, for example, form a bicategory \( \ContCart_{1,0} \),
+and it should be straightforward (albeit tedious) to show that \( \Der \) restricts to a pseudo\-functor on this bicategory.
+
+\subsection{Linear adjunction}
+
+\begin{itemize}
+  \item Unlike \cite{AbbottEtAl2005DataDifferentiating}, we define the adjunction
+    via unit and counit, not as a natural hom-set isomorphism.
+  \item
+    Mostly do this because it is easier,
+    but also because it yields an equivalence of hom-types more directly.
+\end{itemize}
+
+\begin{problem}\label{derivative-adjunction}
+  Define a wild adjunction \( (\eta, \varepsilon) : (\Maybe{-}) \dashv \Der{(-)} \),
+  that is:
+  \begin{enumerate}
+    \item
+      Two families of morphisms
+      \[
+        \eta : \prod_{F : \Cont} \Cart{F}{\Der{(F \CTimes \Id)}}
+        \quad\text{and}\quad
+        \varepsilon : \prod_{G : \Cont} \Cart{\Der{G} \CTimes \Id}{G}
+      \]
+    \item with fillers of naturality squares
+      \begin{align*}
+        &
+          \begin{tikzcd}[ampersand replacement=\&]
+            F
+              \ar[r, -multimap, "\eta_F"]
+              \ar[d, -multimap, "f"{swap}]
+              \&
+            \Der(\Maybe{F})
+              \ar[d, -multimap, "\Der(\Maybe{f})"]
+              \\
+            G
+              \ar[r, -multimap, "\eta_G"{swap}]
+              \&
+            \Der(\Maybe{G})
+          \end{tikzcd}
+        &
+          &\text{and}
+        &
+        &
+          \begin{tikzcd}[ampersand replacement=\&]
+            \Maybe{\Der{F}}
+              \ar[r, -multimap, "\varepsilon_F"]
+              \ar[d, -multimap, "\Maybe{\Der{f}}"{swap}]
+              \&
+            F
+              \ar[d, -multimap, "f"]
+              \\
+            \Maybe{\Der{G}}
+              \ar[r, -multimap, "\varepsilon_G"{swap}]
+              \&
+            G
+          \end{tikzcd}%
+      \end{align*}
+      for all \( f : \Cart{F}{G} \),
+    \item and zigzag-diagrams
+      \begin{align*}
+        &
+        \begin{tikzcd}[ampersand replacement=\&, column sep=tiny, row sep=large]
+          \Maybe{F} \& \& \Maybe{F} \\
+                    \& \Maybe{(\Der{(\Maybe{F})})} \& %
+          \ar[from=1-1, to=1-3, -multimap, "\Op{id}"]
+          \ar[from=1-1, to=2-2, -multimap, "\Maybe{{\eta_F}}"{'}]
+          \ar[from=2-2, to=1-3, -multimap, "\varepsilon_{\Maybe{F}}"{'}]
+        \end{tikzcd}
+        &
+          &\text{and}
+        &
+        &
+        \begin{tikzcd}[ampersand replacement=\&, column sep=tiny, row sep=large]
+                    \& \Der{(\Maybe{\Der{G}})} \& \\
+          \Der{G} \& \& \Der{G} %
+          \ar[from=2-1, to=2-3, -multimap, "\Op{id}"]
+          \ar[from=2-1, to=1-2, -multimap, "\eta_{\Der{G}}"]
+          \ar[from=1-2, to=2-3, -multimap, "\Der{(\varepsilon_{G})}"]
+        \end{tikzcd}
+      \end{align*}
+  \end{enumerate}
+  \begin{construction}
+    Let \( F \JudgeEq (\MkCont{S}{P}) \) and define \( \eta_F : \Cart{F}{\Der{(\Maybe{F})}} \).
+    On shapes, \( {\eta_F^{\Sh}} : S \to \sum_{(s, \mathunderscore) : S \times 1} \Isolated{(P_s + 1)} \)
+    sends \( s \) to \( (s, \bullet) \) and \( \mathsf{nothing} \);
+    the latter is isolated by \autoref{is-isolated-nothing}.
+    On positions, define \( \eta_F^{\Ps} : \prod_{s : S} (P_s + 1) \setminus \Nothing \simeq P_s \)
+    as in \autoref{maybe-minus-nothing-equiv}.
+
+    Let \( G \JudgeEq (\MkCont{T}{Q}) \); define the counit \( \varepsilon_G : \Cart{\Maybe{(\Der{G})}}{G} \) as follows:
+    on shapes, \( \varepsilon_G^{\Sh} : \sum_{t : T} \Isolated{Q_t} \times 1 \to T \) is the first projection.
+    On positions the equivalence
+    \(
+      \varepsilon_G^{\Ps}(t , q) : Q_t \simeq (Q_t \setminus q) + 1
+    \)
+    is given by \autoref{isolated-minus-plus-equiv} for all \( t : T \) and \( q : \Isolated{Q_t} \).
+
+    To construct the zigzag-fillers,
+    we apply the necessary extensionality principles for functions, equivalences and sum types.
+    We are left to construct paths that are almost \( \Op{refl} \);
+    only some proofs of isolation and removal need to be compared up to propositional equality.
+    Construction of the naturality squares for \( \eta \) and \( \varepsilon \) is done similarly.
+  \end{construction}
+\end{problem}
+
+If we restrict the above to set-truncated containers, we can solve a problem left open by \citeauthor{AbbottEtAl2005DataDifferentiating}:
+they \enquote{leave it to future work to identify the subcategory of differentiable containers}~\cite[14]{AbbottEtAl2005DataDifferentiating};
+indeed, \emph{every} container is differentiable in this sense, as long as we define derivatives in terms of isolated positions:
+\begin{theorem}
+  In the 1-category of set-truncated containers \( \ContCart_{0,0} \), \( \Der \) is right-adjoint to tensoring with \( \Id \).
+\end{theorem}
+
+Presenting the above wild adjunction in terms of unit and counit natural transformations
+has two advantages:
+Firstly, this data yields the desired equivalence of hom-types
+\( (\Cart{F}{\Der{G}}) \simeq (\Cart{\Maybe{F}}{G}) \),
+with underlying map
+\begin{align*}
+  {\Blank}^\sharp &: (\Cart{F}{\Der{G}}) \to (\Cart{\Maybe{F}}{G}) \\
+  f^{\sharp} &\DefEq \varepsilon_G \circ (\Maybe{f})
+\end{align*}
+as it would for an 1-categorical adjunction,
+which otherwise would be somewhat tedious to establish.
+Secondly, \( {\Blank}^{\sharp} \) being an equivalence
+means that for all \( { g : \Cart{\Maybe{F}}{G} } \)
+the type of fibers
+\(
+  \sum_{f : \Cart{F}{\Der{G}}} \varepsilon_G \circ (\Maybe{f}) = g
+\) is contractible.
+This expresses the \emph{property} of \( \varepsilon_G \) being a universal arrow from \( \Maybe{\Blank} \) to \( G \):
+any \( g \) factors uniquely through \( \varepsilon_G \).
+Hence, the data of the wild adjunction in \autoref{derivative-adjunction} is uniquely determined, up to our choice of counit.
+
+\subsection{Laws of Derivates}
+
+\begin{itemize}
+  \item
+    derivative of a container enjoys a number of desirable properties
+  \item
+    ensure that our generalization still respects those
+\end{itemize}
+
+Recall that the \emph{constant container} at a type \( A \) is \( \CConst(A) \DefEq (\MkCont{A}{0}) \).
+The derivative of a constant is always the zero-container \( \CConst(0) \),
+and that of the identity \( \Id \) is the constant \( \CConst(1) \).
+Both facts factor through the following observation:
+\begin{proposition}\label{derivative-prop-trunc}
+  Let \( S : \Type \) and \( P : S \to \Op{Prop} \).
+  There is an equivalence of containers
+  \[
+    { \Der{(\MkCont{S}{P})} }
+      \CartEquiv
+    { (\MkCont{{\textstyle \sum_{S} P }}{0}) }
+  \]
+  In particular, we have
+  \( \Der{(\Id)} \CartEquiv \CConst(1) \)
+  and \( \Der(\CConst(A)) \CartEquiv \CConst(0) \).
+  \begin{proof}
+    Since \( P_s \) is a proposition, we know that \( \Isolated{P_s} \simeq P_s \) and \( P_s \setminus p \simeq 0 \).
+    Thus,
+    \begin{align*}
+      \Der{(\MkCont{S}{P})}
+        &\CartEquiv (\MkCont{((s, p) : \textstyle\sum_{s : S} \Isolated{P_s})}{P_s \setminus p})
+          \\
+        &\CartEquiv (\MkCont{((s, p) : \textstyle\sum_{s : S} P_s)}{0})
+          \qedhere
+    \end{align*}
+  \end{proof}
+\end{proposition}
+
+Similarly, we convince ourselves that \( \Der \) distributes over (binary) sums,
+and that for products it obeys a Leibniz rule:
+\begin{proposition}\label{sum-product-rule}\label{sum-rule}\label{leibniz-rule}
+  For containers \( F, G \), the following hold:
+  \begin{enumerate}
+    \item Sum rule: \( {\Der{(F \oplus G)}} \CartEquiv {\Der{F} \oplus \Der{G}} \)
+    \item Leibniz rule: \( {\Der{(F \CTimes G)}} \CartEquiv {(\Der{F} \CTimes G) \oplus (F \CTimes \Der{G})} \)
+  \end{enumerate}
+  \begin{proof}
+    Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
+    Both properties are proved like in the discrete setting
+    (cf.~\cite[{Proposition 6.3 and 6.4}]{AbbottEtAl2005DataDifferentiating}),
+    with one exception:
+    % The sum rule is proved entirely like in the discrete setting \cite[{Proposition~6.3}]{AbbottEtAl2005DataDifferentiating}.
+    % The Leibniz rule almost follows the traditional proof (\cite[{Proposition~6.4}]{AbbottEtAl2005DataDifferentiating}),
+    for the Leibniz rule,
+    one needs to show that isolated points distribute over binary sums in
+    \[
+      \sum_{s : S} \sum_{t : T} \Isolated{(P_s + Q_t)}
+        \simeq
+      \sum_{s : S} \sum_{t : T} \Isolated{P_s} + \Isolated{Q_t}
+    \]
+    This is done via \autoref{isolated-sum-equiv}.
+  \end{proof}
+\end{proposition}
+
+\todo[inline]{%
+  Say something about fixed-points of \( \Der \):
+  We expect a trivial fixed-point \( \Der{0} \CartEquiv 0 \),
+  but also an analouge of \( \Der{e^x} = e^x \).
+  The latter is done in \autoref{bag-fixed-point}.
+  But in general, these fixed points are probably not unique,
+  given that we can express combinatorial species as containers over \( \FinSet \)
+  (thanks Brent, \cite{Yorgey2014CombinatorialSpeciesLabelled}),
+  and that for species, differential equations have a lot of solutions \cite{Labelle1986combinatorialdifferentialequations}.
+}
+
+Let \( \FinSet \DefEq \sum_{X : \Type} \exists n : \mathbb{N}.\, X \simeq \Op{Fin}(n) \) be the universe of Bishop-finite sets,
+together with its forgetful map \( \El \DefEq \Op{fst} : \FinSet \to \Type \).
+The container of \emph{bags} is \( \Op{Bag} \DefEq (\MkCont{\FinSet}{\El}) \).
+As written, the shapes of this container quantify over all types, hence live in a higher universe.
+There are however equivalent small replacements of this type,
+such as the one given by \emph{Finster et al.} in \cite[Theorem~25]{FinsterEtAl2021CartesianBicategoryPolynomial}.
+
+\begin{proposition}\label{bag-fixed-point}
+  The bag-container is a fixed-point of deriviation:
+  there is an equivalence \( \CartIso{\Der{\Op{Bag}}}{\Op{Bag}} \).
+  \begin{proof}
+    First, note that finite sets are closed under addition and removal of points:
+    if \( X \) is finite, then so are \( X + 1 \) and \( X \setminus x \) for all \( x : X \).
+    On shapes, we construct an equivalence
+    \(
+      \sum_{X : \FinSet} \Isolated{\El(X)} \simeq \FinSet
+    \)
+    from mutually inverse functions \( f \) and \( g \).
+    From left to right, define \( f(X, x_0) \DefEq X \setminus x_0 \);
+    the other way let \( g(X) \DefEq (X + 1 , \Nothing) \).
+    By univalence, finite sets are equal if their carrier types are equivalent,
+    so \( f \) and \( g \) are inverses by \autoref{isolated-minus-plus-equiv} and \autoref{maybe-minus-nothing-equiv}.
+    Given \( X : \FinSet \) and \( x_0 : \El(X) \), positions are related by the identity equivalence,
+    that is
+    \(
+      \Op{Bag}_{\Ps}(f(X, x_0)) = \El(f(X, x_0)) = X \setminus x_0 = \Der{\Op{Bag}}_{\Ps}(X, x_0)
+    \).
+  \end{proof}
+\end{proposition}
+
+Unlike in classical analysis, where the exponential function is the unique solution to
+the differential equation \( f^{\prime} = f \) such that \( f(0) = 1 \),
+the situation for containers is more nuanced:
+While \( \Op{Bag} \) is a fixed-point of \( \Der \) for which \( { F[\CConst{0}] \CartEquiv \CConst{1} } \),
+it is far from the only one:
+modulo size issues, the proof of \autoref{bag-fixed-point} goes through for any subuniverse
+of types closed under addition and removal of single points
+-- for example, type-theoretic ordinals.\todo{Or cardinals???}
+This is not entirely unexpected:
+containers are closely related to Joyal's \emph{combinatorial species}
+(as discussed e.g.~in Yorgey's thesis \cite[67]{Yorgey2014CombinatorialSpeciesLabelled}),
+and these are known to have many non-isomorphic solutions even for simple differential equations,
+as shown by Labelle in~\cite{Labelle1986combinatorialdifferentialequations}.
+
+\begin{proposition}
+  Let \( \Op{Cyc} \) the container of cyclic sets.
+  Then \( \CartIso{\Der{\Op{Cyc}}}{\Op{List}} \).
+\end{proposition}
+
+\subsection{The Chain Rule}
+
+Stretching the analogy with a derivative of functions further,
+we might expect \( \Der \) to satisfy a version of the chain rule
+\( (f \circ g)^{\prime} = (f^{\prime} \circ g) \cdot g^{\prime} \).
+In our setting, substitution \( \Subst{-}{-} \) takes on the role of composition,
+and 
+
+\begin{problem}[note={The lax chain rule}]\label{lax-chain-rule}
+  For any two containers \( F, G \), define a morphism
+  \[
+    \Op{chain}_{F,G} :
+    \Cart%
+      { \Subst{(\Der{F})}{G} \CTimes \Der{G} }%
+      {\Der{(\Subst{F}{G})}}
+  \]
+\end{problem}
+\begin{construction}[note={for \autoref{lax-chain-rule}}]
+  Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
+  As usual, we have to construct a map on shapes and an equivalence of positions.
+  On shapes, our goal is a map
+  \[
+    \big(\sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} (P_s \setminus p \to T) \big)
+      \times
+    \sum_{t : T} \Isolated{Q_t}
+      \to
+    \Big(
+      \sum\nolimits_{(s, f) : \sum_{s : S} (P_s \to T)} \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)}
+    \Big)
+  \]
+  Let us first reshape the left side by some equivalences.
+  By re-associating the sums, we obtain
+  \begin{align*}
+      %
+    &\mathrel{\hphantom{\simeq}}
+      \big(\sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} P_s \setminus p \to T \big)
+        \times
+      \sum_{t : T} \Isolated{Q_t}
+    \\
+    &\simeq
+      \sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} \sum\nolimits_{(f, t) : (P_s \setminus p \to T \times T)} \Isolated{Q_t}
+  \intertext{%
+    By \autoref{graft-equiv}, the type \( (P_s \setminus p \to T \times T) \) is equivalent to \( P_s \to T \),
+    thus we simplify to
+  }
+    &\simeq
+      \sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} \sum\nolimits_{f : P_s \to T} \Isolated{Q_{fp}}
+  \intertext{%
+    By re-associating the sum yet again, we are left with
+  }
+    &\simeq
+      \sum\nolimits_{(s, f) : \sum_{s : S} (P_s \to T)} \big( \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})} \big)
+  \end{align*}
+  Denote this equivalence by \( \Op{chain}^{\Op{left}}_{F,G} \).
+  Now, the left and the right only differ in
+  \begin{align*}
+    \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})}
+      \qquad\text{vs.}\qquad
+    \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)}
+  \end{align*}
+  \Autoref{sigma-isolate} gives us a map
+  \(
+    \SigmaIsolate_{P_s,Q_{f(\shortminus)}} :
+      \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})}
+        \to
+      \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)}
+  \),
+  hence
+  \(
+    \cramped{
+      \Op{chain}_{F,G}^{\Sh} \DefEq
+        \Op{\Sigma}(\Op{id}, \SigmaIsolate_{P_s,Q_{f(\shortminus)}}) \circ \Op{chain}^{\Op{left}}_{F,G}
+    }
+  \).
+
+  To construct the equivalence on positions,
+  let \( s : S \), \( p_0 : \Isolated{P_s} \), \( f : P_s \setminus p_0 \to T \), \( t : T \) and \( q_0 : \Isolated{Q_t} \).
+  Our goal becomes to construct an equivalence
+  \[
+      \big(
+        \sum_{p : P_s} Q_{\GraftSyntax{f}{t}(p)}
+      \big) \setminus (p_0 , q_0)
+    \simeq
+      \big(
+        \smashoperator{\sum_{p : P_s \setminus p_0}} Q_{f(p)}
+      \big)
+        +
+      (Q_t \setminus q_0),
+  \]
+  which we obtain from \autoref{is-equiv-sigma-remove}.
+\end{construction}
+
+Note that the above proof essentially factors \( \Op{chain}_{F,G} \) into
+\[
+  \begin{tikzcd}[column sep=large]
+    { \Subst{(\Der{F})}{G} \CTimes \Der{G} }%
+      \ar[r, -multimap, "\Op{chain}_{F,G}"]
+      \ar[d, -multimap, "\sim"{swap}]
+      &
+    {\Der{(\Subst{F}{G})}}
+      \\
+    H_0
+      \ar[r, -multimap, "\eta"{swap}]
+      &
+    H_1
+      \ar[u, -multimap, "\sim"{swap}]
+  \end{tikzcd}
+\]
+in which
+\(
+  \eta_{\Sh} :
+    \Cart%
+      { \sum_{s : S} \sum_{f : P_s \to T} \sum_{p : \Isolated{P_s}} \Isolated{Q_{fp}} }%
+      { \sum_{s : S} \sum_{f : P_s \to T} \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)} }
+\)
+applies \( \SigmaIsolate_{P_s,Q_{f(\shortminus)}} \).
+We will make this factorization explicit in the derivation of the chain rule for indexed containers (\autoref{binary-chain-rule}),
+but for now we can record the following fact:
+\begin{proposition}\label{strong-chain-rule-iff-is-equiv-sigma-isolate}
+  Let \( F = (\MkCont{S}{P}) \) and \( G = (\MkCont{T}{Q}) \).
+  The following are equivalent propositions:
+  \begin{enumerate}
+    \item \label{strong-chain-rule-iff-is-equiv-sigma-isolate-1}
+      \( \Op{chain}_{F,G} \) is an equivalence of containers
+    \item \label{strong-chain-rule-iff-is-equiv-sigma-isolate-2}
+        \( \SigmaIsolate_{P_s,Q_{f(\shortminus)}} \) is an equivalence for all \( s : S \) and \( f : P_s \to T \)
+    \item \label{strong-chain-rule-iff-is-equiv-sigma-isolate-3}
+      For all \( s : S \) and \( f : P_s \to T \), if \( (p, q) : \sum_{p : P_s} Q_{fp} \) is isolated,
+      then both \( p \) and \( q \) are isolated.
+  \end{enumerate}
+  \begin{proof}
+    Equivalence of the first two points follows from inspection of the definition of \( \Op{chain} \) in terms of \( \SigmaIsolate \).
+    Equivalence with the last point is \autoref{is-equiv-sigma-isolate-iff-isolated-pair}.
+  \end{proof}
+\end{proposition}
+
+This characterization lets us immediately see in which cases we can and cannot expect a strong chain rule.
+Firstly, we recover a strong chain rule for \emph{discrete} containers, as expected by
+\cite[{Proposition~6.6}]{AbbottEtAl2005DataDifferentiating}:
+\begin{theorem}\label{discrete-strong-chain-rule}
+  For discrete containers \( F, G \), \( \Op{chain}_{F,G} \) is an equivalence.
+  \begin{proof}
+    The positions of \( F \) and \( G \) are discrete,
+    so by \autoref{discrete-is-equiv-sigma-isolated}
+    \( \SigmaIsolate \) is an equivalence,
+    hence is \( \Op{chain}_{F,G} \).
+  \end{proof}
+\end{theorem}
+
+Secondly, we conclude that globally having a strong chain rule is an inherently classical property:
+\begin{theorem}\label{globally-discrete-iff-strong-chain-rule}
+  The following are equivalent propositions:
+  \begin{enumerate}
+    \item \emph{every} type is discrete
+    \item for all containers \( F \) and \( G\), \( \Op{chain}_{F,G} \) is an equivalence
+  \end{enumerate}
+  \begin{proof}
+    If every type is discrete, then so is every container, hence the chain rule is always an equivalence by \autoref{discrete-strong-chain-rule}.
+    In the other direction,
+    use \autoref{discrete-iff-is-equiv-singl-isolate} to show that any given type \( A \) is discrete
+    ---
+    that is, given some \( a_0 : A \), prove that \( \SigmaIsolate_{A, {a_0 = (\shortminus)}} \) is an equivalence.
+    We do so by applying \autoref{strong-chain-rule-iff-is-equiv-sigma-isolate} to containers
+    \( F \DefEq (\MkCont{1}{A}) \) and \( G \DefEq (\MkCont{(a_0 : A)}{a_0 = (\shortminus)}) \).
+    % In the other direction,
+    % use \autoref{is-equiv-sigma-isolate-discrete} to show that any given type \( A \) is discrete
+    % ---
+    % that is, given some \( B : A \to \Type \), prove that \( \SigmaIsolate_{A,B} \) is an equivalence.
+    % We do so by applying \autoref{strong-chain-rule-iff-is-equiv-sigma-isolate} to containers
+    % \( F \DefEq (\MkCont{1}{A}) \) and \( G \DefEq (\MkCont{A}{B}) \),
+    % and \( s \DefEq \bullet : 1 \) and \( f \DefEq \Op{id} : A \to A \).
+  \end{proof}
+\end{theorem}
+
+\begin{corollary}
+  Assuming a strong chain rule is inconsistent in the presence of non-discrete types:
+  \[
+    \neg \big( \smashoperator{\prod_{F, G : \Cont}} \Op{isEquiv}(\Op{chain}_{F,G}) \big)
+  \]
+  \begin{proof}
+    The circle \( S^1 \) is provably not discrete: If it were, it would be a set.
+  \end{proof}
+\end{corollary}
+
+\begin{corollary}
+  The following are equivalent:
+  \begin{enumerate}
+    \item Every set is discrete.
+    \item In the 1-category of set-truncated containers, \( \Chain_{F,G} \) is an isomorphism
+      for all pairs of containers \( F \) and \( G \).
+  \end{enumerate}
+  \begin{proof}
+    In a 1-category, being an isomorphism is a proposition,
+    which
+    --- in the category of set-truncated containers ---
+    is equivalent to being an equivalence.
+    The claim follows by inspection of the proof of \autoref{globally-discrete-iff-strong-chain-rule},
+    and ensuring that the same argument applies even when all types involved are 0-truncated.
+  \end{proof}
+\end{corollary}
+
+We have seen that our definition of derivative behaves nicely even in the presence of non-discrete types,
+in that we retain the ways it interacts with sums and products (\autoref{sum-product-rule}).
+Its interaction with substitution, however, is more subtle.
+While we do obtain a chain rule, it is now \emph{directed} or \emph{lax} (\autoref{lax-chain-rule}),
+and whether we can strengthen it to an equivalence depends on the pair of containers involved (\autoref{strong-chain-rule-iff-is-equiv-sigma-isolate}).
+Indeed, assuming the latter for any pair of containers is inconsistent in the presence of non-discrete types such
+as HITs like the circle \( S^1 \).
+
+
+\subsection{Derivatives of Fixed Points}
+
+If we interpret containers as blueprints for polymorphic types in a single variable,
+we can readily generalize to containers in \( I \) variables, for any \( I : \Type \):
+\[
+  \Cont_{I} \DefEq \sum_{S : \Type} (I \to S \to \Type)
+\]
+Ordinary containers correspond to unary containers \( \Cont_{1} \).
+Substitution generalizes to an operation \( {-}[{-}] : \Cont_{I+1} \to \Cont_{I} \to \Cont_{I} \).
+For any fixed \( F : \Cont_{I+1} \), \( F[-] \) is a wild endofunctor of \( I \)-ary containers.
+We encode inductive types as smallest fixed points of substitution.
+For some \( F : \Cont_2 \), the container \( {\mu F} : \Cont_1 \) comes with a dedicated
+equivalence of containers \( {\mu F} \CartEquiv F \).
+This corresponds to \( F \) satisfying the functional equation
+\[
+  {\mu F}(X) \simeq F(X, {\mu F}(X))
+\]
+Assuming we have access to \( \W \)-types, recall that we can define a (smallest) fixed point container.
+For \( A : \Type \) and \( B : A \to \Type \), \( \W(A, B) : \Type \) has the single constructor
+\begin{center}
+  \hspace*{\fill}
+  {
+    \AxiomC{\( a : A \)}
+    \AxiomC{\( f : B(a) \to \W(A, B) \)}
+    \BinaryInfC{\( \Sup(a, f) : \W(A, B) \)}
+    \DisplayProof
+  }
+  \hspace*{\fill}
+\end{center}
+A cursor to a position into a \( \W(A, B) \)-tree,
+labelled by some \( C : A \to \Type \),
+can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \) with two constructors, namely
+\begin{center}
+  \hspace*{\fill}
+  {
+    \AxiomC{\( c : C(a) \)}
+    \UnaryInfC{\( \Op{top}(c) : \bar{\W}_{A, B, C}(\Sup(s, f)) \)}
+    \DisplayProof
+  }
+  \hfill%
+  and
+  \hfill%
+  % \hspace*{\fill}
+  % \\[1em]
+  % \hspace*{\fill}
+  {
+    \AxiomC{\( b : B(a) \)}
+    \AxiomC{\( w : \bar{\W}_{A,B,C}(f(b)) \)}
+    \BinaryInfC{\( \Op{below}(b, w) : \bar{\W}_{A, B, C}(\Sup(s, f)) \)}
+    \DisplayProof
+  }
+  \hspace*{\fill}
+\end{center}
+
+% \begin{align*}
+%   \Op{top} &: \prod_{a : A} \prod_{f : B(a) \to \W(A, B)} C(a) \to \bar{\W}_{A,B,C}(\Sup(s, f)) \\
+%   \Op{below} &: \prod_{a : A} \prod_{f : B(a) \to \W(A, B)} \prod_{b : B(a)} \bar{\W}_{A,B,C}(f(b)) \to \bar{\W}_{A,B,C}(\Sup(s, f))
+% \end{align*}
+
+
+\begin{definition}
+  Let \( F \JudgeEq (\MkCont{S}{P}) : \Cont_{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \Cont_I \):
+  \begin{align*}
+    S^\mu &\DefEq \W(S, P_{\Nothing}) \\
+    P^\mu_i & \DefEq \bar{\W}_{S,P(\Nothing),P(\Just i)}
+  \end{align*}
+\end{definition}
+\begin{problem}
+  Define an equivalence of containers \( \Op{in}_F : F[{\mu F}] \CartEquiv {\mu F} \).
+\end{problem}
+\begin{problem}\label{mu-rec}
+  Define an induction principle for morphisms out of \( \mu \)-containers:
+  \begin{center}
+    \hspace*{\fill}
+    {
+      \AxiomC{\( F : \Cont_{I+1} \)}
+      \AxiomC{\( G : \Cont_I \)}
+      \AxiomC{\( \alpha : \Cart{F[G]}{G} \)}
+      \TrinaryInfC{\( \Op{rec}_{F}(\alpha) : \Cart{\mu F}{G} \)}
+      \DisplayProof
+    }
+    \hspace*{\fill}
+  \end{center}
+\end{problem}
+
+\begin{lemma}\label{is-equiv-from-mu-rec}
+  Let \( \alpha : \Cart{\Subst{F}{G}}{G} \).
+  If \( \Op{rec}_{F}(\alpha) \) is an equivalence, then so is \( \alpha \).
+  \begin{proof}
+    Substitution \( \Subst{F}{-} \) preserves equivalences,
+    so by 3-for-2 for equivalences of containers, \( \alpha \) on the right is an equivalence:
+    \[
+      \begin{tikzcd}[column sep=huge]
+        \Subst{F}{\mu F} & \Subst{F}{G} \\
+        {\mu F}          & G
+        \ar[from=1-1, to=1-2, multimap-multimap, "\Subst{F}{\Op{rec}_F(\alpha)}"]
+        \ar[from=1-1, to=2-1, multimap-multimap, "\Op{in}_F"{swap}]
+        \ar[from=2-1, to=2-2, multimap-multimap, "\Op{rec}_F(\alpha)"{swap}]
+        \ar[from=1-2, to=2-2, -multimap, "\alpha"]
+      \end{tikzcd}
+      \qedhere
+    \]
+  \end{proof}
+\end{lemma}
+
+\begin{definition}[note={Derivative of \( I \)-ary containers}]
+  Let \( F \JudgeEq (\MkCont{S}{P}) : \Cont_I \) and \( i : \Isolated{I} \).
+  The \( i \)th derivative \( {\Der_i}F \DefEq (\MkCont{S'}{P'}) : \Cont_I \) is defined as follows:
+  \begin{align*}
+    S' &\DefEq \sum_{s : S} \Isolated{P_i(s)} \\
+    P'(j, s, p) &\DefEq
+      \begin{cases}
+        P_i(s) \setminus p & \text{if } i = j \\
+        P_j(s) & \text{otherwise}
+      \end{cases}
+  \end{align*}
+\end{definition}
+
+\begin{remark}
+  For an \( (I+1) \)-ary container \( F \), the index \( \Nothing : I + 1 \)
+  is always isolated, so we will tacitly write \( \Der{F} \)
+  for \( \Der_{\Nothing}(F) : \Cont_I \);
+  and similarly in the unary case.
+\end{remark}
+
+\begin{problem}
+  Construct an action on morphisms
+  \[
+    \Der_{i} : (\Cart{F}{G}) \to (\Cart{\Der_i{F}}{\Der_i{G}})
+  \]
+\end{problem}
+
+\begin{proposition}[note={Lax chain rule for binary containers}]\label{binary-chain-rule}
+  Let \( F : \Cont_2 \) and \( G : \Cont_1 \).
+  There exists a cartesian morphism
+  \[
+    \Op{chain}_{F,G}
+      :
+    \Cart%
+      {{\Der_0{F}}[G] \CPlus \big( {\Der_1{F}}[G] \CTimes \Der{G} \big)}%
+      {\Der{(F[G])}}
+  \]
+  \begin{construction}
+    \renewcommand*{\L}{\Op{L}}
+    \newcommand*{\R}{\Op{R}}
+    Let \( F \JudgeEq (\MkCont{S}{P}) \), \( G \JudgeEq (\MkCont{T}{Q}) \).
+    We define auxiliary containers \( H_1, H_2 \) and factor the morphism into the following:
+    \[
+      \begin{tikzcd}
+        \L \DefEq {{\Der_0{F}}[G] \CPlus \big( {\Der_1{F}}[G] \CTimes \Der{G} \big)}
+          \ar[r, -multimap, "\sim"] &
+        H_1
+          \ar[r, -multimap, "\eta"] &
+        H_2
+          \ar[r, -multimap, "\sim"] &
+        {\Der{(F[G])}}
+        \eqcolon \R
+      \end{tikzcd}
+    \]
+    Following the argument in \autoref{lax-chain-rule} and some type yoga,
+    we see that type of shapes of the container to the left is equivalent to
+    \begin{align}
+      U_1 \DefEq
+        \sum_{s : S} \sum_{f : P_1(s) \to T} \Isolated{P_0(s)} + \smashoperator{\sum_{p : \Isolated{P_1(s)}}} \Isolated{Q(fp)}
+          \label{binary-chain-rule-shape-equiv}
+    \end{align}
+    Let \( f_1 : {\L}_{\Sh} \simeq U_1 \) be this equivalence, and define \( H_1 \DefEq (\MkCont{U_1}{R_1}) \),
+    where \( R_1 \DefEq {\L}_{\Ps} \circ f_1^{\Inv}\).
+
+    On the other side we obtain an equivalence \( f_2 : U_2 \simeq {\R}_{\Sh} \)
+    by distributing \( \Isolated{(-)} \) over binary sums:
+    \begin{align*}
+      U_2
+      &\DefEq
+      \sum_{s : S} \sum_{f : P_1(s) \to T}
+        \Isolated{P_0(s)} + \Isolated{\big( \smashoperator{\sum_{p : P_1(s)}} Q(fp) \big)}
+        \\
+      &\simeq
+      \sum_{s : S} \sum_{f : P_1(s) \to T}
+        \Isolated{\big( P_0(s) + \smashoperator{\sum_{p : {P_1(s)}}} Q(fp) \big)}
+        \\
+      &\simeq
+        {\R}_{\Sh}
+    \end{align*}
+    Again, let \( H_2 \DefEq (\MkCont{U_2}{R_2}) \) where \( R_2 \DefEq {\R}_{\Ps} \circ f_2 \).
+
+    Let us now define \( \eta : H_1 \multimap H_2 \).
+    As in \autoref{lax-chain-rule}, define the shape map \( \eta_{\Sh} : U_1 \to U_2 \) using \( \SigmaIsolate_{P_1(s),Q(f\shortminus)} \).
+    On positions, the equivalence
+    \(
+      \eta_{\Ps}(u) : R_2(\eta_{\Sh}(u)) \simeq R_1(u)
+    \)
+    is defined by cases, depending on which side of the sum \( u : U_1 \) falls.
+    Let \( s : S \), \( f : P_1(s) \to T \).
+    In case of \( u \JudgeEq (s, f, \Inl{p_0}) \) for \( p_0 : \Isolated{P_0(s)} \), our goal is to give
+    \[
+      ( \Isolated{P_0(s)} + B ) \setminus \Inl(p_0)
+        \simeq
+      ( \Isolated{P_0(s)} \setminus p_0 ) + B
+      \quad
+      (\text{where } B \DefEq {\textstyle \sum_{p : P_1(s)} Q(fp) }),
+    \]
+    which is an instance of \autoref{sum-remove-equiv}.
+
+    When \( u \JudgeEq (s, f, \Inr(p_1, q)) \) for some \( p_1 : \Isolated{P_1(s)} \) and \( q : \Isolated{Q(fp)} \),
+    we rewrite as follows:
+    \begin{align}
+      R_2(f_2(s , f , \Inr(p_1, q)))
+        &\mathrel{\JudgeEq}
+          \big( P_0(s) + \smashoperator{\sum_{p : P_1(s)}} Q(f p) \big) \setminus \Inr(p_1, q)
+          \notag
+          \\
+        &\simeq
+          P_0(s) + \big( \smashoperator{\sum_{p : P_1(s)}} Q(f p) \big) \setminus (p_1, q)
+          \label{binary-chain-rule-pos-equiv-sum-minus}
+          \\
+        &\simeq
+          P_0(s) + \smashoperator{\sum_{p : P_1(s) \setminus p}} Q(f p) + (Q(f\,p_1) \setminus q)
+          \label{binary-chain-rule-pos-equiv-sigma-minus}
+          \\
+        &\mathrel{\JudgeEq}
+          R_1(s, f, \Inr{(p_1, q)})
+          \notag
+    \end{align}
+    In \eqref{binary-chain-rule-pos-equiv-sum-minus}, we move the pair \( (p_1, q) \) to the right of the sum (\autoref{sum-remove-equiv}).
+    For \eqref{binary-chain-rule-pos-equiv-sigma-minus},
+    we split the \( \Sigma \)-type by applying \autoref{is-equiv-sigma-remove}.
+    This is justified since both \( p_1 \) and \( q \) are isolated points,
+    and together, the pair \( (p_1, q) \) is isolated in \( \sum_{p : P_1(s)} Q(f p) \) by \autoref{is-isolated-pair}.
+  \end{construction}
+\end{proposition}
+
+For \( F : \Cont_I \), denote by \( \Wk{F} : \Cont_{I+1} \) the inclusion into containers with one more variable
+given by
+\[
+  \Wk{F}_{\Ps}(\Just{i}) \DefEq F_{\Ps}(i), \quad \Wk{F}_{\Ps}(\Nothing) \DefEq 0
+\]
+For \( i : I \), the \( i \)th projection container is \( \pi_i \DefEq (\MkCont{1}{\mathord{i = {\mathunderscore}}}) : \Cont_I \).
+If \( i \) is isolated, the \( i = j \) is a decidable proposition for any \( j : I \);
+in this case \( \pi_i \) is equivalent to a container whose \( i \)th type of positions is \( 1 \),
+and \( 0 \) for any other direction.
+
+\begin{problem}[note={\( \mu \)-rule}]\label{mu-rule}
+  For \( F : \Cont_2 \), define a cartesian morphism
+  \[
+    \MuRule_F
+      :
+    \Cart%
+      {
+        \mu(
+          { \Wk{\Der_0{F}[ {\mu F} ]} }
+            \CPlus
+          (
+            \Wk{\Der_1{F}[ {\mu F} ]}
+              \CTimes
+            \Proj{1}
+          )
+        )
+      }%
+      {\Der(\mu F)}
+  \]
+\end{problem}
+  \begin{construction}
+    We define the morphism using the induction principle (\autoref{mu-rec}).
+    Our goal is to provide some
+    \[
+      \alpha : \Cart{G[\Der(\mu F)]}{\Der(\mu F)}
+    \]
+    where \( G \DefEq { \Wk{\Der_0{F}[ {\mu F} ]} } \CPlus ( \Wk{\Der_1{F}[ {\mu F} ]} \CTimes \Proj{1} ) \).
+    First note that \( G \) is a container in two variables,
+    and substitution into the second replaces \( \Proj{1} \), i.e.\@ there is an equivalence
+    \[
+      \gamma_{\Highlight{Y}} :
+      G[\Highlight{Y}]
+        \mathrel{\CartEquiv}
+      { \Der_0{F}[ {\mu F} ] } \CPlus ( {\Der_1{F}[ {\mu F} ]} \CTimes \Highlight{Y} )
+    \]
+    Equipped with this knowledge, we use the chain rule to define \( \alpha \) as the following composite:
+    \begin{equation*}
+      \begin{tikzcd}[column sep=large]
+        {G[\Highlight{\Der(\mu F)}]}
+          &
+        {\Der(\mu F)}
+          \\
+        {
+          { \Der_0{F}[ {\mu F} ] }
+            \CPlus
+          (
+            {\Der_1{F}[ {\mu F} ]}
+              \CTimes
+            \Highlight{\Der(\mu F)}
+          )
+        }
+          &
+        \Der(F[\mu F])
+        \ar[from=1-1, to=2-1, -multimap, "\gamma_{\Highlight{\Der(\mu F)}}"{swap}, "\sim"]
+        \ar[from=2-1, to=2-2, -multimap, "\Op{chain}_{F,{\mu\!F}}"{swap}]
+        \ar[from=2-2, to=1-2, -multimap, "\Der(\Op{in}_F)"{swap}, "\sim"]
+        \ar[from=1-1, to=1-2, dashed, -multimap, "\alpha"]
+      \end{tikzcd}
+    \end{equation*}
+    Lastly, define \( \MuRule_F \DefEq \Op{rec}_{G}(\alpha) : \Cart{ \mu G }{ \Der{(\mu F)} } \).
+  \end{construction}
+
+\begin{proposition}
+  For any container \( F \),
+  \( \MuRule_F \) is an equivalence if and only if \( \Op{chain}_{F,{\mu F}} \) is an equivalence.
+  \begin{proof}
+    Assume that \( \MuRule_F \) is an equivalence.
+    In \autoref{mu-rule}, \( \MuRule_F \) is defined by recursion from some \( \alpha \),
+    hence \( \alpha \) is an equivalence by \autoref{is-equiv-from-mu-rec}.
+    But \( \alpha \) is just \( \Op{chain}_{F, {\mu F}} \) wedged between two equivalences,
+    so the latter is an equivalence as well.
+    Conversely, assume \( \Op{chain}_{F,{\mu F}} \) to be an equivalence.
+    By \autoref{strong-chain-rule-iff-is-equiv-sigma-isolate}, this is equivalent to isolated pairs
+    \( (p_1, \bar{w}) \)
+    having isolated components \( p_1 : P_1(s) \) and \( \bar{w} : \bar{\W}(f{p_1}) \),
+    for all \( s : S \) and \( f : P_1(s) \to \W_{\!S}(P_1) \).
+    This property is exactly what is needed to define a putative inverse on shapes,
+    i.e.\@ a map \( \Der{(\mu F)}_{\Sh} \to {(\mu G)}_{\Sh} \).
+    That this defines an equivalence of shapes follows by a somewhat tedious,
+    but straightforward argument.\todo{The argument is not fully straightforward, one needs has to mix \( \W \)-induction with \( \Graft \)-induction.}
+  \end{proof}
+\end{proposition}
+

@@ -1,0 +1,487 @@
+\section{Isolated Points and How to Remove Them}
+
+Recall that a type is \emph{discrete} if equality of any pair of its points is decidable.
+In a univalent world, this is a rather strong property --- by Hedberg's Theorem, any such type forms a (homotopy) set,
+and can thus not have any interesting path structure.
+In some cases a type might have this property locally, however.
+Consider for example the sum \( A + 1 \) for an arbitrary type \( A \).
+Even if equality in this type is not decidable without further assumptions on \( A \),
+it should at least be possible to decide \( x = \Inr(\bullet) \), no matter which \( x : A + 1 \) we are given.
+After all, the constructors \( \Inl \) and \( \Inr \) are injective,
+so case-analysis should yield a decision procedure, even without looking at points of \( A \).
+We call such points \emph{isolated}:
+\begin{definition}
+  A point \( a : A \) is \emph{isolated} if \( a = b \) is decidable for all \( b : A \).
+  We denote by \( \Isolated{A} \) the subtype of isolated points, that is
+  \(
+    \Isolated{A} \DefEq \sum_{a : A} \prod_{b : B} \Dec(a = b)
+  \).
+\end{definition}
+\begin{remark}[note={Where does this go?}]
+  In \cite[\TypeTopology{Factorial.Law}]{EscardocontributorsTypeTopology}, \citeauthor{EscardocontributorsTypeTopology}
+  prove a \enquote{factorial law} for arbitrary types: if \( X! \) denotes the type of autormorphisms \( X \simeq X \),
+  then \( (X + 1)! \simeq \Isolated{(X + 1)} \times X! \).
+\end{remark}
+Note that, \emph{a priori}, the type of proofs that some point is isolated might not be a proposition.
+Take for example the circle \( S^1 \): there are \( \mathbb{Z} \)-many proofs of \( \Op{Dec}(\Op{base} =_{S^1} \Op{base}) \).\footnote{In fact \( S^1 \) is \emph{perfect}, i.e.\@ has no isolated points at all.}
+However, since equality has to be decidable uniformly for a point to be isolated, this does not happen:
+isolated points \emph{do} have trivial path spaces.
+To prove this, \citeauthor{KrausEtAl2017NotionsAnonymousExistence} give the following
+\enquote{local} version of Hedberg's Theorem:\todo{\cite{Kraus2015TruncationLevelsHomotopy} has a nice discussion in \S 3.2.}
+\begin{lemma}[note={\cite[Theorem~3.12]{KrausEtAl2017NotionsAnonymousExistence}}]\label{is-prop-isolated-path}
+  If \( a : A \) is isolated, then \( a = b \) is a proposition for all \( b : A \).
+\end{lemma}
+This has a number of important consequences:
+\begin{corollary}\label{is-prop-isolated-dec-path}\label{is-prop-is-isolated}
+  If \( a : A \) is isolated, then \( \Dec{(a = b)} \) is a proposition for all \( b : A \).
+  In particular, being isolated is a proposition.
+\end{corollary}
+
+Taking all of this together, we see that the subtype of isolated points carves out a discrete part of a type:
+\begin{proposition}[note={Isolated points form a set}]\label{is-set-isolated}
+  For any type \( A \), its type of isolated points \( \Isolated{A} \) is discrete, hence a set.
+  \begin{proof}
+    Given \( (a, h_a), (b , h_b) : \Isolated{A} \), it suffices to show that
+    \( \sum_{p : a = b} h_a =_{p} h_b \) is a proposition.
+    By \autoref{is-prop-isolated-path}, \( a = b \) is a proposition.
+    By \autoref{is-prop-is-isolated}, both \( h_a \) and \( h_b \) are propositions,
+    hence is the dependent path type \( h_a =_{p} h_b \).
+  \end{proof}
+\end{proposition}
+
+
+% A type whose points are all isolated is always a (homotopy) set.
+% This corresponds to the intuition that, classically,
+% a space consisting entirely of isolated points is necessarily (topologically) discrete.
+% In a univalent setting, however, types can have interesting, non-trivial path types.
+% The subtype of isolated points then carves out the topologically discrete part of a type:
+
+As expected, being an isolated point is stable under equivalence:
+\begin{lemma}\label{is-isolated-respect-equiv}
+  If \( e : A \simeq B \),
+  then \( a : A \) is isolated if and only if \( e(a) : B \) is isolated.
+  We write \( \Isolated{e} : \Isolated{A} \simeq \Isolated{B} \) for the induced equivalence.
+\end{lemma}
+In cases where a map \( f : A \to B \) is not an equivalence,
+we might deduce its behavior on isolated points given that it behaves \enquote{nicely} on path spaces.
+Recall that \( f \) is an embedding if \( \Op{cong}_f : x = y \to f(x) = f(y) \) is an equivalence,
+written \( f : A \hookrightarrow B \).
+Such maps reflect isolated points:
+\begin{proposition}[note={Embeddings reflect isolated points}]\label{embedding-reflect-isolated}
+  Let \( f : A \hookrightarrow B \) and \( a : A \).
+  If \( f(a) \) is isolated in \( B \), then \( a \) is isolated in \( A \).
+  \begin{proof}
+    For all \( a^\prime : A \), we need to decide \( a = a^\prime \).
+    By assumption, we can decide whether \( f(a) = f(a^\prime) \) or not.
+    If \( f(a) \neq f(a^\prime) \), then necessarily \( a \neq a^\prime \).
+    If \( f(a) = f(a^\prime) \), we get \( a = a^\prime \) since \( f \) is an embedding, which we can cancel.
+  \end{proof}
+\end{proposition}
+In principle, we can weaken the assumptions of the previous proposition to a function \( f : A \to B \)
+for which \emph{some} \( \prod_{x,y} f(x) = f(y) \to x = y \) exists -- not necessarily an inverse to \( \Op{cong}_f \):
+the proof works no matter which path we pick,
+and \emph{post hoc} this choice of path is unique, since it originates from an isolated point.
+
+In the remainder, however, we will, apply \autoref{embedding-reflect-isolated} exclusively to embeddings.
+In particular, we deduce that the canonical embeddings \( \Inl : A \hookrightarrow A + B \) and \( \Inr : B \hookrightarrow A + B \)
+both reflect and create isolated points:
+
+\begin{proposition}\label{sum-embeddings-respect-isolated}
+  Let \( A, B : \Type \).
+  A point \( a : A \) is isolated if and only if \( \Inl{(a)} : A + B \) is isolated;
+  similarly for \( b : B \) and \( \Inr{(b)} : A + B \).
+  \begin{proof}
+    Let \( a : A \). In the forward direction, assume that \( a \) is isolated.
+    We need to show that for any \( x : A + B \), the type \( \Inl{a} = x \) is decidable.
+    Consider the case of \( x \JudgeEq \Inl{a^{\prime}} \).
+    We know that \( \Inl \) is an embedding, and as such there is an equivalence
+    of path spaces \( (\Inl{a} = \Inl{a^\prime}) \simeq (a = a^\prime) \).
+    But \( (a = a^\prime) \) is decidable by assumption,
+    hence \( (\Inl{a} = \Inl{a^\prime}) \) is decidable.
+    In case \( x \JudgeEq \Inr{b} \), the type \( \Inl{a} = \Inr{b} \) is empty, hence decidable.
+    For the converse, apply \autoref{embedding-reflect-isolated}:
+    The map \( \Inl \) is an embedding, and as such reflects isolated points.
+  \end{proof}
+\end{proposition}
+
+We see that isolated points distribute over sums:
+\begin{problem}\label{isolated-sum-equiv}
+  Construct an equivalence \( \Isolated{(A + B)} \simeq \Isolated{A} + \Isolated{B} \).
+  \begin{construction}
+    Define the obvious forward- and backward maps by case analysis,
+    and prove that points are isolated using \autoref{sum-embeddings-respect-isolated}.
+    That these maps are mutually inverse follows since being isolated is a proposition (\autoref{is-prop-is-isolated}).
+  \end{construction}
+\end{problem}
+
+From this we immediately see that \( \Nothing \DefEq \Inr{(\bullet)} : A + 1 \) is an isolated point, since \( \bullet : 1 \)
+is trivially isolated:
+\begin{corollary}\label{is-isolated-nothing}
+  The point \( \Nothing : A + 1 \) is isolated for any type \( A \),
+  and there is an equivalence \( \Isolated{(A + 1)} \simeq \Isolated{A} + 1 \).
+\end{corollary}
+This yields the decision procedure for \( \prod_{x : A + 1} \Op{Dec}(x = \Nothing) \) that we alluded to earlier.
+
+While it may seem obvious that the isolated points of a disjoint sum are a sum of isolated points,
+describing the isolated points of \( \Sigma \)-types is a more subtle affair.
+First, observe that any dependent pair of isolated points defines an isolated point in the corresponding \( \Sigma \)-type:
+\begin{proposition}\label{is-isolated-pair}\label{sigma-isolate}
+  Let \( A : \Type \) and \( B : A \to \Type \) with points \( a_0 : A \) and \( b_0 : B(a_0) \).
+  If both \( a_0 \) and \( b_0 \) are isolated, then \( (a_0 , b_0) \) is isolated in \( \sum_{a : A} B(a) \).
+  This defines a map
+  \[
+    \SigmaIsolate_{A,B} :
+      \sum\nolimits_{a_0 : \Isolated{A}} \Isolated{B(a_0)}
+        \to
+      \Isolated{%
+        \big(
+          \sum\nolimits_{a : A} B(a)
+        \big)
+      }.
+  \]
+  \begin{proof}
+    Let \( a : A \), \( b : B(a) \). Our goal is to decide whether \( (a_0 , b_0) = (a, b) \) or not.
+    By extensionality of path types of dependent sums
+    it suffices to decide the equivalent type \( \sum_{p : a_0 = a} b_0 = \Op{subst}_B(p^{\Inv}, b_0) \).
+    If \( a_0 \neq a \), then this type is empty.
+    Otherwise, we have some \( p : a_0 = a \), and the type is inhabited or empty
+    depending on whether \( b_0 = \Op{subst}_B(p^{\Inv}, b_0) \) or not.
+  \end{proof}
+\end{proposition}
+
+If we had an inverse to \( \SigmaIsolate \), then the converse would hold as well.
+It turns out that this requirement is not only sufficient, but also necessary:
+
+\begin{lemma}\label{is-equiv-sigma-isolate-iff-isolated-pair}
+  Let \( A : \Type \) and \( B : A \to \Type \).
+  The following are equivalent:
+  \begin{enumerate}
+    \item \label{is-equiv-sigma-isolate-iff-isolated-pair-is-equiv}
+      \( \SigmaIsolate_{A,B} \) is an equivalence.
+    \item \label{is-equiv-sigma-isolate-iff-isolated-pair-pair}
+      For all \( a_0 : A \) and \( b_0 : B(a_0) \),
+      if \( (a_0 , b_0) \) is isolated in \( \Sigma_{A} B \),
+      then both \( a_0 \) and \( b_0 \) are isolated.
+  \end{enumerate}
+  \begin{proof}
+    The first implies the second as follows:
+    Assume that \( \SigmaIsolate_{A,B} \) is an equivalence with inverse
+    \( u : \Isolated{\big(\sum_{a : A} B(a)\big)} \to \sum_{a : \Isolated{A}} \Isolated{B(a)} \).
+    Let \( a_0 : A \), \( b_0 : B(a_0) \), and \( h_0 : \Op{isIsolated}{(a_0, b_0)} \).
+    Apply \( u \) to get some \( y \DefEq u((a_0 , b_0) , h_0) \)
+    with components \( y \JudgeEq ((a, h_a), (b, h_b)) \).
+    Note that \( h_a \) and \( h_b \) are proofs that \( a \) and \( b \) are isolated, respectively.
+    We are done if we can show that \( p : a_0 = a \) and \( \cramped{b_0 =_{p} b} \),
+    since transport along these paths preserves isolated points.
+    Indeed, both \( \SigmaIsolate(y) \JudgeEq ((a, b), \mathunderscore) \) and \( ((a_0, b_0), p_0) \)
+    lie in \( \Op{fiber}_u(y) \), which is necessarily contractible,
+    hence \( (a_0 , b_0) = (a, b) \) as desired.
+
+    In the other direction, the assumption provides the missing properties to define a tentative inverse to \( \SigmaIsolate \);
+    that this is the correct inverse follows as being isolated is a proposition (cf.~\autoref{is-prop-is-isolated}).
+  \end{proof}
+\end{lemma}
+
+% For discrete \( A : \Type \) and \( B : A \to \Type \),
+% \autoref{is-equiv-forget-isolated-iff-discrete} tells us that isolated points trivially distribute over sums;
+% there is an equivalence
+% \( \sum_{a_0 : \Isolated{A}} \Isolated{B(a_0)} \simeq \sum_{a : A} B(a) \simeq \cramped{ \Isolated{\big(\sum_{a : A} B(a)\big)} } \).
+% The previous result confirms that the map underlying this equivalence is \( \SigmaIsolate \):
+For sums of discrete types over a discrete base, we can always trivially separate isolated pairs into isolated components:
+\begin{corollary}\label{discrete-is-equiv-sigma-isolated}
+  If \( A : \Type \) is discrete, and \( B : A \to \Type \) is a family of discrete types,
+  then \( \SigmaIsolate_{A,B} \) is an equivalence.
+  \begin{proof}
+    Condition \ref{is-equiv-sigma-isolate-iff-isolated-pair-pair} of \autoref{is-equiv-sigma-isolate-iff-isolated-pair} is vacuously satisfied for discrete types.
+  \end{proof}
+\end{corollary}
+
+Less trivially, we can state this locally for an isolated point in the base,
+and obtain a generalization of \autoref{sum-embeddings-respect-isolated} from binary-
+to arbitrary sums:
+\begin{proposition}
+  Let \( A : \Type \), \( B : A \to \Type \), and \( a : \Isolated{A} \).
+  Then any \( b : B(a) \) is isolated if and only if \( (a, b) : \sum_{A} B \) is isolated.
+  \begin{proof}
+    Only the backward direction is non-trivial,
+    and follows from \autoref{embedding-reflect-isolated}:
+    \( \lambda b.\, (a, b) \) is an embedding, which necessarily reflects isolated points.
+  \end{proof}
+\end{proposition}
+
+In general, however, it seems difficult to describe exactly when isolated points distribute this way.
+In extreme cases, both \( A \) and \( B \) can be complicated types, whereas their sum \( \sum_A B \) is entirely trivial.
+This applies in particular to the type of singletons, \( \Op{singl}(a_0) \DefEq \sum_{a : A} a_0 = a \):
+\begin{proposition}\label{discrete-iff-is-equiv-singl-isolate}
+  For all types \( A \), following are equivalent:
+  \begin{enumerate}
+    \item \( A \) is discrete.
+    \item For all \( a_0 : A \), the map
+      \(
+        \SigmaIsolate_{A, a_0 = {(\shortminus)}} : \sum_{a : \Isolated{A}} \Isolated{(a_0 = a)} \to \Isolated{\Op{singl}(a_0)}
+      \)
+      is an equivalence.
+  \end{enumerate}
+  \begin{proof}
+    If \( A \) is discrete, then so are its path types, hence \( \SigmaIsolate_{A, a_0 = (\shortminus)} \) is an equivalence by \autoref{discrete-is-equiv-sigma-isolated}.
+    In the other direction, we can show that every \( a_0 : A \) is isolated:
+    Since \( \Op{singl}(a_0) \) is a contractible type, its center \( (a_0, \Op{refl}) \) is isolated.
+    Thus, by \autoref{is-equiv-sigma-isolate-iff-isolated-pair}, the first component \( a_0 \) must be isolated.
+  \end{proof}
+\end{proposition}
+This lets us describe whether a type is discrete purely in terms of \( \SigmaIsolate \),
+which will be useful in situations in which we have control over the types indexing \( \SigmaIsolate \).
+
+\subsection{Removing points}
+
+
+For any type \( A \) and point \( a_0 : A \) we define the subtype of \enquote{\( A \) with \( a_0 \) removed}
+to be \( A \setminus a_0 \DefEq \sum_{a : A} a_0 \neq a \).
+Adding a point to a type \( A \) and then removing it again yields an equivalence, as expected:
+\begin{problem}\label{maybe-minus-nothing-equiv}
+  Define an equivalence \( (A + 1) \setminus \Nothing \simeq A \).
+\end{problem}
+
+This is an instance of the more general case where removing a point from a sum
+is the same as removing it from either side, and then taking the sum:
+\begin{problem}\label{sum-remove-equiv}
+  Given \( A, B : \Type \), define equivalences
+  \begin{align*}
+    (A + B) \setminus \Inl(a_0) &\simeq (A \setminus a_0) + B \\
+    (A + B) \setminus \Inr(b_0) &\simeq A + (B \setminus b_0)
+  \end{align*}
+  for all points \( a_0 : A \) and \( b_0 : B \), respectively.
+  \begin{construction}
+    Define the obvious maps in either direction by case-analysis.
+    These preserve inequalities since \( \Inl \) and \( \Inr \) are embeddings,
+    and are inverses of each other as inequalities are always propositions.
+  \end{construction}
+\end{problem}
+
+\begin{construction}[note={for \autoref{maybe-minus-nothing-equiv}}]
+  The type \( (1 \setminus \bullet) \) is empty,
+  so by \autoref{sum-remove-equiv}, \( (A + 1) \setminus \Nothing \simeq A + (1 \setminus \bullet) \simeq A \).
+\end{construction}
+
+Let us now consider the converse problem:
+\emph{first} removing a point \( a_0 : A \), \emph{then} adding it back into the type.
+Does this yield a type equivalent to \( A \)?
+There is an obvious map \( \Replace_{a_0} : (A \setminus a_0) + 1 \to A \);
+defined by cases
+as
+\(
+  \Replace_{a_0}(\Just{(a, \mathunderscore)}) \DefEq a
+\)
+and
+\(
+  \Replace_{a_0}(\Nothing) \DefEq a_0
+\).
+Classically, this map is an isomorphism of sets;
+the inverse simply maps \( a_0 \) to \( \bullet \).
+In a univalent setting however, this replaces the higher path spaces of \( a_0 \)
+with the trivial ones of \( \bullet \).
+Consider for example the circle \( S^1 \) with \( \mathsf{base} : S^1 \).
+Then \( S^1 \setminus \mathsf{base} \simeq 0 \),
+hence \( (S^1 \setminus \mathsf{base}) + 1 \simeq 1 \not\simeq S^1 \):
+removing \( \mathsf{base} \) removes the entire circle, which is \emph{not} contractible.
+% This intui
+
+We observe that we can replicate the classical behavior exactly when \( a_0 \) is an isolated point:
+
+\begin{proposition}\label{isolated-minus-plus-equiv}
+  Let \( a_0 : A \).
+  The map \( \Replace_{a_0} \) is an equivalence typed \( (A \setminus a_0) + 1 \simeq A \)
+  if and only if \( a_0 \) is isolated in \( A \).
+  \begin{proof}
+    First, assume that \( a_0 \) is isolated.
+    We give a two-sided inverse \( g : A \to (A \setminus a_0) + 1 \) as follows.
+    Define \( \Op{r} : \prod_{a : A} \Dec{(a_0 = a)} \to (A \setminus a_0) + 1 \)
+    by
+    \[
+      \Op{r}(a, d) \DefEq
+      \begin{cases}
+        \Nothing & \text{if}\ d \JudgeEq \Op{yes}(\mathunderscore : a_0 = a) \\
+        \Just{(a, h)} & \text{if}\ d \JudgeEq \Op{no}(h : a_0 \neq a)
+      \end{cases}
+    \]
+    For \( i_0 : \Op{isIsolated}(a_0) \), let \( g(a) \DefEq \Op{r}(a, i_0(a)) \).
+    By \autoref{is-prop-isolated-dec-path}, \( \Dec(a_0 = a) \) (the type of \( i_0(a) \)) is a proposition for all \( a : A \);
+    we use this to ensure that \( g \) computes correctly:
+    \begin{align*}
+      g(a_0) &\JudgeEq \Op{r}(a_0, \Highlight{i_0(a_0)}) = \Op{r}(a_0, \Highlight{\Op{yes}(\Op{refl})}) \JudgeEq \Nothing \\
+      g(a)   &\JudgeEq \Op{r}(a, \Highlight{i_0(a)}) = \Op{r}(a, \Highlight{\Op{no}(h))} \JudgeEq \Just{(a, h)}
+        \quad \text{where}~h : a_0 \neq a
+    \end{align*}
+    Hence \( {\Replace_{a_0}} \circ g = \Op{id} \) and \( g \circ {\Replace_{a_0}} = \Op{id} \).
+
+    For the converse, assume that \( \Replace_{a_0} \) is an equivalence.
+    By \autoref{is-isolated-nothing}, \( \Nothing \) is isolated in \( (A \setminus a_0 ) + 1 \),
+    so \autoref{is-isolated-respect-equiv} tells us that \( \Replace_{a_0}(\Nothing) \JudgeEq a_0 \) is isolated as well.
+  \end{proof}
+\end{proposition}
+
+Later on, it will become necessary to understand how to remove points from \( \Sigma \)-types.
+If we think of an \( A \)-indexed sum \( \sum_{a : A} B(a) \) as a generalization of binary sums \( B_0 + B_1 \),
+then we expect removal to behave similarly:
+Removing some \( (a, b) \) should remove \( b : B(a) \) from the \( a \)\textsuperscript{th}
+summand, leaving all other summands unchanged.
+This is indeed the case, as long as we put some restrictions%
+\footnote{In~\cite[\href{https://www.cs.bham.ac.uk/~mhe/TypeTopology/UF.Sets.html\#is-h-isolated}{UF.Sets}]{EscardocontributorsTypeTopology}, \( a_0 \) is called \emph{\( h \)-isolated} if \( a_0 = a_0 \) is a proposition.}
+on the paths of the indexing type \( A \):
+\begin{problem}\label{sigma-remove}
+  Let \( A : \Type \) and \( B : A \to \Type \)
+  with points \( a_0 : A \) and \( b_0 : B(a_0) \),
+  and assume \( p : \Op{isProp}(a_0 = a_0) \).
+  There is a map
+  \[
+    \operatorname{\Op{\Sigma-remove}}_p :
+    \big(\smashoperator{\sum_{a : A \setminus a_0}} B(a)\big) + \big(B(a_0) \setminus b_0\big)
+      \to
+    \big(\sum_{a : A} B(a) \big) \setminus (a_0 , b_0)
+  \]
+  \begin{construction}
+    We define \( \operatorname{\Op{\Sigma-remove}}_p(x) \) by cases.
+    Let
+    \[
+      \SigmaRemove_p(\Inl{(a, h_a, b)}) \DefEq ((a, b) , h^\prime_a),
+    \]
+    where \( h^\prime_a : (a_0 , b_0) = (a, b) \xrightarrow{\Op{cong}_{\Op{fst}}} a_0 = a \xrightarrow{h_a} \bot \).
+    In the other case, let
+    \[
+      \SigmaRemove_p(\Inr{(b, h_b)}) \DefEq ((a_0, b) , h^\prime_b),
+    \]
+    and show \( h^\prime_b : (a_0 , b_0) \neq (a_0 , b) \) as follows:
+    Assume to the contrary that \( p_b : (a_0 , b_0) = (a_0 , b) \).
+    From this we obtain (dependent) paths \( p_b^1 : a_0 = a_0 \) and \( p_b^2 : b_0 =_{p_b^1} b \).
+    Since \( a_0 = a_0 \) is a proposition, we know that \( p_b^1 = \Op{refl} \),
+    hence \( b_0 = b \).
+    This is contradictory since we are given \( h_b : b_0 \neq b \).
+  \end{construction}
+\end{problem}
+
+This map is an equivalence whenever we can decide if we are removing from a chosen index \( a_0 \):
+\begin{proposition}\label{is-equiv-sigma-remove}
+  Let \( A : \Type \), \( B : A \to \Type \) with \( a_0 : A \) and \( b_0 : B(a_0) \).
+  If \( a_0 \) is an isolated point of \( A \), then \( \SigmaRemove \) of \autoref{sigma-remove}
+  is an equivalence.
+  \begin{proof}
+    First note that \( a_0 = a_0 \) is a proposition by \autoref{is-prop-isolated-path},
+    thus the map is well-defined.
+    We construct an inverse
+    \[
+      \SigmaRemove^{\Inv}
+        :
+      \Big(\sum_{a : A} B(a) \Big) \setminus (a_0 , b_0)
+        \to
+      \Big(\smashoperator{\sum_{a : A \setminus a_0}} B(a)\Big) + \big(B(a_0) \setminus b_0\big)
+    \]
+    as follows:
+    Introduce \( a : A \), \( b : B(a) \) and \( h : (a_0 , b_0) \neq (a , b) \),
+    then decide whether \( a_0 = a \) or not.
+    If \( p : a_0 = a \), we map to \( \Inr{(\Op{subst}_B(p, a), h^\prime)} \),
+    where \( h^\prime : b_0 \neq \Op{subst}_B(p, a) \),
+    which we conclude from \( h \) and \( p \).
+    In case that \( h : a_0 \neq a \) we map to \( \Inl{((a, h), b)} \) directly.
+    It is straightforward to verify that these maps are inverses of each other.
+  \end{proof}
+\end{proposition}
+
+\begin{tikzpicture}
+  % \filldraw[
+  %   rounded corners=10pt,
+  %   fill=blue!30,
+  %   draw=blue!80!black,
+  %   thick,
+  % ]
+  %   (0,0) rectangle (7,4);
+
+  \coordinate (O) at (-0.5,-0.5);
+
+  \draw[->] (O) -- ++(0,1) node[above] {\( b : B(a) \)};
+  \draw[->] (O) -- ++(1,0) node[right] {\( a : A \)};
+
+  \foreach \x/\X in {0/6, 1/3, 2/5, 3/1, 4/4, 5/7} {
+    \foreach \y in {1,...,\X} {
+      \fill[black] (0.5+\x, \y*0.5) circle (2pt);
+    }
+  }
+\end{tikzpicture}
+
+\subsection{Grafting}
+
+In order to derive the chain rule for derivatives,
+\citeauthor{AbbottEtAl2005DataDifferentiating}~\cite{AbbottEtAl2005DataDifferentiating} investigate functions \( f : A \setminus a \to B \) that are defined on all but one inputs.
+They call the process of extending \( f \) to all of \( A \) \emph{grafting}.
+We have seen that in the presence of higher types, removal is only well-behaved for isolated points.
+In order to obtain a good notion of grafting, we have to adjust the definitions accordingly.
+In particular, we derive an induction principle for types
+\( A \) with a chosen isolated point \( a_0 : \Isolated{A} \):
+Functions out of \( A \) are exactly those out of \( A \setminus a_0 \), plus a chosen point \( b_0 : B \).
+First, we define \emph{grafting}:
+\begin{problem}
+  For types \( A \) and \( B \), construct a function
+  \[
+    \Graft : \prod_{a_0 : \Isolated{A}}
+      \big((A \setminus a_0 \to B) \times B \big)
+        \to
+      (A \to B)
+  \]
+\end{problem}
+\begin{construction}
+  Let \( a_0 : \Isolated{A} \), \( f : A \setminus a_0 \to B \) and \( b_0 : B \).
+  Decide equality with \( a_0 \) to define \( \Graft_{a_0}(f, b_0) : A \to B \) as follows:
+  \[
+    \Graft_{a_0}(f, b_0) \DefEq
+    \lambda a.\,
+    \begin{cases}
+      f(a, h) & \text{if}\ (h : a_0 \neq a) \\
+      b_0 & \text{otherwise}
+    \end{cases}
+    \qedhere
+  \]
+\end{construction}
+
+We adopt the notation
+\( \GraftSyntaxX{f}{b_0}{a_0} \DefEq \Graft_{a_0}(f, b_0) \)
+of \citeauthor{AbbottEtAl2005DataDifferentiating},
+or simply \( \GraftSyntax{f}{b_0} \) if \( a_0 : \Isolated{A} \) is understood from context.
+
+\begin{proposition}[note={\( \Graft \)-induction}]\label{graft-equiv}
+  For \( A : \Type \) with \( a_0 : \Isolated{A} \),
+  grafting has the following properties:
+  \begin{enumerate}
+    \item (Computation rules). For all \( f : A \setminus a_0 \to B \) and \( b_0 : B \):
+      \begin{align*}
+        \GraftSyntaxX{f}{b_0}{a_0}(a_0) &= b_0
+          &
+        &\text{and}
+          &
+        \adjustlimits \prod_{a : A} \prod_{h : a_0 \neq a} \GraftSyntaxX{f}{b_0}{a_0}(a) &= f(a, h)
+      \end{align*}
+    \item
+      \(
+        \Graft_{a_0} :
+        \big((A \setminus a_0 \to B) \times B \big)
+          \simeq
+        (A \to B)
+      \)
+      is an equivalence of types.
+  \end{enumerate}
+  \begin{proof}
+    The computation rules are straightforward, but crucially make use of \autoref{is-prop-isolated-dec-path}:
+    the type \( \Dec(a_0 = a) \) is a proposition for all \( a \), and \( \Graft \) is defined by induction on this type.
+    To show that \( \Graft \) is an equivalence, consider that any \( f : A \to B \) can be split
+    into \( f \circ \Op{fst} : A \setminus a_0 \to B \) and \( f(a_0) : B \);
+    the computation rules ensure that this is an inverse to \( \Graft \).
+  \end{proof}
+\end{proposition}
+
+As presented here, \( \Graft \) characterizes non-dependent functions out of types with an isolated point.
+This generalizes to a dependent induction principle, i.e.\@ an equivalence
+\(
+  \big( (\prod_{a : A \setminus a_0} B(a)) \times B(a_0) \big) \simeq \big(\prod_{a : A} B(a) \big)
+\)
+for families \( B \) over \( A \).
+Although not necessary for later results in this paper,
+we include the construction of the dependent induction principle in our formalization of the results.
+
