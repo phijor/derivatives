@@ -21,11 +21,25 @@
 
 \NewDocumentCommand{\TypeTopology}{m O{}}{\href{https://www.cs.bham.ac.uk/~mhe/TypeTopology/#1.html\IfValueT{#2}{\##2}}{\texttt{#1}}}
 
-\newkeytheoremstyle{proof}{
+\newkeytheoremstyle{boxed}{
+  tcolorbox-no-titlebar={sharp corners=all,boxrule=1pt,colback=black!8},
+}
+\newkeytheoremstyle{boxed-definition}{
+  inherit-style=boxed,
+  % qed=$\lrcorner$,
+  numbered=false,
+}
+\newkeytheoremstyle{construction}{
   inherit-style=definition,
+  headfont={\itshape},
   qed=$\lrcorner$,
   numbered=false,
 }
+\newkeytheoremstyle{todo}{
+  tcolorbox-no-titlebar={sharp corners=all,boxrule=1pt,colback=orange!10},
+  numbered=false,
+}
+\newkeytheorem{todo-block}[style=todo,name={TODO},headfont={\scshape}]
 \newkeytheorem{theorem}[style=plain,parent=section]
 \newkeytheorem{
   proposition,
@@ -38,7 +52,7 @@
   sibling=theorem,
 ]
 \newkeytheorem{definition}[style=definition,sibling=theorem]
-\newkeytheorem{construction}[style=proof,sibling=theorem]
+\newkeytheorem{construction}[style=construction,sibling=theorem]
 \newkeytheorem{remark}[style=remark,sibling=theorem]
 
 % A custom tikzcd arrow tip, a lollipop (⊸).
@@ -58,6 +72,10 @@
 
 \addbibresource{bibliography.bib}
 
+% https://damaru2.github.io/general/notations_with_links/
+% \NewDocumentCommand{\newlink}{m m}{\protect\hyperlink{#1}{#2}}
+
+
 \DeclareMathSymbol{\shortminus}{\mathbin}{AMSa}{"39}
 
 \newcommand*{\Op}[1]{\mathsf{#1}}
@@ -70,7 +88,9 @@
 \DeclareMathOperator{\DefEq}{\mathrel{\coloneq}}
 \DeclareMathOperator{\JudgeEq}{\mathrel{\doteq}}
 \NewDocumentCommand{\Inv}{}{{\shortminus 1}}
-\NewDocumentCommand{\Blank}{}{\shortminus}
+% \NewDocumentCommand{\Blank}{}{\shortminus}
+\def\blankskip{0mu minus 1fill}
+\NewDocumentCommand{\Blank}{}{{\mskip\blankskip\mathunderscore\mskip\blankskip}}
 
 \DeclareMathOperator{\Isolate}{\Op{isolate}}
 \DeclareMathOperator{\Replace}{\Op{replace}}
