@@ -156,9 +156,12 @@ module _ (F : Container _ 𝟚) (G : Container _ 𝟙) where
     ((s : S) → (f : P ₁ s → T) → isEquiv (Σ-isolate (P ₁ s) (Q ∘ f)))
       →
     isContainerEquiv (binary-chain-rule F G)
-  isEquiv-Σ-isolate→isEquivBinaryChainRule is-equiv-Σ-isolate = isContainerEquivComp {! e₁ !} {!  !} {! !} {! !} where
+  isEquiv-Σ-isolate→isEquivBinaryChainRule is-equiv-Σ-isolate = equivIsContainerEquiv binary-chain-rule-equiv where
     η* : H₁ ⧟ H₂
-    η* = {! !}
+    η* = isContainerEquiv→Equiv η (isEquiv-Σ-map-snd λ s → isEquiv-Σ-map-snd λ f → isEquiv→isEquiv-⊎-map-right (is-equiv-Σ-isolate s f))
+
+    binary-chain-rule-equiv : Equiv _ _
+    binary-chain-rule-equiv = e₁ ⋆ₑ η* ⋆ₑ e₂
 
   DiscreteContainer→isEquivBinaryChainRule :
       (∀ s → Discrete (Pos F ₁ s))
