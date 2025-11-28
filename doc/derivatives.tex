@@ -648,11 +648,11 @@ To do so, they recognize that each \( \mu F \) essentially behaves like repeated
 and infer a fixed-point rule from the chain rule.
 
 Our goal is to derive a similar fixed-point rule for our generalized derivative,
-ideally by deriving it from the chain-rule.
-This begs the question: if in general, the chain-rule rule is lax,
+ideally by deriving it from the chain-rule as well.
+This begs the question: if in general the chain-rule rule is lax,
 is it ever possible to have a strong fixed-point rule?\todo{Spoil the answer to this question here.}
 
-To do define and reason about an operation \( \mu \) taking a container to a fixed-point,
+To define and reason about an operation \( \mu \) taking a container to a fixed-point,
 we first have to recall the definition indexed containers.
 These encode data types polymorphic in more than one variable,
 which are necessary to transcribe fixed-point description of types such as
@@ -671,14 +671,16 @@ Cartesian morphisms between containers \(F , G : \Cont_{I} \) are defined simila
 \]
 Together, \( I \)-indexed containers assemble again assemble into a wild category, \( \ContCart_{I} \).
 As expected, indexed containers are closed under constants \( \CConst(A) \), sums \( (\CPlus) \) and products \( (\CTimes) \);
-Substitution generalizes to an operation that places a container inside the positions at index \( \Nothing : I + 1 \) of a \( I + 1 \)-ary container:
+Substitution generalizes to an operation that places a container inside the positions at index \( \Nothing : I + 1 \) of a \( I + 1 \)-indexed container.
+To aid readability, we denote an \( I+1 \)-indexed container \( (\MkCont{S}{\bar{P}}) \) by \( (\MkCont{S}{\vec{P}, P}) \),
+where \( \vec{P}_i \DefEq \bar{P}_{\Just(i)} \) and \( P \DefEq \bar{P}_{\Nothing} \).
 \begin{definition}
     Substitution is an operation \( \Subst{\Blank}{\Blank} : \Cont_{I+1} \to \Cont_{I} \to \Cont_{I} \),
     defined as follows:
     \begin{align*}
-      \Subst{(\MkCont{S}{P})}{(\MkCont{T}{Q})}_{\Sh} &\DefEq \sum_{s : S} P(i, s) \to T
+      \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Sh} &\DefEq \sum_{s : S} P(s) \to T
         \\
-      \Subst{(\MkCont{S}{P})}{(\MkCont{T}{Q})}_{\Ps} &\DefEq \lambda (s, f).\, P(\Just(i), s) + \smashoperator{\sum_{p : P(\Nothing, s)}} Q(i, fp)
+      \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Ps} &\DefEq \lambda (s, f).\, \vec{P}_i(s) + \smashoperator{\sum_{p : P(s)}} Q_i(fp)
         \qedhere
     \end{align*}
 \end{definition}
@@ -695,11 +697,10 @@ Recall that for \( A : \Type \) and \( B : A \to \Type \), the type \( \W(A, B) 
     \AxiomC{\( f : B(a) \to \W(A, B) \)}
     \BinaryInfC{\( \Sup(a, f) : \W(A, B) \)}
     \DisplayProof
-  },
+  }
   \hspace*{\fill}
 \end{center}
-which defines an equivalence \( \operatorname{\Op{W-in}} : \sum_{a : A} (B(a) \to \W(A, B)) \simeq \W(A, B) \).
-A path to a branch inside a \( \W(A, B) \)-tree,
+A path to a node inside a \( \W(A, B) \)-tree,
 labelled by some \( C : A \to \Type \),
 can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \) with two constructors, namely
 \begin{center}
@@ -722,22 +723,35 @@ can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \)
 \end{center}
 for all \( a : A \) and \( f : B(a) \to \W(A, B) \).
 
-% \begin{align*}
-%   \Op{top} &: \prod_{a : A} \prod_{f : B(a) \to \W(A, B)} C(a) \to \bar{\W}_{A,B,C}(\Sup(s, f)) \\
-%   \Op{below} &: \prod_{a : A} \prod_{f : B(a) \to \W(A, B)} \prod_{b : B(a)} \bar{\W}_{A,B,C}(f(b)) \to \bar{\W}_{A,B,C}(\Sup(s, f))
-% \end{align*}
-
-
+Together, we can use \( \W \) and \( \bar{\W} \) to define the shapes and position, respectively, of the smallest fixed-point container:
 \begin{definition}
-  Let \( F \JudgeEq (\MkCont{S}{P}) : \Cont_{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \Cont_I \):
+  Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \Cont_{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \Cont_I \):
   \begin{align*}
-    S^\mu &\DefEq \W(S, P_{\Nothing}) \\
-    P^\mu_i & \DefEq \bar{\W}_{S,P(\Nothing),P(\Just i)}
+    S^\mu &\DefEq \W(S, P) \\
+    P^\mu_i & \DefEq \bar{\W}_{S,P,\vec{P}}
   \end{align*}
 \end{definition}
+
+Both \( \W \) and \( \bar{\W} \) can be described by unfolding them by one level
+---
+the constructors define equivalences
+\begin{align*}
+  \operatorname{\Op{W-in}} &: \sum_{a : A} (B(a) \to \W(A, B)) \simeq \W(A, B)
+    \\
+  \operatorname{\Op{\bar{W}-in}}_{a, f} &: C(a) + \sum_{b : B(a)} \bar{\W}_{A,B,C}(f(b)) \simeq \bar{\W}_{A,B,C}(\Sup(a, f))
+\end{align*}
+for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
+These let us derive the fixed-point property:
 \begin{problem}
   Define an equivalence of containers \( \Op{in}_F : F[{\mu F}] \CartEquiv {\mu F} \).
+  \begin{construction}
+    Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) \).
+    Shapes of \( \Subst{F}{\mu F} \) are \( \sum_{s : S} (P(s) \to \W(S, P)) \),
+    hence \( \operatorname{\Op{W-in}} \) establishes an equivalence with the shapes of \( \mu F \).
+    Similarly, the positions of \( \Subst{F}{\mu F} \) are equivalent to those of \( \mu F \) via \( \operatorname{\Op{\bar{W}-in}} \).
+  \end{construction}
 \end{problem}
+
 \begin{problem}\label{mu-rec}
   Define an induction principle for morphisms out of \( \mu \)-containers:
   \begin{center}
