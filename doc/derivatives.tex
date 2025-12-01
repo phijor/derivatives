@@ -670,10 +670,20 @@ Cartesian morphisms between containers \(F , G : \Cont_{I} \) are defined simila
   \Cart{F}{G} \DefEq \smashoperator[l]{\sum_{f : F_{\Sh} \to G_{\Sh}}} \prod_{i : I, s : F_{\Sh}} G_{\Ps}(i, f(s)) \simeq F_{\Ps}(i, s)
 \]
 Together, \( I \)-indexed containers assemble again assemble into a wild category, \( \ContCart_{I} \).
-As expected, indexed containers are closed under constants \( \CConst(A) \), sums \( (\CPlus) \) and products \( (\CTimes) \);
-Substitution generalizes to an operation that places a container inside the positions at index \( \Nothing : I + 1 \) of a \( I + 1 \)-indexed container.
+For \( F : \Cont_I \), denote by \( \Wk{F} : \Cont_{I+1} \) the inclusion into containers with one more variable
+given by
+\[
+  \Wk{F}_{\Ps}(\Just{i}) \DefEq F_{\Ps}(i), \quad \Wk{F}_{\Ps}(\Nothing) \DefEq 0
+\]
 To aid readability, we denote an \( I+1 \)-indexed container \( (\MkCont{S}{\bar{P}}) \) by \( (\MkCont{S}{\vec{P}, P}) \),
 where \( \vec{P}_i \DefEq \bar{P}_{\Just(i)} \) and \( P \DefEq \bar{P}_{\Nothing} \).
+In particular, \( \Wk{(\MkCont{S}{P})} = (\MkCont{S}{P,0}) \).
+For \( i : I \), the \( i \)th projection container is \( \pi_i \DefEq (\MkCont{1}{\lambda j\,\Blank.\,{i = j}}) : \Cont_I \).
+If \( i \) is isolated, then \( i = j \) is a decidable proposition for any \( j : I \);
+in this case \( \pi_i \) is equivalent to a container whose \( i \)th type of positions is \( 1 \),
+and \( 0 \) for any other direction.
+As expected, indexed containers are closed under constants \( \CConst(A) \), sums \( (\CPlus) \) and products \( (\CTimes) \);
+Substitution generalizes to an operation that places a container inside the positions at index \( \Nothing : I + 1 \) of a \( I + 1 \)-indexed container:
 \begin{definition}
     Substitution is an operation \( \Subst{\Blank}{\Blank} : \Cont_{I+1} \to \Cont_{I} \to \Cont_{I} \),
     defined as follows:
@@ -741,7 +751,7 @@ the constructors define equivalences
   \operatorname{\Op{\bar{W}-in}}_{a, f} &: C(a) + \sum_{b : B(a)} \bar{\W}_{A,B,C}(f(b)) \simeq \bar{\W}_{A,B,C}(\Sup(a, f))
 \end{align*}
 for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
-These let us derive the fixed-point property:
+These let us derive a fixed-point to substitution:
 \begin{problem}
   Define an equivalence of containers \( \Op{in}_F : F[{\mu F}] \CartEquiv {\mu F} \).
   \begin{construction}
@@ -751,41 +761,6 @@ These let us derive the fixed-point property:
     Similarly, the positions of \( \Subst{F}{\mu F} \) are equivalent to those of \( \mu F \) via \( \operatorname{\Op{\bar{W}-in}} \).
   \end{construction}
 \end{problem}
-
-\begin{problem}\label{mu-rec}
-  Define an induction principle for morphisms out of \( \mu \)-containers:
-  \begin{center}
-    \hspace*{\fill}
-    {
-      \AxiomC{\( F : \Cont_{I+1} \)}
-      \AxiomC{\( G : \Cont_I \)}
-      \AxiomC{\( \alpha : \Cart{F[G]}{G} \)}
-      \TrinaryInfC{\( \Op{rec}_{F}(\alpha) : \Cart{\mu F}{G} \)}
-      \DisplayProof
-    }
-    \hspace*{\fill}
-  \end{center}
-\end{problem}
-
-\begin{lemma}\label{is-equiv-from-mu-rec}
-  Let \( \alpha : \Cart{\Subst{F}{G}}{G} \).
-  If \( \Op{rec}_{F}(\alpha) \) is an equivalence, then so is \( \alpha \).
-  \begin{proof}
-    Substitution \( \Subst{F}{-} \) preserves equivalences,
-    so by 3-for-2 for equivalences of containers, \( \alpha \) on the right is an equivalence:
-    \[
-      \begin{tikzcd}[column sep=huge]
-        \Subst{F}{\mu F} & \Subst{F}{G} \\
-        {\mu F}          & G
-        \ar[from=1-1, to=1-2, multimap-multimap, "\Subst{F}{\Op{rec}_F(\alpha)}"]
-        \ar[from=1-1, to=2-1, multimap-multimap, "\Op{in}_F"{swap}]
-        \ar[from=2-1, to=2-2, multimap-multimap, "\Op{rec}_F(\alpha)"{swap}]
-        \ar[from=1-2, to=2-2, -multimap, "\alpha"]
-      \end{tikzcd}
-      \qedhere
-    \]
-  \end{proof}
-\end{lemma}
 
 We can now define derivatives of indexed containers, and investigate how they behave with respect to fixed-points.
 \begin{definition}[note={Derivative of \( I \)-ary containers}]
@@ -842,8 +817,7 @@ we factor the problem into smaller steps that make it obvious why, in general, t
         \sum_{s : S} \sum_{f : P_1(s) \to T} \Isolated{P_0(s)} + \smashoperator{\sum_{p : \Isolated{P_1(s)}}} \Isolated{Q(fp)}
           \label{binary-chain-rule-shape-equiv}
     \end{align}
-    Let \( f_1 : {\L}_{\Sh} \simeq U_1 \) be this equivalence, and define \( H_1 \DefEq (\MkCont{U_1}{R_1}) \),
-    where \( R_1 \DefEq {\L}_{\Ps} \circ f_1^{\Inv}\).
+    Denote this equivalence by \( f_1 : {\L}_{\Sh} \simeq U_1 \), and define \( H_1 \DefEq (\MkCont{U_1}{{\L}_{\Ps} \circ f_1^{\Inv}}) \).
 
     On the other side we obtain an equivalence \( f_2 : U_2 \simeq {\R}_{\Sh} \)
     by distributing \( \Isolated{(\Blank)} \) over binary sums:
@@ -860,13 +834,13 @@ we factor the problem into smaller steps that make it obvious why, in general, t
       &\simeq
         {\R}_{\Sh}
     \end{align*}
-    Again, let \( H_2 \DefEq (\MkCont{U_2}{R_2}) \) where \( R_2 \DefEq {\R}_{\Ps} \circ f_2 \).
+    Again, let \( H_2 \DefEq (\MkCont{U_2}{{\R}_{\Ps} \circ f_2}) \).
 
     Let us now define \( \eta : H_1 \multimap H_2 \).
     As in \autoref{lax-chain-rule}, define the shape map \( \eta_{\Sh} : U_1 \to U_2 \) using \( \SigmaIsolate_{P_1(s),Q(f\shortminus)} \).
     On positions, the equivalence
     \(
-      \eta_{\Ps}(u) : R_2(\eta_{\Sh}(u)) \simeq R_1(u)
+      \eta_{\Ps}(u) : H_2^{\Ps}(\eta_{\Sh}(u)) \simeq H_1^{\Ps}(u)
     \)
     is defined by cases, depending on which side of the sum \( u : U_1 \) falls.
     Let \( s : S \), \( f : P_1(s) \to T \).
@@ -883,7 +857,7 @@ we factor the problem into smaller steps that make it obvious why, in general, t
     When \( u \JudgeEq (s, f, \Inr(p_1, q)) \) for some \( p_1 : \Isolated{P_1(s)} \) and \( q : \Isolated{Q(fp)} \),
     we rewrite as follows:
     \begin{align}
-      R_2(f_2(s , f , \Inr(p_1, q)))
+      H_2^{\Ps}(\eta_{\Sh}(s , f , \Inr(p_1, q)))
         &\mathrel{\JudgeEq}
           \big( P_0(s) + \smashoperator{\sum_{p : P_1(s)}} Q(f p) \big) \setminus \Inr(p_1, q)
           \notag
@@ -897,7 +871,7 @@ we factor the problem into smaller steps that make it obvious why, in general, t
           \label{binary-chain-rule-pos-equiv-sigma-minus}
           \\
         &\mathrel{\JudgeEq}
-          R_1(s, f, \Inr{(p_1, q)})
+          H_1^{\Ps}(s, f, \Inr{(p_1, q)})
           \notag
     \end{align}
     In \eqref{binary-chain-rule-pos-equiv-sum-minus}, we move the pair \( (p_1, q) \) to the right of the sum (\autoref{sum-remove-equiv}).
@@ -921,22 +895,48 @@ Like for unary containers, the chain-rule is strong whenever isolated points dis
   \end{proof}
 \end{proposition}
 
-For \( F : \Cont_I \), denote by \( \Wk{F} : \Cont_{I+1} \) the inclusion into containers with one more variable
-given by
-\[
-  \Wk{F}_{\Ps}(\Just{i}) \DefEq F_{\Ps}(i), \quad \Wk{F}_{\Ps}(\Nothing) \DefEq 0
-\]
-For \( i : I \), the \( i \)th projection container is \( \pi_i \DefEq (\MkCont{1}{\lambda j.\,{i = j}}) : \Cont_I \).
-If \( i \) is isolated, the \( i = j \) is a decidable proposition for any \( j : I \);
-in this case \( \pi_i \) is equivalent to a container whose \( i \)th type of positions is \( 1 \),
-and \( 0 \) for any other direction.
-
 \begin{todo-block}
   We observe the \( \mu \)-rule has the shape of an algebra for a \( \Subst{G}{\Blank} \)-functor,
   given some container \( G \) derived from \( F \).
 \end{todo-block}
 
-\begin{problem}[note={\( \mu \)-rule}]\label{mu-rule}
+We define morphisms out of a fixed-point via a non-dependent recursion principle:
+\begin{problem}\label{mu-rec}
+  Define an induction principle for morphisms out of \( \mu \)-containers.
+  That is, a morphism
+  \begin{center}
+    \hspace*{\fill}
+    {
+      \AxiomC{\( F : \Cont_{I+1} \)}
+      \AxiomC{\( G : \Cont_I \)}
+      \AxiomC{\( \alpha : \Cart{F[G]}{G} \)}
+      \TrinaryInfC{\( \Op{rec}_{F}(\alpha) : \Cart{\mu F}{G} \)}
+      \DisplayProof
+    }
+    \hspace*{\fill}
+  \end{center}
+  with a filler of
+    \begin{equation}\label{mu-rec-comm}
+      \begin{tikzcd}[column sep=huge]
+        \Subst{F}{\mu F} & \Subst{F}{G} \\
+        {\mu F}          & G
+        \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\Op{rec}_F(\alpha)}"]
+        \ar[from=1-1, to=2-1, -multimap, "\Op{in}_F"{swap}]
+        \ar[from=2-1, to=2-2, -multimap, "\Op{rec}_F(\alpha)"{swap}]
+        \ar[from=1-2, to=2-2, -multimap, "\alpha"]
+      \end{tikzcd}
+    \end{equation}
+    for all \( \alpha : \Cart{\Subst{F}{G}}{G} \).
+\end{problem}
+
+\begin{todo-block}
+  It should not be hard to show\todo{Either do it or check who has done it}
+  that \( \mu F, \In_F \) is the initial algebra of the wild endofunctor \( \Subst{F}{\Blank} \),
+  in the sense that for all \( \alpha : \Cart{\Subst{F}{G}}{G} \), the type of morphisms \( \alpha^\ast : \Cart{\mu F}{G} \)
+  such that \autoref{mu-rec-comm} commutes is contractible.
+\end{todo-block}
+
+\begin{problem}[note={Lax \( \mu \)-rule}]\label{mu-rule}
   For \( F : \Cont_2 \), define a cartesian morphism
   \[
     \MuRule_F
@@ -998,17 +998,56 @@ and \( 0 \) for any other direction.
     Lastly, define \( \MuRule_F \DefEq \Op{rec}_{G}(\alpha) : \Cart{ \mu G }{ \Der{(\mu F)} } \).
   \end{construction}
 
-\begin{proposition}
-  For any container \( F \),
-  \( \MuRule_F \) is an equivalence if and only if \( \Op{chain}_{F,{\mu F}} \) is an equivalence.
+% Our goal is to derive a fixed-point rule \( \varphi : \CartIso{\mu F^{\prime}}{\Der{\mu F}} \) for some \( F^{\prime} \).
+% Assuming we had defined \( \varphi \) by recursion from a \( \Subst{F^{\prime}}{\Blank} \)-algebra,
+% Importantly, \( \varphi \) being an equivalence is reflected by recursion:
+One advantage of defining the \( \mu \)-rule by recursion is that it highlights the dependency on the chain-rule.
+First, observe that recursion reflects equivalence, in the following sense:
+\begin{lemma}\label{is-equiv-from-mu-rec}
+  Let \( \alpha : \Cart{\Subst{F}{G}}{G} \).
+  If \( \Op{rec}_{F}(\alpha) \) is an equivalence, then so is \( \alpha \).
+  \begin{proof}
+    Substitution \( \Subst{F}{-} \) preserves equivalences,
+    so by 3-for-2 for equivalences of containers, \( \alpha \) on the right is an equivalence:
+    \[
+      \begin{tikzcd}[column sep=huge]
+        \Subst{F}{\mu F} & \Subst{F}{G} \\
+        {\mu F}          & G
+        \ar[from=1-1, to=1-2, multimap-multimap, "\Subst{F}{\Op{rec}_F(\alpha)}"]
+        \ar[from=1-1, to=2-1, multimap-multimap, "\Op{in}_F"{swap}]
+        \ar[from=2-1, to=2-2, multimap-multimap, "\Op{rec}_F(\alpha)"{swap}]
+        \ar[from=1-2, to=2-2, -multimap, "\alpha"]
+      \end{tikzcd}
+      \qedhere
+    \]
+  \end{proof}
+\end{lemma}
+
+Thus, a strong \( \mu \)-rule for some container necessarily implies a strong rule between \( F \) and \( \mu F \):
+\begin{proposition}\label{strong-chain-rule-from-strong-mu-rule}
+  Let \( F : \Cont_{I + 1} \).
+  If \( \MuRule_F \) is an equivalence, then so is \( \Op{chain}_{F,{\mu F}} \).
   \begin{proof}
     Assume that \( \MuRule_F \) is an equivalence.
     In \autoref{mu-rule}, \( \MuRule_F \) is defined by recursion from some \( \alpha \),
     hence \( \alpha \) is an equivalence by \autoref{is-equiv-from-mu-rec}.
     But \( \alpha \) is just \( \Op{chain}_{F, {\mu F}} \) wedged between equivalences,
     so the latter is an equivalence.
+  \end{proof}
+\end{proposition}
 
+With a bit of creativity we can show that this is not only a necessary,
+but also a sufficient condition:
+\begin{theorem}
+  For any container \( F : \Cont_{I + 1} \), the following are equivalent:
+  \begin{enumerate}
+    \item \( \MuRule_F \) is an equivalence.
+    \item \( \Op{chain}_{F,{\mu F}} \) is an equivalence.
+  \end{enumerate}
+  \begin{proof}
+    One direction is exactly \autoref{strong-chain-rule-from-strong-mu-rule}.
     Let us sketch the other direction; for details, see the formalization.
+
     Assume \( \Op{chain}_{F,{\mu F}} \) to be an equivalence.
     By \autoref{strong-binary-chain-rule-iff-is-equiv-sigma-isolate}, this is equivalent to isolated pairs
     \( (p_1, \bar{w}) \)
@@ -1018,8 +1057,51 @@ and \( 0 \) for any other direction.
     i.e.\@ a map \( \Der{(\mu F)}_{\Sh} \to {(\mu G)}_{\Sh} \).
     Using this map, we then prove that all fibers of the shape map are inhabited.
     It remains to show that these fibers are propositions:
-    By \( \W \)-induction, we see that they are equivalent to (disjoint) sums of fibers over the constructors \( \Op{top} \)
-    and \( \Op{below} \), which are embeddings, hence have propositional fibers.
+    By a combination of \( \W \)-induction and \( \Graft \)-induction,
+    we see that each fiber is equivalent to a (disjoint) sums of fibers over the constructors \( \Op{top} \) and \( \Op{below} \).
+    But these are embeddings, hence any such fiber is a proposition.
   \end{proof}
-\end{proposition}
+\end{theorem}
+
+With this at hand, we can give a proof that the \( \mu \)-rule is strong for discrete containers
+that factors entirely through the properties of the chain-rule:
+\begin{corollary}
+  If \( F : \Cont_{I + 1} \) is discrete, then \( \MuRule_F \) is an equivalence.
+  \begin{proof}
+    By the previous theorem, it suffices to show that \( \Chain_{F,\mu F} \) is an equivalence.
+    But \( \mu F \) is discrete, and the chain-rule between discrete containers is strong (\autoref{discrete-strong-chain-rule}).
+  \end{proof}
+\end{corollary}
+
+\begin{todo-block}
+  Is a globally strong \( \mu \)-rule a constructive taboo the same way that a global chain-rule is?
+  That is not so obvious.
+
+  First, note that strong \( \MuRule_F \) implies (by \autoref{strong-binary-chain-rule-iff-is-equiv-sigma-isolate}) that
+  for every \( s : S \) and \( f : P_1(S) \to \W(S, P_1) \), \( \SigmaIsolate \) defines an equivalence
+  \[
+    \sum_{p : \Isolated{P_1(s)}} \Isolated{\bar{\W}_{P_0}(f(p))} \simeq 
+      \Isolated{\big(
+        \sum_{p : P_1(s)} \bar{\W}_{P_0}(f(p))
+      \big)}
+  \]
+  Is this enough to derive that either types of positions, \( P_0 \) or \( P_1 \), are discrete?
+  We get:
+  \[
+      \Isolated{P_0(s)}
+        +
+      \Isolated{\big(
+        \sum_{p : P_1(s)} \bar{\W}_{P_0}(f(p))
+      \big)}
+      \simeq
+      \Isolated{\bar{\W}_{P_0}(\Sup(s, f))}
+  \]
+\end{todo-block}
+
+\begin{todo-block}
+  Sketch a (dis)proof that \( \Chain_{F,\mu F} \) is an equivalence:
+  If \( \alpha : \Cart{ \Subst{G}{\Der(\mu F)} }{ \Der(\mu F) } \) is an initial \( \Subst{G}{\Blank} \)-algebra,
+  then it is --- by Lambek's Lemma --- an equivalence.
+  In this case, \( \Chain_{F, \mu F} \) would be invertible.
+\end{todo-block}
 
