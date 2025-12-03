@@ -651,6 +651,12 @@ Our goal is to derive a similar fixed-point rule for our generalized derivative,
 ideally by deriving it from the chain-rule as well.
 This begs the question: if in general the chain-rule rule is lax,
 is it ever possible to have a strong fixed-point rule?\todo{Spoil the answer to this question here.}
+It appears that the answer to this question is \enquote{it depends}:
+we are able to show (cf.~\autoref{strong-mu-rule-iff-strong-chain-rule})
+that the fixed-point rule for an \( I + 1 \)-indexed container \( F \) is strong if and only if the chain rule
+between \( F \) and \( \mu F \) is.
+
+\subsubsection{Indexed Containers}
 
 To define and reason about an operation \( \mu \) taking a container to a fixed-point,
 we first have to recall the definition indexed containers.
@@ -664,12 +670,15 @@ into actual containers.
     \Cont_{I} \DefEq \sum_{S : \Type} (I \to S \to \Type)
   \).
 \end{definition}
-Ordinary containers correspond to unary containers \( \Cont_{1} \).
-Cartesian morphisms between containers \(F , G : \Cont_{I} \) are defined similarly by ranging over all indices \( I \):
+Each index \( i : I \) corresponds to a variable in the type that a container describes.
+For example, a type like \( F(X, Y) = 1 + X \times Y \) would be encoded as a binary container, indexed by the type \( 2 \).
+Ordinary containers correspond to unary containers, \( \Cont_{1} \).
+
+Cartesian morphisms between containers \(F , G : \Cont_{I} \) are defined by ranging over all indices \( I \):
 \[
   \Cart{F}{G} \DefEq \smashoperator[l]{\sum_{f : F_{\Sh} \to G_{\Sh}}} \prod_{i : I, s : F_{\Sh}} G_{\Ps}(i, f(s)) \simeq F_{\Ps}(i, s)
 \]
-Together, \( I \)-indexed containers assemble again assemble into a wild category, \( \ContCart_{I} \).
+Together, \( I \)-indexed containers again assemble into a wild category, \( \ContCart_{I} \).
 For \( F : \Cont_I \), denote by \( \Wk{F} : \Cont_{I+1} \) the inclusion into containers with one more variable
 given by
 \[
@@ -695,74 +704,9 @@ Substitution generalizes to an operation that places a container inside the posi
     \end{align*}
 \end{definition}
 For any fixed \( F : \Cont_{I+1} \), \( F[-] \) is a wild endofunctor of \( I \)-ary containers.
-Assuming we have access to \( \W \)-types, we encode inductive types as smallest fixed-points of this functor:
-For all \( F : \Cont_{I+1} \), there is a container \( {\mu F} : \Cont_I \)
-such that \( \Subst{F}{\mu F} \CartEquiv {\mu F} \).
 
-Recall that for \( A : \Type \) and \( B : A \to \Type \), the type \( \W(A, B) \) has the single constructor
-\begin{center}
-  \hspace*{\fill}
-  {
-    \AxiomC{\( a : A \)}
-    \AxiomC{\( f : B(a) \to \W(A, B) \)}
-    \BinaryInfC{\( \Sup(a, f) : \W(A, B) \)}
-    \DisplayProof
-  }
-  \hspace*{\fill}
-\end{center}
-A path to a node inside a \( \W(A, B) \)-tree,
-labelled by some \( C : A \to \Type \),
-can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \) with two constructors, namely
-\begin{center}
-  \hspace*{\fill}
-  {
-    \AxiomC{\( c : C(a) \)}
-    \UnaryInfC{\( \Op{top}(c) : \bar{\W}_{A, B, C}(\Sup(a, f)) \)}
-    \DisplayProof
-  }
-  \hfill%
-  and
-  \hfill%
-  {
-    \AxiomC{\( b : B(a) \)}
-    \AxiomC{\( w : \bar{\W}_{A,B,C}(f(b)) \)}
-    \BinaryInfC{\( \Op{below}(b, w) : \bar{\W}_{A, B, C}(\Sup(a, f)) \)}
-    \DisplayProof
-  }
-  \hspace*{\fill}
-\end{center}
-for all \( a : A \) and \( f : B(a) \to \W(A, B) \).
-
-Together, we can use \( \W \) and \( \bar{\W} \) to define the shapes and position, respectively, of the smallest fixed-point container:
-\begin{definition}
-  Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \Cont_{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \Cont_I \):
-  \begin{align*}
-    S^\mu &\DefEq \W(S, P) \\
-    P^\mu_i & \DefEq \bar{\W}_{S,P,\vec{P}}
-  \end{align*}
-\end{definition}
-
-Both \( \W \) and \( \bar{\W} \) can be described by unfolding them by one level
----
-the constructors define equivalences
-\begin{align*}
-  \operatorname{\Op{W-in}} &: \sum_{a : A} (B(a) \to \W(A, B)) \simeq \W(A, B)
-    \\
-  \operatorname{\Op{\bar{W}-in}}_{a, f} &: C(a) + \sum_{b : B(a)} \bar{\W}_{A,B,C}(f(b)) \simeq \bar{\W}_{A,B,C}(\Sup(a, f))
-\end{align*}
-for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
-These let us derive a fixed-point to substitution:
-\begin{problem}
-  Define an equivalence of containers \( \Op{in}_F : F[{\mu F}] \CartEquiv {\mu F} \).
-  \begin{construction}
-    Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) \).
-    Shapes of \( \Subst{F}{\mu F} \) are \( \sum_{s : S} (P(s) \to \W(S, P)) \),
-    hence \( \operatorname{\Op{W-in}} \) establishes an equivalence with the shapes of \( \mu F \).
-    Similarly, the positions of \( \Subst{F}{\mu F} \) are equivalent to those of \( \mu F \) via \( \operatorname{\Op{\bar{W}-in}} \).
-  \end{construction}
-\end{problem}
-
-We can now define derivatives of indexed containers, and investigate how they behave with respect to fixed-points.
+We can now lift derivatives to indexed containers,
+and define a derivative for each index, as long as equality with that index is decidable:
 \begin{definition}[note={Derivative of \( I \)-ary containers}]
   Let \( F \JudgeEq (\MkCont{S}{P}) : \Cont_I \) and \( i : \Isolated{I} \).
   The \( i \)th derivative \( {\Der_i}F \DefEq (\MkCont{S'}{P'}) : \Cont_I \) is defined as follows:
@@ -773,6 +717,7 @@ We can now define derivatives of indexed containers, and investigate how they be
         P_i(s) \setminus p & \text{if } i = j \\
         P_j(s) & \text{otherwise}
       \end{cases}
+      \qedhere
   \end{align*}
 \end{definition}
 
@@ -894,6 +839,91 @@ Like for unary containers, the chain-rule is strong whenever isolated points dis
     This in turn is exactly the case when the second condition holds.
   \end{proof}
 \end{proposition}
+
+\subsubsection{Smallest Fixed-points of Containers}
+
+Assuming we have access to \( \W \)-types, we encode inductive types as smallest fixed-points of the substitution functor:
+For all \( F : \Cont_{I+1} \), there is a container \( {\mu F} : \Cont_I \)
+such that \( \Subst{F}{\mu F} \CartEquiv {\mu F} \).
+The positions at the \( I + 1\)\textsuperscript{st} index describe
+occurrences of the recursion variable \( Y \) in an informal fixed-point specification of an inductive type
+such as \( \Op{List}(X) = \mu Y.\, 1 + X \times Y \).
+
+Recall that for \( A : \Type \) and \( B : A \to \Type \),
+the type \( \W(A, B) \) has the single constructor
+\begin{equation*}
+  {
+    \AxiomC{\( a : A \)}
+    \AxiomC{\( f : B(a) \to \W(A, B) \)}
+    \BinaryInfC{\( \Sup(a, f) : \W(A, B) \)}
+    \DisplayProof
+  }
+\end{equation*}
+Each \( w : \W(A, B) \) is a tree with \( A \)-labeled nodes, and \( B(a) \)-branching subtrees.
+A path to some node inside \( w \), labelled by \( C : A \to \Type \),
+can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \) with two constructors, namely
+\begin{center}
+  \hspace*{\fill}
+  {
+    \AxiomC{\( c : C(a) \)}
+    \UnaryInfC{\( \Op{top}(c) : \bar{\W}_{A, B, C}(\Sup(a, f)) \)}
+    \DisplayProof
+  }
+  \hfill%
+  and
+  \hfill%
+  {
+    \AxiomC{\( b : B(a) \)}
+    \AxiomC{\( w : \bar{\W}_{A,B,C}(f(b)) \)}
+    \BinaryInfC{\( \Op{below}(b, w) : \bar{\W}_{A, B, C}(\Sup(a, f)) \)}
+    \DisplayProof
+  }
+  \hspace*{\fill}
+\end{center}
+for all \( a : A \) and \( f : B(a) \to \W(A, B) \).
+
+Together, we can use \( \W \) and \( \bar{\W} \) to define the shapes and position, respectively, of the smallest fixed-point container:
+\begin{definition}
+  Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \Cont_{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \Cont_I \):
+  \begin{align*}
+    S^\mu &\DefEq \W(S, P) \\
+    P^\mu_i & \DefEq \bar{\W}_{S,P,\vec{P}}
+    \qedhere
+  \end{align*}
+\end{definition}
+
+Both \( \W \) and \( \bar{\W} \) can be described by unfolding them by one level
+---
+the constructors define equivalences
+\begin{align*}
+  \operatorname{\Op{W-in}} &: \sum_{a : A} (B(a) \to \W(A, B)) \simeq \W(A, B)
+    \\
+  \operatorname{\Op{\bar{W}-in}}_{a, f} &: C(a) + \sum_{b : B(a)} \bar{\W}_{A,B,C}(f(b)) \simeq \bar{\W}_{A,B,C}(\Sup(a, f))
+\end{align*}
+for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
+These let us derive a fixed-point to substitution:
+\begin{problem}
+  Define an equivalence of containers \( \Op{in}_F : F[{\mu F}] \CartEquiv {\mu F} \).
+  \begin{construction}
+    Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) \).
+    Shapes of \( \Subst{F}{\mu F} \) are \( \sum_{s : S} (P(s) \to \W(S, P)) \),
+    hence \( \operatorname{\Op{W-in}} \) establishes an equivalence with the shapes of \( \mu F \).
+    Similarly, the positions of \( \Subst{F}{\mu F} \) are equivalent to those of \( \mu F \) via \( \operatorname{\Op{\bar{W}-in}} \).
+  \end{construction}
+\end{problem}
+
+% \begin{example}
+%   Binary trees are inductive types such that \( \Op{Tr}(X) = X + X \times \Op{Tr}(X)^2 \).
+%   As a container, we encode \( \Op{Tr} \DefEq \mu \Op{T} : \Cont_1 \) as follows:
+%   \( \Op{T} = (\MkCont{S}{P}) \) is a binary container with a set of two shapes, \( \{ \Op{leaf}, \Op{branch} \} \),
+%   over which there are the following positions for each of the two indices:
+%   \begin{align*}
+%     P_0(\Op{leaf}) &\DefEq 1  & P_0(\Op{branch}) &\DefEq 1 \\
+%     P_1(\Op{leaf}) &\DefEq 0  & P_1(\Op{branch}) &\DefEq 2
+%   \end{align*}
+%   The positions \( P_0 \) and \( P_1 \) correspond, respectively, to occurrences of the variables
+%   \( X \) and \( Y \) in the fixed-point specifications \( \Op{Tr} = \mu Y.\, X + X \times Y^2 \).
+% \end{example}
 
 \begin{todo-block}
   We observe the \( \mu \)-rule has the shape of an algebra for a \( \Subst{G}{\Blank} \)-functor,
@@ -1038,7 +1068,7 @@ Thus, a strong \( \mu \)-rule for some container necessarily implies a strong ru
 
 With a bit of creativity we can show that this is not only a necessary,
 but also a sufficient condition:
-\begin{theorem}
+\begin{theorem}\label{strong-mu-rule-iff-strong-chain-rule}
   For any container \( F : \Cont_{I + 1} \), the following are equivalent:
   \begin{enumerate}
     \item \( \MuRule_F \) is an equivalence.
@@ -1055,11 +1085,11 @@ but also a sufficient condition:
     for all \( s : S \) and \( f : P_1(s) \to \W_{\!S}(P_1) \).
     This property is exactly what is needed to define a putative inverse on shapes,
     i.e.\@ a map \( \Der{(\mu F)}_{\Sh} \to {(\mu G)}_{\Sh} \).
-    Using this map, we then prove that all fibers of the shape map are inhabited.
+    Using this map, we then prove that all fibers of the (forward) shape map are inhabited.
     It remains to show that these fibers are propositions:
     By a combination of \( \W \)-induction and \( \Graft \)-induction,
-    we see that each fiber is equivalent to a (disjoint) sums of fibers over the constructors \( \Op{top} \) and \( \Op{below} \).
-    But these are embeddings, hence any such fiber is a proposition.
+    we see that each fiber is equivalent to a disjoint sum of fibers over the constructors \( \Op{top} \) and \( \Op{below} \).
+    But these maps are embeddings, hence any of their fibers are propositions.
   \end{proof}
 \end{theorem}
 

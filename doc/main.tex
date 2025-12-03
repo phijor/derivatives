@@ -29,6 +29,10 @@
   % qed=$\lrcorner$,
   numbered=false,
 }
+\newkeytheoremstyle{marked-definition}{
+  inherit-style=definition,
+  qed=$\lrcorner$,
+}
 \newkeytheoremstyle{construction}{
   inherit-style=definition,
   headfont={\itshape},
@@ -52,9 +56,10 @@
   style=plain,
   sibling=theorem,
 ]
-\newkeytheorem{definition}[style=definition,sibling=theorem]
+\newkeytheorem{definition}[style=marked-definition,sibling=theorem]
 \newkeytheorem{construction}[style=construction,sibling=theorem]
 \newkeytheorem{remark}[style=remark,sibling=theorem]
+\newkeytheorem{example}[style=example,sibling=theorem]
 
 % A custom tikzcd arrow tip, a lollipop (⊸).
 % https://tex.stackexchange.com/a/730357
