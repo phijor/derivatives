@@ -1,0 +1,211 @@
+\section{The Chain Rule}
+
+\begin{todo-block}
+  Explain that we are going to tackle a more advance law of derivatives:
+  In which way do derivatives of containers satisfy a chain rule?
+\end{todo-block}
+
+We expect the derivative of a composite of containers to satisfy a version of the chain rule
+\( (f \circ g)^{\prime} = (f^{\prime} \circ g) \cdot g^{\prime} \).
+In our setting, substitution \( \Subst{\Blank}{\Blank} \) takes on the role of composition,
+and for discrete containers, \citeauthor{AbbottEtAl2005DataDifferentiating} show that
+\( \Der{\Subst{F}{G}} \) is indeed isomorphic to \( \Subst{(\Der{F})}{G} \CTimes \Der{G} \).
+Attempting to lift their proof to untruncated containers,
+we run into difficulties:
+While it is possible to define a morphism from one to the other,
+it is not immediately clear that an inverse exists.
+Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
+\begin{problem}[note={The lax chain rule}]\label{lax-chain-rule}
+  For any two containers \( F, G \), define a morphism
+  \[
+    \Op{chain}_{F,G} :
+    \Cart%
+      { \Subst{(\Der{F})}{G} \CTimes \Der{G} }%
+      {\Der{(\Subst{F}{G})}}
+  \]
+\end{problem}
+\begin{construction}[note={for \autoref{lax-chain-rule}}]
+  Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
+  As usual, we have to construct a map on shapes and an equivalence of positions.
+  On shapes, our goal is a map
+  \[
+    \big(\sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} (P_s \setminus p \to T) \big)
+      \times
+    \sum_{t : T} \Isolated{Q_t}
+      \to
+    \Big(
+      \sum\nolimits_{(s, f) : \sum_{s : S} (P_s \to T)} \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)}
+    \Big)
+  \]
+  Let us first reshape the left side by some equivalences.
+  By re-associating the sums, we obtain
+  \begin{align*}
+      %
+    &\mathrel{\hphantom{\simeq}}
+      \big(\sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} P_s \setminus p \to T \big)
+        \times
+      \sum_{t : T} \Isolated{Q_t}
+    \\
+    &\simeq
+      \sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} \sum\nolimits_{(f, t) : (P_s \setminus p \to T \times T)} \Isolated{Q_t}
+    % &\simeq
+    %   \adjustlimits\sum_{s : S} \sum_{p : \Isolated{P_s}} \smashoperator[r]{\sum_{(\Blank, t) : (P_s \setminus p \to T \times T)}} \Isolated{Q_t}
+  \intertext{%
+    The induction principle for \( \Graft \) tells us that the types \( (P_s \setminus p \to T) \times T \) and \( P_s \to T \) are equivalent (\autoref{graft-equiv}),
+    thus we simplify to
+  }
+    &\simeq
+      \sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} \sum\nolimits_{f : P_s \to T} \Isolated{Q_{fp}}
+  \intertext{%
+    By permuting the sum yet again, we are left with
+  }
+    &\simeq
+      \sum\nolimits_{(s, f) : \sum_{s : S} (P_s \to T)} \big( \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})} \big)
+  \end{align*}
+  Denote this equivalence by \( \lambda \).
+  Now, the left and the right only differ in
+  \begin{align*}
+    \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})}
+      \qquad\text{vs.}\qquad
+    \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)}
+  \end{align*}
+  \Autoref{sigma-isolate} gives us a map
+  \(
+    \SigmaIsolate_{P_s,Q_{f(\Blank)}} :
+      \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})}
+        \to
+      \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)}
+  \),
+  hence
+  \(
+    \cramped{
+      \Op{chain}_{F,G}^{\Sh} \DefEq
+        \Op{\Sigma}(\Op{id}, \SigmaIsolate_{P_s,Q_{f(\Blank)}}) \circ \lambda
+    }
+  \).
+
+  To construct the equivalence on positions,
+  let \( s : S \), \( p_0 : \Isolated{P_s} \), \( f : P_s \setminus p_0 \to T \), \( t : T \) and \( q_0 : \Isolated{Q_t} \).
+  Our goal becomes to construct an equivalence
+  \[
+      \big(
+        \sum_{p : P_s} Q_{\GraftSyntaxX{f}{t}{p_0}(p)}
+      \big) \setminus (p_0 , q_0)
+    \simeq
+      \big(
+        \smashoperator{\sum_{p : P_s \setminus p_0}} Q_{f(p)}
+      \big)
+        +
+      (Q_t \setminus q_0),
+  \]
+  which we obtain from \autoref{is-equiv-sigma-remove},
+  and by applying the computation rules of grafting to \( \GraftSyntaxX{f}{t}{p_0} : P_s \to T \).
+\end{construction}
+
+Note that the above proof essentially factors \( \Op{chain}_{F,G} \) into
+\[
+  \begin{tikzcd}[column sep=large]
+    { \Subst{(\Der{F})}{G} \CTimes \Der{G} }%
+      \ar[r, -multimap, "\Op{chain}_{F,G}"]
+      \ar[d, -multimap, "\sim"{swap}]
+      &
+    {\Der{(\Subst{F}{G})}}
+      \\
+    H_0
+      \ar[r, -multimap, "\eta"{swap}]
+      &
+    H_1
+      \ar[u, -multimap, "\sim"{swap}]
+  \end{tikzcd}
+\]
+in which
+\(
+  \eta_{\Sh} :
+    { \sum_{s : S} \sum_{f : P_s \to T} \sum_{p : \Isolated{P_s}} \Isolated{Q_{fp}} }%
+      \to
+    { \sum_{s : S} \sum_{f : P_s \to T} \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)} }
+\)
+applies \( \SigmaIsolate_{P_s,Q_{f(\Blank)}} \).
+We will make this factorization explicit in the derivation of the chain rule for indexed containers (\autoref{binary-chain-rule}),
+but for now we can record the following fact:
+\begin{proposition}\label{strong-chain-rule-iff-is-equiv-sigma-isolate}
+  Let \( F = (\MkCont{S}{P}) \) and \( G = (\MkCont{T}{Q}) \).
+  The following are equivalent propositions:
+  \begin{enumerate}
+    \item \label{strong-chain-rule-iff-is-equiv-sigma-isolate-1}
+      \( \Op{chain}_{F,G} \) is an equivalence of containers
+    \item \label{strong-chain-rule-iff-is-equiv-sigma-isolate-2}
+        \( \SigmaIsolate_{P_s,Q_{f(\Blank)}} \) is an equivalence for all \( s : S \) and \( f : P_s \to T \)
+    \item \label{strong-chain-rule-iff-is-equiv-sigma-isolate-3}
+      For all \( s : S \) and \( f : P_s \to T \), if \( (p, q) : \sum_{p : P_s} Q_{fp} \) is isolated,
+      then both \( p \) and \( q \) are isolated.
+  \end{enumerate}
+  \begin{proof}
+    Equivalence of the first two points follows from inspection of the definition of \( \Op{chain} \) in terms of \( \SigmaIsolate \).
+    Equivalence with the last point is \autoref{is-equiv-sigma-isolate-iff-isolated-pair}.
+  \end{proof}
+\end{proposition}
+
+We say that the chain rule for \( F \) and \( G \) is \emph{strong} if \( \Chain_{F,G} \) is an equivalence of containers;
+the above lets us immediately see when we can and cannot expect this to be the case.
+Firstly, we recover a strong chain rule for \emph{discrete} containers, as expected by
+\cite[{Proposition~6.6}]{AbbottEtAl2005DataDifferentiating}:
+\begin{theorem}\label{discrete-strong-chain-rule}
+  For discrete containers \( F, G \), \( \Op{chain}_{F,G} \) is an equivalence.
+  In particular, it is an isomorphism in the 1-category of set-truncated containers.
+  \begin{proof}
+    The positions of \( F \) and \( G \) are discrete,
+    so by \autoref{discrete-is-equiv-sigma-isolated}
+    \( \SigmaIsolate \) is an equivalence.
+    By the previous proposition, is \( \Op{chain}_{F,G} \) is an equivalence of containers.
+  \end{proof}
+\end{theorem}
+
+Secondly, we conclude that globally having a strong chain rule is an inherently classical property:
+\begin{theorem}\label{globally-discrete-iff-strong-chain-rule}
+  The following are equivalent propositions:
+  \begin{enumerate}
+    \item \emph{every} type is discrete
+    \item for all containers \( F \) and \( G\), \( \Op{chain}_{F,G} \) is an equivalence
+  \end{enumerate}
+  \begin{proof}
+    If every type is discrete, then so is every container, hence the chain rule is always an equivalence by \autoref{discrete-strong-chain-rule}.
+    In the other direction,
+    use \autoref{discrete-iff-is-equiv-singl-isolate} to show that any given type \( A \) is discrete
+    ---
+    that is, given some \( a_0 : A \), prove that \( \SigmaIsolate_{A, {a_0 = \Blank}} \) is an equivalence.
+    We do so by applying \autoref{strong-chain-rule-iff-is-equiv-sigma-isolate} to containers
+    \( F \DefEq (\MkCont{1}{A}) \) and \( G \DefEq (\MkCont{(a : A)}{a_0 = a}) \).
+  \end{proof}
+\end{theorem}
+
+As a consequence, globally assuming that the chain rule is strong is inconsistent in the presence of types of higher truncation level:
+The circle \( S^1 \) is provably not discrete (if it were, it would be a set!),
+hence
+\(
+  \neg ( \prod_{F, G : \Cont} \Op{isEquiv}(\Op{chain}_{F,G}) )
+\).
+
+If instead we restrict ourselves to the world of sets,
+then we can conclude that a globally strong chain rule exists if and only if arbitrary equalities are decidable:
+\begin{corollary}
+  The following are equivalent:
+  \begin{enumerate}
+    \item Every set is discrete.
+    \item In the 1-category of set-truncated containers, \( \Chain_{F,G} \) is an isomorphism
+      for all pairs of containers \( F \) and \( G \).
+  \end{enumerate}
+  \begin{proof}
+    In the 1-category \( \ContCart_{0,0} \), being an isomorphism is a proposition,
+    which is equivalent to being an equivalence of containers.
+    The claim follows by inspection of the proof of \autoref{globally-discrete-iff-strong-chain-rule},
+    and ensuring that the same argument applies even when all types involved are sets.
+  \end{proof}
+\end{corollary}
+
+We have seen that our definition of derivative behaves nicely even in the presence of non-discrete types,
+in that we retain the ways it interacts with sums and products (\autoref{sum-product-rule}).
+Its interaction with substitution, however, is more subtle.
+While we do obtain a chain rule, it is now \emph{directed} or \emph{lax} (\autoref{lax-chain-rule}),
+and whether we can strengthen it to an equivalence depends on the pair of containers involved (\autoref{strong-chain-rule-iff-is-equiv-sigma-isolate}).
+Indeed, assuming the latter for any pair of containers is inconsistent in the presence of higher inductive types such the circle \( S^1 \).
