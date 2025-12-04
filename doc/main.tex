@@ -8,6 +8,7 @@
 \usepackage{cmll}
 \usepackage{csquotes}
 \usepackage{enumitem}
+\usepackage[only=llbracket,rrbracket]{stmaryrd}
 \usepackage{tikz-cd}
 \usepackage{keytheorems}
 \usepackage{todonotes}
@@ -112,6 +113,8 @@
   {_{#3}}%
   {#2 \delimsize\vert #1}
 \DeclarePairedDelimiterX{\GraftSyntax}[2]{[}{]}{#2 \delimsize\vert #1}
+\DeclarePairedDelimiter{\Ext}{\llbracket}{\rrbracket}
+\NewDocumentCommand{\Alg}{m}{\operatorname{\Op{Alg}}_{#1}}
 
 \newcommand*{\MkCont}[2]{#1\mathbin{\triangleleft}#2}
 \DeclareMathOperator{\Sh}{\mathsf{Sh}}

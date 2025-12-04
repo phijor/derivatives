@@ -42,6 +42,7 @@ Cartesian morphisms between containers \(F , G : \Cont_{I} \) are defined by ran
   \Cart{F}{G} \DefEq \smashoperator[l]{\sum_{f : F_{\Sh} \to G_{\Sh}}} \prod_{i : I, s : F_{\Sh}} G_{\Ps}(i, f(s)) \simeq F_{\Ps}(i, s)
 \]
 Together, \( I \)-indexed containers again assemble into a wild category, \( \ContCart_{I} \).
+Not knowing where to put the indices, we denote by \( \ContCart_{I,n,k} \) the wild subcategories of \( I \)-indexed, \( (n, k) \)-truncated containers.\todo{Maybe \( I\operatorname{-}\ContCart_{n,k} \) is better?}
 Each container in \( I \) variables is also one in \( I + 1 \) variables:
 For \( F : \Cont_I \), denote by \( \Wk{F} : \Cont_{I+1} \) the inclusion given by
 \[
@@ -196,9 +197,45 @@ Factorized like that, it becomes obvious that the binary chain rule is strong wh
   \end{proof}
 \end{proposition}
 
-\subsection{Algebras of Containers}
+\subsection{Fixed Point Containers}
 
-Substitution generalizes to an operation that places a container inside the positions at index \( \Nothing : I + 1 \) of a \( I + 1 \)-indexed container:
+To show how derivatives of untruncated containers interact with fixed points,
+we first have to give a suitable specification of what we mean by such a \enquote{fixed point}.
+Traditionally, the (smallest) fixed point associated to an signature container is constructed as follow:
+Given an \( I \)-indexed and set-truncated container \( (\MkCont{S}{P}) \),
+it is interpreted as a functor \( \llbracket \MkCont{S}{P} \rrbracket : [\Op{Set}^I, \Op{Set}] \),
+which takes families \( \vec{X} : I \to \Op{Set} \) to
+\[
+  \llbracket \MkCont{S}{P} \rrbracket \vec{X} \DefEq \sum_{s : S} \prod_{i : I} P_i(s) \to \vec{X}_i
+\]
+This defines a full and faithful embedding of the category \( \ContCart_{I,0,0} \) into the category of functors \( [\Op{Set}^I, \Op{Set}] \)~\cite[Thm.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
+Notably, this embedding reflects much of the structure of the functor category \( [\Op{Set}^I, \Op{Set}] \) back into containers,
+allowing concise proofs for a number of properties.
+In particular, given a signature container \( F : \Cont_{I+1} \), its interpretation \( \llbracket F \rrbracket(\vec{X}, \Blank) : [ \Op{Set}, \Op{Set} ] \)
+admits an initial algebra for any \( \vec{X} \).
+This initial algebra can be shown to lie in the image of the interpretation functor, hence it defines a necessarily unique \( I \)-indexed container \( \mu F \),
+which is regarded as the smallest fixed point of \( F \).
+
+Recently,
+\citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} have expanded upon this idea in~\cite{DamatoEtAl2025FormalisingInductiveCoinductive},
+and taken untruncated \( I \)-indexed containers to wild functors typed \( [ \Type^I, \Type ] \).
+They show that for any \( F : \Cont_{I + 1} \) and \( \vec{X} : I \to \Type \),
+the wild functor \( \llbracket F \rrbracket(\vec{X}, \Blank) : [\Type, \Type] \) admits an initial algebra
+whose carrier is given by \( \llbracket \mu F \rrbracket\vec{X} \) --- the interpretation of some container \( \mu F : \Cont_I \).
+Ideally, one would like to show that this construction is natural in \( \vec{X} \) and
+pull its properties back along \( \llbracket \Blank \rrbracket \),
+thus proving that \( \mu F \) itself is defined universally among \emph{containers},
+without needing to reference their interpretations.
+This, however, is hampered by the fact that we cannot (yet) internally prove that the wild categories involved are suitably coherent,
+that is \( (\infty,1) \)-categories in an appropriate sense.
+If they were, one could attempt to show that \( \llbracket \Blank \rrbracket \) is a structure-preserving embedding:
+a particularly elegant way to show that \( \llbracket \Blank \rrbracket \) is fully faithful for sets
+is given by \citeauthor{Damato2023RevisitingContainersCubical} in \cite{Damato2023RevisitingContainersCubical} and relies almost exclusively on the Yoneda-lemma,
+which should make it amenable to generalization.
+
+In light of this, we are going to define a notion fixed point entirely internal to the wild category of containers,
+which should nonetheless correspond to the more traditional definition, barring the above-mentioned issues.
+First, note that substitution generalizes to an operation that places a container inside the positions at index \( \Nothing : I + 1 \) of a \( I + 1 \)-indexed container:
 \begin{definition}
     Substitution is an operation \( \Subst{\Blank}{\Blank} : \Cont_{I+1} \to \Cont_{I} \to \Cont_{I} \),
     defined as follows:
@@ -209,17 +246,82 @@ Substitution generalizes to an operation that places a container inside the posi
         \qedhere
     \end{align*}
 \end{definition}
-For any fixed \( F : \Cont_{I+1} \), \( F[-] \) is a wild endofunctor of \( I \)-ary containers.
+Substitution into a fixed \( F : \Cont_{I+1} \), \( \Subst{F}{\Blank} \) behaves functorially:
+\begin{problem}
+  Given \( F : \Cont_{I+1} \), extend \( \Subst{F}{\Blank} \) to a wild endofunctor on \( \ContCart_I \).
+\end{problem}
+\begin{construction}
+  Straightforward.
+\end{construction}
+Substitution commutes with composition under the interpretation of containers,
+that is for suitable \( F \) and \( G \),
+there is an equivalence of types
+\( \llbracket \Subst{F}{G} \rrbracket \vec{X} \simeq \llbracket F \rrbracket(\vec{X}, \llbracket G \rrbracket\vec{X}) \), natural in \( \vec{X} : I \to \Type \).
+In particular, a fixed point of containers \( \varphi : \CartIso{\Subst{F}{G}}{G} \) induces a fixed point of \( \Ext{F}(\vec{X}, \Blank ) \).
+If initial, then this corresponds exactly to a container fixed point in the sense of \cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
 
-\subsection{Fixed Point Containers}
+We thus define smallest fixed points of a signature functor \( F \) without reference to its associated functor \( \Ext{F} \),
+namely as initial algebras of the wild functor \( \Subst{F}{\Blank} \).
+Let us set this up precisely:
+\begin{problem}[note={\( \Subst{F}{\Blank} \)-algebras}]
+  Given \( F : \Cont_{I+1} \), define the structure of a wild category \( \Alg{\Subst{F}{\Blank}} \),
+  such that
+  \begin{itemize}
+    \item objects are of type \( \sum_{G : \Cont_I} \Cart{\Subst{F}{G}}{G} \),
+    \item morphisms \( \Alg{\Subst{F}{\Blank}}((G, g), (H, h)) \) are container morphisms
+      \( f : \Cart{G}{G'} \) together with a path ensuring that the square
+      \[
+        \begin{tikzcd}
+          \Subst{F}{G} \ar[r, -multimap, "\Subst{F}{f}"] & \Subst{F}{H} \\
+          G \ar[r, -multimap, "f"{swap}] & H
+          \ar[from=1-1, to=2-1, -multimap, "h"{swap}]
+          \ar[from=1-2, to=2-2, -multimap, "g"]
+        \end{tikzcd}
+      \]
+      commutes.
+  \end{itemize}
+\end{problem}
+\begin{construction}
+  Identities and composite morphisms are defines as expected.
+  However, unlike in 1-categories, unitality and associativity of composition is not automatically inherited from the base category \( \Cont_I \),
+  since we have to ensure that there are higher paths between composite squares, such as
+  \[
+    \begin{tikzcd}
+      \Subst{F}{G} \ar[r, -multimap, "\Subst{F}{f}"]
+        & \Subst{F}{H} \ar[r, -multimap, "\Subst{F}{\Op{id}}"]
+        & \Subst{F}{H}  \\
+      G \ar[r, -multimap, "f"{swap}]
+        & H \ar[r, -multimap, "\Op{id}"{swap}]
+        & H
+      \ar[from=1-1, to=2-1, -multimap, "h"{swap}]
+      \ar[from=1-2, to=2-2, -multimap, "g"]
+      \ar[from=1-3, to=2-3, -multimap, "g"]
+    \end{tikzcd}
+    =
+    \begin{tikzcd}
+      \Subst{F}{G} \ar[r, -multimap, "\Subst{F}{f}"] & \Subst{F}{H} \\
+      G \ar[r, -multimap, "f"{swap}] & H
+      \ar[from=1-1, to=2-1, -multimap, "h"{swap}]
+      \ar[from=1-2, to=2-2, -multimap, "g"]
+    \end{tikzcd}
+  \]
+  Fortunately, these higher paths are straightforward to construct by extensionality of container morphisms.
+\end{construction}
 
-Assuming we have access to \( \W \)-types, we encode inductive types as smallest fixed-points of the substitution functor:
-For all \( F : \Cont_{I+1} \), there is a container \( {\mu F} : \Cont_I \)
-such that \( \Subst{F}{\mu F} \CartEquiv {\mu F} \).
-The positions at the \( I + 1\)\textsuperscript{st} index describe
-occurrences of the recursion variable \( Y \) in an informal fixed-point specification of an inductive type
-such as \( \Op{List}(X) = \mu Y.\, 1 + X \times Y \).
+Unlike other concepts, we can express initiality in wild categories coherently as a \emph{property} of an object:
+an object \( 0 \) of a wild category \( \mathcal{C} \) is \emph{initial}
+if for any other object \( X \), the type of morphisms \( \mathcal{C}(0, X) \) is \emph{contractible}.
+We define:
+\begin{definition}
+  A smallest fixed point of a signature container \( F : \Cont_{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
+\end{definition}
+Spelled out, an \( F \)-fixed point it consists of a \emph{carrier} \( M : \Cont_I \)
+and a structure map \( m : \Cart{\Subst{F}{M}}{M} \)
+such that for any other algebra \( (G, g) \), the type of morphisms \( \Alg{\Subst{F}{\Blank}}((M, m), (G, g)) \) is contractible.
+The latter means exactly that there is a unique map \( r : \Cart{M}{G} \) that commutes with the structure maps \( m \) and \( g \).
+As a consequence, the carriers of smallest fixed points are equivalent (hence equal) as containers.
 
+We now show, assuming access to \( \W \)-types, that all containers admit smallest fixed points in this sense:
 Recall that for \( A : \Type \) and \( B : A \to \Type \),
 the type \( \W(A, B) \) has the single constructor
 \begin{equation*}
@@ -283,25 +385,9 @@ These let us derive a fixed-point to substitution:
   \end{construction}
 \end{problem}
 
-% \begin{example}
-%   Binary trees are inductive types such that \( \Op{Tr}(X) = X + X \times \Op{Tr}(X)^2 \).
-%   As a container, we encode \( \Op{Tr} \DefEq \mu \Op{T} : \Cont_1 \) as follows:
-%   \( \Op{T} = (\MkCont{S}{P}) \) is a binary container with a set of two shapes, \( \{ \Op{leaf}, \Op{branch} \} \),
-%   over which there are the following positions for each of the two indices:
-%   \begin{align*}
-%     P_0(\Op{leaf}) &\DefEq 1  & P_0(\Op{branch}) &\DefEq 1 \\
-%     P_1(\Op{leaf}) &\DefEq 0  & P_1(\Op{branch}) &\DefEq 2
-%   \end{align*}
-%   The positions \( P_0 \) and \( P_1 \) correspond, respectively, to occurrences of the variables
-%   \( X \) and \( Y \) in the fixed-point specifications \( \Op{Tr} = \mu Y.\, X + X \times Y^2 \).
-% \end{example}
-
-\begin{todo-block}
-  We observe the \( \mu \)-rule has the shape of an algebra for a \( \Subst{G}{\Blank} \)-functor,
-  given some container \( G \) derived from \( F \).
-\end{todo-block}
-
-We define morphisms out of a fixed-point via a non-dependent recursion principle:
+Together, \( \mu F \) and \( \In_F \) form an \( \Subst{F}{\Blank} \)-algebra.
+We define a non-dependent recursion principle for maps out of \( \mu F \),
+which yields a morphism into \emph{any} other algebra:
 \begin{problem}\label{mu-rec}
   Define an induction principle for morphisms out of \( \mu \)-containers.
   That is, a morphism
@@ -330,52 +416,100 @@ We define morphisms out of a fixed-point via a non-dependent recursion principle
     for all \( \alpha : \Cart{\Subst{F}{G}}{G} \).
 \end{problem}
 
-\begin{todo-block}
-  It should not be hard to show (either do it or check who has done it)
-  that \( \mu F, \In_F \) is the initial algebra of the wild endofunctor \( \Subst{F}{\Blank} \),
-  in the sense that for all \( \alpha : \Cart{\Subst{F}{G}}{G} \), the type of morphisms \( \alpha^\ast : \Cart{\mu F}{G} \)
-  such that \autoref{mu-rec-comm} commutes is contractible.
-\end{todo-block}
+In fact, this morphism is uniquely determined, hence we get a fixed point for any signature container:
+\begin{theorem}
+  For all \( F : \Cont_{I + 1}\), the pair \( (\mu F, \In_F) \) is an initial \( \Subst{F}{\Blank} \)-algebra,
+  hence a smallest fixed-point of \( F \).
+  \begin{proof}
+    Let \( (G, \alpha) \) be a second \( \Subst{F}{\Blank} \)-algebra.
+    By definition, \( \Op{rec}_F(\alpha) : \Cart{\mu F}{G} \) is an algebra morphism.
+    It remains to show that for any other algebra morphism \( \alpha^* : \Cart{\mu F}{G} \), \( \Op{rec}_F(\alpha) = \alpha^* \).
+    \todo[inline]{Finish this by sketching the proof}
+  \end{proof}
+\end{theorem}
+
+\subsection{The \texorpdfstring{\( \mu \)}{fixed-point}-rule}
+
+% The positions at the \( I + 1\)\textsuperscript{st} index describe
+% occurrences of the recursion variable \( Y \) in an informal fixed-point specification of an inductive type
+% such as \( \Op{List}(X) = \mu Y.\, 1 + X \times Y \).
+
+% \begin{example}
+%   Binary trees are inductive types such that \( \Op{Tr}(X) = X + X \times \Op{Tr}(X)^2 \).
+%   As a container, we encode \( \Op{Tr} \DefEq \mu \Op{T} : \Cont_1 \) as follows:
+%   \( \Op{T} = (\MkCont{S}{P}) \) is a binary container with a set of two shapes, \( \{ \Op{leaf}, \Op{branch} \} \),
+%   over which there are the following positions for each of the two indices:
+%   \begin{align*}
+%     P_0(\Op{leaf}) &\DefEq 1  & P_0(\Op{branch}) &\DefEq 1 \\
+%     P_1(\Op{leaf}) &\DefEq 0  & P_1(\Op{branch}) &\DefEq 2
+%   \end{align*}
+%   The positions \( P_0 \) and \( P_1 \) correspond, respectively, to occurrences of the variables
+%   \( X \) and \( Y \) in the fixed-point specifications \( \Op{Tr} = \mu Y.\, X + X \times Y^2 \).
+% \end{example}
+
+Having convinced ourselves that fixed points do exist, we can now characterize their derivatives.
+Let \( F : \Cont_2 \).
+If we think of \( \mu F \) as an \( F \)-branching tree, then \( \Der{\mu F} \) represents a type of trees with a hole.
+Such a hole must be either in the position of a leaf or occur recursively in a branch,
+which are given by the positions \( P_0 \) and \( P_1 \).
+If \( F \) is discrete, then derivative of \( \mu F \) is thus again a fixed point,
+with branching given by \( \Der_0{F} \) and \( \Der_1{F} \):
+there is an equivalence
+\(
+  \CartIso { \mu F' }{ \Der(\mu F) }
+\)
+in which
+\(
+  F' \DefEq
+    { \Wk{\Der_0{F}[ {\mu F} ]} }
+      \CPlus
+    (
+      \Wk{\Der_1{F}[ {\mu F} ]}
+        \CTimes
+      \Proj{1}
+    )
+\).
+Proving that this is the case even for untruncated containers is not entirely straightforward.
+There is however hope to recover at least a morphism out of \( \mu F' \) into \( \Der{\mu F} \) by recursion:
 
 \begin{problem}[note={Lax \( \mu \)-rule}]\label{mu-rule}
-  For \( F : \Cont_2 \), define a cartesian morphism
+  For \( F : \Cont_2 \), define by recursion a cartesian morphism
   \[
-    \MuRule_F
-      :
-    \Cart%
-      {
-        \mu(
-          { \Wk{\Der_0{F}[ {\mu F} ]} }
-            \CPlus
-          (
-            \Wk{\Der_1{F}[ {\mu F} ]}
-              \CTimes
-            \Proj{1}
-          )
-        )
-      }%
-      {\Der(\mu F)}
+    \MuRule_F : \Cart{ \mu F' }{ \Der(\mu F) }
   \]
+  where
+  \(
+    F' \DefEq
+      { \Wk{\Der_0{F}[ {\mu F} ]} }
+        \CPlus
+      (
+        \Wk{\Der_1{F}[ {\mu F} ]}
+          \CTimes
+        \Proj{1}
+      )
+    : \Cont_2
+  \).
 \end{problem}
   \begin{construction}
-    We define the morphism using the induction principle (\autoref{mu-rec}).
     Our goal is to provide some
-    \[
-      \alpha : \Cart{G[\Der(\mu F)]}{\Der(\mu F)}
-    \]
-    where \( G \DefEq { \Wk{\Der_0{F}[ {\mu F} ]} } \CPlus ( \Wk{\Der_1{F}[ {\mu F} ]} \CTimes \Proj{1} ) \).
-    First note that \( G \) is a container in two variables,
+    \(
+      \alpha : \Cart{ \Subst{F'}{\Der{\mu F}} }{ \Der{\mu F} }
+    \).
+    First note that \( F' \) is a container in two variables,
     and substitution into the second replaces \( \Proj{1} \), i.e.\@ there is an equivalence
     \[
       \gamma_{\Highlight{Y}} :
-      G[\Highlight{Y}]
+      F'[\Highlight{Y}]
         \mathrel{\CartEquiv}
       { \Der_0{F}[ {\mu F} ] } \CPlus ( {\Der_1{F}[ {\mu F} ]} \CTimes \Highlight{Y} )
     \]
-    Equipped with this knowledge, we use the chain rule to define \( \alpha \) as the following composite:
+    for any choice of \( \Highlight{Y} : \Cont_1 \).
+    In particular, for \( \Highlight{Y} \JudgeEq \Der(\mu F) \),
+    the codomain of \( \gamma_{\Der{\mu F}} \) is exactly the domain of the binary chain rule (cf.~\autoref{binary-chain-rule}).
+    Hence, we define \( \alpha \) as the following composite:
     \begin{equation*}
       \begin{tikzcd}[column sep=large]
-        {G[\Highlight{\Der(\mu F)}]}
+        {F'[\Highlight{\Der(\mu F)}]}
           &
         {\Der(\mu F)}
           \\
@@ -396,7 +530,7 @@ We define morphisms out of a fixed-point via a non-dependent recursion principle
         \ar[from=1-1, to=1-2, dashed, -multimap, "\alpha"]
       \end{tikzcd}
     \end{equation*}
-    Lastly, define \( \MuRule_F \DefEq \Op{rec}_{G}(\alpha) : \Cart{ \mu G }{ \Der{(\mu F)} } \).
+    Lastly, let \( \MuRule_F \DefEq \Op{rec}_{F'}(\alpha) : \Cart{ \mu F' }{ \Der{(\mu F)} } \).
   \end{construction}
 
 % Our goal is to derive a fixed-point rule \( \varphi : \CartIso{\mu F^{\prime}}{\Der{\mu F}} \) for some \( F^{\prime} \).

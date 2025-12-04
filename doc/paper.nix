@@ -22,6 +22,7 @@
           cmll
           csquotes
           enumitem
+          stmaryrd
           tcolorbox
           tikz-cd
           todonotes
