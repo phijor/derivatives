@@ -10,6 +10,7 @@ open import Derivative.Decidable
     ; Discrete
     ; isProp¬
     )
+open import Derivative.Embedding
 open import Derivative.Remove
 open import Derivative.Sum as Sum using (_⊎_ ; inl ; inr)
 open import Derivative.W as W
@@ -17,9 +18,10 @@ open import Derivative.W as W
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.Properties using (equivAdjointEquiv ; hasRetract ; hasSection ; congEquiv)
 open import Cubical.Foundations.HLevels
-open import Cubical.Foundations.Path using (toPathP⁻)
+open import Cubical.Foundations.Path using (toPathP⁻ ; flipSquare)
 open import Cubical.Foundations.Transport using (subst⁻ ; subst⁻-filler)
 open import Cubical.Functions.Embedding
+open import Cubical.Functions.Surjection
 open import Cubical.Relation.Nullary.Properties using (EquivPresDec ; EquivPresDiscrete)
 open import Cubical.Relation.Nullary.HLevels using (isPropDiscrete)
 open import Cubical.Data.Unit as Unit using (Unit*)
@@ -59,6 +61,13 @@ forget-isolated = fst
 _-_ : (A : Type ℓ) (a : A °) → Type ℓ
 A - a = A ∖ (a .fst)
 
+isIsolated→K : (a : A °) (p : a .fst ≡ a .fst) → p ≡ refl
+isIsolated→K (a , is-isolated-a) p = isIsolated→isPropPath a is-isolated-a a p refl
+
+isIsolated→isContrLoop : (a : A) → isIsolated a → isContr (a ≡ a)
+isIsolated→isContrLoop a is-isolated-a .fst = refl
+isIsolated→isContrLoop a is-isolated-a .snd = sym ∘ isIsolated→K (a , is-isolated-a)
+
 
 module _ {ℓB : Level} {B : A → Type ℓB}
   ((a₀ , a₀≟_) : A °)
@@ -95,7 +104,10 @@ DiscreteIsolated (a , a≟_) (b , b≟_) = Dec.map Isolated≡ Isolated≢ (a≟
 
 opaque
   isSetIsolated : isSet (A °)
-  isSetIsolated = Dec.Discrete→isSet DiscreteIsolated
+  -- isSetIsolated = Dec.Discrete→isSet DiscreteIsolated
+  isSetIsolated (a₀ , isolated-a₀) (a₁ , isolated-a₁) = isOfHLevelRespectEquiv 1 ΣPathP≃PathPΣ $ isPropΣ
+    (isIsolated→isPropPath a₀ isolated-a₀ a₁)
+    (λ p → isOfHLevelPathP 1 (isPropIsIsolated a₁) _ _)
 
 module _ (_≟_ : Discrete A) where
   Discrete→isIsolated : ∀ a → isIsolated a
@@ -135,12 +147,20 @@ IsolatedSubstEquiv e = Σ-cong-equiv e lemma where
   lemma a = propBiimpl→Equiv (isPropIsIsolated _) (isPropIsIsolated _) (isIsolatedPreserveEquiv e a) (isIsolatedPreserveEquiv' e a)
 
 opaque
-  EmbeddingReflectIsolated : (f : A → B) → isEmbedding f → ∀ {a} → isIsolated (f a) → isIsolated a
-  EmbeddingReflectIsolated f emb-f {a} isolated-fa a′ =
+  InjReflectIsolated : (f : A → B) → (∀ a b → f a ≡ f b → a ≡ b) → ∀ {a} → isIsolated (f a) → isIsolated a
+  InjReflectIsolated f inj-f {a} isolated-fa a′ =
     Dec.map
-      (isEmbedding→Inj emb-f a a′)
+      (inj-f a a′)
       (λ fa≢fa′ a≡a′ → fa≢fa′ $ cong f a≡a′)
       (isolated-fa (f a′))
+
+  EmbeddingReflectIsolated : (f : A → B) → isEmbedding f → ∀ {a} → isIsolated (f a) → isIsolated a
+  EmbeddingReflectIsolated f emb-f = InjReflectIsolated f (isEmbedding→Inj emb-f)
+
+  DecEmbeddingCreateIsolated : (f : A → B) → isEmbedding f → (∀ b → Dec (fiber f b)) → ∀ {a} → isIsolated a → isIsolated (f a)
+  DecEmbeddingCreateIsolated f emb-f dec-fib {a} isolated-a b with (dec-fib b)
+  ... | (yes (a′ , fa′≡b)) = Dec.map (λ a≡a′ → cong f a≡a′ ∙ fa′≡b) (λ a≢a′ fa≡b → a≢a′ (isEmbedding→Inj emb-f _ _ (fa≡b ∙ sym fa′≡b))) (isolated-a a′)
+  ... | (no ¬fib) = no (¬fib ∘ (a ,_))
 
 isIsolatedFromInl : ∀ {a : A} → isIsolated (inl {B = B} a) → isIsolated a
 isIsolatedFromInl = EmbeddingReflectIsolated inl Sum.isEmbedding-inl
@@ -180,6 +200,10 @@ opaque
     → isIsolated (subst B p b)
   isIsolatedSubst B p {b} = isIsolatedTransport b (cong B p)
 
+subst° : (B : A → Type ℓ) {x y : A} (p : x ≡ y) → B x ° → B y °
+subst° B p (b , isolated-b) .fst = subst B p b
+subst° B p (b , isolated-b) .snd = isIsolatedSubst B p isolated-b
+
 isProp→isIsolated : isProp A → (a : A) → isIsolated a
 isProp→isIsolated prop-A a b = yes $ prop-A a b
 
@@ -192,32 +216,12 @@ isContr→isIsolatedCenter = isProp→isIsolated ∘ isContr→isProp
 remove-emb : (a : A) → A ∖ a → A
 remove-emb a = fst
 
-module _ {ℓS ℓP ℓQ} {S : Type ℓS} {P : S → Type ℓP} {Q : S → Type ℓQ} where
-  private
-    variable
-      s : S
-      f : P s → W S P
-
-  isIsolatedTop : ∀ {q : Q s} → isIsolated q → isIsolated {A = Wᴰ S P Q (sup s f)} (top q)
-  isIsolatedTop {s} {f} {q} isolated-q (top q′) = {! EmbeddingReflectIsolated !}
-  isIsolatedTop {s} {f} {q} isolated-q (below p b) = {! !}
-
-  isIsolatedFromTop : ∀ {q : Q s} → isIsolated {A = Wᴰ S P Q (sup s f)} (top q) → isIsolated q
-  isIsolatedFromTop {s} {f} {q} isolated-top = isIsolatedFromInl isolated-inl where
-    isolated-inl : isIsolated {A = Q s ⊎ (Σ[ p ∈ P s ] (Wᴰ S P Q (f p)))} (inl q)
-    isolated-inl = isIsolatedPreserveEquiv (Wᴰ-out-equiv _ _ _ s f) (top q) isolated-top
-
-  isIsolatedBelow : ∀ {p : P s} {wᴰ : Wᴰ S P Q (f p)}
-    → isIsolated {A = Σ[ p ∈ P s ] Wᴰ S P Q (f p)} (p , wᴰ)
-    → isIsolated {A = Wᴰ S P Q (sup s f)} (below p wᴰ)
-  isIsolatedBelow = {! !}
-
-  isIsolatedFromBelow : ∀ {p : P s} {wᴰ : Wᴰ S P Q (f p)}
-    → isIsolated {A = Wᴰ S P Q (sup s f)} (below p wᴰ)
-    → isIsolated {A = Σ[ p ∈ P s ] Wᴰ S P Q (f p)} (p , wᴰ)
-  isIsolatedFromBelow {s} {f} {p} {wᴰ} isolated-below = isIsolatedFromInr isolated-inr where
-    isolated-inr : isIsolated {A = Q s ⊎ (Σ[ p ∈ P s ] (Wᴰ S P Q (f p)))} (inr (p , wᴰ))
-    isolated-inr = isIsolatedPreserveEquiv (Wᴰ-out-equiv _ _ _ s f) (below p wᴰ) isolated-below
+-- Yeah, that's a pity:
+DecIsolated→DecProp : (∀ (A : Type ℓ) → Dec (Isolated A)) → ∀ P → isProp P → Dec P
+DecIsolated→DecProp all-dec P is-prop-P = Dec.map forget-isolated nope (all-dec P)
+  where
+    nope : ¬ (P °) → ¬ P
+    nope heck-no p = heck-no (invEq (isProp→IsolatedEquiv is-prop-P) p)
 
 isIsolatedΣ : ∀ {ℓB} {B : A → Type ℓB}
   → {a : A} {b : B a}
@@ -238,8 +242,19 @@ isIsolatedΣ {B} {a} {b} isolated-a isolated-b (a′ , b′) = discrete (isolate
 
 Σ-isolate : ∀ {ℓA ℓB} (A : Type ℓA) (B : A → Type ℓB)
   → (Σ[ a° ∈ A ° ] (B (a° .fst)) °) → (Σ[ a ∈ A ] B a) °
-Σ-isolate A B ((a , isolated-a) , b , isolated-b) .fst = a , b
+Σ-isolate A B ((a , isolated-a) , b , isolated-b) .fst .fst = a
+Σ-isolate A B ((a , isolated-a) , b , isolated-b) .fst .snd = b
 Σ-isolate A B ((a , isolated-a) , b , isolated-b) .snd = isIsolatedΣ isolated-a isolated-b
+
+_,°_ : ∀ {B : A → Type ℓ} (a : A °) (b : B (a .fst) °) → (Σ[ a ∈ A ] B a) °
+a ,° b = Σ-isolate _ _ (a , b)
+
+isIsolatedΣSndProp : ∀ {ℓP} {P : A → Type ℓP}
+  → {a : A} {p : P a}
+  → isIsolated a
+  → isProp (P a)
+  → isIsolated {A = Σ A P} (a , p)
+isIsolatedΣSndProp {P} {a} {p} isolated-a is-prop-P = isIsolatedΣ isolated-a (isProp→isIsolated is-prop-P p)
 
 isIsolatedΣSnd→Discrete : {ℓ : Level}
   → (A : Type ℓ)
@@ -258,7 +273,7 @@ isIsolatedΣSnd→Discrete {ℓ} A Σ-isolated-fst a₀ a₁ = goal where
   goal : Dec (a₀ ≡ a₁)
   goal = Σ-isolated-fst B' a₀ b₀ is-isolated-pair a₁
 
-module _ {A : Type ℓ} {B : A → Type ℓ} (is-equiv-Σ-isolate : isEquiv (Σ-isolate A B)) where
+module _ {ℓA ℓB} {A : Type ℓA} {B : A → Type ℓB} (is-equiv-Σ-isolate : isEquiv (Σ-isolate A B)) where
   private
     unisolate-equiv : (Σ[ a ∈ A ] B a) ° ≃ (Σ[ a° ∈ A ° ] (B (a° .fst)) °)
     unisolate-equiv = invEquiv (_ , is-equiv-Σ-isolate)
@@ -316,13 +331,104 @@ isIsolatedPair→isEquiv-Σ-isolated {A} {B} is-isolated-pair = isoToIsEquiv Σ-
   Σ-isolate-Iso .Iso.rightInv _ = Isolated≡ refl
   Σ-isolate-Iso .Iso.leftInv _ = ΣPathP (Isolated≡ refl , Isolated≡ refl)
 
+Σ-isolate-fiber-equiv : ∀ (A : Type ℓ) (B : A → Type ℓ)
+  → (a : A) (b : B a) (isolated-ab : isIsolated {A = Σ A B} (a , b))
+  → fiber (Σ-isolate A B) ((a , b) , isolated-ab) ≃ (isIsolated a × isIsolated b)
+Σ-isolate-fiber-equiv A B a b isolated-ab =
+  (Σ[ ((a′ , _) , (b′ , _)) ∈ Σ[ (a , _) ∈ A ° ] B a ° ] ((a′ , b′) , _) ≡ _)
+    ≃⟨ Σ-cong-equiv-snd (λ _ → invEquiv $ Σ≡PropEquiv isPropIsIsolated) ⟩
+  (Σ[ ((a′ , _) , (b′ , _)) ∈ Σ[ (a , _) ∈ A ° ] B a ° ] (a′ , b′) ≡ (a , b))
+    ≃⟨ Σ-cong-equiv-snd (λ _ → invEquiv ΣPathP≃PathPΣ) ⟩
+  (Σ[ ((a′ , _) , (b′ , _)) ∈ Σ[ (a , _) ∈ A ° ] B a ° ] Σ[ p ∈ a′ ≡ a ] PathP (λ i → B (p i)) b′ b)
+    ≃⟨ strictEquiv
+      (λ { (((a′ , h-a′) , (b′ , h-b′)) , p , pᴰ) → ((a′ , sym p) , (b′ , symP pᴰ) , (h-a′ , h-b′)) })
+      (λ { ((a′ , p) , (b′ , pᴰ) , (h-a′ , h-b′)) → (((a′ , h-a′) , (b′ , h-b′)) , sym p , symP pᴰ) })
+    ⟩
+  (Σ[ (a′ , p) ∈ singl a ] Σ[ (b′ , pᴰ) ∈ singlP (λ i → B (p i)) b ] isIsolated a′ × isIsolated b′)
+    ≃⟨ Σ-contractFst (isContrSingl a) ⟩
+  (Σ[ (b′ , pᴰ) ∈ singl b ] isIsolated a × isIsolated b′)
+    ≃⟨ Σ-contractFst (isContrSingl b) ⟩
+  (isIsolated a × isIsolated b)
+    ≃∎
+
+isProp-fiber-Σ-isolate : ∀ (A : Type ℓ) (B : A → Type ℓ)
+  → ∀ y → isProp (fiber (Σ-isolate A B) y)
+isProp-fiber-Σ-isolate A B y = isOfHLevelRespectEquiv 1 (invEquiv $ Σ-isolate-fiber-equiv A B _ _ _)
+  $ isProp× (isPropIsIsolated _) (isPropIsIsolated _)
+
+isEmbedding-Σ-Isolate : ∀ (A : Type ℓ) (B : A → Type ℓ) → isEmbedding (Σ-isolate A B)
+isEmbedding-Σ-Isolate A B = hasPropFibers→isEmbedding $ isProp-fiber-Σ-isolate A B
+
+Σ-isolate-embedding : ∀ (A : Type ℓ) (B : A → Type ℓ)
+  → (Σ[ a° ∈ A ° ] (B (a° .fst)) °) ↪ ((Σ[ a ∈ A ] B a) °)
+Σ-isolate-embedding A B .fst = Σ-isolate A B
+Σ-isolate-embedding A B .snd = isEmbedding-Σ-Isolate A B
+
+isEquiv-Σ-isolate≃isSurjection-Σ-isolate : (A : Type ℓ) (B : A → Type ℓ) → isEquiv (Σ-isolate A B) ≃ isSurjection (Σ-isolate A B)
+isEquiv-Σ-isolate≃isSurjection-Σ-isolate A B =
+  isEquiv _
+    ≃⟨ isEquiv≃isEquiv' _ ⟩
+  (∀ y → isContr (fiber (Σ-isolate A B) y))
+    ≃⟨ equivΠCod (λ y → isContr≃mereInh×isProp) ⟩
+  (∀ y → ∥ fiber _ y ∥₁ × isProp (fiber _ y))
+    ≃⟨ equivΠCod (λ y → Σ-contractSnd λ _ → inhProp→isContr (isProp-fiber-Σ-isolate _ _ y) isPropIsProp) ⟩
+  (∀ y → ∥ fiber _ y ∥₁)
+    ≃∎
+
+isSurjection-Σ-isolate≃isIsolatedPair : (A : Type ℓ) (B : A → Type ℓ)
+  → isSurjection (Σ-isolate A B) ≃ (∀ a → (b : B a) → isIsolated {A = Σ A B} (a , b) → isIsolated a × isIsolated b)
+isSurjection-Σ-isolate≃isIsolatedPair A B =
+  (∀ y → ∥ fiber _ y ∥₁)
+    ≃⟨ equivΠCod (λ y → PT.propTruncIdempotent≃ (isProp-fiber-Σ-isolate _ _ y))  ⟩
+  (∀ y → fiber _ y)
+    ≃⟨ curryEquiv ⟩
+  ((a,b : Σ A B) → (h : isIsolated a,b) → fiber (Σ-isolate A B) (a,b , h))
+    ≃⟨ curryEquiv ⟩
+  ((a : A) (b : B a) (h : isIsolated (a , b)) → fiber (Σ-isolate A B) ((a , b) , h))
+    ≃⟨ equivΠCod (λ a → equivΠCod λ b → equivΠCod λ h → Σ-isolate-fiber-equiv A B a b h) ⟩
+  ((a : A) (b : B a) → isIsolated (a , b) → isIsolated a × isIsolated b)
+    ≃∎
+
 isEquiv-Σ-isolate≃isIsolatedPair : (A : Type ℓ) (B : A → Type ℓ)
- → isEquiv (Σ-isolate A B) ≃ (∀ {a₀ : A} {b₀ : B a₀} → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀ × isIsolated b₀)
-isEquiv-Σ-isolate≃isIsolatedPair A B = propBiimpl→Equiv
-  (isPropIsEquiv _)
-  (isPropImplicitΠ2 λ a₀ b₀ → isProp→ (isProp× (isPropIsIsolated a₀) (isPropIsIsolated b₀)))
-  isEquiv-Σ-isolate→isIsolatedPair
-  isIsolatedPair→isEquiv-Σ-isolated
+ → isEquiv (Σ-isolate A B) ≃ (∀ (a₀ : A) (b₀ : B a₀) → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀ × isIsolated b₀)
+isEquiv-Σ-isolate≃isIsolatedPair A B = isEquiv-Σ-isolate≃isSurjection-Σ-isolate A B ∙ₑ isSurjection-Σ-isolate≃isIsolatedPair A B
+
+isIsolated→isEmbeddingInjSnd : ∀ {ℓA ℓB} {A : Type ℓA} {B : A → Type ℓB}
+  → (a₀ : A) → isIsolated a₀
+  → isEmbedding {A = B a₀} {B = Σ A B} (a₀ ,_)
+isIsolated→isEmbeddingInjSnd {A} {B} a₀ is-isolated-a₀ = λ b₀ b₁ → equivIsEquiv $ isoToEquiv (path-iso b₀ b₁) where
+  path-iso : (b₀ b₁ : B a₀) → Iso (b₀ ≡ b₁) ((a₀ , b₀) ≡ (a₀ , b₁))
+  path-iso b₀ b₁ =
+    (b₀ ≡ b₁)
+      Iso⟨ invIso (Σ-contractFstIso (isIsolated→isContrLoop a₀ is-isolated-a₀)) ⟩
+    Σ[ p ∈ a₀ ≡ a₀ ] PathP (λ i → B (p i)) b₀ b₁
+      Iso⟨ ΣPathPIsoPathPΣ {B = λ i → B} ⟩
+    ((a₀ , b₀) ≡ (a₀ , b₁))
+      ∎Iso
+
+isIsolatedFst→isIsolatedSnd≃isIsolatedPair : ∀ {ℓA ℓB} {A : Type ℓA} {B : A → Type ℓB}
+  → {a₀ : A} → isIsolated a₀
+  → (b₀ : B a₀)
+  → isIsolated b₀ ≃ isIsolated {A = Σ A B} (a₀ , b₀)
+isIsolatedFst→isIsolatedSnd≃isIsolatedPair {A} {B} {a₀} isolated-a₀ b₀ = propBiimpl→Equiv
+  (isPropIsIsolated b₀)
+  (isPropIsIsolated (a₀ , b₀))
+  (isIsolatedΣ isolated-a₀)
+  (InjReflectIsolated (a₀ ,_) is-inj-map-snd)
+  where
+    is-inj-map-snd : (b₁ b₂ : B a₀) → (a₀ , b₁) ≡ (a₀ , b₂) → b₁ ≡ b₂
+    is-inj-map-snd b₁ b₂ q = goal where
+      q₁ : a₀ ≡ a₀
+      q₁ = cong fst q
+
+      q₂ : PathP (λ i → B (q₁ i)) b₁ b₂
+      q₂ = cong snd q
+
+      h : q₁ ≡ refl
+      h = isIsolated→isPropPath a₀ isolated-a₀ a₀ _ _
+
+      goal : b₁ ≡ b₂
+      goal = subst (λ (- : a₀ ≡ a₀) → PathP (λ i → B (- i)) b₁ b₂) h q₂
 
 isEquiv-Σ-isolate→DiscreteFst : (A : Type ℓ)
   → ((B : A → Type ℓ) → isEquiv (Σ-isolate A B))
@@ -455,6 +561,37 @@ stitch'-β (a₀ , a₀≟_) f {b₀} with (a₀≟ a₀)
 ... | (yes p) = refl
 ... | (no ¬p) = ex-falso $ ¬p refl
 
+stitch-eval : (a° : A °) → (f : A → B) (b₀ : B)
+  → (p : b₀ ≡ f (a° .fst))
+  → stitch a° (f ∘ fst , b₀) ≡ f
+stitch-eval a° f b₀ p using (a₀ , a₀≟_) ← a° = funExt λ a → eval-dec a (a₀≟ a) module stitch-eval where
+  eval-dec : ∀ a → Dec (a₀ ≡ a) → stitch a° (f ∘ fst , b₀) a ≡ f a
+  eval-dec a (yes a₀≡a) = elimIsolated-β-yes a° (λ _ _ → b₀) (f ∘ fst) a a₀≡a ∙∙ p ∙∙ cong f a₀≡a
+  eval-dec a (no ¬a₀≡a) = stitch-β' a° (f ∘ fst) (a , ¬a₀≡a)
+
+stitch-eval-yes-filler : (a° : A °) → (f : A → B) (b₀ : B)
+  → (p : b₀ ≡ f (a° .fst))
+  → Square (stitch-β a° (f ∘ fst) {b₀ = b₀}) (refl′ (f (a° .fst))) (stitch-eval a° f b₀ p ≡$ a° .fst) p
+stitch-eval-yes-filler a° f b₀ p using (a₀ , a₀≟_) ← a° = λ i j → eval-dec-filler (a₀≟ a₀) (~ j) i module stitch-eval-yes-filler where
+  open stitch-eval a° f b₀ p
+
+  eval-dec-filler : (a₀≟a₀ : Dec (a₀ ≡ a₀)) → Square p (eval-dec a₀ a₀≟a₀) (sym $ stitch-β a° (f ∘ fst) {b₀}) (refl′ (f a₀))
+  eval-dec-filler (yes a₀≡a₀) = goal
+    where
+      filler : Square p (eval-dec a₀ (yes a₀≡a₀)) _ (cong f a₀≡a₀)
+      filler = doubleCompPath-filler (elimIsolated-β-yes a° (λ _ _ → b₀) (f ∘ fst) a₀ a₀≡a₀) p (cong f a₀≡a₀)
+
+      adjust₁ : cong f a₀≡a₀ ≡ refl
+      adjust₁ i j = f (isIsolated→K a° a₀≡a₀ i j)
+
+      adjust₂ : elimIsolated-β-yes a° (λ _ _ → b₀) (f ∘ fst) a₀ a₀≡a₀ ≡ stitch-β a° (f ∘ fst) {b₀}
+      adjust₂ = cong (elimIsolated-β-yes a° _ (f ∘ fst) a₀) (isIsolated→K a° a₀≡a₀)
+
+      goal : Square p (eval-dec a₀ (yes a₀≡a₀)) (sym $ stitch-β a° (f ∘ fst)) (refl′ (f a₀))
+      goal = subst2 (λ r s → Square p (eval-dec a₀ (yes a₀≡a₀)) (sym r) s) adjust₂ adjust₁ filler
+
+  eval-dec-filler (no ¬a₀≡a₀) = ex-falso $ ¬a₀≡a₀ refl
+
 unstitch : (a° : A °) → (A → B) → (((A ∖ a° .fst) → B) × B)
 unstitch (a₀ , _) f .fst = f ∘ fst
 unstitch (a₀ , _) f .snd = f a₀
@@ -505,6 +642,61 @@ stitchEquiv a° .snd = isEquivStitch' a°
 unstitchEquiv : (a° : A °) → (A → B) ≃ ((A ∖ a° .fst → B) × B)
 unstitchEquiv a° .fst = unstitch a°
 unstitchEquiv a° .snd = isoToIsEquiv $ invIso $ isEquivStitch.stich-iso _ (a° .snd)
+
+module _ {ℓS ℓP ℓQ} {S : Type ℓS} {P : S → Type ℓP} {Q : S → Type ℓQ} where
+  private
+    variable
+      s : S
+      f : P s → W S P
+
+  opaque
+    isIsolatedTop : ∀ {q : Q s} → isIsolated q → isIsolated {A = Wᴰ S P Q (sup s f)} (top q)
+    isIsolatedTop {s} {f} {q} = isIsolatedPreserveEquiv' (Wᴰ-out-equiv S P Q s f) (top q) ∘ isIsolatedInl
+
+  top° : Q s ° → Wᴰ S P Q (sup s f) °
+  top° = Σ-map top λ q → isIsolatedTop
+
+  isIsolatedFromTop : ∀ {q : Q s} → isIsolated {A = Wᴰ S P Q (sup s f)} (top q) → isIsolated q
+  isIsolatedFromTop {s} {f} {q} isolated-top = isIsolatedFromInl isolated-inl where
+    isolated-inl : isIsolated {A = Q s ⊎ (Σ[ p ∈ P s ] (Wᴰ S P Q (f p)))} (inl q)
+    isolated-inl = isIsolatedPreserveEquiv (Wᴰ-out-equiv _ _ _ s f) (top q) isolated-top
+
+  opaque
+    isIsolatedBelow : ∀ {p : P s} {wᴰ : Wᴰ S P Q (f p)}
+      → isIsolated {A = Σ[ p ∈ P s ] Wᴰ S P Q (f p)} (p , wᴰ)
+      → isIsolated {A = Wᴰ S P Q (sup s f)} (below p wᴰ)
+    isIsolatedBelow {s} {f} {p} {wᴰ} = isIsolatedPreserveEquiv' (Wᴰ-out-equiv S P Q s f) (below p wᴰ) ∘ isIsolatedInr
+
+  below° : (Σ[ p ∈ P s ] Wᴰ S P Q (f p)) ° → Wᴰ S P Q (sup s f) °
+  below° = Σ-map (uncurry below) λ _ → isIsolatedBelow
+
+  isIsolatedFromBelow : ∀ {p : P s} {wᴰ : Wᴰ S P Q (f p)}
+    → isIsolated {A = Wᴰ S P Q (sup s f)} (below p wᴰ)
+    → isIsolated {A = Σ[ p ∈ P s ] Wᴰ S P Q (f p)} (p , wᴰ)
+  isIsolatedFromBelow {s} {f} {p} {wᴰ} isolated-below = isIsolatedFromInr isolated-inr where
+    isolated-inr : isIsolated {A = Q s ⊎ (Σ[ p ∈ P s ] (Wᴰ S P Q (f p)))} (inr (p , wᴰ))
+    isolated-inr = isIsolatedPreserveEquiv (Wᴰ-out-equiv _ _ _ s f) (below p wᴰ) isolated-below
+
+  opaque
+    isEmbeddingTop : ∀ {s f} → isEmbedding {B = Wᴰ S P Q (sup s f)} top
+    isEmbeddingTop {s} {f} = isEmbeddingPostecompEquiv→isEmbedding top (Wᴰ-out-equiv _ _ _ s f) Sum.isEmbedding-inl
+
+    isEmbeddingTop° : ∀ {s} {f} → isEmbedding {B = Wᴰ S P Q (sup s f) °} top°
+    isEmbeddingTop° {s} {f} = isPropSnd→isEmbedding-Σ-map isEmbeddingTop isPropIsIsolated (isPropIsIsolated ∘ top)
+
+    -- isEmbeddingBelow : ∀ {s f} (p : P s) → isIsolated p → isEmbedding {B = Wᴰ S P Q (sup s f)} (below p)
+    -- isEmbeddingBelow {s} {f} p is-isolated-p = isEmbeddingPostecompEquiv→isEmbedding (below p) (Wᴰ-out-equiv _ _ _ s f) $
+    --   isEmbeddingComp
+    --     (p ,_) inr
+    --     (isIsolated→isEmbeddingInjSnd p is-isolated-p) Sum.isEmbedding-inr
+
+    isEmbeddingBelow : ∀ {s f} → isEmbedding {A = Σ[ p ∈ P s ] Wᴰ S P Q (f p)} {B = Wᴰ S P Q (sup s f)} (uncurry below)
+    isEmbeddingBelow {s} {f} = isEmbeddingPostecompEquiv→isEmbedding (uncurry below) (Wᴰ-out-equiv _ _ _ s f) Sum.isEmbedding-inr
+
+    -- isEmbeddingBelow° : ∀ {s f} (p : P s °) → isEmbedding {B = Wᴰ S P Q (sup s f) °} (λ wᴰ → below° (p ,° wᴰ))
+    -- isEmbeddingBelow° (p , isolated-p) = isPropSnd→isEmbedding-Σ-map (isEmbeddingBelow p isolated-p) isPropIsIsolated (isPropIsIsolated ∘ below p)
+    isEmbeddingBelow° : ∀ {s f} → isEmbedding {A = (Σ[ p ∈ P s ] Wᴰ S P Q (f p)) °} {B = Wᴰ S P Q (sup s f) °} below°
+    isEmbeddingBelow° {s} {f} = isPropSnd→isEmbedding-Σ-map isEmbeddingBelow isPropIsIsolated (isPropIsIsolated ∘ uncurry below)
 
 module S1 where
   open import Cubical.HITs.S1

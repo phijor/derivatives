@@ -156,35 +156,47 @@ First, observe that any dependent pair of isolated points defines an isolated po
 \end{proposition}
 
 If we had an inverse to \( \SigmaIsolate \), then the converse would hold as well.
-It turns out that this requirement is not only sufficient, but also necessary:
+It turns out that this requirement is not only sufficient, but also necessary.
+Inspecting the fibers of \( \SigmaIsolate \), we notice that they are all propositions,
+hence \( \SigmaIsolate \) must be an embedding:
+\begin{lemma}\label{is-embedding-sigma-isolate}
+  For all \( A : \Type \), \( B : A \to \Type \), and \( y \JudgeEq ((a, b), \Blank) : \Isolated{(\sum_{A} B)} \),
+  there is an equivalence of propositions \( \Op{fiber}_{\SigmaIsolate}(y) \simeq \Op{isIsolated}(a) \times \Op{isIsolated}(b) \).
+  In particular, \( \SigmaIsolate_{A, B} \) is an embedding.
+  \begin{proof}
+    By extensionality of paths in \( \Sigma \)-types, we re-phrase the type of fibers over \( y \) in terms of singletons
+    over \( a \) and \( b \), namely
+    \[
+        \textstyle
+        \sum_{(a', \Blank) : \Op{singl}(a)}
+        \sum_{(b', \Blank) : \Op{singl}(p_{*}{b})}
+          \Op{isIsolated}(a') \times \Op{isIsolated}(b')
+    \]
+    The claim follows by contracting away these singletons.
+  \end{proof}
+\end{lemma}
 
+A map is an equivalence if and only if it is both an equivalence and a surjection (i.e.\@ a map whose fibers are merely inhabited),
+hence we obtain the following characterization of isolated points in \( \Sigma \)-types:
 \begin{lemma}\label{is-equiv-sigma-isolate-iff-isolated-pair}
   Let \( A : \Type \) and \( B : A \to \Type \).
   The following are equivalent:
-  \begin{enumerate}
+  \begin{enumerate}[label=(\arabic*)]
     \item \label{is-equiv-sigma-isolate-iff-isolated-pair-is-equiv}
       \( \SigmaIsolate_{A,B} \) is an equivalence.
+    \item \label{is-equiv-sigma-isolate-iff-isolated-pair-is-surj}
+      \( \SigmaIsolate_{A,B} \) is a surjection.
     \item \label{is-equiv-sigma-isolate-iff-isolated-pair-pair}
-      For all \( a_0 : A \) and \( b_0 : B(a_0) \),
-      if \( (a_0 , b_0) \) is isolated in \( \Sigma_{A} B \),
-      then both \( a_0 \) and \( b_0 \) are isolated.
+      For all \( a : A \) and \( b : B(a) \),
+      if \( (a , b) \) is isolated in \( \Sigma_{A} B \),
+      then both \( a \) and \( b \) are isolated.
   \end{enumerate}
   \begin{proof}
-    The first implies the second as follows:
-    Assume that \( \SigmaIsolate_{A,B} \) is an equivalence with inverse
-    \( u : \Isolated{\big(\sum_{a : A} B(a)\big)} \to \sum_{a : \Isolated{A}} \Isolated{B(a)} \).
-    Let \( a_0 : A \), \( b_0 : B(a_0) \), and \( h_0 : \Op{isIsolated}{(a_0, b_0)} \).
-    Apply \( u \) to get some \( y \DefEq u((a_0 , b_0) , h_0) \)
-    with components \( y \JudgeEq ((a, h_a), (b, h_b)) \).
-    Note that \( h_a \) and \( h_b \) are proofs that \( a \) and \( b \) are isolated, respectively.
-    We are done if we can show that \( p : a_0 = a \) and \( \cramped{b_0 =_{p} b} \),
-    since transport along these paths preserves isolated points.
-    Indeed, both \( \SigmaIsolate(y) \JudgeEq ((a, b), \mathunderscore) \) and \( ((a_0, b_0), p_0) \)
-    lie in \( \Op{fiber}_u(y) \), which is necessarily contractible,
-    hence \( (a_0 , b_0) = (a, b) \) as desired.
-
-    In the other direction, the assumption provides the missing properties to define a tentative inverse to \( \SigmaIsolate \);
-    that this is the correct inverse follows as being isolated is a proposition (cf.~\autoref{is-prop-is-isolated}).
+    Since \( \SigmaIsolate \) is an embedding, \ref{is-equiv-sigma-isolate-iff-isolated-pair-is-equiv} and \ref{is-equiv-sigma-isolate-iff-isolated-pair-is-surj} are clearly equivalent.
+    We show that \ref{is-equiv-sigma-isolate-iff-isolated-pair-is-surj} if and only if \ref{is-equiv-sigma-isolate-iff-isolated-pair-pair}:
+    By \autoref{is-embedding-sigma-isolate}, the fiber over an arbitrary \( y \JudgeEq ((a, b), h) : \Isolated{(\sum_A\!B)} \) is equivalent to
+    \( \Op{isIsolated}(a) \times \Op{isIsolated}(b) \).
+    By currying, \ref{is-equiv-sigma-isolate-iff-isolated-pair-pair} holds if and only if all fibers of \( \SigmaIsolate \) are inhabited.
   \end{proof}
 \end{lemma}
 
