@@ -23,19 +23,22 @@ between \( F \) and \( \mu F \) is.
 
 To define and reason about an operation \( \mu \) taking a container to a fixed-point,
 we first have to recall the definition indexed containers.
-These encode data types polymorphic in more than one variable,
-which are necessary to transcribe fixed-point description of types such as
-\( \Op{List}(X) = \mu Y.\, 1 + X \times Y \)
-into actual containers.
+These encode data types polymorphic in more than one variable:
 \begin{definition}[note={Indexed containers}]
   Let \( I : \Type \). The type of \emph{\( I \)-ary} or \emph{\( I \)-indexed containers} is
   \(
     \Cont_{I} \DefEq \sum_{S : \Type} (I \to S \to \Type)
   \).
 \end{definition}
-Each index \( i : I \) corresponds to a variable in the type that a container describes.
-For example, a description of type like \( F(X, Y) = 1 + X \times Y \) would be encoded as a binary container, indexed by the type \( 2 \).
 Ordinary containers correspond to unary containers, \( \Cont_{1} \).
+Each index \( i : I \) corresponds to a variable in the type that a container describes.
+In particular, \( I + 1 \)-indexed containers are used to transcribe fixed-point expressions that contain an extra recursion variable.
+We call \( I + 1 \)-indexed containers \emph{signature containers}; their fixed points describe inductive types.
+\begin{example}
+  In the informal specification \( \Op{List}(X) = \mu Y.\, 1 + X \times Y \),
+  the expression \( F(X, Y) = 1 + X \times Y \) is transcribed into a binary container \( F \), indexed by the type \( 2 \).
+  Its positions at index \( \Inr(\bullet) : 2 \) encode occurrences of the recursion variable \( Y \).
+\end{example}
 
 Cartesian morphisms between containers \(F , G : \Cont_{I} \) are defined by ranging over all indices \( I \):
 \[
@@ -57,7 +60,7 @@ in this case \( \pi_i \) is equivalent to a container whose \( i \)th type of po
 and \( 0 \) for any other direction.
 As expected, indexed containers are closed under constants \( \CConst(A) \), sums \( (\CPlus) \) and products \( (\CTimes) \).
 Similarly, we can lift derivatives to indexed containers.
-For an \( I \)-indexed container, we can take a derivative in the direction of each index, as long as equality with that index is decidable:
+For an \( I \)-indexed container, we can take a derivative with respect to any index \( i : I \), as long as equality with \( i \) is decidable:
 \begin{definition}[note={Derivative of \( I \)-ary containers}]
   Let \( F \JudgeEq (\MkCont{S}{P}) : \Cont_I \) and \( i : \Isolated{I} \).
   The \( i \)th derivative \( {\Der_i}F \DefEq (\MkCont{S'}{P'}) : \Cont_I \) is defined as follows:
@@ -96,7 +99,7 @@ its construction factors into smaller steps that make it obvious why, in general
     \renewcommand*{\L}{\Op{L}}
     \newcommand*{\R}{\Op{R}}
     Let \( F \JudgeEq (\MkCont{S}{P}) \), \( G \JudgeEq (\MkCont{T}{Q}) \).
-    We define auxiliary containers \( H_1, H_2 \) and factor the morphism through some equivalences as follows:
+    We define auxiliary containers \( H_1, H_2 \) and factor the morphism through a pair of equivalences as follows:
     \[
       \begin{tikzcd}[column sep=large]
         {\mathllap{\L \DefEq {}} {{\Der_0{F}}[G] \CPlus \big( {\Der_1{F}}[G] \CTimes \Der{G} \big)}}
@@ -120,6 +123,7 @@ its construction factors into smaller steps that make it obvious why, in general
           \label{binary-chain-rule-shape-equiv}
     \end{align}
     Denote this equivalence by \( f_1 : {\L}_{\Sh} \simeq U_1 \), and define \( H_1 \DefEq (\MkCont{U_1}{{\L}_{\Ps} \circ f_1^{\Inv}}) \).
+    This defines the equivalence \( \CartIso{\L}{H_1} \) to the left.
 
     On the other side we obtain an equivalence \( f_2 : U_2 \simeq {\R}_{\Sh} \)
     by distributing \( \Isolated{(\Blank)} \) over binary sums:
@@ -136,10 +140,11 @@ its construction factors into smaller steps that make it obvious why, in general
       &\simeq
         {\R}_{\Sh}
     \end{align*}
-    Again, let \( H_2 \DefEq (\MkCont{U_2}{{\R}_{\Ps} \circ f_2}) \).
+    Let \( H_2 \DefEq (\MkCont{U_2}{{\R}_{\Ps} \circ f_2}) \),
+    which yields the equivalence \( \CartIso{H_2}{\R} \) to the right.
 
     Let us now define \( \eta : H_1 \multimap H_2 \).
-    As in \autoref{lax-chain-rule}, define the shape map \( \eta_{\Sh} : U_1 \to U_2 \) using \( \SigmaIsolate_{P_1(s),Q(f\shortminus)} \).
+    As in \autoref{lax-chain-rule}, define the shape map \( \eta_{\Sh} : U_1 \to U_2 \) using \( \SigmaIsolate_{P_1(s),Q(f(\Blank))} \).
     On positions, the equivalence
     \(
       \eta_{\Ps}(u) : H_2^{\Ps}(\eta_{\Sh}(u)) \simeq H_1^{\Ps}(u)
@@ -151,13 +156,11 @@ its construction factors into smaller steps that make it obvious why, in general
       ( \Isolated{P_0(s)} + B ) \setminus \Inl(p_0)
         \simeq
       ( \Isolated{P_0(s)} \setminus p_0 ) + B
-      \quad
-      (\text{where } B \DefEq {\textstyle \sum_{p : P_1(s)} Q(fp) }),
     \]
-    which is an instance of \autoref{sum-remove-equiv}.
+    for \( B \DefEq {\textstyle \sum_{p : P_1(s)} Q(fp) } \), which is an instance of \autoref{sum-remove-equiv}.
 
     When \( u \JudgeEq (s, f, \Inr(p_1, q)) \) for some \( p_1 : \Isolated{P_1(s)} \) and \( q : \Isolated{Q(fp)} \),
-    we rewrite as follows:
+    we rewrite the type of positions as follows:
     \begin{align}
       H_2^{\Ps}(\eta_{\Sh}(s , f , \Inr(p_1, q)))
         &\mathrel{\JudgeEq}
@@ -197,11 +200,11 @@ Factorized like that, it becomes obvious that the binary chain rule is strong wh
   \end{proof}
 \end{proposition}
 
-\subsection{Fixed Point Containers}
+\subsection{Fixed Point Containers}\label{fixed-point-containers}
 
 To show how derivatives of untruncated containers interact with fixed points,
 we first have to give a suitable specification of what we mean by such a \enquote{fixed point}.
-Traditionally, the (smallest) fixed point associated to an signature container is constructed as follow:
+Traditionally, the (smallest) fixed point associated to a signature container is constructed as follow:
 Given an \( I \)-indexed and set-truncated container \( (\MkCont{S}{P}) \),
 it is interpreted as a functor \( \llbracket \MkCont{S}{P} \rrbracket : [\Op{Set}^I, \Op{Set}] \),
 which takes families \( \vec{X} : I \to \Op{Set} \) to
@@ -231,10 +234,11 @@ that is \( (\infty,1) \)-categories in an appropriate sense.
 If they were, one could attempt to show that \( \llbracket \Blank \rrbracket \) is a structure-preserving embedding:
 a particularly elegant way to show that \( \llbracket \Blank \rrbracket \) is fully faithful for sets
 is given by \citeauthor{Damato2023RevisitingContainersCubical} in \cite{Damato2023RevisitingContainersCubical} and relies almost exclusively on the Yoneda-lemma,
-which should make it amenable to generalization.
+which should make the proof amenable to generalization.
 
 In light of this, we are going to define a notion fixed point entirely internal to the wild category of containers,
-which should nonetheless correspond to the more traditional definition, barring the above-mentioned issues.
+which does not reference the interpretation functor \( \Ext{\Blank} \) at all.
+Barring the above-mentioned issues, this should correspond to the more traditional definitions of container fixed point.
 First, note that substitution generalizes to an operation that places a container inside the positions at index \( \Nothing : I + 1 \) of a \( I + 1 \)-indexed container:
 \begin{definition}
     Substitution is an operation \( \Subst{\Blank}{\Blank} : \Cont_{I+1} \to \Cont_{I} \to \Cont_{I} \),
@@ -246,7 +250,7 @@ First, note that substitution generalizes to an operation that places a containe
         \qedhere
     \end{align*}
 \end{definition}
-Substitution into a fixed \( F : \Cont_{I+1} \), \( \Subst{F}{\Blank} \) behaves functorially:
+Substitution into a fixed container behaves functorially:
 \begin{problem}
   Given \( F : \Cont_{I+1} \), extend \( \Subst{F}{\Blank} \) to a wild endofunctor on \( \ContCart_I \).
 \end{problem}
@@ -254,7 +258,7 @@ Substitution into a fixed \( F : \Cont_{I+1} \), \( \Subst{F}{\Blank} \) behaves
   Straightforward.
 \end{construction}
 Substitution commutes with composition under the interpretation of containers,
-that is for suitable \( F \) and \( G \),
+that is for \( F : \Cont_{I + 1} \) and \( G : \Cont_I \),
 there is an equivalence of types
 \( \llbracket \Subst{F}{G} \rrbracket \vec{X} \simeq \llbracket F \rrbracket(\vec{X}, \llbracket G \rrbracket\vec{X}) \), natural in \( \vec{X} : I \to \Type \).
 In particular, a fixed point of containers \( \varphi : \CartIso{\Subst{F}{G}}{G} \) induces a fixed point of \( \Ext{F}(\vec{X}, \Blank ) \).
@@ -311,7 +315,7 @@ Let us set this up precisely:
 Unlike other concepts, we can express initiality in wild categories coherently as a \emph{property} of an object:
 an object \( 0 \) of a wild category \( \mathcal{C} \) is \emph{initial}
 if for any other object \( X \), the type of morphisms \( \mathcal{C}(0, X) \) is \emph{contractible}.
-We define:
+Hence we say:
 \begin{definition}
   A smallest fixed point of a signature container \( F : \Cont_{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
 \end{definition}
@@ -354,7 +358,6 @@ can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \)
   \hspace*{\fill}
 \end{center}
 for all \( a : A \) and \( f : B(a) \to \W(A, B) \).
-
 Together, we can use \( \W \) and \( \bar{\W} \) to define the shapes and position, respectively, of the smallest fixed-point container:
 \begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \Cont_{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \Cont_I \):
@@ -388,21 +391,14 @@ These let us derive a fixed-point to substitution:
 Together, \( \mu F \) and \( \In_F \) form an \( \Subst{F}{\Blank} \)-algebra.
 We define a non-dependent recursion principle for maps out of \( \mu F \),
 which yields a morphism into \emph{any} other algebra:
-\begin{problem}\label{mu-rec}
-  Define an induction principle for morphisms out of \( \mu \)-containers.
-  That is, a morphism
-  \begin{center}
-    \hspace*{\fill}
-    {
-      \AxiomC{\( F : \Cont_{I+1} \)}
-      \AxiomC{\( G : \Cont_I \)}
-      \AxiomC{\( \alpha : \Cart{F[G]}{G} \)}
-      \TrinaryInfC{\( \Op{rec}_{F}(\alpha) : \Cart{\mu F}{G} \)}
-      \DisplayProof
-    }
-    \hspace*{\fill}
-  \end{center}
-  with a filler of
+\begin{problem}[note={\( \mu \)-recursion}]\label{mu-rec}
+  Define a recursion principle for morphisms out of \( \mu \)-containers.
+  That is, for any \( F : \Cont_{I+1} \), \( G : \Cont_I \) and \( \alpha : \Cart{F[G]}{G} \),
+  give a morphism
+  \[
+      \Op{rec}_{F}(\alpha) : \Cart{\mu F}{G}
+  \]
+  and a filler of
     \begin{equation}\label{mu-rec-comm}
       \begin{tikzcd}[column sep=huge]
         \Subst{F}{\mu F} & \Subst{F}{G} \\
@@ -415,6 +411,50 @@ which yields a morphism into \emph{any} other algebra:
     \end{equation}
     for all \( \alpha : \Cart{\Subst{F}{G}}{G} \).
 \end{problem}
+\begin{construction}
+  Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
+  Abbreviate \( \Op{rec}_{F}(\alpha) \) by \( \Op{rec} \).
+  On shapes, \( \Rec \)  is defined by \( \W \)-recursion,
+  \begin{align*}
+    \Rec_{\Sh} &: \W(S, P) \to T \\
+    \Rec_{\Sh} &\DefEq \lambda(\Sup(s, f)).\, \alpha_{\Sh} (s, \Rec_{\Sh} \circ f)
+  \end{align*}
+  For any \( i : I \) and \( w : \W(S, P) \), there is a map of positions
+  typed \( u : Q_i(\Rec_{\Sh}(w)) \to \bar{\W}_{S,P,\vec{P}}(w) \),
+  again defined by induction on \( w \JudgeEq \Sup(s, f) \) as the composite
+  \[
+    \begin{tikzcd}
+      Q_i(\alpha_{\Sh}(s , \Rec_{\Sh} \circ f)
+        \ar[r, dashed, "u"]
+        \ar[d, "{\alpha_{\Ps}(i, \Rec_{\Sh} \circ f)}"{swap}]
+        &
+      \bar{\W}_{S,P,\vec{P}}(\Sup(s, f))
+        \\
+      \vec{P}_i(s) + \sum_{p \in P(s)} Q_i(\Rec_{\Sh}(f(p)))
+        \ar[r, "u^*"{swap}]
+        &
+      \vec{P}_i(s) + \sum_{p \in P(s)} \bar{\W}_{S,P,\vec{P}}(\Sup(s, f))
+        \ar[u, "\operatorname{\Op{\bar{W}-in}}"{swap}]
+    \end{tikzcd}
+  \]
+  in which \( u^* \) applies \( u(f(p)) \) recursively in the second component of the \( \Sigma \)-type.
+  By induction, all maps in this composite are equivalences, hence it is the map underlying
+  the desired equivalence \( \Rec_{\Ps}(i, w) \) of positions.
+
+  To show that \eqref{mu-rec-comm} commutes, it suffices to find a filler for
+  \begin{equation}\label{mu-rec-out-filler}
+    \begin{tikzcd}[column sep=huge]
+      \Subst{F}{\mu F} & \Subst{F}{G} \\
+      {\mu F}          & G
+      \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\Op{rec}_F(\alpha)}"]
+      \ar[from=1-1, to=2-1, multimap-, "\Op{out}_F"{swap}]
+      \ar[from=2-1, to=2-2, -multimap, "\Op{rec}_F(\alpha)"{swap}]
+      \ar[from=1-2, to=2-2, -multimap, "\alpha"]
+    \end{tikzcd}
+  \end{equation}
+  as \( \Op{in}_F \) is an equivalence with inverse \( \Op{out}_F \).
+  This is done by \( \W \)-induction on the shapes of \( \mu F \).
+\end{construction}
 
 In fact, this morphism is uniquely determined, hence we get a fixed point for any signature container:
 \begin{theorem}
@@ -423,8 +463,35 @@ In fact, this morphism is uniquely determined, hence we get a fixed point for an
   \begin{proof}
     Let \( (G, \alpha) \) be a second \( \Subst{F}{\Blank} \)-algebra.
     By definition, \( \Op{rec}_F(\alpha) : \Cart{\mu F}{G} \) is an algebra morphism.
-    It remains to show that for any other algebra morphism \( \alpha^* : \Cart{\mu F}{G} \), \( \Op{rec}_F(\alpha) = \alpha^* \).
-    \todo[inline]{Finish this by sketching the proof}
+    It suffices to show that \( \Rec_F(\alpha) \) together with the filler \eqref{mu-rec-out-filler} is unique.
+    That is, for any other algebra morphism \( \alpha^* : \Cart{\mu F}{G} \),
+    there is a path \( p : \Op{rec}_F(\alpha) = \alpha^* \),
+    and over this path, there is a path \( q \) connecting the commuting squares
+    \[
+      \begin{tikzcd}[column sep=huge]
+        \Subst{F}{\mu F} & \Subst{F}{G} \\
+        {\mu F}          & G
+        \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\Op{rec}_F(\alpha)}"]
+        \ar[from=1-1, to=2-1, multimap-, "\Op{out}_F"{swap}]
+        \ar[from=2-1, to=2-2, -multimap, "\Op{rec}_F(\alpha)"{swap}]
+        \ar[from=1-2, to=2-2, -multimap, "\alpha"]
+      \end{tikzcd}
+      \qquad\text{and}\qquad
+      \begin{tikzcd}[column sep=huge]
+        \Subst{F}{\mu F} & \Subst{F}{G} \\
+        {\mu F}          & G
+        \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\alpha^*}"]
+        \ar[from=1-1, to=2-1, multimap-, "\Op{out}_F"{swap}]
+        \ar[from=2-1, to=2-2, -multimap, "\alpha^*"{swap}]
+        \ar[from=1-2, to=2-2, -multimap, "\alpha"]
+      \end{tikzcd}
+    \]
+    Let us sketch the proof.
+    By induction, we define \( p \) as a composite of two paths, \( p_1 \) and \( p_2 \),
+    using the path which ensures that \( \alpha^* \) is a morphism of algebras.
+    The composite of these two paths is unique up to a unique dependent path, and from this we build the filler connecting the two squares above.
+    In our mechanized proof, this construction makes extensive use Cubical Agda's primitive support for dependent path types and cube filling operations.
+    This allows us to leave \texttt{transport} hell, and instead settle in \texttt{PathP}  purgatory.
   \end{proof}
 \end{theorem}
 
@@ -447,7 +514,7 @@ In fact, this morphism is uniquely determined, hence we get a fixed point for an
 %   \( X \) and \( Y \) in the fixed-point specifications \( \Op{Tr} = \mu Y.\, X + X \times Y^2 \).
 % \end{example}
 
-Having convinced ourselves that fixed points do exist, we can now characterize their derivatives.
+Having convinced ourselves that fixed points do exist even for untruncated containers, we can now characterize their derivatives.
 Let \( F : \Cont_2 \).
 If we think of \( \mu F \) as an \( F \)-branching tree, then \( \Der{\mu F} \) represents a type of trees with a hole.
 Such a hole must be either in the position of a leaf or occur recursively in a branch,

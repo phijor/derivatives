@@ -1,17 +1,14 @@
 \section{The Chain Rule}
 
-\begin{todo-block}
-  Explain that we are going to tackle a more advance law of derivatives:
-  In which way do derivatives of containers satisfy a chain rule?
-\end{todo-block}
-
-We expect the derivative of a composite of containers to satisfy a version of the chain rule
-\( (f \circ g)^{\prime} = (f^{\prime} \circ g) \cdot g^{\prime} \).
+In addition to the basic properties of the previous section,
+we expect the derivative to satisfy an analogue of the chain rule
+\( (f \circ g)^{\prime} = (f^{\prime} \circ g) \cdot g^{\prime} \),
+which describes how derivatives distribute over composition.
 In our setting, substitution \( \Subst{\Blank}{\Blank} \) takes on the role of composition,
 and for discrete containers, \citeauthor{AbbottEtAl2005DataDifferentiating} show that
 \( \Der{\Subst{F}{G}} \) is indeed isomorphic to \( \Subst{(\Der{F})}{G} \CTimes \Der{G} \).
-Attempting to lift their proof to untruncated containers,
-we run into difficulties:
+Na{\"\i}vely attempting to lift their proof to untruncated containers,
+we unfortunately run into difficulties:
 While it is possible to define a morphism from one to the other,
 it is not immediately clear that an inverse exists.
 Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
@@ -24,7 +21,7 @@ Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
       {\Der{(\Subst{F}{G})}}
   \]
 \end{problem}
-\begin{construction}[note={for \autoref{lax-chain-rule}}]
+\begin{construction}
   Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
   As usual, we have to construct a map on shapes and an equivalence of positions.
   On shapes, our goal is a map
@@ -126,38 +123,38 @@ in which
     { \sum_{s : S} \sum_{f : P_s \to T} \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)} }
 \)
 applies \( \SigmaIsolate_{P_s,Q_{f(\Blank)}} \).
-We will make this factorization explicit in the derivation of the chain rule for indexed containers (\autoref{binary-chain-rule}),
-but for now we can record the following fact:
+We will make this factorization explicit in the derivation of the chain rule for indexed containers (\autoref{binary-chain-rule}).
+We say that the chain rule for \( F \) and \( G \) is \emph{strong} if \( \Chain_{F,G} \) is an equivalence of containers;
+the above lets us immediately see when under which circumstances we can expect this to be the case.
 \begin{proposition}\label{strong-chain-rule-iff-is-equiv-sigma-isolate}
   Let \( F = (\MkCont{S}{P}) \) and \( G = (\MkCont{T}{Q}) \).
   The following are equivalent propositions:
   \begin{enumerate}
-    \item \label{strong-chain-rule-iff-is-equiv-sigma-isolate-1}
+    \item
       \( \Op{chain}_{F,G} \) is an equivalence of containers
-    \item \label{strong-chain-rule-iff-is-equiv-sigma-isolate-2}
-        \( \SigmaIsolate_{P_s,Q_{f(\Blank)}} \) is an equivalence for all \( s : S \) and \( f : P_s \to T \)
-    \item \label{strong-chain-rule-iff-is-equiv-sigma-isolate-3}
-      For all \( s : S \) and \( f : P_s \to T \), if \( (p, q) : \sum_{p : P_s} Q_{fp} \) is isolated,
-      then both \( p \) and \( q \) are isolated.
+    \item
+      \( \SigmaIsolate_{P_s,Q_{f(\Blank)}} \) is an equivalence for all \( s : S \) and \( f : P_s \to T \)
   \end{enumerate}
   \begin{proof}
-    Equivalence of the first two points follows from inspection of the definition of \( \Op{chain} \) in terms of \( \SigmaIsolate \).
-    Equivalence with the last point is \autoref{is-equiv-sigma-isolate-iff-isolated-pair}.
+    By inspection of the definition of \( \Op{chain} \) in terms of \( \SigmaIsolate \).
   \end{proof}
 \end{proposition}
+We can use any of the equivalent properties listed in \autoref{is-equiv-sigma-isolate-iff-isolated-pair}
+to express when exactly we have a strong chain rule.
+In particular, we know that \( \SigmaIsolate \) is always an embedding (cf.~\autoref{is-embedding-sigma-isolate}),
+hence we can think of \( \Chain_{F,G} \) as embedding \( \Subst{(\Der{F})}{G} \CTimes \Der{G} \)
+as a sub-container inside of \( \Der(\Subst{F}{G}) \).
 
-We say that the chain rule for \( F \) and \( G \) is \emph{strong} if \( \Chain_{F,G} \) is an equivalence of containers;
-the above lets us immediately see when we can and cannot expect this to be the case.
-Firstly, we recover a strong chain rule for \emph{discrete} containers, as expected by
-\cite[{Proposition~6.6}]{AbbottEtAl2005DataDifferentiating}:
+As expected by \cite[{Proposition~6.6}]{AbbottEtAl2005DataDifferentiating},
+the chain rule is strong for \emph{discrete} containers:
 \begin{theorem}\label{discrete-strong-chain-rule}
   For discrete containers \( F, G \), \( \Op{chain}_{F,G} \) is an equivalence.
   In particular, it is an isomorphism in the 1-category of set-truncated containers.
   \begin{proof}
-    The positions of \( F \) and \( G \) are discrete,
+    Positions of \( F \) and \( G \) are discrete,
     so by \autoref{discrete-is-equiv-sigma-isolated}
     \( \SigmaIsolate \) is an equivalence.
-    By the previous proposition, is \( \Op{chain}_{F,G} \) is an equivalence of containers.
+    By \autoref{strong-chain-rule-iff-is-equiv-sigma-isolate}, \( \Op{chain}_{F,G} \) is an equivalence of containers.
   \end{proof}
 \end{theorem}
 

@@ -403,26 +403,26 @@ This map is an equivalence whenever we can decide if we are removing from a chos
   \end{proof}
 \end{proposition}
 
-\begin{tikzpicture}
-  % \filldraw[
-  %   rounded corners=10pt,
-  %   fill=blue!30,
-  %   draw=blue!80!black,
-  %   thick,
-  % ]
-  %   (0,0) rectangle (7,4);
+% \begin{tikzpicture}
+%   % \filldraw[
+%   %   rounded corners=10pt,
+%   %   fill=blue!30,
+%   %   draw=blue!80!black,
+%   %   thick,
+%   % ]
+%   %   (0,0) rectangle (7,4);
 
-  \coordinate (O) at (-0.5,-0.5);
+%   \coordinate (O) at (-0.5,-0.5);
 
-  \draw[->] (O) -- ++(0,1) node[above] {\( b : B(a) \)};
-  \draw[->] (O) -- ++(1,0) node[right] {\( a : A \)};
+%   \draw[->] (O) -- ++(0,1) node[above] {\( b : B(a) \)};
+%   \draw[->] (O) -- ++(1,0) node[right] {\( a : A \)};
 
-  \foreach \x/\X in {0/6, 1/3, 2/5, 3/1, 4/4, 5/7} {
-    \foreach \y in {1,...,\X} {
-      \fill[black] (0.5+\x, \y*0.5) circle (2pt);
-    }
-  }
-\end{tikzpicture}
+%   \foreach \x/\X in {0/6, 1/3, 2/5, 3/1, 4/4, 5/7} {
+%     \foreach \y in {1,...,\X} {
+%       \fill[black] (0.5+\x, \y*0.5) circle (2pt);
+%     }
+%   }
+% \end{tikzpicture}
 
 \subsection{Grafting}
 
