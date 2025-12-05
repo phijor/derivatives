@@ -141,3 +141,37 @@ cart-Iso F G = go where
   go .Iso.inv = Ψ
   go .Iso.rightInv = rinv
   go .Iso.leftInv = {! !}
+
+cart-equiv : (F G : Container ℓ ℓ) → (Cart (F ⊗Id) G) ≃ (Cart F (∂ G))
+cart-equiv F G .fst f = unit F ⋆ ∂[ f ]
+cart-equiv F G .snd .equiv-proof g = goal where
+  fiber-equiv : {! !} ≃ (fiber (λ f → unit F ⋆ ∂[ f ]) g)
+  fiber-equiv =
+    {! !}
+      ≃⟨ {! !} ⟩
+    Σ[ f ∈ Cart (F ⊗Id) G ] (unit F ⋆ ∂[ f ]) ≡ g
+      ≃∎
+  goal : isContr (fiber (λ f → unit F ⋆ ∂[ f ]) g)
+  goal = {! !}
+
+cart-equiv' : (F G : Container ℓ ℓ) → (Cart F (∂ G)) ≃ (Cart (F ⊗Id) G)
+cart-equiv' F G .fst g = [ g ]⊗Id ⋆ counit G
+cart-equiv' F G .snd = isoToIsEquiv (invIso (cart-Iso F G))
+
+universal-arrow : (G : Container ℓ ℓ) → ∀ F → (g : Cart (F ⊗Id) G) → ∃![ g* ∈ Cart F (∂ G) ] [ g* ]⊗Id ⋆ counit G ≡ g
+universal-arrow G F g = cart-equiv' F G .snd .equiv-proof g
+
+module Generalized (G : Container ℓ ℓ) where
+  open Container G renaming (Shape to T ; Pos to Q)
+
+  ∂* : Container ℓ ℓ → Container ℓ ℓ
+  ∂* (S ◁ P) = (T → Σ[ s ∈ S ] (P s °)) ◁ λ f → (t : T) → P (f t .fst) - (f t .snd)
+
+  module _ (F : Container ℓ ℓ) where
+    unit' : Cart F (∂* (F ⊗ G))
+    unit' .shape s t = (s , t) , {! !}
+    unit' .pos = {! !}
+
+    counit' : Cart ((∂* F) ⊗ G) F
+    counit' .shape (f , t) = f t .fst
+    counit' .pos (f , t) = {! !}

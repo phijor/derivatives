@@ -73,6 +73,25 @@ open Cart
   ([ a ∈ A ° ]◁ (A - a))
     ⊸≃∎
 
+∂-𝕪 : (A : Type ℓ) → Discrete A → Equiv (∂ 𝕪[ A ⊎ (𝟙 ℓ) ]) (𝕂 (A ⊎ 𝟙 ℓ) ⊗ 𝕪[ A ])
+∂-𝕪 {ℓ} A discrete-A =
+  ∂ (𝟙 _ ◁ const (A ⊎ 𝟙 _))
+    ⊸≃⟨⟩
+  ([ (_ , x , _) ∈ 𝟙 ℓ × ((A ⊎ 𝟙 ℓ) °) ]◁ ((A ⊎ 𝟙 _) ∖ x))
+    ⊸≃⟨ Equiv-fst (isoToEquiv lUnit*×Iso) ⟩
+  ([ (x , _) ∈ ((A ⊎ 𝟙 ℓ) °) ]◁ ((A ⊎ 𝟙 _) ∖ x))
+    ⊸≃⟨ Equiv-inv $ Equiv-fst (Sum.⊎-right-≃ (invEquiv (isProp→IsolatedEquiv isPropUnit*)) ∙ₑ invEquiv IsolatedSumEquiv) ⟩
+  ([ x ∈ (A °) ⊎ 𝟙 ℓ ]◁ ((A ⊎ 𝟙 _) ∖ _))
+    ⊸≃⟨ Equiv-inv $ Equiv-fst (Sum.⊎-left-≃ (invEquiv $ Discrete→IsolatedEquiv discrete-A)) ⟩
+  ([ x ∈ A ⊎ 𝟙 ℓ ]◁ ((A ⊎ 𝟙 _) ∖ _))
+    ⊸≃⟨ Equiv-snd (λ x → RemoveRespectEquiv _ Sum.⊎-swap-≃) ⟩
+  ([ x ∈ A ⊎ 𝟙 ℓ ]◁ ((𝟙 _ ⊎ A) ∖ _))
+    ⊸≃⟨ Equiv-snd (λ { (just a) → {! replace-isolated-equiv !} ; nothing → {! !} }) ⟩
+  ((A ⊎ 𝟙 ℓ) ◁ (λ { (just a) → A ∖ a ; nothing → {! !} }))
+    ⊸≃⟨ [ isoToEquiv (invIso rUnit*×Iso) ◁≃ (λ { (just a) → {! invEquiv removeNothingEquiv !} ; nothing → {! !} }) ] ⟩
+  ((A ⊎ 𝟙 _) ◁ const (𝟘 _)) ⊗ (𝟙 _ ◁ const A)
+    ⊸≃∎
+
 module _ (F G : Container ℓ ℓ) where
   open Container F renaming (Shape to S ; Pos to P)
   open Container G renaming (Shape to T ; Pos to Q)
@@ -123,3 +142,12 @@ module _ {Ix : Type ℓ} (F : Ix → Container ℓ ℓ) where
   sum'-rule : Equiv (∂ (∑ F)) (∑ (∂ ∘ F))
   sum'-rule .Equiv.shape = Σ-assoc-≃
   sum'-rule .Equiv.pos ((ix , s) , p , _) = idEquiv $ F ix .Pos s ∖ p
+
+module _ (F : Container ℓ ℓ) where
+  dig : Cart (∂ F) (∂ (∂ F))
+  dig .shape (s , p°) = (s , {! !}) , {! !}
+  dig .pos = {! !}
+
+  derelict : Cart (∂ F) F
+  derelict .shape = fst
+  derelict .pos (s , p°) = {! !}

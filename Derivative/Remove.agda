@@ -98,3 +98,28 @@ module _ {B : A → Type ℓ} (a₀ : A) (b₀ : B a₀) (is-prop-a₀-loop : is
       goal : Empty.⊥
       goal = b₀≢b b₀≡b
       {-# INLINE goal #-}
+
+module Connected where
+  open import Cubical.Homotopy.Connected
+  open import Cubical.HITs.PropositionalTruncation as PT using (∥_∥₁)
+  import      Cubical.HITs.Truncation as Tr
+
+  isConnectedSuc→inh : ∀ k → isConnected (suc k) A → ∥ A ∥₁
+  isConnectedSuc→inh k (trunc-center , _) = Tr.rec (isProp→isOfHLevelSuc k PT.isPropPropTrunc) PT.∣_∣₁ trunc-center
+
+  isConnectedSuc→inhPath : ∀ k → isConnected (2 + k) A → (a b : A) → ∥ a ≡ b ∥₁
+  isConnectedSuc→inhPath k conn-A a b = isConnectedSuc→inh k $ isConnectedPath (suc k) conn-A a b
+
+  isConnected→isEmptyRemove : isConnected 2 A → ∀ a₀ → ¬ (A ∖ a₀)
+  isConnected→isEmptyRemove {A} 2-conn-A a₀ (a , a₀≢a) = contradiction where
+    1-conn-path : isConnected 1 (a₀ ≡ a)
+    1-conn-path = isConnectedPath 1 2-conn-A _ _
+
+    mere-path : Tr.∥ a₀ ≡ a ∥ 1
+    mere-path = 1-conn-path .fst
+
+    contradiction : Empty.⊥
+    contradiction = Tr.rec {n = 1} Empty.isProp⊥ a₀≢a mere-path
+
+  isConnected+2→isEmptyRemove : ∀ k → isConnected (k + 2) A → ∀ a₀ → ¬ (A ∖ a₀)
+  isConnected+2→isEmptyRemove k = isConnected→isEmptyRemove ∘ isConnectedSubtr 2 k

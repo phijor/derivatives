@@ -115,3 +115,6 @@ isEquiv-⊎-map-right→isEquiv {A} {C} f is-equiv-map .equiv-proof = goal where
   fiber-equiv : singl a ≃ fiber inl (inl a)
   fiber-equiv = Σ-cong-equiv-snd λ a′ → symEquiv ∙ₑ congInlEquiv
 ⊎-empty-right ¬B .snd .equiv-proof (inr b) = ex-falso (¬B b)
+
+⊎-fiber-≃ : {C : Type ℓ} {f : A ⊎ B → C} → ∀ y → fiber f y ≃ (fiber (f ∘ inl) y) ⊎ (fiber (f ∘ inr) y)
+⊎-fiber-≃ y = Σ-⊎-fst-≃

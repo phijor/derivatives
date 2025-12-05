@@ -5,7 +5,7 @@ open import Derivative.Container
 open import Derivative.Derivative
 open import Derivative.Isolated
 open import Derivative.Remove
-open import Derivative.Decidable
+open import Derivative.Decidable as Dec
 open import Derivative.Maybe
 
 open import Cubical.Foundations.Univalence
@@ -87,8 +87,6 @@ private
 
 module Universe (P : Type → Type)
   (is-prop-P : ∀ A → isProp (P A))
-  -- (is-P-⊎ : ∀ {A B : Type} → P A → P B → P (A ⊎ B))
-  -- (is-P-⊤ : P ⊤)
   (is-P-+1 : ∀ {A : Type} → P A → P (A ⊎ ⊤))
   (is-P-∖ : ∀ {A : Type} → P A → ∀ a → P (A ∖ a))
   where
@@ -102,14 +100,6 @@ module Universe (P : Type → Type)
   _-ᵁ_ : (X : U) → (x : ⟨ X ⟩) → U
   (X -ᵁ x) .fst = ⟨ X ⟩ ∖ x
   (X -ᵁ x) .snd = is-P-∖ (str X) x
-
-  -- _+ᵁ_ : (X Y : U) → U
-  -- (X +ᵁ Y) .fst = ⟨ X ⟩ ⊎ ⟨ Y ⟩
-  -- (X +ᵁ Y) .snd = is-P-⊎ (str X) (str Y)
-
-  -- ⊤ᵁ : U
-  -- ⊤ᵁ .fst = ⊤
-  -- ⊤ᵁ .snd = is-P-⊤
 
   _+1 : U → U
   (X +1) .fst = ⟨ X ⟩ ⊎ ⊤
@@ -148,28 +138,74 @@ module SubNat where
   isPropIsSub : ∀ X → isProp (isSub X)
   isPropIsSub X = isPropPropTrunc
 
-  -- XXX: Interleaving embedding
-  isSub-⊎ : ∀ {X Y} → isSub X → isSub Y → isSub (X ⊎ Y)
-  isSub-⊎ {X} {Y} = PT.map2 λ ι κ → {! !}
-
   isSub-⊤ : isSub ⊤
   isSub-⊤ = PT.∣ const 0 , hasPropFibers→isEmbedding (λ { n (tt* , _) (tt* , _) → Σ≡Prop (λ _ → isSetℕ _ _) refl }) ∣₁
 
   isSub-+1 : ∀ {X} → isSub X → isSub (X ⊎ ⊤)
   isSub-+1 {X} = PT.map _+1 where module _ (ι : X ↪ ℕ) where
+    suc-ι : (X ⊎ ⊤) → ℕ
+    suc-ι (just x) = suc (ι .fst x)
+    suc-ι nothing = 0
+
     _+1 : (X ⊎ ⊤) ↪ ℕ
-    _+1 .fst (just x) = suc (ι .fst x)
-    _+1 .fst nothing = 0
-    _+1 .snd = hasPropFibersOfImage→isEmbedding λ where
-      (just x) → {! !}
-      nothing (just x , p) y → {! !}
-      nothing (nothing , p) y → {! !}
+    _+1 .fst = suc-ι
+    _+1 .snd = injEmbedding isSetℕ cancel where
+      cancel : ∀ {x y : X ⊎ ⊤} → suc-ι x ≡ suc-ι y → x ≡ y
+      cancel {x = just x} {y = just y} p = cong just (isEmbedding→Inj (ι .snd) x y (injSuc p))
+      cancel {x = just x} {y = nothing} = ex-falso ∘ snotz
+      cancel {x = nothing} {y = just y} = ex-falso ∘ znots
+      cancel {x = nothing} {y = nothing} _ = refl′ nothing
 
   isSub-∖ : ∀ {X} → isSub X → ∀ x → isSub (X ∖ x)
-  isSub-∖ {X} = PT.rec {! !} λ ι x → PT.∣ compEmbedding ι (remove-embedding x) ∣₁
+  isSub-∖ {X} = PT.rec (isPropΠ λ x → isPropIsSub (X ∖ x)) λ ι x → PT.∣ compEmbedding ι (remove-embedding x) ∣₁
 
   open Universe isSub isPropIsSub isSub-+1 isSub-∖
     renaming (uBag to ℕBag)
 
   ∂-ℕBag : Equiv (∂ ℕBag) ℕBag
   ∂-ℕBag = ∂-uBag
+
+module SubV where
+  open import Derivative.Sum
+  open import Derivative.W
+
+  open V using (V ; El)
+
+  V-Bag : Container (ℓ-suc ℓ-zero) ℓ-zero
+  V-Bag .Container.Shape = V
+  V-Bag .Container.Pos = El
+
+  is-isolated-inh-suc : ∀ A → isIsolated (V.inh-suc A)
+  is-isolated-inh-suc (sup A f) = isIsolatedNothing
+
+  is-isolated-𝟘 : isIsolated V.𝟘
+  is-isolated-𝟘 (sup A f) = {! !}
+
+  pred : (Σ[ A ∈ V ] (El A °)) → V
+  pred (A , a₀ , _) = A V.- a₀
+
+  suc : V → Σ[ A ∈ V ] (El A °)
+  suc A = (A V.+1) , V.inh-suc A , is-isolated-inh-suc A
+
+  sec : section pred suc
+  sec (sup A f) = WPath→≡ _ _ (ua removeNothingEquiv , ua→ λ { ((just a) , _) → refl′ (f a) ; (nothing , nothing≢nothing) → ex-falso $ nothing≢nothing refl })
+
+  ret : retract pred suc
+  ret (sup A f , x°) = ΣPathP (WPath→≡ _ _ (ua (unreplace-isolated-equiv (x° .fst) (x° .snd)) , ua→ λ { (just a) → refl ; nothing → {!ret _  !} }) , {! !})
+  -- ret (sup A f , x°) = ΣPathP (sym (WPath→≡ _ _ (ua (replace-isolated-equiv (x° .fst) (x° .snd)) , ua→ bar)) , {! !})
+    where
+      bar : (a : A) → f a ≡ V.+1-El (f ∘ fst) (replace-isolated (x° .fst) (x° .snd) a)
+      bar a = Dec.rec (λ p → {! replace?-yes (x° .fst) (x° .snd) !}) (λ h → sym $ cong (V.+1-El (f ∘ fst)) (replace?-no (x° .fst) (x° .snd) (a , h))) (x° .snd a)
+        -- cong (V.+1-El (f ∘ fst)) (sym $ replace?-no (x° .fst) (x° .snd) (a , {! !}))
+      foo : (a : Maybe (A - x°)) → W-branch ((sup A f) V.+1) (⊎-map-left fst a) ≡ f (unreplace-isolated (x° .fst) a)
+      foo (just a) = refl′ (f (a .fst))
+      foo nothing = {! !}
+
+  ∂-V-Bag-shape-Iso : Iso (Σ[ A ∈ V ] (El A °)) V
+  ∂-V-Bag-shape-Iso .Iso.fun = pred
+  ∂-V-Bag-shape-Iso .Iso.inv = suc
+  ∂-V-Bag-shape-Iso .Iso.rightInv = sec
+  ∂-V-Bag-shape-Iso .Iso.leftInv = ret
+
+  ∂-V : Equiv (∂ V-Bag) V-Bag
+  ∂-V = {! !}

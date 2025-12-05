@@ -1,0 +1,105 @@
+module Derivative.Square where
+
+open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.Equiv
+open import Cubical.Foundations.Path
+open import Cubical.Foundations.HLevels using (isSet→SquareP)
+
+private
+  variable
+    ℓ ℓ' : Level
+
+module _
+  {A : I → I → Type ℓ}
+  {B : (i j : I) → A i j → Type ℓ'}
+  {x₀₀ : Σ (A i0 i0) (B i0 i0)}
+  {x₀₁ : Σ (A i0 i1) (B i0 i1)}
+  {x₀₋ : PathP (λ j → Σ (A i0 j) (B i0 j)) x₀₀ x₀₁}
+  {x₁₀ : Σ (A i1 i0) (B i1 i0)}
+  {x₁₁ : Σ (A i1 i1) (B i1 i1)}
+  {x₁₋ : PathP (λ j → Σ (A i1 j) (B i1 j)) x₁₀ x₁₁}
+  {x₋₀ : PathP (λ i → Σ (A i i0) (B i i0)) x₀₀ x₁₀}
+  {x₋₁ : PathP (λ i → Σ (A i i1) (B i i1)) x₀₁ x₁₁}
+  where
+
+  fstP : ∀ {ℓ ℓ'} {A : I → Type ℓ} {B : (i : I) → A i → Type ℓ'}
+    → {x₀ : Σ (A i0) (B i0)}
+    → {x₁ : Σ (A i1) (B i1)}
+    → PathP (λ i → Σ (A i) (B i)) x₀ x₁
+    → PathP A (fst x₀) (fst x₁)
+  fstP p = λ i → fst (p i)
+  {-# INLINE fstP #-}
+
+  sndP : ∀ {ℓ ℓ'} {A : I → Type ℓ} {B : (i : I) → A i → Type ℓ'}
+    → {x₀ : Σ (A i0) (B i0)}
+    → {x₁ : Σ (A i1) (B i1)}
+    → (p : PathP (λ i → Σ (A i) (B i)) x₀ x₁)
+    → PathP (λ i → B i (fstP p i)) (snd x₀) (snd x₁)
+  sndP p = λ i → snd (p i)
+  {-# INLINE sndP #-}
+
+  ΣSquareP :
+    Σ[ sq ∈ SquareP A (fstP x₀₋) (fstP x₁₋) (fstP x₋₀) (fstP x₋₁) ]
+      SquareP (λ i j → B i j (sq i j)) (sndP x₀₋) (sndP x₁₋) (sndP x₋₀) (sndP x₋₁)
+    → SquareP (λ i j → Σ (A i j) (B i j)) x₀₋ x₁₋ x₋₀ x₋₁
+  ΣSquareP sq = λ i j → (sq .fst i j) , (sq .snd i j)
+
+  ΣSquarePProp : ((a : A i1 i1) → isProp (B i1 i1 a))
+    → SquareP A (fstP x₀₋) (fstP x₁₋) (fstP x₋₀) (fstP x₋₁)
+    → SquareP (λ i j → Σ (A i j) (B i j)) x₀₋ x₁₋ x₋₀ x₋₁
+  fst (ΣSquarePProp propB₁₁ sqA i j) = sqA i j
+  snd (ΣSquarePProp propB₁₁ sqA i j) = sqB i j where
+    propB : (i j : I) → isProp (B i j (sqA i j))
+    propB i j = transport (λ k → isProp (B (~ k ∨ i) (~ k ∨ j) (sqA (~ k ∨ i) (~ k ∨ j)))) (propB₁₁ (sqA i1 i1))
+
+    sqB : SquareP (λ i j → B i j (sqA i j)) (sndP x₀₋) (sndP x₁₋) (sndP x₋₀) (sndP x₋₁)
+    sqB = isProp→SquareP (λ i j → propB i j) _ _ _ _
+
+  ΣSquarePSet : ((a : A i1 i1) → isSet (B i1 i1 a))
+    → SquareP A (fstP x₀₋) (fstP x₁₋) (fstP x₋₀) (fstP x₋₁)
+    → SquareP (λ i j → Σ (A i j) (B i j)) x₀₋ x₁₋ x₋₀ x₋₁
+  ΣSquarePSet is-set-B₁₁ sqA i j .fst = sqA i j
+  ΣSquarePSet is-set-B₁₁ sqA i j .snd = sqB i j where
+    is-set-B : (i j : I) → isSet (B i j (sqA i j))
+    is-set-B i j = transport (λ k → isSet (B (~ k ∨ i) (~ k ∨ j) (sqA (~ k ∨ i) (~ k ∨ j)))) (is-set-B₁₁ (sqA i1 i1))
+
+    sqB : SquareP (λ i j → B i j (sqA i j)) (sndP x₀₋) (sndP x₁₋) (sndP x₋₀) (sndP x₋₁)
+    sqB = isSet→SquareP (λ i j → is-set-B i j) _ _ _ _
+
+ΣSquare : {A : Type ℓ} {B : A → Type ℓ'}
+  {x₀₀ x₀₁ : Σ A B}
+  {x₀₋ : x₀₀ ≡ x₀₁}
+  {x₁₀ x₁₁ : Σ A B}
+  {x₁₋ : x₁₀ ≡ x₁₁}
+  {x₋₀ : x₀₀ ≡ x₁₀}
+  {x₋₁ : x₀₁ ≡ x₁₁}
+  → Σ[ sq ∈ Square (cong fst x₀₋) (cong fst x₁₋) (cong fst x₋₀) (cong fst x₋₁) ]
+      SquareP (λ i j → B (sq i j)) (cong snd x₀₋) (cong snd x₁₋) (cong snd x₋₀) (cong snd x₋₁)
+  → Square x₀₋ x₁₋ x₋₀ x₋₁
+ΣSquare {A = A} {B = B} = ΣSquareP {A = λ _ _ → A} {B = λ _ _ → B}
+
+ΣSquareProp : {A : Type ℓ} {B : A → Type ℓ'}
+  → (∀ a → isProp (B a))
+  → {x₀₀ x₀₁ : Σ A B}
+  → {x₀₋ : x₀₀ ≡ x₀₁}
+  → {x₁₀ x₁₁ : Σ A B}
+  → {x₁₋ : x₁₀ ≡ x₁₁}
+  → {x₋₀ : x₀₀ ≡ x₁₀}
+  → {x₋₁ : x₀₁ ≡ x₁₁}
+  → Square (cong fst x₀₋) (cong fst x₁₋) (cong fst x₋₀) (cong fst x₋₁)
+  → Square x₀₋ x₁₋ x₋₀ x₋₁
+ΣSquareProp {A = A} {B = B} propB = ΣSquarePProp {A = λ _ _ → A} {B = λ _ _ → B} propB
+
+equivSquareP :
+  {A B : I → I → Type ℓ}
+  {e₀₀ : (A i0 i0) ≃ (B i0 i0)}
+  {e₀₁ : (A i0 i1) ≃ (B i0 i1)}
+  {e₀₋ : PathP (λ j → (A i0 j) ≃ (B i0 j)) e₀₀ e₀₁}
+  {e₁₀ : (A i1 i0) ≃ (B i1 i0)}
+  {e₁₁ : (A i1 i1) ≃ (B i1 i1)}
+  {e₁₋ : PathP (λ j → (A i1 j) ≃ (B i1 j)) e₁₀ e₁₁}
+  {e₋₀ : PathP (λ i → (A i i0) ≃ (B i i0)) e₀₀ e₁₀}
+  {e₋₁ : PathP (λ i → (A i i1) ≃ (B i i1)) e₀₁ e₁₁}
+  → SquareP (λ i j → A i j → B i j) (congP (λ _ → equivFun) e₀₋) (congP (λ _ → equivFun) e₁₋) (congP (λ _ → equivFun) e₋₀) (congP (λ _ → equivFun) e₋₁)
+  → SquareP (λ i j → A i j ≃ B i j) e₀₋ e₁₋ e₋₀ e₋₁
+equivSquareP = ΣSquarePProp isPropIsEquiv

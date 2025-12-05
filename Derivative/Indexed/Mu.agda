@@ -1,3 +1,4 @@
+-- TODO: Clean up imports
 {-# OPTIONS -WnoUnsupportedIndexedMatch #-}
 module Derivative.Indexed.Mu where
 
@@ -9,12 +10,19 @@ open import Derivative.Prelude
 open import Derivative.Decidable
 open import Derivative.Isolated
 open import Derivative.Maybe
+open import Derivative.Remove
+open import Derivative.Square
 open import Derivative.Sum
 open import Derivative.W
 
+open import Cubical.Foundations.Path
+open import Cubical.Foundations.Transport using (substEquiv)
+import      Cubical.Data.Empty as Empty
 open import Cubical.Data.Sigma
 import      Cubical.Data.Unit as Unit
 open import Cubical.Functions.FunExtEquiv
+open import Cubical.Functions.Embedding
+open import Cubical.Functions.Surjection
 
 private
   variable
@@ -54,20 +62,31 @@ module _ (F : Container ℓ (Maybe Ix)) where
 
     pos : ∀ ix s* → Pos (F [ μ F ]) ix (W-out s*) ≃ Pos (μ F) ix s*
     pos ix (sup s f) = Wᴰ-in-equiv _ _ _ s f
+    {-# INLINE pos #-}
 
   μ-out : μ F ⊸ F [ μ F ]
   μ-out = Equiv.as-⊸ μ-out-equiv
 
+  μ-rec-Π : (G : Container ℓ Ix)
+    → (F [ G ]) Π⊸ G
+    → μ F Π⊸ G
+  μ-rec-Π G α = W-elim goal where
+    module _ (s : S) (f : P nothing s → W S (P nothing)) where
+      goal : (∀ p → Σ[ t ∈ G .Shape ] ∀ ix → Pos G ix t ≃ Pos (μ F) ix (f p))
+        → Σ[ t ∈ G .Shape ] ∀ ix → Pos G ix t ≃ Pos (μ F) ix (sup s f)
+      goal rec .fst = α (s , fst ∘ rec) .fst
+      goal rec .snd = λ ix → α (s , fst ∘ rec) .snd ix ∙ₑ ⊎-right-≃ (Σ-cong-equiv-snd λ p → rec p .snd ix) ∙ₑ Wᴰ-in-equiv _ _ _ s f
+
   μ-rec : (G : Container ℓ Ix)
     → (F [ G ]) ⊸ G
     → μ F ⊸ G
-  μ-rec G φ = [ shape ⊸ pos ] module μ-rec where
+  μ-rec G φ = [ shape ⊸ {! !} ] module μ-rec where
     open Container G renaming (Shape to T ; Pos to Q)
 
     module φ = _⊸_ φ
 
-    shape : W S (P ₁) → T
-    shape (sup s f) = φ.shape (s , λ p → shape (f p))
+    shape : W S (P nothing) → T
+    shape = W-rec φ.shape
 
     shape-β : shape ≡ φ.shape ∘ Σ-map-snd (λ s (f : P ₁ s → W S _) → shape ∘ f) ∘ W-out
     shape-β = funExt λ { (sup s f) → refl }
@@ -94,12 +113,13 @@ module _ (F : Container ℓ (Maybe Ix)) where
       goal : isEquiv (Wᴰ-in _ _ _ s f ∘ ⊎-map-right (Σ-map-snd $ pos-fun i ∘ f) ∘ equivFun (φ.pos i (s , shape ∘ f)))
       goal = isEquiv-∘ step-2 (equivIsEquiv (φ.pos i _))
 
-    pos' : ∀ i → (s : W S (P ₁)) → Q i (shape s) ≃ Pos (μ F) i s
-    pos' i w .fst = pos-fun i w
-    pos' i w .snd = is-equiv-pos-fun i w
-
     pos : ∀ i → (s : W S (P ₁)) → Q i (shape s) ≃ Pos (μ F) i s
-    pos i (sup s f) =
+    pos i w .fst = pos-fun i w
+    pos i w .snd = is-equiv-pos-fun i w
+    {-# INLINE pos #-}
+
+    pos' : ∀ i → (s : W S (P ₁)) → Q i (shape s) ≃ Pos (μ F) i s
+    pos' i (sup s f) =
       Q i (φ.shape (s , shape ∘ f))
         ≃⟨ φ.pos i (s , shape ∘ f) ⟩
       (P (just i) s ⊎ (Σ[ p ∈ P nothing s ] Q i (shape (f p))))
@@ -115,57 +135,80 @@ module _ (F : Container ℓ (Maybe Ix)) where
   μ-rec-β' G α = ⊸≡-ext (μ-rec.shape-β G α) λ where
     ix (sup s f) → refl
 
-  μ-rec-β : (G : Container ℓ Ix)
-    → (α : (F [ G ]) ⊸ G)
-    → μ-in ⋆ μ-rec G α ≡ [-]-map F (μ-rec G α) ⋆ α
-  μ-rec-β G α = ⊸≡-ext refl λ ix s → {! !}
+  -- TODO: Prove directly that μ-rec is unique by reshaping the type of algebra-morphisms
+  isProp-rec-unique' : (G : Container ℓ Ix) (α : (F [ G ]) ⊸ G) → isProp (Σ[ α* ∈ μ F ⊸ G ] α* ≡ μ-out ⋆ [-]-map F α* ⋆ α)
+  isProp-rec-unique' G α@([ f ⊸ u ]) = isOfHLevelRespectEquiv 1 (invEquiv equiv) {! !} where
+    rec-pos :
+      ∀ (u* : ∀ (ix : Ix) (w : W S (P ₁)) → Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w)
+      → ∀ (ix : Ix) (w : W S (P ₁)) → Pos G ix ((W-out ⨟ Σ-map-snd (λ z → _∘_ (W-rec f)) ⨟ f) w) ≃ Wᴰ S (P ₁) (P (just ix)) w
+    rec-pos u* = (μ-out ⋆ [-]-map F (the (μ F ⊸ G) ([ W-rec f ⊸ u* ])) ⋆ α) ._⊸_.pos
+
+    RHS : (μ F ⊸ G) → (μ F ⊸ G)
+    RHS α*@([ f* ⊸ u* ]) = μ-out ⋆ [-]-map F α* ⋆ α where
+      _ = {! equivFun $ (μ-out ⋆ [-]-map F α* ⋆ α) ._⊸_.pos _ _ !}
+    RHS-pos : ∀ ix (w : W S (P ₁))
+      → (f* : W _ _ → Shape G)
+      → (u* : Pos G ix (f* w) → Wᴰ _ _ (P (just ix)) w)
+      → Pos G ix (f* w) → Wᴰ _ _ (P (just ix)) w
+    -- RHS-pos ix (sup s x) f* u* = Wᴰ-in _ _ _ s x ∘ {! ⊎-map-right !} ∘ u*
+    RHS-pos ix (sup s x) f* u* = Wᴰ-in _ _ _ s x ∘ {!  !} ∘ u*
+
+    equiv : (Σ[ α* ∈ μ F ⊸ G ] α* ≡ μ-out ⋆ [-]-map F α* ⋆ α ) ≃ {! !}
+    equiv =
+      (Σ[ α* ∈ μ F ⊸ G ] α* ≡ μ-out ⋆ [-]-map F α* ⋆ α)
+        ≃⟨ Σ-cong-equiv-fst ⊸-Σ-equiv ⟩
+      (Σ[ (f* , u*) ∈ Σ[ f* ∈ (W _ _ → Shape G) ] (∀ ix w → Pos G ix (f* w) ≃ Wᴰ _ _ (Pos F (just ix)) w) ] [ f* ⊸ u* ] ≡ RHS ([ f* ⊸ u* ]))
+        ≃⟨ strictEquiv (λ { ((f* , u*) , p) → (f* , cong _⊸_.shape p) , (u* , cong _⊸_.pos p) }) (λ { ((f* , pˢ) , (u* , pᵖ)) → ((f* , u*) , λ i → [ pˢ i ⊸ pᵖ i ]) }) ⟩
+      Σ[ (f* , h) ∈ Σ[ f* ∈ (W S _ → Shape G) ] f* ≡ W-out ⨟ Σ-map-snd (λ _ → f* ∘_) ⨟ f ] Σ[ u* ∈ (∀ ix w → Pos G ix (f* w) ≃ Wᴰ _ _ (Pos F (just ix)) w) ] PathP (λ i → ∀ ix w → Pos G ix (h i w) ≃ Wᴰ _ _ (P (just ix)) w) u* (RHS ([ f* ⊸ u* ]) ._⊸_.pos)
+        ≃⟨ Σ-contractFst (W-out-unique f) ⟩
+      Σ[ u* ∈ (∀ ix w → Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w) ] PathP (λ i → ∀ ix w → Pos G ix (W-rec-β f i w) ≃ Wᴰ _ _ (P (just ix)) w) u* (RHS [ W-rec f ⊸ u* ] ._⊸_.pos)
+        ≃⟨ invEquiv $ Σ-cong-equiv-snd (λ u* → funExt₂Equiv) ⟩
+      Σ[ u* ∈ (∀ ix w → Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w) ]
+        (∀ ix (w : W S _) → PathP (λ i → Pos G ix (W-rec-β f i w) ≃ Wᴰ _ _ (P (just ix)) w) (u* ix w) (RHS [ W-rec f ⊸ u* ] ._⊸_.pos ix w))
+        ≃⟨ Σ-cong-equiv-snd (λ u* → equivΠCod λ ix → equivΠCod λ w → invEquiv equivPathPEquiv) ⟩
+      Σ[ u* ∈ (∀ ix w → Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w) ]
+        (∀ ix (w : W S _) → PathP (λ i → Pos G ix (W-rec-β f i w) → Wᴰ _ _ (P (just ix)) w) (equivFun $ u* ix w) (equivFun $ RHS [ W-rec f ⊸ u* ] ._⊸_.pos ix w))
+        ≃⟨ Σ-cong-equiv-snd (λ u* → equivΠCod λ ix → equivΠ' W-out-equiv λ p → {! !}) ⟩
+      Σ[ u* ∈ (∀ ix w → Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w) ]
+        (∀ ix ((s , x) : Σ _ _)
+          → PathP (λ i → Pos G ix (f (s , (λ p → W-rec f (x p)))) → Wᴰ _ _ (P (just ix)) (sup s x))
+            (equivFun $ u* ix (sup s x))
+            {! !}
+        )
+        -- ≃⟨ invEquiv (Σ-Π₂-≃ {A = Ix} {B = λ _ → W S _} {C = λ ix w → Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w} {D = λ ix w u* → {! !}}) ⟩
+      -- (∀ ix (w : W S _) → Σ[ u* ∈ Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w ] PathP (λ i → Pos G ix (W-rec-β f i w) → Wᴰ _ _ (P (just ix)) w) (equivFun u*) _)
+        -- ≃⟨ equivΠCod (λ ix → equivΠCod λ w → Σ-cong-equiv-snd λ u* → invEquiv equivPathPEquiv) ⟩
+      -- (∀ ix (w : W S _) → Σ[ u* ∈ Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w ] PathP (λ i → Pos G ix (W-rec-β f i w) → Wᴰ _ _ (P (just ix)) w) (equivFun u*) _)
+        -- ≃⟨ {! Σ-Π-≃ !} ⟩
+        ≃⟨ {! !} ⟩
+      {! !}
+        ≃∎
+
+    contr : ∀ ix → (w : W S (P nothing)) → ∃![ u* ∈ Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w ] PathP (λ i → Pos G ix (W-rec-β f i w) → Wᴰ _ _ (P (just ix)) w) (equivFun u*) _
+    contr ix (sup s f) = {! !}
 
   μ-rec-unique' : (G : Container ℓ Ix)
     → (α : (F [ G ]) ⊸ G)
     → isContr (Σ[ α* ∈ μ F ⊸ G ] α* ≡ μ-out ⋆ [-]-map F α* ⋆ α )
   μ-rec-unique' G α .fst .fst = μ-rec G α
   μ-rec-unique' G α .fst .snd = μ-rec-β' G α
-  μ-rec-unique' G α .snd (ζ , ζ-β) = ΣPathP (goal , {! !}) where
+  μ-rec-unique' G α .snd (ζ , ζ-β) = ΣPathP (goal , goal-coh) where
     module α = _⊸_ α
     module ζ = _⊸_ ζ
 
     shape-≡-ext : ∀ w → μ-rec.shape G α w ≡ ζ.shape w
-    shape-≡-ext (sup s f) = p ∙ q
+    shape-≡-ext w@(sup s f) = p ∙ q
       module shape-≡-ext where
         p = cong α.shape (ΣPathP (refl′ s , funExt (shape-≡-ext ∘ f)))
-        q = sym $ cong _⊸_.shape ζ-β ≡$ sup s f
+        q = sym $ cong _⊸_.shape ζ-β ≡$ w
 
         filler = compPath-filler p q
 
     shape-≡ : μ-rec.shape G α ≡ ζ.shape
     shape-≡ = funExt shape-≡-ext
 
-  {-
-    pos-≡' : ∀ ix (s : S) (f : _)
-      → PathP (λ i → Pos G ix (shape-≡-ext (sup s f) i) → μ.pos F ix (sup s f)) (equivFun (μ-rec.pos G α ix (sup s f))) (equivFun $ ζ.pos ix (sup s f))
-    pos-≡' ix s f = compPathP' {B = B} {p = p} {q = q} pᴰ qᴰ
-      module pos-≡' where
-        B : Shape G → Type _
-        B t = Pos G ix t → μ.pos F ix (sup s f)
-
-        p = cong α.shape (ΣPathP (refl , funExt (shape-≡-ext ∘ f)))
-        q = sym $ cong _⊸_.shape ζ-β ≡$ sup s f
-
-        pᴰ : PathP (λ i → Pos G ix (shape-≡-ext.p s f i) → μ.pos F ix (sup s f))
-          (Wᴰ-in _ _ _ s f ∘ ⊎-map-right (Σ-map-snd λ { p → μ-rec.pos-fun G α ix (f p) }) ∘ equivFun (α.pos ix (s , μ-rec.shape _ _ ∘ f)))
-          (Wᴰ-in _ _ _ s f ∘ ⊎-map-right (Σ-map-snd λ { p → equivFun (ζ.pos ix (f p)) }) ∘ equivFun (α.pos ix (s , ζ.shape ∘ f)))
-        pᴰ i = Wᴰ-in _ _ _ s f ∘ {! !}
-
-        qᴰ : PathP (λ i → Pos G ix (shape-≡-ext.q s f i) → μ.pos F ix (sup s f))
-          (Wᴰ-in _ _ _ s f ∘ ⊎-map-right (Σ-map-snd λ { p → equivFun (ζ.pos ix (f p)) }) ∘ equivFun (α.pos ix (s , ζ.shape ∘ f)))
-          (equivFun (ζ.pos ix (sup s f)))
-        qᴰ i = equivFun (ζ-β (~ i) ._⊸_.pos ix (sup s f))
-
-        filler = compPathP'-filler {B = B} {p = p} {q = q} pᴰ qᴰ
-    -}
-
-    pos-≡ : ∀ ix (w : W S (P ₁)) → PathP (λ i → Pos G ix (shape-≡ i w) ≃ μ.pos F ix w) (μ-rec.pos G α ix w) (ζ.pos ix w)
-    pos-≡ ix (sup s f) = compPathP' {B = B} {p = p} {q = q} pᴰ qᴰ
+    pos-≡-ext : ∀ ix (w : W S (P ₁)) → PathP (λ i → Pos G ix (shape-≡ i w) ≃ μ.pos F ix w) (μ-rec.pos G α ix w) (ζ.pos ix w)
+    pos-≡-ext ix (sup s f) = compPathP' {B = B} {p = p} {q = q} pᴰ qᴰ
       module pos-≡ where
         B : Shape G → Type _
         B t = Pos G ix t ≃ μ.pos F ix (sup s f)
@@ -175,30 +218,79 @@ module _ (F : Container ℓ (Maybe Ix)) where
         yᴰ : _ ≃ _
         yᴰ = α.pos ix (s , ζ.shape ∘ f) ∙ₑ ⊎-right-≃ (Σ-cong-equiv-snd (ζ.pos ix ∘ f)) ∙ₑ Wᴰ-in-equiv _ _ _ s f
 
+        pᴰ-fun : PathP (λ i → Pos G ix (shape-≡-ext.p s f i) → μ.pos F ix (sup s f)) (equivFun $ μ-rec.pos G α ix (sup s f)) (equivFun yᴰ)
+        pᴰ-fun i =
+          equivFun (α.pos ix (s , shape-≡ i ∘ f))
+          ⨟ᴰ ⊎-map-right (Σ-map-snd {B = λ p₁ → Pos G ix (shape-≡ i (f p₁))} λ p₁ → equivFun (pos-≡-ext ix (f p₁) i))
+          ⨟ᴰ Wᴰ-in _ _ _ s f
+
         pᴰ : PathP (λ i → B (shape-≡-ext.p s f i)) (μ-rec.pos G α ix (sup s f)) yᴰ
-        -- pᴰ = equivPathP $ funExtNonDep λ {x₀} {x₁} h → cong (Wᴰ-in _ _ _ s f) λ where
-        --   i → ⊎-map-right (Σ-map-snd λ { p → {! !} }) $ equivFun (α.pos ix (s , λ p₁ → {! q !})) {!h!} -- (equivFun {! !} (α.pos ix (s , ?)))
-        pᴰ = {! !}
-          -- equivPathP $ λ where
-          --   i q → Wᴰ-in _ _ _ s f (⊎-map-right (λ xx → {! !}) {! !})
-          -- $ {!cong₂ (λ x y → ⊎-map-right (equivFun (Σ-cong-equiv-snd (λ p → x ix (f p)) ()) !}
+        pᴰ = equivPathP pᴰ-fun
 
         qᴰ : PathP (λ i → B (shape-≡-ext.q s f i)) yᴰ (ζ.pos ix (sup s f))
         qᴰ i = ζ-β (~ i) ._⊸_.pos ix (sup s f)
 
+        filler : SquareP (λ z i → B (compPath-filler p q z i)) pᴰ (compPathP' {B = B} {p = p} {q = q} pᴰ qᴰ) _ qᴰ
+        filler = compPathP'-filler {B = B} {p = p} {q = q} pᴰ qᴰ
+
+    pos-≡ : PathP (λ i → ∀ ix w → Pos G ix (shape-≡ i w) ≃ μ.pos F ix w) (μ-rec.pos G α) ζ.pos
+    pos-≡ = funExt₂ pos-≡-ext
+
     goal : μ-rec G α ≡ ζ
-    goal = ⊸≡ shape-≡ $ funExt₂ pos-≡
+    goal = ⊸≡ shape-≡ pos-≡
 
-    goal-coh : PathP (λ i → goal i ≡ μ-out ⋆ [-]-map F (goal i) ⋆ α) (μ-rec-β' G α) ζ-β
-    goal-coh i j ._⊸_.shape (sup s f) = shape-≡-ext.filler s f (~ j) i
-    goal-coh i j ._⊸_.pos ix (sup s f) = {! pos-≡.filler ix s f  !}
+    goal-coh-shape : Square {A = W S (P nothing) → Shape G}
+      (λ i → μ-rec-β' G α i ._⊸_.shape)
+      (λ i → ζ-β i ._⊸_.shape)
+      shape-≡
+      λ i z → α.shape (_⊸_.shape ([-]-map F (goal i)) (_⊸_.shape μ-out z))
+    goal-coh-shape i j (sup s f) = shape-≡-ext.filler s f (~ j) i
 
-  μ-rec-unique : (G : Container ℓ Ix)
-    → (α : (F [ G ]) ⊸ G)
-    → isContr (Σ[ α* ∈ μ F ⊸ G ] μ-in ⋆ α* ≡ [-]-map F α* ⋆ α )
-  μ-rec-unique G α .fst .fst = μ-rec G α
-  μ-rec-unique G α .fst .snd = μ-rec-β G α
-  μ-rec-unique G α .snd (α* , p) = ΣPathP ({! !} , {! !})
+    goal-coh-pos-ext : ∀ ix w
+      → SquareP (λ i j → Pos G ix (goal-coh-shape i j w) ≃ μ.pos F ix w)
+        (λ i → μ-rec-β' G α i ._⊸_.pos ix w)
+        (λ i → ζ-β i ._⊸_.pos ix w)
+        (λ i → pos-≡-ext ix w i)
+        λ i → (α.pos ix (_⊸_.shape ([-]-map F (goal i)) (_⊸_.shape μ-out w))) ∙ₑ (_⊸_.pos ([-]-map F (goal i)) ix (_⊸_.shape μ-out w) ∙ₑ _⊸_.pos μ-out ix w)
+    goal-coh-pos-ext ix (sup s f) = equivSquareP λ i j → equivFun (pos-≡.filler ix s f (~ j) i)
+
+    goal-coh-pos : SquareP (λ i j → ∀ ix w → Pos G ix (goal-coh-shape i j w) ≃ μ.pos F ix w)
+      (λ i → μ-rec-β' G α i ._⊸_.pos)
+      (λ i → ζ-β i ._⊸_.pos)
+      pos-≡
+      λ i ix w → (α.pos ix (_⊸_.shape ([-]-map F (goal i)) (_⊸_.shape μ-out w))) ∙ₑ (_⊸_.pos ([-]-map F (goal i)) ix (_⊸_.shape μ-out w) ∙ₑ _⊸_.pos μ-out ix w)
+    goal-coh-pos i j ix w = goal-coh-pos-ext ix w i j
+
+    goal-coh : Square (μ-rec-β' G α) ζ-β goal (cong (λ f → μ-out ⋆ [-]-map F f ⋆ α) goal)
+    goal-coh i j ._⊸_.shape = goal-coh-shape i j
+    goal-coh i j ._⊸_.pos = goal-coh-pos i j
+
+  opaque
+    μ-rec-unique : (G : Container ℓ Ix)
+      → (α : (F [ G ]) ⊸ G)
+      → isContr (Σ[ α* ∈ μ F ⊸ G ] μ-in ⋆ α* ≡ [-]-map F α* ⋆ α )
+    μ-rec-unique G α = isOfHLevelRespectEquiv 0 (Σ-cong-equiv-snd comm-square-equiv) $ μ-rec-unique' G α
+      where
+        μ-out-inv-coh : Equiv.as-⊸ (Equiv.inv μ-out-equiv) ≡ μ-in
+        μ-out-inv-coh = ⊸≡-ext
+          (refl′ (uncurry sup))
+          λ ix (s , f) → funExt λ wᴰ → transportRefl _ ∙ transportRefl (Wᴰ-out S (P ₁) (P (just ix)) s f wᴰ)
+
+        comm-square-equiv : (α* : μ F ⊸ G) → (α* ≡ μ-out ⋆ [-]-map F α* ⋆ α) ≃ (μ-in ⋆ α* ≡ [-]-map F α* ⋆ α)
+        comm-square-equiv α* =
+          (α* ≡ (μ-out ⋆ [-]-map F α*) ⋆ α)
+            ≃⟨ compPathrEquiv (⋆-assoc μ-out ([-]-map F α*) α) ⟩
+          (α* ≡ μ-out ⋆ ([-]-map F α* ⋆ α))
+            ≃⟨ containerAdjointEquiv μ-out-equiv α* ([-]-map F α* ⋆ α) ⟩
+          (Equiv.as-⊸ (Equiv.inv μ-out-equiv) ⋆ α* ≡ [-]-map F α* ⋆ α)
+            ≃⟨ substEquiv (λ - → - ⋆ α* ≡ [-]-map F α* ⋆ α) μ-out-inv-coh ⟩
+          (μ-in ⋆ α* ≡ [-]-map F α* ⋆ α)
+            ≃∎
+
+    μ-rec-β : (G : Container ℓ Ix)
+      → (α : (F [ G ]) ⊸ G)
+      → μ-in ⋆ μ-rec G α ≡ [-]-map F (μ-rec G α) ⋆ α
+    μ-rec-β G α = {! !}
 
   isEquivFrom-μ-rec : (G : Container ℓ Ix)
     → (φ : (F [ G ]) ⊸ G)
@@ -218,239 +310,23 @@ module _ (F : Container ℓ (Maybe Ix)) where
     is-equiv-φ : isContainerEquiv φ
     is-equiv-φ = isContainerEquivCompRight' (μ-out ⋆ [-]-map F (μ-rec G φ)) φ is-equiv-μ-out⋆F[μ-rec] is-equiv-comp
 
-μ-rule : ∀ (F : Container _ 𝟚) →
-  μ ((↑ (∂ ₀° F [ μ F ])) ⊕ ((↑ (∂ ₁° F [ μ F ])) ⊗ π₁))
-    ⊸
-  ∂ tt° (μ F)
-μ-rule F = μ-rec G (∂ tt° (μ F)) α module μ-rule where
-  open Container F renaming (Shape to S ; Pos to P)
-
-  G : Container _ 𝟚
-  G = (↑ (∂ ₀° F [ μ F ])) ⊕ ((↑ (∂ ₁° F [ μ F ])) ⊗ π₁)
-
-  G[_] : Container _ 𝟙 → Container _ 𝟙
-  G[ Y ] = (∂ ₀° F [ μ F ]) ⊕ ((∂ ₁° F [ μ F ]) ⊗ Y)
-
-  G-subst : ∀ Y → Equiv (G [ Y ]) (G[ Y ])
-  G-subst Y = [ shape ◁≃ pos ] where
-    shape-Iso : Iso (Shape (G [ Y ])) (Shape G[ Y ])
-    shape-Iso .Iso.fun (inl s , _) = inl s
-    shape-Iso .Iso.fun (inr (s , _) , f) = inr (s , f (inr •))
-    shape-Iso .Iso.inv (inl s) = inl s , λ ()
-    shape-Iso .Iso.inv (inr (s , y)) = inr (s , •) , λ { (inr •) → y }
-    shape-Iso .Iso.rightInv (inl s) = refl
-    shape-Iso .Iso.rightInv (inr (s , y)) = refl
-    shape-Iso .Iso.leftInv (inl s , 0→Y) = ΣPathP (refl , λ { i () })
-    shape-Iso .Iso.leftInv (inr (s , •) , f) = ΣPathP (refl , funExt λ { (inr •) → refl′ (f _) })
-
-    shape = isoToEquiv shape-Iso
-
-    μP : W S (P ₁) → Type
-    μP = Wᴰ S (P ₁) (P ₀)
-
-    pos₀ : (s : S) (p° : P ₀ s °) (f₁ : P ₁ s → W S (P ₁)) (f₀ : 𝟘* → Shape Y)
-      →
-        (P ₀ s - p°) ⊎ (Σ[ p ∈ P ₁ s ] μP (f₁ p))
-          ≃
-        ((P ₀ s - p°) ⊎ (Σ[ p ∈ P ₁ s ] μP (f₁ p))) ⊎ (Σ[ x ∈ 𝟘* ] Pos Y _ (f₀ x))
-    pos₀ _ _ _ _ = ⊎-empty-right (λ ())
-
-    pos₁ : (s : S) (p° : P ₁ s °) (f₁ : (P ₁ s - p°) → W S (P ₁)) (f₀ : 𝟘* ⊎ 𝟙 → Shape Y)
-      → (P ₀ s ⊎ (Σ[ p ∈ (P ₁ s) - p° ] μP (f₁ p))) ⊎ (Pos Y _ (f₀ (inr •)))
-          ≃
-        ((P ₀ s ⊎ (Σ[ p ∈ (P ₁ s) - p° ] μP (f₁ p))) ⊎ 𝟘) ⊎ (Σ[ i ∈ 𝟘* ⊎ 𝟙 ] Pos Y _ (f₀ i))
-    pos₁ s p° f₁ f₀ =
-      let X = P ₀ s
-          W = (Σ[ p ∈ (P ₁ s) - p° ] μP (f₁ p))
-          Z : 𝟘* ⊎ 𝟙 → Type _
-          Z i = Pos Y _ (f₀ i)
-      in
-      (X ⊎ W) ⊎ (Z (inr •))
-        ≃⟨ ⊎-left-≃ (⊎-empty-right λ ()) ⟩
-      ((X ⊎ W) ⊎ 𝟘) ⊎ (Z (inr •))
-        ≃⟨ ⊎-right-≃ $ invEquiv (Σ-contractFst (isOfHLevelRespectEquiv 0 (⊎-empty-left λ ()) Unit.isContrUnit)) ⟩
-      ((X ⊎ W) ⊎ 𝟘) ⊎ (Σ[ i ∈ 𝟘* ⊎ 𝟙 ] Z i)
-        ≃∎
-
-    pos : (i : 𝟙) → (s : Shape $ G [ Y ]) → Pos G[ Y ] i (equivFun shape s) ≃ Pos (G [ Y ]) i s
-    pos • (inl ((s , p°) , f₁) , f₀) = pos₀ s p° f₁ f₀
-    pos • (inr (((s , p°) , f₁) , •) , f₀) = pos₁ s p° f₁ f₀
-
-  η₀ : (G [ ∂ tt° (μ F) ]) ⧟ ((∂ ₀° F [ μ F ]) ⊕ ((∂ ₁° F [ μ F ]) ⊗ ∂ tt° (μ F)))
-  η₀ = G-subst (∂ tt° (μ F))
-
-  η₁ : ∂ tt° (F [ μ F ]) ⧟ ∂ tt° (μ F)
-  η₁ = ∂-map-equiv tt° (μ-in-equiv F)
-
-  α : (G [ ∂ tt° (μ F) ]) ⊸ ∂ tt° (μ F)
-  α =
-    (G [ ∂ tt° (μ F) ])
-      ⧟⟨ η₀ ⟩
-    ((∂ ₀° F [ μ F ]) ⊕ ((∂ ₁° F [ μ F ]) ⊗ ∂ tt° (μ F)))
-      ⊸⟨ binary-chain-rule F (μ F) ⟩
-    ∂ tt° (F [ μ F ])
-      ⧟⟨ η₁ ⟩
-    ∂ tt° (μ F)
-      ⊸∎
-
-μ-discrete : (F : Container _ 𝟚)
-  → (∀ ix s → Discrete (Pos F ix s))
-  → (∀ w → Discrete (Pos (μ F) • w))
-μ-discrete F discrete-P = discrete-Wᴰ S (P ₁) (P ₀) (discrete-P ₁) (discrete-P ₀) where
-  open Container F renaming (Shape to S ; Pos to P)
-
-Discrete→isEquiv-μ-chain-rule : (F : Container _ 𝟚) → (∀ ix s → Discrete (Pos F ix s)) → isContainerEquiv (binary-chain-rule F (μ F))
-Discrete→isEquiv-μ-chain-rule F discrete-P = DiscreteContainer→isEquivBinaryChainRule F (μ F) (discrete-P ₁) (μ-discrete F discrete-P)
-
-module _ (F : Container _ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binary-chain-rule F (μ F))) where
-  open Container F renaming (Shape to S ; Pos to P)
-  open μ-rule F
-  private
+  isEmbedding-μ-rec : (G : Container ℓ Ix)
+    → (α : (F [ G ]) ⊸ G)
+    → isEmbedding (α ._⊸_.shape)
+    → isEmbedding (μ-rec G α ._⊸_.shape)
+  isEmbedding-μ-rec G α = {! !} where
     module α = _⊸_ α
 
-    is-equiv-Σ-isolate : ∀ (s : S) (f : P ₁ s → W S (P ₁)) → isEquiv (Σ-isolate (P ₁ s) (Wᴰ S (P ₁) (P ₀) ∘ f))
-    is-equiv-Σ-isolate = isEquivBinaryChainRule→isEquiv-Σ-isolate F (μ F) is-equiv-chain-rule
+    step₁ : isEmbedding (([-]-map F (μ-rec G α) ⋆ α) ._⊸_.shape)
+    step₁ = {! !}
 
-  μ-rule-shape : Shape (μ G) → Shape ((∂ tt° (μ F)))
-  μ-rule-shape = W-elim λ where
-    (inl ((s , p₀) , f)) _ rec → sup s f , top (p₀ .fst) , isIsolatedTop (p₀ .snd)
-    (inr (((s , p₁) , f) , _)) _ rec →
-      let (w , wᴰ) = rec (inr •)
-      in sup s (stitch p₁ (f , w))
-        , below (p₁ .fst) (subst (Pos (μ F) •) (sym (stitch-β p₁ f {w})) (wᴰ .fst))
-        , isIsolatedBelow (isIsolatedΣ (p₁ .snd) (isIsolatedSubst (Pos (μ F) •) (sym (stitch-β p₁ f {w})) (wᴰ .snd)))
+    goal : isEmbedding (W-rec α.shape)
+    goal = {! !}
 
-  μ-rule-shape⁻¹ : Shape ((∂ tt° (μ F))) → Shape (μ G)
-  μ-rule-shape⁻¹ = uncurry $ W-elim λ where
-    s f rec (top p₀ , isolated-top-p₀) → sup (inl ((s , (p₀ , isIsolatedFromTop isolated-top-p₀)) , f)) λ ()
-    s f rec (below p₁ wᴰ , isolated-below-p₁-wᴰ) →
-      let (isolated-p₁ , isolated-wᴰ) = isEquiv-Σ-isolate→isIsolatedPair (is-equiv-Σ-isolate s f) (isIsolatedFromBelow isolated-below-p₁-wᴰ)
-      in sup (inr (((s , p₁ , isolated-p₁) , f ∘ fst) , •)) λ where
-        (inr •) → rec p₁ (wᴰ , isolated-wᴰ)
-
-  μ-rule-shape-rinv : section μ-rule-shape μ-rule-shape⁻¹
-  μ-rule-shape-rinv (sup s f , top p₀ , _) = ΣPathP (refl , Isolated≡ refl)
-  μ-rule-shape-rinv (sup s f , below p₁ wᴰ , _) = ΣPathP (cong (sup s) {! !} , IsolatedPathP {! !})
-
-  μ-rule-shape-linv : retract μ-rule-shape μ-rule-shape⁻¹
-  μ-rule-shape-linv (sup (inl ((s , p₀ , _) , f)) g) = cong₂ sup (cong inl (ΣPathP (cong (s ,_) (Isolated≡ (refl′ p₀)) , refl′ f))) $ funExt λ ()
-  μ-rule-shape-linv (sup (inr (((s , p₁) , f) , _)) g) = cong₂ sup (cong inr {! !}) {! !}
-
-  μ-rule-shape-Iso : Iso (Shape (μ G)) (Shape ((∂ tt° (μ F))))
-  μ-rule-shape-Iso .Iso.fun = μ-rule-shape
-  μ-rule-shape-Iso .Iso.inv = μ-rule-shape⁻¹
-  μ-rule-shape-Iso .Iso.rightInv = μ-rule-shape-rinv
-  μ-rule-shape-Iso .Iso.leftInv = μ-rule-shape-linv
-
-  μ-rule⁻¹ : isEquiv (μ-rec.shape G (∂ tt° (μ F)) α)
-  μ-rule⁻¹ .equiv-proof = uncurry contr-fib where
-    contr-fib : (w : W S (P ₁)) (wᴰ : Wᴰ S (P ₁) (P ₀) w °) → isContr (fiber (μ-rec.shape G _ α) (w , wᴰ))
-    contr-fib (sup s f) (top p₀ , isolated-top-p₀) = {! !} where
-      top-equiv : {! !} ≃ fiber (μ-rec.shape G _ α) ((sup s f) , (top p₀ , isolated-top-p₀))
-      top-equiv =
-        {! !}
-          ≃⟨ {! !} ⟩
-        -- Σ[ x ∈ Σ (Shape G) (λ t → Pos G ₁ t → W (Shape G) (Pos G ₁)) ] (α.shape (x .fst , λ p → μ-rec.shape _ _ α (x .snd p))) ≡ ((sup s f) , (top p₀ , isolated-top-p₀))
-        --   ≃⟨⟩
-        Σ[ x ∈ Σ (Shape G) (λ t → Pos G ₁ t → W (Shape G) (Pos G ₁)) ] μ-rec.shape G _ α (sup (x .fst) (x .snd)) ≡ ((sup s f) , (top p₀ , isolated-top-p₀))
-          ≃⟨ Σ-cong-equiv W-in-equiv {! !} ⟩
-        Σ[ x ∈ W (Shape G) (Pos G ₁) ] μ-rec.shape G _ α x ≡ ((sup s f) , (top p₀ , isolated-top-p₀))
-          ≃∎
-    contr-fib (sup s f) (below p₁ wᴰ , isolated-below-p₁-wᴰ) = {! !}
-
-  isEquiv-μ-rule : isContainerEquiv (μ-rule F)
-  isEquiv-μ-rule = μ-rule⁻¹
-
-{-
-module _ (F : Container _ 𝟚) where
-  open Container F renaming (Shape to S ; Pos to P)
-  open μ-rule F
-
-  -- TODO: Prove that having a strong chain rule for F[μF] implies that μ-rule F is strong.
-  isEquiv-ind→isEquiv-μ-rule : isContainerEquiv (μ-rule.α F) → isContainerEquiv (μ-rule F)
-  isEquiv-ind→isEquiv-μ-rule is-equiv-α = isoToIsEquiv iso where
-    module α = Equiv (isContainerEquiv→Equiv α is-equiv-α)
-
-    is-equiv-chain-rule : isContainerEquiv (binary-chain-rule F (μ F))
-    is-equiv-chain-rule = {! !}
-    
-    is-equiv-Σ-isolate : ∀ (s : S) (f : P ₁ s → W S (P ₁)) → isEquiv (Σ-isolate (P ₁ s) (Wᴰ S (P ₁) (P ₀) ∘ f))
-    is-equiv-Σ-isolate = isEquivBinaryChainRule→isEquiv-Σ-isolate F (μ F) is-equiv-chain-rule
-
-    isolate-below-pair : ∀ (s : S) (f : P ₁ s → W S (P ₁)) {p₁ : P ₁ s} {wᴰ : Wᴰ S (P ₁) (P ₀) (f p₁)}
-      → isIsolated (p₁ , wᴰ)
-      → isIsolated p₁ × isIsolated wᴰ
-    isolate-below-pair s f = isEquiv-Σ-isolate→isIsolatedPair (is-equiv-Σ-isolate s f)
-
-    inv : Shape (∂ tt° (μ F)) → Shape (μ G)
-    inv = uncurry $ W-elim λ where
-      s f invᴿ (top p₀ , isolated-top-p₀) → sup (inl ((s , p₀ , isIsolatedFromTop isolated-top-p₀) , f)) λ ()
-      s f invᴿ (below p₁ wᴰ , isolated-below-p₁-wᴰ) →
-        let (isolated-p₁ , isolated-wᴰ) = isolate-below-pair s f (isIsolatedFromBelow isolated-below-p₁-wᴰ)
-        in
-        sup (inr (((s , p₁ , isolated-p₁) , f ∘ fst) , •)) λ where
-          (inr •) → invᴿ p₁ (wᴰ , isolated-wᴰ)
-
-    rinv : ∀ y → μ-rec.shape G (∂ tt° (μ F)) α (inv y) ≡ y
-    rinv (sup s f , top p₀ , isolated-top-p₀) = ΣPathP (refl′ (sup s f) , Isolated≡ (refl′ (top p₀)))
-    rinv (sup s f , below p₁ wᴰ , isolated-below-p₁-wᴰ) =
-      ΣPathP (cong (sup s) lemma , {! !}) -- ΣPathP (cong (sup s) lemma , {! IsolatedPathP {B = Pos (μ F) •} {p = cong (sup s) lemma} {! !} !})
-      where
-        isolated-p₁ : isIsolated p₁
-        isolated-p₁ = isolate-below-pair s f {wᴰ = wᴰ} (isIsolatedFromBelow isolated-below-p₁-wᴰ) .fst
-
-        lemma-ext : (p₁ : P ₁ s) → _ ≡ f p₁
-        lemma-ext p₁ = {! !}
-
-        lemma : _ ≡ f
-        lemma = funExt lemma-ext
-        -- lemma = stitch-eval (p₁ , isolated-p₁) f {!_!} ?
-
-    iso : Iso (Shape (μ G)) (Shape (∂ tt° (μ F)))
-    iso .Iso.fun = μ-rec.shape G (∂ tt° (μ F)) α
-    iso .Iso.inv = inv
-    iso .Iso.rightInv = rinv
-    iso .Iso.leftInv xx = {! !}
--}
-
-module isEquiv-μ-rule (F : Container _ 𝟚) (is-equiv-μ-rule : isContainerEquiv (μ-rule F)) where
-  open Container F renaming (Shape to S ; Pos to P)
-  open μ-rule F using (α ; G ; η₀ ; η₁)
-
-  private
-    μP = Wᴰ (Shape F) (Pos F ₁) (Pos F ₀)
-
-
-    is-equiv-α : isContainerEquiv α
-    is-equiv-α = isEquivFrom-μ-rec G (∂ tt° (μ F)) α is-equiv-μ-rule
-
-  is-equiv-chain-rule : isContainerEquiv (binary-chain-rule F (μ F))
-  is-equiv-chain-rule = isContainerEquivCompLeftRight η₀ η₁ (binary-chain-rule F (μ F)) {! is-equiv-α !}
-  
-  isEquiv-Σ-isolate : ∀ (s : S) (f : P ₁ s → W S (P ₁)) → isEquiv (Σ-isolate (P ₁ s) (μP ∘ f))
-  isEquiv-Σ-isolate = isEquivBinaryChainRule→isEquiv-Σ-isolate F (μ F) is-equiv-chain-rule
-
-  foo : (w : W S (P ₁)) → isEquiv (Σ-isolate (P ₁ (W-shape w)) (μP ∘ W-branch w))
-  foo (sup s f) = isEquiv-Σ-isolate s f
-
-  isEquiv-μ-rule→IsolatedEquiv : ∀ (s : S) (f : P ₁ s → W S (P ₁))
-    →
-      μP (sup s f) °
-        ≃
-      (P ₀ s °) ⊎ (Σ[ (p , _) ∈ P ₁ s ° ] (μP (f p) °))
-  isEquiv-μ-rule→IsolatedEquiv s f =
-    μP (sup s f) °
-      ≃⟨ IsolatedSubstEquiv (Wᴰ-out-equiv _ _ _ s f) ⟩
-    ((Pos F ₀ s) ⊎ (Σ[ p ∈ Pos F ₁ s ] μP (f p))) °
-      ≃⟨ IsolatedSumEquiv ⟩
-    (Pos F ₀ s °) ⊎ ((Σ[ p ∈ Pos F ₁ s ] μP (f p)) °)
-      ≃⟨ ⊎-right-≃ $ invEquiv (_ , isEquiv-Σ-isolate s f) ⟩
-    (Pos F ₀ s °) ⊎ (Σ[ (p , _) ∈ Pos F ₁ s ° ] (μP (f p) °))
-      ≃∎
-
-  discrete-μP : ∀ w → Discrete (Wᴰ S (P ₁) (P ₀) w)
-  discrete-μP (sup s f) (top p₀) = {! isIsolatedFromTop !}
-  discrete-μP (sup s f) (below p₁ wᴰ) = {! !}
-
-  discrete-P₁ : ∀ s → Discrete (P ₁ s)
-  discrete-P₁ s = {! !}
+  isSurjection-μ-rec : (G : Container ℓ Ix)
+    → (α : (F [ G ]) ⊸ G)
+    → isSurjection (α ._⊸_.shape)
+    → isSurjection (μ-rec G α ._⊸_.shape)
+  isSurjection-μ-rec G α = {! !} where
+    step₁ : isSurjection (([-]-map F (μ-rec G α) ⋆ α) ._⊸_.shape)
+    step₁ = {! !}

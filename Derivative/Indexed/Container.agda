@@ -20,7 +20,8 @@ open import Cubical.Foundations.Equiv.Properties
     ; isEquiv[f∘equivFunA≃B]→isEquiv[f]
     ; isEquivPostComp
     )
-open import Cubical.Foundations.Transport using (substEquiv)
+open import Cubical.Foundations.Univalence using (ua)
+open import Cubical.Foundations.Transport using (substEquiv ; subst2Equiv)
 
 record Container (ℓ : Level) (Ix : Type ℓ) : Type (ℓ-suc ℓ) where
   constructor _◁_
@@ -71,6 +72,18 @@ record _⊸_ (F G : Container ℓ Ix) : Type ℓ where
 
 infix 1 _⊸_
 
+⊸-Σ-Iso : ∀ {F G : Container ℓ Ix} → Iso (F ⊸ G) (Σ[ shape ∈ (F .Shape → G .Shape) ] ∀ ix s → G .Pos ix (shape s) ≃ F .Pos ix s)
+⊸-Σ-Iso {F} {G} = iso where
+  iso : Iso _ _
+  iso .Iso.fun [ shape ⊸ pos ] = shape , pos
+  iso .Iso.inv (shape , pos) = [ shape ⊸ pos ]
+  iso .Iso.rightInv _ = refl
+  iso .Iso.leftInv _ = refl
+  {-# INLINE iso #-}
+
+⊸-Σ-equiv : ∀ {F G : Container ℓ Ix} → (F ⊸ G) ≃ (Σ[ shape ∈ (F .Shape → G .Shape) ] ∀ ix s → G .Pos ix (shape s) ≃ F .Pos ix s)
+⊸-Σ-equiv = strictIsoToEquiv ⊸-Σ-Iso
+
 ⊸≡ : {F G : Container ℓ Ix}
   → {φ γ : F ⊸ G}
   → (p : φ ._⊸_.shape ≡ γ ._⊸_.shape)
@@ -91,9 +104,17 @@ _⋆_ : ∀ {F G H : Container ℓ Ix} → (F ⊸ G) → (G ⊸ H) → (F ⊸ H)
 (f ⋆ g) ._⊸_.pos i s = g ._⊸_.pos i (f ._⊸_.shape s) ∙ₑ f ._⊸_.pos i s
 infixl 9 _⋆_
 
+⋆-assoc : ∀ {F G H K : Container ℓ Ix}
+  → (f : F ⊸ G) (g : G ⊸ H) (h : H ⊸ K)
+  → (f ⋆ g) ⋆ h ≡ f ⋆ (g ⋆ h)
+⋆-assoc f g h = ⊸≡-ext refl λ ix s → refl
+
 id : (F : Container ℓ Ix) → F ⊸ F
 id F ._⊸_.shape s = s
 id F ._⊸_.pos s i = idEquiv _
+
+_Π⊸_ : (F G : Container ℓ Ix) → Type ℓ
+F Π⊸ G = (s : F .Shape) → Σ[ t ∈ G .Shape ] ∀ ix → G .Pos ix t ≃ F .Pos ix s
 
 record Equiv (F G : Container ℓ Ix) : Type ℓ where
   constructor [_◁≃_]
@@ -177,6 +198,13 @@ isContainerEquivCompLeftRight f g e is-equiv-comp = isContainerEquivCompLeft e g
   is-equiv-comp' : isContainerEquiv (e ⋆ Equiv.as-⊸ g)
   is-equiv-comp' = isContainerEquivCompRight f (e ⋆ Equiv.as-⊸ g) is-equiv-comp
 
+containerAdjointEquiv : {F G H : Container ℓ Ix}
+  → (e : F ⧟ G)
+  → (f₀ : F ⊸ H)
+  → (f₁ : G ⊸ H)
+  → (f₀ ≡ (Equiv.as-⊸ e) ⋆ f₁) ≃ (Equiv.as-⊸ (Equiv.inv e) ⋆ f₀ ≡ f₁)
+containerAdjointEquiv e f₀ f₁ = {!  !}
+
 module _ where
   private
     variable
@@ -201,6 +229,19 @@ module _ where
   infixr 0 _⊸≃⟨_⟩_
   infix 1 _⊸∎
 
+_⟨_⟩[_] : (F : Container ℓ Ix) (i : Ix °) (G : Container ℓ (Ix - i)) → Container ℓ (Ix - i)
+_⟨_⟩[_] {Ix} F (i , i≟_) G = shape ◁ pos module ⟨-⟩[-] where
+  shape : Type _
+  shape = Σ[ s ∈ F .Shape ] (F .Pos i s → G .Shape)
+
+  pos-dec : (j : Ix) → i ≢ j → Dec (i ≡ j) → shape → Type _
+  pos-dec j i≢j (yes i≡j) _ = ex-falso $ i≢j i≡j
+  pos-dec j i≢j (no  _) (s , f) = F .Pos j s ⊎ (Σ[ p ∈ F .Pos i s ] G .Pos (j , i≢j) (f p))
+
+  pos : Ix ∖ i → shape → Type _
+  pos (j , i≢j) = pos-dec j i≢j (i≟ j)
+
+
 _[_] : (F : Container ℓ (Maybe Ix)) (G : Container ℓ Ix) → Container ℓ Ix
 F [ G ] = shape ◁ pos module [-] where
   shape : Type _
@@ -208,6 +249,12 @@ F [ G ] = shape ◁ pos module [-] where
 
   pos : _ → shape → Type _
   pos ix (s , f) = F .Pos (just ix) s ⊎ (Σ[ p ∈ F .Pos nothing s ] G .Pos ix (f p))
+
+private
+  sanity : (F : Container ℓ (Maybe Ix)) (G : Container ℓ Ix)
+    → ∀ (ix : Maybe Ix - nothing°) s → (F [ G ]) .Pos (remove-nothing ix) s ≃ (F ⟨ nothing° ⟩[ subst (Container ℓ) (sym $ ua removeNothingEquiv) G ]) .Pos ix s
+  sanity F G (just ix , _) (s , f) = ⊎-right-≃ (Σ-cong-equiv-snd λ p → subst2Equiv (G .Pos) (sym (transportRefl ix)) (sym (transportRefl (f p))))
+  sanity F G (nothing , ₁≢₁) = ex-falso $ ₁≢₁ refl
 
 ⊸-intro : {F G : Container ℓ Ix}
   → ((s : F .Shape) → Σ[ t ∈ G .Shape ] ∀ i → G .Pos i t ≃ F .Pos i s)

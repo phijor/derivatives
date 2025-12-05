@@ -64,7 +64,7 @@ Const S .Pos _ = ⊥*
 One : (ℓ : Level) → Container ℓ ℓ
 One ℓ = Const Unit.Unit*
 
-record Cart (F G : Container ℓS ℓP) : Type (ℓ-max ℓS ℓP) where
+record Cart {ℓS ℓT ℓP ℓQ} (F : Container ℓS ℓP) (G : Container ℓT ℓQ) : Type (ℓ-max (ℓ-max ℓS ℓP) (ℓ-max ℓT ℓQ)) where
   constructor [_◁_]
   field
     shape : F .Shape → G .Shape
@@ -104,8 +104,8 @@ module CartReasoning where
     variable
       F G H : Container ℓS ℓP
 
-  _⊸⟨_⟩_ : (F : Container ℓS ℓP) → Cart F G → Cart G H → Cart F H
-  _⊸⟨_⟩_ {G} {H} F f g = _⋆_ {F = F} {G = G} {H = H} f g
+  _⊸⟨_⟩_ : (F : Container ℓS ℓP) {G H : Container ℓS ℓP} → Cart F G → Cart G H → Cart F H
+  _⊸⟨_⟩_ F {G} {H} f g = _⋆_ {F = F} {G = G} {H = H} f g
 
   _⊸∎ : (F : Container ℓS ℓP) → Cart F F
   F ⊸∎ = id F

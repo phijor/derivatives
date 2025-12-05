@@ -729,3 +729,92 @@ module S1 where
 
   isPerfectS¹ : isPerfect S¹
   isPerfectS¹ = uncurry (S¹-elimProp (λ x → Dec.isProp¬ (isIsolated x)) ¬isIsolated-base)
+
+module Compact where
+  isComplemented : {A : Type ℓ} → (B : A → Type ℓ) → Type ℓ
+  isComplemented B = ∀ a → Dec (B a)
+
+  isCompact : (A : Type ℓ) → Type _
+  isCompact {ℓ} A = ∀ (B : A → Type ℓ) → isComplemented B → Dec (Σ A B)
+
+  isEquiv-Σ-isolate→isCompact : (A : Type ℓ) → (B : A → Type ℓ)
+    → isEquiv (Σ-isolate A B)
+    → ∀ a → isCompact (B a)
+  isEquiv-Σ-isolate→isCompact A B is-equiv-Σ-isolate a P is-complemented-P = {! !}
+
+  isCompact→isEquiv-Σ-isolate : (A : Type ℓ) → (B : A → Type ℓ)
+    → (∀ a → isCompact (B a))
+    → isEquiv (Σ-isolate A B)
+  isCompact→isEquiv-Σ-isolate A B is-compact-B = isIsolatedPair→isEquiv-Σ-isolated is-isolated-pair where
+    is-isolated-pair : {a₀ : A} {b₀ : B a₀} → isIsolated (a₀ , b₀) → isIsolated a₀ × isIsolated b₀
+    is-isolated-pair {a₀} {b₀} isolated-ab = {! !}
+
+
+module Comodality where
+  _⇀_ : (A B : Type ℓ) → Type ℓ
+  A ⇀ B = Σ[ f ∈ (A → B) ] ∀ {a} → isIsolated a → isIsolated (f a)
+
+  infix 1 _⇀_
+
+  Equiv→⇀ : (e : A ≃ B) → (A ⇀ B)
+  Equiv→⇀ e .fst = equivFun e
+  Equiv→⇀ e .snd = isIsolatedPreserveEquiv e _
+
+  ⇀-≡ : {f g : A ⇀ B} → f .fst ≡ g .fst → f ≡ g
+  ⇀-≡ = Σ≡Prop λ f → isPropImplicitΠ λ a → isProp→ (isPropIsIsolated (f a))
+
+  _⋄_ : ∀ {A B C : Type ℓ} → (f : A ⇀ B) (g : B ⇀ C) → (A ⇀ C)
+  ((f , f-create-isolated) ⋄ (g , g-create-isolated)) .fst = f ⨟ g
+  ((f , f-create-isolated) ⋄ (g , g-create-isolated)) .snd = g-create-isolated ∘ f-create-isolated
+
+  infixr 10 _⋄_
+
+  id° : (A : Type ℓ) → A ⇀ A
+  id° A .fst = λ a → a
+  id° A .snd = λ iso → iso
+
+  [_]° : (f : A ⇀ B) → A ° ⇀ B °
+  [ f , f-create-isolated ]° .fst (a , isolated-a) = (f a , f-create-isolated isolated-a)
+  [ f , f-create-isolated ]° .snd {a = a₀ , isolated-a₀} _ = isIsolatedΣSndProp
+    (f-create-isolated isolated-a₀)
+    (isPropIsIsolated (f a₀))
+
+  dig-equiv : A ° ≃ (A °) °
+  dig-equiv = invEquiv (Discrete→IsolatedEquiv DiscreteIsolated)
+
+  dig : A ° ⇀ (A °) °
+  dig = Equiv→⇀ dig-equiv
+
+  derelict : A ° ⇀ A
+  derelict .fst = forget-isolated
+  derelict .snd {a = a₀ , is-isolated-a₀} _ = is-isolated-a₀
+
+  counit-left : (dig ⋄ [ derelict ]°) ≡ id° (A °)
+  counit-left = ⇀-≡ refl
+
+  counit-right : (dig ⋄ derelict {A = A °}) ≡ id° (A °)
+  counit-right = ⇀-≡ refl
+
+  comul : dig {A = A} ⋄ dig {A = A °} ≡ dig ⋄ [ dig {A = A} ]°
+  comul = ⇀-≡ $ funExt λ { a° → Isolated≡ $ Isolated≡ $ refl′ a° }
+
+  contract : A ° ⇀ A ° × A °
+  contract .fst a = a , a
+  contract .snd iso-a = isIsolatedΣ iso-a iso-a
+
+  [_×_] : ∀ {A₀ A₁ B₀ B₁ : Type ℓ}
+    → (f₀ : A₀ ° ⇀ B₀ °)
+    → (f₁ : A₁ ° ⇀ B₁ °)
+    → A₀ ° × A₁ ° ⇀ B₀ ° × B₁ °
+  [ f × g ] .fst = Σ-map (f .fst) λ _ → (g .fst)
+  [ f × g ] .snd {a = a₀ , a₁} = {! !}
+
+  weaken : A ° → ⊤ ℓ
+  weaken = const _
+
+  dig-comonoid-hom : dig ⋄ contract ≡ contract {A = A} ⋄ [ dig × dig ]
+  dig-comonoid-hom = ⇀-≡ refl
+
+  par : A ° × A ⇀ A °
+  par .fst (a° , a) = {! !}
+  par .snd = {! !}
