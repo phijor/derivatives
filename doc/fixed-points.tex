@@ -1,11 +1,11 @@
 \section{Derivatives of Fixed Points}
 
-Containers let us model inductive data types as fixed-points to substitution \( \Subst{\Blank}{\Blank} \):
+Containers let us model inductive data types as fixed points to substitution \( \Subst{\Blank}{\Blank} \):
 if \( F \) describes the branching of an inductive data type, then there is a corresponding
 container \( \mu F \) such that \( \CartIso{\Subst{F}{\mu F}}{\mu F} \).
 This lets us turn informal recursive specifications such as \( \Op{List}(X) = 1 + X \times \Op{List}(X) \)
 into a precise description of \( \Op{List} \) as a container.
-\Citeauthor{AbbottEtAl2005DataDifferentiating} prove that the derivative of a fixed-point point container
+\Citeauthor{AbbottEtAl2005DataDifferentiating} prove that the derivative of a fixed-point container
 is itself a fixed point: \( \Der{(\mu F)} \) is equivalent to \( \mu F' \) for some \( F' \) derived from \( F \).
 To do so, they recognize that each \( \mu F \) essentially behaves like repeated substitution \( \Subst{F}{\Subst{F}{\Subst{F}{\ldots}}} \),
 and infer a fixed-point rule from the chain rule.
@@ -22,7 +22,7 @@ between \( F \) and \( \mu F \) is.
 \subsection{Indexed Containers}
 
 To define and reason about an operation \( \mu \) taking a container to a fixed-point,
-we first have to recall the definition indexed containers.
+we first have to recall the definition of indexed containers.
 These encode data types polymorphic in more than one variable:
 \begin{definition}[note={Indexed containers}]
   Let \( I : \Type \). The type of \emph{\( I \)-ary} or \emph{\( I \)-indexed containers} is
@@ -32,12 +32,15 @@ These encode data types polymorphic in more than one variable:
 \end{definition}
 Ordinary containers correspond to unary containers, \( \Cont_{1} \).
 Each index \( i : I \) corresponds to a variable in the type that a container describes.
-In particular, \( I + 1 \)-indexed containers are used to transcribe fixed-point expressions that contain an extra recursion variable.
-We call \( I + 1 \)-indexed containers \emph{signature containers}; their fixed points describe inductive types.
+In particular, \( (I + 1) \)-indexed containers are used to transcribe fixed-point expressions that contain an extra recursion variable.
+We call \( (I + 1) \)-indexed containers \emph{signature containers}; their fixed points describe inductive types.
 \begin{example}
   In the informal specification \( \Op{List}(X) = \mu Y.\, 1 + X \times Y \),
-  the expression \( F(X, Y) = 1 + X \times Y \) is transcribed into a binary container \( F \), indexed by the type \( 2 \).
+  the expression \( L(X, Y) = 1 + X \times Y \) is transcribed into a binary container \( L \), indexed by the type \( 2 \).
   Its positions at index \( \Inr(\bullet) : 2 \) encode occurrences of the recursion variable \( Y \).
+  \begin{todo-block}
+    Write out the type of shapes and positions.
+  \end{todo-block}
 \end{example}
 
 Cartesian morphisms between containers \(F , G : \Cont_{I} \) are defined by ranging over all indices \( I \):
@@ -45,7 +48,7 @@ Cartesian morphisms between containers \(F , G : \Cont_{I} \) are defined by ran
   \Cart{F}{G} \DefEq \smashoperator[l]{\sum_{f : F_{\Sh} \to G_{\Sh}}} \prod_{i : I, s : F_{\Sh}} G_{\Ps}(i, f(s)) \simeq F_{\Ps}(i, s)
 \]
 Together, \( I \)-indexed containers again assemble into a wild category, \( \ContCart_{I} \).
-Not knowing where to put the indices, we denote by \( \ContCart_{I,n,k} \) the wild subcategories of \( I \)-indexed, \( (n, k) \)-truncated containers.\todo{Maybe \( I\operatorname{-}\ContCart_{n,k} \) is better?}
+We denote by \( \IContCart{I}_{n,k} \) the wild subcategories of \( I \)-indexed, \( (n, k) \)-truncated containers.
 Each container in \( I \) variables is also one in \( I + 1 \) variables:
 For \( F : \Cont_I \), denote by \( \Wk{F} : \Cont_{I+1} \) the inclusion given by
 \[
@@ -59,6 +62,17 @@ If \( i \) is isolated, then \( i = j \) is a decidable proposition for any \( j
 in this case \( \pi_i \) is equivalent to a container whose \( i \)th type of positions is \( 1 \),
 and \( 0 \) for any other direction.
 As expected, indexed containers are closed under constants \( \CConst(A) \), sums \( (\CPlus) \) and products \( (\CTimes) \).
+Substitution generalizes to an operation that places a container inside the positions at index \( \Nothing : I + 1 \) of a \( I + 1 \)-indexed container:
+\begin{definition}
+    Substitution is an operation \( \Subst{\Blank}{\Blank} : \Cont_{I+1} \to \Cont_{I} \to \Cont_{I} \),
+    defined as follows:
+    \begin{align*}
+      \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Sh} &\DefEq \sum_{s : S} P(s) \to T
+        \\
+      \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Ps} &\DefEq \lambda (s, f).\, \vec{P}_i(s) + \smashoperator{\sum_{p : P(s)}} Q_i(fp)
+        \qedhere
+    \end{align*}
+\end{definition}
 Similarly, we can lift derivatives to indexed containers.
 For an \( I \)-indexed container, we can take a derivative with respect to any index \( i : I \), as long as equality with \( i \) is decidable:
 \begin{definition}[note={Derivative of \( I \)-ary containers}]
@@ -116,7 +130,7 @@ its construction factors into smaller steps that make it obvious why, in general
       \end{tikzcd}
     \]
     Following the argument in \autoref{lax-chain-rule} and some type yoga,
-    we see that type of shapes of the container to the left is equivalent to
+    we see that the type of shapes of \( \L \) is equivalent to
     \begin{align}
       U_1 \DefEq
         \sum_{s : S} \sum_{f : P_1(s) \to T} \Isolated{P_0(s)} + \smashoperator{\sum_{p : \Isolated{P_1(s)}}} \Isolated{Q(fp)}
@@ -211,7 +225,7 @@ which takes families \( \vec{X} : I \to \Op{Set} \) to
 \[
   \llbracket \MkCont{S}{P} \rrbracket \vec{X} \DefEq \sum_{s : S} \prod_{i : I} P_i(s) \to \vec{X}_i
 \]
-This defines a full and faithful embedding of the category \( \ContCart_{I,0,0} \) into the category of functors \( [\Op{Set}^I, \Op{Set}] \)~\cite[Thm.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
+This defines a full and faithful embedding of the category \( \IContCart{I}_{0,0} \) into the category of functors \( [\Op{Set}^I, \Op{Set}] \)~\cite[Thm.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
 Notably, this embedding reflects much of the structure of the functor category \( [\Op{Set}^I, \Op{Set}] \) back into containers,
 allowing concise proofs for a number of properties.
 In particular, given a signature container \( F : \Cont_{I+1} \), its interpretation \( \llbracket F \rrbracket(\vec{X}, \Blank) : [ \Op{Set}, \Op{Set} ] \)
@@ -236,29 +250,18 @@ a particularly elegant way to show that \( \llbracket \Blank \rrbracket \) is fu
 is given by \citeauthor{Damato2023RevisitingContainersCubical} in \cite{Damato2023RevisitingContainersCubical} and relies almost exclusively on the Yoneda-lemma,
 which should make the proof amenable to generalization.
 
-In light of this, we are going to define a notion fixed point entirely internal to the wild category of containers,
+In light of this, we are going to define a notion of fixed point entirely internal to the wild category of containers,
 which does not reference the interpretation functor \( \Ext{\Blank} \) at all.
 Barring the above-mentioned issues, this should correspond to the more traditional definitions of container fixed point.
-First, note that substitution generalizes to an operation that places a container inside the positions at index \( \Nothing : I + 1 \) of a \( I + 1 \)-indexed container:
-\begin{definition}
-    Substitution is an operation \( \Subst{\Blank}{\Blank} : \Cont_{I+1} \to \Cont_{I} \to \Cont_{I} \),
-    defined as follows:
-    \begin{align*}
-      \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Sh} &\DefEq \sum_{s : S} P(s) \to T
-        \\
-      \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Ps} &\DefEq \lambda (s, f).\, \vec{P}_i(s) + \smashoperator{\sum_{p : P(s)}} Q_i(fp)
-        \qedhere
-    \end{align*}
-\end{definition}
-Substitution into a fixed container behaves functorially:
+First, note that substitution into a fixed container behaves functorially:
 \begin{problem}
   Given \( F : \Cont_{I+1} \), extend \( \Subst{F}{\Blank} \) to a wild endofunctor on \( \ContCart_I \).
 \end{problem}
 \begin{construction}
   Straightforward.
 \end{construction}
-Substitution commutes with composition under the interpretation of containers,
-that is for \( F : \Cont_{I + 1} \) and \( G : \Cont_I \),
+It also commutes with composition under the interpretation of containers:
+for all \( F : \Cont_{I + 1} \) and \( G : \Cont_I \),
 there is an equivalence of types
 \( \llbracket \Subst{F}{G} \rrbracket \vec{X} \simeq \llbracket F \rrbracket(\vec{X}, \llbracket G \rrbracket\vec{X}) \), natural in \( \vec{X} : I \to \Type \).
 In particular, a fixed point of containers \( \varphi : \CartIso{\Subst{F}{G}}{G} \) induces a fixed point of \( \Ext{F}(\vec{X}, \Blank ) \).
@@ -319,7 +322,7 @@ Hence we say:
 \begin{definition}
   A smallest fixed point of a signature container \( F : \Cont_{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
 \end{definition}
-Spelled out, an \( F \)-fixed point it consists of a \emph{carrier} \( M : \Cont_I \)
+Spelled out, a smallest \( F \)-fixed point it consists of a \emph{carrier} \( M : \Cont_I \)
 and a structure map \( m : \Cart{\Subst{F}{M}}{M} \)
 such that for any other algebra \( (G, g) \), the type of morphisms \( \Alg{\Subst{F}{\Blank}}((M, m), (G, g)) \) is contractible.
 The latter means exactly that there is a unique map \( r : \Cart{M}{G} \) that commutes with the structure maps \( m \) and \( g \).
@@ -336,7 +339,7 @@ the type \( \W(A, B) \) has the single constructor
     \DisplayProof
   }
 \end{equation*}
-Each \( w : \W(A, B) \) is a tree with \( A \)-labeled nodes, and \( B(a) \)-branching subtrees.
+Each \( w : \W(A, B) \) is a well-founded tree with \( A \)-labeled nodes, and \( B(a) \)-branching subtrees.
 A path to some node inside \( w \), labelled by \( C : A \to \Type \),
 can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \) with two constructors, namely
 \begin{center}
@@ -638,8 +641,7 @@ Thus, a strong \( \mu \)-rule for some container necessarily implies a strong ru
   \end{proof}
 \end{proposition}
 
-With a bit of creativity we can show that this is not only a necessary,
-but also a sufficient condition:
+We can show that this is not only a necessary, but also a sufficient condition:
 \begin{theorem}\label{strong-mu-rule-iff-strong-chain-rule}
   For any container \( F : \Cont_{I + 1} \), the following are equivalent:
   \begin{enumerate}

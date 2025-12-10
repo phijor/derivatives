@@ -8,7 +8,7 @@ Let us recall the notion of a container in type theory:
   \( (\MkCont{S}{P})_{\Sh} \DefEq S \) and \( (\MkCont{S}{P})_{\Ps} \DefEq P \).
 \end{definition}
 
-Containers were introduced to model polymorphic data types,
+Containers were introduced to model inductive data types,
 hence they are closed under products \( \times \), sums \( + \) and substitution \( \Subst{\Blank}{\Blank} \);
 see \autoref{container-operations} for their definitions.
 The constant container at a type \( S \) is \( \CConst{S} \DefEq (\MkCont{S}{0}) \);
@@ -44,6 +44,16 @@ is a unit for substitution, which is a non-symmetric monoidal product.
   \label{container-operations}
 \end{figure}
 
+A shape \( s : S \) of a container \( F \JudgeEq (\MkCont{S}{P}) \) is intuitively understood
+as the name of a constructor of the inductive type encoded by \( F \),
+and each position \( p : P(s) \) indexes an argument to this constructor.
+To model (polymorphic) functions between inductive types,
+one should describe how constructors of the input map to constructors in the output,
+and associate to each position in the output --- encoding the argument to a constructor --- its occurrence in the input.
+Hence, a morphism \( (\MkCont{S}{P}) \to (\MkCont{T}{Q}) \) consists of a map of shapes \( f : S \to T \),
+and a family of maps of positions \( u : \prod_{s : S} Q_{fs} \to P_s \).
+For our purposes, we have to go one step further and describe a kind of \enquote{linear} function;
+one in which positions are mapped 1-to-1 between input and output:
 \begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
   The type of \emph{cartesian morphisms} between \( F \) and \( G \) is
@@ -60,8 +70,9 @@ Morphisms of containers compose as expected, and together with an identity morph
 they form a wild category \( \ContCart \):
 composition is associative and unital, but we make no assumption on the truncation level of the hom-types \( \Cart{F}{G} \).
 Note that this wild category is \emph{not} univalent in the na{\"i}ve sense:
-The canonical map taking paths of containers \( F = G \) to categorical isomorphisms
-(i.e. pairs \( f : \Cart{F}{G}, g : \Cart{G}{F} \) with chosen paths \( fg = \Op{id}_F \) and \( gf = \Op{id}_G \)),
+The canonical map taking paths of containers \( F = G \) to categorical isomorphisms,\footnote{%
+  that is, pairs \( f : \Cart{F}{G}, g : \Cart{G}{F} \) with chosen paths \( fg = \Op{id}_F \) and \( gf = \Op{id}_G \)
+}
 is \emph{not} an equivalence, unless shapes and positions of the involved containers are sets.
 Instead, we are going to use the following definition when comparing containers:
 
@@ -93,14 +104,14 @@ through (equivalent) auxiliary containers
 \begin{equation*}
   \begin{tikzcd}
     F \ar[r, -multimap, "f"] & G \\
-    {F'} \ar[r, -multimap, "f'"{swap}] & {G'}
-    \ar[from=1-1,to=2-1, -multimap, "\sim"{swap}]
-    \ar[from=2-2,to=1-2, -multimap, "\sim"{swap}]
+    {F\mathrlap{'}} \ar[r, -multimap, "f'"{swap}] & {G\mathrlap{'}}
+    \ar[from=1-1,to=2-1, multimap-multimap]
+    \ar[from=2-2,to=1-2, multimap-multimap]
   \end{tikzcd}
 \end{equation*}
 This lets us separate the bureaucracy of bringing \( F \) and \( G \) into a comparable shape
 from the act of defining an interesting morphism \( f' : \Cart{F'}{G'} \).
-As a consequence, \( f \) is an equivalence of containers if and only if \( f' \) is,
+In particular, \( f \) is an equivalence of containers if and only if \( f' \) is,
 which is often easier to characterize.
 
 \subsection{Derivatives, Universally}
@@ -112,7 +123,7 @@ Given \( G \JudgeEq (\MkCont{T}{Q}) \), \citeauthor{AbbottEtAl2005DataDifferenti
 to have as shapes pairs \( (t , q) : \sum_{T} Q \), over which the positions are \( Q_t \setminus q \).
 To ensure that \( \Der \) is well-behaved, it is characterized by a universal property:
 on a suitable subcategory of containers,\footnote{namely that of discrete containers} \( \Der \) extends to an endofunctor,
-and one is interested in finding an adjunction \( \Maybe{\Blank} \dashv \Der \)
+and one shows the existence of an adjunction \( \Maybe{\Blank} \dashv \Der \)
 that describes morphisms into \( \Der{G} \):
 If such an adjunction exists, then morphisms \( \Cart{F}{\Der{G}} \) are in 1-to-1 correspondence with morphisms of shape \( (f, u) : \Cart{\Maybe{F}}{G} \).
 On positions, such morphisms are equivalences \( u_s : G_{\Ps}(fs) \simeq F_{\Ps}(s) + 1 \),
@@ -142,13 +153,13 @@ We can not only take the derivative of a container, but also act functorially on
   Define a wild endofunctor \( \Der : \ContCart \to \ContCart \).
   That is,
   for all \( f : \Cart{F}{G} \), a morphisms \( \Der{f} : \Cart{\Der{F}}{\Der{G}} \),
-  such that \( \Der(\Id_F) = \Id_{\Der{F}} \) and \(\Der(fg) = (\Der{f})(\Der{g}) \).
+  such that \( \Der(\Op{id}_F) = \Op{id}_{\Der{F}} \) and \(\Der(fg) = (\Der{f})(\Der{g}) \).
   \begin{construction}
     For any \( (f, u) : \Cart{(\MkCont{S}{P})}{(\MkCont{T}{Q})} \),
     there is a canonical morphism \( \Der{(f, u)} \DefEq (f' , u') : \Cart{\Der{(\MkCont{S}{P})}}{\Der{(\MkCont{T}{Q})}} \)
     obtained as follows:
-    On shapes, the map \( f' : \sum_{s : S} \Isolated{P_s} \to \sum_{t : T} \Isolated{G_t} \)
-    applies \( f \) to the first component and \( \Isolated{(u_s^\Inv)} : \Isolated{P_s} \simeq \Isolated{G_{fs}} \) to the second.
+    On shapes, the map \( f' : \sum_{s : S} \Isolated{P_s} \to \sum_{t : T} \Isolated{Q_t} \)
+    applies \( f \) to the first component and \( \Isolated{(u_s^\Inv)} : \Isolated{P_s} \simeq \Isolated{Q_{fs}} \) to the second.
     On positions, \( u'_{s,p} : G_{fs} \setminus u_s^\Inv(p) \simeq F_s \setminus p \) is obtained from \( u_s \), which respects the removed point \( p \).
     (cf.\@ \autoref{is-isolated-respect-equiv}).
   \end{construction}
@@ -286,22 +297,12 @@ From this, we can extract the familiar natural isomorphism of hom-sets in \( \Co
 In fact, the same argument lets us obtain a natural equivalence of hom-types for arbitrary containers,
 which otherwise would be somewhat tedious to establish:
 there is an equivalence \( (\Cart{F}{\Der{G}}) \simeq (\Cart{\Maybe{F}}{G}) \) natural in \( F, G : \ContCart \),
-with underlying map\footnote{%
-  Interestingly, the proof of \cite[{Theorem 5.1}]{AbbottEtAl2005DataDifferentiating} already uses \( {\Blank}^{\sharp} \) to show naturality of the hom-set isomorphism in \( F \)!
-}
+with underlying map
 \begin{align*}
   {\Blank}^\sharp &: (\Cart{F}{\Der{G}}) \to (\Cart{\Maybe{F}}{G}) \\
   f^{\sharp} &\DefEq \varepsilon_G \circ (\Maybe{f})
 \end{align*}
-That \( {\Blank}^{\sharp} \) is an equivalence
-means that for all \( { g : \Cart{\Maybe{F}}{G} } \)
-the type of fibers
-\(
-  \sum_{f : \Cart{F}{\Der{G}}} \varepsilon_G \circ (\Maybe{f}) = g
-\) is contractible.
-This expresses the \emph{property} of \( \varepsilon_G \) being a universal arrow from \( \Maybe{\Blank} \) to \( G \):
-any \( g \) factors uniquely through \( \varepsilon_G \).
-Hence, the data of the wild adjunction in \autoref{derivative-adjunction} is uniquely determined, up to our choice of counit.
+Interestingly, the proof of \cite[{Theorem 5.1}]{AbbottEtAl2005DataDifferentiating} already uses \( {\Blank}^{\sharp} \) to show naturality of the hom-set isomorphism in \( F \).
 
 \subsection{Basic Laws of Derivates}
 
@@ -422,5 +423,5 @@ of types closed under addition and removal of single points:
   such that \( \CartIso{\Der{\Op{Bag}_P}}{\Op{Bag}_P} \). \qedhere
 \end{proposition}
 For the details of the proof we refer the reader to the formalization;
-there one can find an example of this applied to subcountable sets
+there one can find an example of this applied to countable sets
 defined by the predicate \( P(A) \DefEq \lVert A \hookrightarrow \mathbb{N} \rVert \).

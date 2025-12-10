@@ -32,7 +32,21 @@ indeed, \emph{every} container is differentiable in this sense, as long as we de
 \subsection*{Notation}
 
 \begin{itemize}
+  \item
+    Follow the HoTT-book for transports/substitutions:
+    For \( B : A \to \Type \) and \( p : x =_A y \), write \( p_* : B(x) \to B(y) \).
+    Not \( \Op{subst} \) or anything like that
+  \item Map over \( \Sigma \)-types with
+    \[
+      \Sigma(\Blank, \Blank) : \prod_{f : A \to A'} (\prod_{a : A} B(a) \to B'(f(a))) \to \sum_{A} B \to \sum_{A'} B'
+    \]
+  \item
+    Define embeddings by two equivalent properties (invertible \( \Op{cong} \) and propositional fibers)
+  \item Recall notions of wild category and functor
   \item Use \enquote{filler} for paths of morphism in a wild category
     (since in general, there can be many distinct paths)
+
+  \item Say how to smartly prove that a certain map is an equivalence:
+    \cite{Jong2025FormalizingEquivalencesTears} minimizes the tears shed over such proofs.
 \end{itemize}
 

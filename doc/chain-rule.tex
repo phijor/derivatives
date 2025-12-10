@@ -44,7 +44,7 @@ Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
       \sum_{t : T} \Isolated{Q_t}
     \\
     &\simeq
-      \sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} \sum\nolimits_{(f, t) : (P_s \setminus p \to T \times T)} \Isolated{Q_t}
+      \sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} \sum\nolimits_{(f, t) : (P_s \setminus p \to T) \times T} \Isolated{Q_t}
     % &\simeq
     %   \adjustlimits\sum_{s : S} \sum_{p : \Isolated{P_s}} \smashoperator[r]{\sum_{(\Blank, t) : (P_s \setminus p \to T \times T)}} \Isolated{Q_t}
   \intertext{%
@@ -125,7 +125,7 @@ in which
 applies \( \SigmaIsolate_{P_s,Q_{f(\Blank)}} \).
 We will make this factorization explicit in the derivation of the chain rule for indexed containers (\autoref{binary-chain-rule}).
 We say that the chain rule for \( F \) and \( G \) is \emph{strong} if \( \Chain_{F,G} \) is an equivalence of containers;
-the above lets us immediately see when under which circumstances we can expect this to be the case.
+the above lets us immediately see under which circumstances we can expect this to be the case.
 \begin{proposition}\label{strong-chain-rule-iff-is-equiv-sigma-isolate}
   Let \( F = (\MkCont{S}{P}) \) and \( G = (\MkCont{T}{Q}) \).
   The following are equivalent propositions:
@@ -205,4 +205,4 @@ in that we retain the ways it interacts with sums and products (\autoref{sum-pro
 Its interaction with substitution, however, is more subtle.
 While we do obtain a chain rule, it is now \emph{directed} or \emph{lax} (\autoref{lax-chain-rule}),
 and whether we can strengthen it to an equivalence depends on the pair of containers involved (\autoref{strong-chain-rule-iff-is-equiv-sigma-isolate}).
-Indeed, assuming the latter for any pair of containers is inconsistent in the presence of higher inductive types such the circle \( S^1 \).
+Indeed, assuming the latter for any pair of containers is inconsistent in the presence of higher inductive types such as the circle \( S^1 \).
