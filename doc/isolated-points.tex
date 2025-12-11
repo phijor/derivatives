@@ -18,25 +18,20 @@ so case-analysis should yield a decision procedure, even without looking at poin
 We call such points \emph{isolated}:
 \begin{definition}
   A point \( a : A \) is \emph{isolated} if \( a = b \) is decidable for all \( b : A \).
-  That is, isolated points satisfy the predicate \( \Op{isIsolated} : A \to \Type \),
+  That is, isolated points satisfy the predicate \( \IsIsolated : A \to \Type \),
   \[
-    \Op{isIsolated}(a) \DefEq \prod_{b : A} \Op{Dec}(a = b)
+    \IsIsolated(a) \DefEq \prod_{b : A} \Op{Dec}(a = b)
   \]
   We denote by
   \(
-    \Isolated{A} \DefEq \sum_{a : A} \Op{isIsolated}(a)
+    \Isolated{A} \DefEq \sum_{a : A} \IsIsolated(a)
   \)
   the subtype of isolated points.
 \end{definition}
-\begin{remark}[note={Where does this go?}]
-  In \cite[\TypeTopology{Factorial.Law}]{EscardocontributorsTypeTopology}, \citeauthor{EscardocontributorsTypeTopology}
-  prove a \enquote{factorial law} for arbitrary types: if \( X! \) denotes the type of autormorphisms \( X \simeq X \),
-  then \( (X + 1)! \simeq \Isolated{(X + 1)} \times X! \).
-\end{remark}
-Note that, \emph{a priori}, the type of proofs that some point is isolated might not be a proposition.
-Take for example the circle \( S^1 \): there are \( \mathbb{Z} \)-many proofs of \( \Op{Dec}(\Op{base} =_{S^1} \Op{base}) \).\footnote{In fact \( S^1 \) is \emph{perfect}, i.e.\@ has no isolated points at all.}
+Note that, \emph{a priori}, the type \( \IsIsolated(a) \) might not be a proposition.
+Take for example the circle \( S^1 \): there are \( \mathbb{Z} \)-many proofs of \( \Op{Dec}(\Op{base} =_{S^1} \Op{base}) \).
 However, since equality has to be decidable uniformly for a point to be isolated, this does not happen:
-isolated points \emph{do} have trivial path spaces.
+isolated points \emph{do} have trivial path spaces.\footnote{In fact \( S^1 \) is \emph{perfect}, i.e.\@ has no isolated points at all.}
 To prove this, \citeauthor{KrausEtAl2017NotionsAnonymousExistence} give the following
 \enquote{local} version of Hedberg's Theorem:\todo{\cite{Kraus2015TruncationLevelsHomotopy} has a nice discussion in \S 3.2.}
 \begin{lemma}[note={\cite[Theorem~3.12]{KrausEtAl2017NotionsAnonymousExistence}}]\label{is-prop-isolated-path}
@@ -45,7 +40,7 @@ To prove this, \citeauthor{KrausEtAl2017NotionsAnonymousExistence} give the foll
 This has a number of important consequences:
 \begin{corollary}\label{is-prop-isolated-dec-path}\label{is-prop-is-isolated}
   If \( a : A \) is isolated, then \( \Dec{(a = b)} \) is a proposition for all \( b : A \).
-  In particular, \( \Op{isIsolated}(a) \) is a proposition for all \( a : A \).
+  In particular, \( \IsIsolated(a) \) is a proposition for all \( a : A \).
 \end{corollary}
 
 Taking all of this together, we see that the subtype of isolated points carves out a discrete part of a type:
@@ -59,13 +54,6 @@ Taking all of this together, we see that the subtype of isolated points carves o
     hence is the dependent path type \( h_a =_{p} h_b \).
   \end{proof}
 \end{proposition}
-
-
-% A type whose points are all isolated is always a (homotopy) set.
-% This corresponds to the intuition that, classically,
-% a space consisting entirely of isolated points is necessarily (topologically) discrete.
-% In a univalent setting, however, types can have interesting, non-trivial path types.
-% The subtype of isolated points then carves out the topologically discrete part of a type:
 
 As expected, being an isolated point is stable under equivalence:
 \begin{lemma}\label{is-isolated-respect-equiv}
@@ -93,8 +81,8 @@ for which \emph{some} \( \prod_{x,y} f(x) = f(y) \to x = y \) exists -- not nece
 the proof works no matter which path we pick,
 and \emph{post hoc} this choice of path is unique, since it originates from an isolated point.
 
-In the remainder, however, we will, apply \autoref{embedding-reflect-isolated} exclusively to embeddings.
-In particular, we deduce that the canonical embeddings \( \Inl : A \hookrightarrow A + B \) and \( \Inr : B \hookrightarrow A + B \)
+In the remainder, however, we will apply \autoref{embedding-reflect-isolated} exclusively to embeddings.
+We can use it, for example, to show that the canonical embeddings \( \Inl : A \hookrightarrow A + B \) and \( \Inr : B \hookrightarrow A + B \)
 both reflect and create isolated points:
 
 \begin{proposition}\label{sum-embeddings-respect-isolated}
@@ -153,10 +141,10 @@ First, observe that any dependent pair of isolated points defines an isolated po
   \begin{proof}
     Let \( a : A \), \( b : B(a) \). Our goal is to decide whether \( (a_0 , b_0) = (a, b) \) or not.
     By extensionality of path types of dependent sums
-    it suffices to decide the equivalent type \( \sum_{p : a_0 = a} b_0 = p^{\Inv}_*(b_0) \).
+    it suffices to decide the equivalent type \( \sum_{p : a_0 = a} b_0 = p^{\Inv}_*(b) \).
     If \( a_0 \neq a \), then this type is empty.
     Otherwise, we have some \( p : a_0 = a \), and the type is inhabited or empty
-    depending on whether \( b_0 = p^{\Inv}_*(b_0) \) or not.
+    depending on whether \( b_0 = p^{\Inv}_*(b) \) or not.
   \end{proof}
 \end{proposition}
 
@@ -164,9 +152,9 @@ If we had an inverse to \( \SigmaIsolate \), then the converse would hold as wel
 It turns out that this requirement is not only sufficient, but also necessary.
 Inspecting the fibers of \( \SigmaIsolate \), we notice that they are all propositions,
 hence \( \SigmaIsolate \) must be an embedding:
-\begin{lemma}\label{is-embedding-sigma-isolate}
+\begin{lemma}\label{sigma-isolate-fibers}
   For all \( A : \Type \), \( B : A \to \Type \), and \( y \JudgeEq ((a, b), \Blank) : \Isolated{(\sum_{A} B)} \),
-  there is an equivalence \( \Op{fiber}_{\SigmaIsolate}(y) \simeq \Op{isIsolated}(a) \times \Op{isIsolated}(b) \).
+  there is an equivalence \( \Op{fiber}_{\SigmaIsolate}(y) \simeq \IsIsolated(a) \times \IsIsolated(b) \).
   In particular, fibers of \( \SigmaIsolate_{A, B} \) are propositions, hence it is an embedding.
   \begin{proof}
     By extensionality of paths in \( \Sigma \)-types, we re-phrase the type of fibers over \( y \) in terms of singletons
@@ -175,13 +163,19 @@ hence \( \SigmaIsolate \) must be an embedding:
         \textstyle
         \sum_{(a', \Blank) : \Op{singl}(a)}
         \sum_{(b', \Blank) : \Op{singl}(p_{*}{b})}
-          \Op{isIsolated}(a') \times \Op{isIsolated}(b')
+          \IsIsolated(a') \times \IsIsolated(b')
     \]
     The claim follows by contracting away these singletons.
   \end{proof}
 \end{lemma}
+\begin{proposition}\label{is-embedding-sigma-isolate}
+  For all \( A : \Type \) and \( B : A \to \Type \), the map \( \SigmaIsolate_{A, B} \) is an embedding.
+  \begin{proof}
+    By the previous result, all fibers of \( \SigmaIsolate_{A, B} \) are propositions.
+  \end{proof}
+\end{proposition}
 
-A map is an equivalence if and only if it is both an equivalence and a surjection (i.e.\@ a map whose fibers are merely inhabited),
+A map is an equivalence if and only if it is both an embedding and a surjection (i.e.\@ a map whose fibers are merely inhabited),
 hence we obtain the following characterization of isolated points in \( \Sigma \)-types:
 \begin{lemma}\label{is-equiv-sigma-isolate-iff-isolated-pair}
   Let \( A : \Type \) and \( B : A \to \Type \).
@@ -199,8 +193,8 @@ hence we obtain the following characterization of isolated points in \( \Sigma \
   \begin{proof}
     Since \( \SigmaIsolate \) is an embedding, \ref{is-equiv-sigma-isolate-iff-isolated-pair-is-equiv} and \ref{is-equiv-sigma-isolate-iff-isolated-pair-is-surj} are clearly equivalent.
     We show that \ref{is-equiv-sigma-isolate-iff-isolated-pair-is-surj} if and only if \ref{is-equiv-sigma-isolate-iff-isolated-pair-pair}:
-    By \autoref{is-embedding-sigma-isolate}, the fiber over an arbitrary \( y \JudgeEq ((a, b), h) : \Isolated{(\sum_A\!B)} \) is equivalent to
-    \( \Op{isIsolated}(a) \times \Op{isIsolated}(b) \).
+    By \autoref{sigma-isolate-fibers}, the fiber over an arbitrary \( y \JudgeEq ((a, b), h) : \Isolated{(\sum_A\!B)} \) is equivalent to
+    \( \IsIsolated(a) \times \IsIsolated(b) \).
     By currying, \ref{is-equiv-sigma-isolate-iff-isolated-pair-pair} holds if and only if all fibers of \( \SigmaIsolate \) are inhabited.
   \end{proof}
 \end{lemma}
@@ -239,9 +233,9 @@ This applies in particular to the type of singletons, \( \Op{singl}(a_0) \DefEq 
   \begin{enumerate}
     \item \( A \) is discrete.
     \item For all \( a_0 : A \), the map
-      \(
+      \[
         \SigmaIsolate_{A, a_0 = {\Blank}} : \sum_{a : \Isolated{A}} \Isolated{(a_0 = a)} \to \Isolated{\Op{singl}(a_0)}
-      \)
+      \]
       is an equivalence.
   \end{enumerate}
   \begin{proof}
@@ -303,7 +297,7 @@ the inverse simply maps \( a_0 \) to \( \bullet \).
 In a univalent setting however, this replaces the higher path spaces of \( a_0 \)
 with the trivial ones of \( \bullet \).
 Consider for example the circle \( S^1 \) with \( \mathsf{base} : S^1 \).
-Then \( S^1 \setminus \mathsf{base} \simeq 0 \),
+Here \( S^1 \setminus \mathsf{base} \simeq 0 \),
 hence \( (S^1 \setminus \mathsf{base}) + 1 \simeq 1 \not\simeq S^1 \):
 removing \( \mathsf{base} \) removes the entire circle, which is \emph{not} contractible.
 % This intui
@@ -326,7 +320,7 @@ We observe that we can replicate the classical behavior exactly when \( a_0 \) i
         \Just{(a, h)} & \text{if}\ d \JudgeEq \Op{no}(h : a_0 \neq a)
       \end{cases}
     \]
-    For \( i_0 : \Op{isIsolated}(a_0) \), let \( g(a) \DefEq \Op{r}(a, i_0(a)) \).
+    For \( i_0 : \IsIsolated(a_0) \), let \( g(a) \DefEq \Op{r}(a, i_0(a)) \).
     By \autoref{is-prop-isolated-dec-path}, \( \Dec(a_0 = a) \) (the type of \( i_0(a) \)) is a proposition for all \( a : A \);
     we use this to ensure that \( g \) computes correctly:
     \begin{align*}

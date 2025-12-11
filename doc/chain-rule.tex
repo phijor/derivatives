@@ -124,14 +124,30 @@ in which
 \)
 applies \( \SigmaIsolate_{P_s,Q_{f(\Blank)}} \).
 We will make this factorization explicit in the derivation of the chain rule for indexed containers (\autoref{binary-chain-rule}).
-We say that the chain rule for \( F \) and \( G \) is \emph{strong} if \( \Chain_{F,G} \) is an equivalence of containers;
-the above lets us immediately see under which circumstances we can expect this to be the case.
+We say that the chain rule for \( F \) and \( G \) is \emph{strong} if \( \Chain_{F,G} \) is an equivalence of containers.
+Using any of the equivalent properties listed in \autoref{is-equiv-sigma-isolate-iff-isolated-pair},
+we can express when exactly we have a strong chain rule.
+First, note that \( \SigmaIsolate \) is always an embedding (cf.~\autoref{is-embedding-sigma-isolate}),
+hence we can think of \( \Chain_{F,G} \) as embedding \( \Subst{(\Der{F})}{G} \CTimes \Der{G} \)
+as a sub-container inside \( \Der(\Subst{F}{G}) \):
+\begin{proposition}\label{is-embedding-chain-rule}
+  For all \( F, G : \Cont \), the shape map \( \Chain_{F,G}^{\Sh} \) is an embedding.
+  \begin{proof}
+    By \autoref{is-embedding-sigma-isolate}, \( \SigmaIsolate \) is an embedding.
+  \end{proof}
+\end{proposition}
+
+\begin{todo-block}
+  Define the notion of \enquote{embedding of containers}.
+\end{todo-block}
+
+Second, this strengthens to an equivalence of containers depending on \( \SigmaIsolate \) alone:
 \begin{proposition}\label{strong-chain-rule-iff-is-equiv-sigma-isolate}
   Let \( F = (\MkCont{S}{P}) \) and \( G = (\MkCont{T}{Q}) \).
   The following are equivalent propositions:
   \begin{enumerate}
     \item
-      \( \Op{chain}_{F,G} \) is an equivalence of containers
+      \( \Chain_{F,G} \) is an equivalence of containers
     \item
       \( \SigmaIsolate_{P_s,Q_{f(\Blank)}} \) is an equivalence for all \( s : S \) and \( f : P_s \to T \)
   \end{enumerate}
@@ -139,11 +155,6 @@ the above lets us immediately see under which circumstances we can expect this t
     By inspection of the definition of \( \Op{chain} \) in terms of \( \SigmaIsolate \).
   \end{proof}
 \end{proposition}
-We can use any of the equivalent properties listed in \autoref{is-equiv-sigma-isolate-iff-isolated-pair}
-to express when exactly we have a strong chain rule.
-In particular, we know that \( \SigmaIsolate \) is always an embedding (cf.~\autoref{is-embedding-sigma-isolate}),
-hence we can think of \( \Chain_{F,G} \) as embedding \( \Subst{(\Der{F})}{G} \CTimes \Der{G} \)
-as a sub-container inside of \( \Der(\Subst{F}{G}) \).
 
 As expected by \cite[{Proposition~6.6}]{AbbottEtAl2005DataDifferentiating},
 the chain rule is strong for \emph{discrete} containers:

@@ -490,7 +490,9 @@ In fact, this morphism is uniquely determined, hence we get a fixed point for an
       \end{tikzcd}
     \]
     Let us sketch the proof.
-    By induction, we define \( p \) as a composite of two paths, \( p_1 \) and \( p_2 \),
+    By extensionality of morphisms (\autoref{container-morphism-ext}), the path \( p \) can be given as a \( {\mu F}_{\!\Sh} \)-indexed family of paths.
+    But \( {\mu F}_{\!\Sh} \) is a \( \W \)-type,
+    hence we define \( p \) by \( \W \)-induction as a composite of two paths, \( p_1 \) and \( p_2 \),
     using the path which ensures that \( \alpha^* \) is a morphism of algebras.
     The composite of these two paths is unique up to a unique dependent path, and from this we build the filler connecting the two squares above.
     In our mechanized proof, this construction makes extensive use Cubical Agda's primitive support for dependent path types and cube filling operations.
@@ -603,9 +605,6 @@ There is however hope to recover at least a morphism out of \( \mu F' \) into \(
     Lastly, let \( \MuRule_F \DefEq \Op{rec}_{F'}(\alpha) : \Cart{ \mu F' }{ \Der{(\mu F)} } \).
   \end{construction}
 
-% Our goal is to derive a fixed-point rule \( \varphi : \CartIso{\mu F^{\prime}}{\Der{\mu F}} \) for some \( F^{\prime} \).
-% Assuming we had defined \( \varphi \) by recursion from a \( \Subst{F^{\prime}}{\Blank} \)-algebra,
-% Importantly, \( \varphi \) being an equivalence is reflected by recursion:
 One advantage of defining the \( \mu \)-rule by recursion is that it highlights the dependency on the chain-rule.
 First, observe that recursion reflects equivalence, in the following sense:
 \begin{lemma}\label{is-equiv-from-mu-rec}
@@ -628,7 +627,7 @@ First, observe that recursion reflects equivalence, in the following sense:
   \end{proof}
 \end{lemma}
 
-Thus, a strong \( \mu \)-rule for some container necessarily implies a strong rule between \( F \) and \( \mu F \):
+Thus, a strong \( \mu \)-rule for some container necessarily implies a strong chain rule between \( F \) and \( \mu F \):
 \begin{proposition}\label{strong-chain-rule-from-strong-mu-rule}
   Let \( F : \Cont_{I + 1} \).
   If \( \MuRule_F \) is an equivalence, then so is \( \Op{chain}_{F,{\mu F}} \).
@@ -641,7 +640,115 @@ Thus, a strong \( \mu \)-rule for some container necessarily implies a strong ru
   \end{proof}
 \end{proposition}
 
-We can show that this is not only a necessary, but also a sufficient condition:
+We would like to establish the converse to this as well, but cannot do so directly,
+as the converse of \autoref{is-equiv-from-mu-rec} does not hold:
+in general, there are fixed points \( \varphi : \Cart{ \Subst{F}{G} }{ G } \) such that \( \mu F \) and \( G \) are not equivalent as containers.
+However, \( \mu F \) is the smallest among such fixed points, and hence embeds into any other (pre-)fixed point:
+\begin{lemma}\lemma{is-embedding-mu-rec}
+  If \( \alpha : \Cart{\Subst{F}{G}}{G} \) is an embedding of containers,
+  then so is \( \Rec_F(\alpha) \).
+  \begin{proof}
+    This is a direct application of the next result (\autoref{is-embedding-W-rec}) to the shape map \( \Rec_F(\alpha)_{\Sh} : \W(S,P) \to T \).
+  \end{proof}
+\end{lemma}
+
+Non-dependent recursion on \( \W(S, P) \) into a type \( A \) can be given by
+\begin{align*}
+  \WRec &: \big(\big( { \textstyle \sum_{s : S} (P(s) \to A) } \big) \to A \big) \to (\W(S, P) \to A) \\
+  \WRec&_h(\Sup(s, f)) \DefEq h(s, \WRec(h) \circ f)
+\end{align*}
+This map preserves embeddings:
+\begin{lemma}\label{is-embedding-W-rec}
+  Let \( S : \Type \) and \( P : S \to \Type \).
+  For all \( A : \Type \),
+  if \( h : ( \sum_{s : S} (P(s) \to A) ) \to A \) is an embedding,
+  then so is \( \WRec_h : \W(S, P) \to A \).
+  \begin{proof}
+    It suffices to show that fibers over the image of \( \WRec_h \) are propositions,
+    i.e. that \( \prod_{w : \W(S, P)} \Op{isProp}(\Op{fiber}_{\WRec_h}(\WRec_h(w)))  \).
+    We do so by \( \W \)-induction.
+    Let \( s : S \), \( f : P(s) \to \W(S, P) \),
+    and consider the type of fibers over \( \Sup(s, f) \):
+    \begin{align*}
+      {} &\mathrel{\hphantom{\simeq}}
+        \Op{fiber}_{\WRec_h}(\WRec_h(\Sup(s, f)))
+      \intertext{
+        By the computation rule for \( \W \)-recursion, it is equivalent to
+      }
+        &\simeq
+        \sum_{w : \W(S, P)} h(x) = h(s, \WRec_h \circ f)
+      \intertext{
+        where \( x \) is a term involving \( w \), to be expanded later.
+        Since \( h \) is an embedding, we can cancel it from the path type:
+      }
+        &\simeq
+        \sum_{w : \W(S, P)} x = (s, \WRec_h \circ f)
+      \intertext{
+        Unfolding \( \W(S, P) \) via \( \operatorname{\Op{W-in}} \) and expanding \( x \),
+        we obtain
+      }
+        &\simeq
+        \adjustlimits\sum_{s' : S} \sum_{f' : P(s') \to \W(S, P)}
+          (s', \WRec_h \circ f') = (s, \WRec_h \circ f)
+      \intertext{
+        Breaking up the path of pairs into a pair of paths, we rearrange:
+      }
+        &\simeq
+        \adjustlimits\sum_{(s\mathrlap{'} , q) : \Op{singl}(s)} \sum_{f' : P(s') \to \W(S, P)}
+          \WRec_h \circ f' =_{q} \WRec_h \circ f
+      \intertext{
+        Contracting \( \Op{singl}(s) \) and applying function extensionality to the right,
+        we are left with
+      }
+        &\simeq
+        \sum_{f' : P(s) \to \W(S, P)}
+          \prod_{p : P(s)}
+          \WRec_h(f'(p)) = \WRec_h(f'(p))
+      \intertext{
+        Distributing \( \Sigma \) over \( \Pi \),
+        we get
+      }
+        &\simeq
+          \prod_{p : P(s)}
+            \sum_{w : \W(S, P)}
+            \WRec_h(w) = \WRec_h(f(p))
+    \end{align*}
+    For any \( p : P(s) \), the codomain of this type is
+    \( \Op{fiber}_{\WRec_h}(\WRec_h(f(p)) \).
+    But since \( f(p) : \W(S, P) \) is structurally smaller than \( \Sup(s, f) : \W(S, P) \),
+    this type is a proposition.
+    Hence, all fibers over the image of \( \WRec_h \).
+  \end{proof}
+\end{lemma}
+
+This tells us that \( \MuRule_F \) embeds \( \mu F' \) as a subcontainer inside of \( \Der(\mu F) \):
+\begin{lemma}\label{is-embedding-mu-rule}
+  For all \( F : \Cont_{I + 1} \), the shape map \( (\MuRule_F)_{\Sh} \) is an embedding.
+  \begin{proof}
+    By the indexed analogue of \autoref{is-embedding-chain-rule},
+    the shape map of the chain rule is an embedding.
+    This lifts to \( \alpha \), and from there to \( \MuRule_F \JudgeEq \Rec_F(\alpha) \) by \autoref{is-equiv-from-mu-rec}.
+  \end{proof}
+\end{lemma}
+
+From this, we can conclude that a strong chain rule alone is enough to prove a strong \( \mu \)-rule:
+\begin{proposition}\label{strong-chain-rule-to-strong-mu-rule}
+  Let \( F : \Cont_{I + 1} \).
+  If  \( \Chain_{F,{\mu F}} \) is an equivalence, then so is \( \MuRule_F \).
+  \begin{proof}
+    Since \( \MuRule_F \) is always an embedding (\autoref{is-embedding-mu-rule}),
+    it suffices to show that its shape map is a surjection.
+    In fact, it is a split surjection: it has a section, hence all of its fibers are inhabited, not just merely inhabited.
+    Assume \( \Op{chain}_{F,{\mu F}} \) to be an equivalence.
+    By \autoref{strong-binary-chain-rule-iff-is-equiv-sigma-isolate}, this is equivalent to isolated pairs
+    \( (p_1, \bar{w}) \)
+    having isolated components \( p_1 : P_1(s) \) and \( \bar{w} : \bar{\W}(f{p_1}) \),
+    for all \( s : S \) and \( f : P_1(s) \to \W_{\!S}(P_1) \).
+    This property is exactly what is needed to define a section to the shape map.
+  \end{proof}
+\end{proposition}
+
+Thus, whether the \( \mu \)-rule is strong depends only on the chain-rule:
 \begin{theorem}\label{strong-mu-rule-iff-strong-chain-rule}
   For any container \( F : \Cont_{I + 1} \), the following are equivalent:
   \begin{enumerate}
@@ -649,21 +756,8 @@ We can show that this is not only a necessary, but also a sufficient condition:
     \item \( \Op{chain}_{F,{\mu F}} \) is an equivalence.
   \end{enumerate}
   \begin{proof}
-    One direction is exactly \autoref{strong-chain-rule-from-strong-mu-rule}.
-    Let us sketch the other direction; for details, see the formalization.
-
-    Assume \( \Op{chain}_{F,{\mu F}} \) to be an equivalence.
-    By \autoref{strong-binary-chain-rule-iff-is-equiv-sigma-isolate}, this is equivalent to isolated pairs
-    \( (p_1, \bar{w}) \)
-    having isolated components \( p_1 : P_1(s) \) and \( \bar{w} : \bar{\W}(f{p_1}) \),
-    for all \( s : S \) and \( f : P_1(s) \to \W_{\!S}(P_1) \).
-    This property is exactly what is needed to define a putative inverse on shapes,
-    i.e.\@ a map \( \Der{(\mu F)}_{\Sh} \to {(\mu G)}_{\Sh} \).
-    Using this map, we then prove that all fibers of the (forward) shape map are inhabited.
-    It remains to show that these fibers are propositions:
-    By a combination of \( \W \)-induction and \( \Graft \)-induction,
-    we see that each fiber is equivalent to a disjoint sum of fibers over the constructors \( \Op{top} \) and \( \Op{below} \).
-    But these maps are embeddings, hence any of their fibers are propositions.
+    One direction is \autoref{strong-chain-rule-from-strong-mu-rule},
+    the other is \autoref{strong-chain-rule-to-strong-mu-rule}.
   \end{proof}
 \end{theorem}
 

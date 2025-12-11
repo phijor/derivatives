@@ -114,6 +114,20 @@ from the act of defining an interesting morphism \( f' : \Cart{F'}{G'} \).
 In particular, \( f \) is an equivalence of containers if and only if \( f' \) is,
 which is often easier to characterize.
 
+Similarly, we will often implicitly use the following extensionality principle
+to construct paths between container morphisms:
+\begin{lemma}[note={Extensionality of container morphisms}]\label{container-morphism-ext}
+  Let \( F, G : \Cont \) and \( f, g : \Cart{F}{G} \).
+  The type \( f = g \) is equivalent to
+  \[
+    \adjustlimits\prod_{s : F_{\Sh}} \sum_{p : f_{\Sh}(s) = g_{\Sh}(s)} f_{\Ps}(s) =_p^{B} g_{\Ps}(s)
+  \]
+  in which the dependent path varies over the family \( B(t) \DefEq G_{\Ps}(t) \to F_{\Ps}(s) \).
+  \begin{proof}
+    By extensionality for paths in \( \Sigma \)- and \( \Pi \)-types, and the fact that paths of equivalences are the same as paths of their underlying functions.
+  \end{proof}
+\end{lemma}
+
 \subsection{Derivatives, Universally}
 
 The derivative of a container \( G \) represents a type of
