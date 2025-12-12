@@ -1,5 +1,71 @@
 \section{Introduction}
 
+A container \cite{AbbottEtAl2005ContainersConstructingstrictly} is a concise encoding
+of an inductive data type:
+it consists of a collection of shapes \( S \), each \( s : S \) representing a constructor,
+and for each a collection of positions \( P(s) \), indexing arguments to the constructor.
+Many operations on data types can be made precise as operations on containers,
+including sums \( F \CPlus G \), products \( F \CTimes G \) and substitution \( \Subst{F}{G} \), allowing us to reason about them.
+\Citeauthor{Huet1997Zipper} presents \citetitle{Huet1997Zipper}~\cite{Huet1997Zipper},
+an informal procedure for computing a type of contexts around a subtree in a tree-like data type.
+In~\cite{McBride2001DerivativeRegularType}, \Citeauthor{McBride2001DerivativeRegularType} turns this into an algorithm for the inductively defined class of \enquote{regular types},
+and notices that this type of one-hole contexts behaves like a derivative with respect to constants,
+sums and products, and that substitution of types follows a chain rule.
+This is extended to containers by \citeauthor{AbbottEtAl2003DerivativesContainers},
+first in a categorical meta-language~\cite{AbbottEtAl2003DerivativesContainers},
+then in a type-theoretic one~\cite{AbbottEtAl2005DataDifferentiating}.
+They show that derivatives of containers satisfy a universal property with respect to a class of \enquote{linear}
+morphisms of containers,
+namely that for any container \( G \) on which equality of positions is decidable,
+linear morphisms \( F \multimap \Der{G} \) are in 1-to-1 correspondence with morphisms \( F \CTimes \Id \multimap G \).
+Furthermore, the laws of derivatives are encoded as (linear) isomorphisms:
+the chain rule, for example, becomes an isomorphism of containers
+\( \Der{(\Subst{F}{G})} \cong \Subst{(\Der{F})}{G} \CTimes \Der{G} \).
+
+In the meantime, other notions of containers have appeared,
+whose shapes and positions have different kinds of structure:
+quotient- \cite{AbbottEtAl2004ConstructingPolymorphicPrograms} and action containers~\cite{JoramVeltri2025DataTypesSymmetries}
+express symmetries by having groups act on sets of positions,
+symmetric containers internalize symmetries in a groupoid of shapes~\cite{Gylterud2011},
+and generalized containers~\cite{AltenkirchKaposi2021containermodeltype} describe directed relations of shapes as a category.
+
+When working in Univalent Foundations, the most direct generalization of containers is that from sets to arbitrary types
+with potentially non-trivial higher path types.
+What can we say about containers whose shapes and positions are such untruncated types?
+Much of the theory transfers directly, since it never assumed that types were sets in the first place.
+Even smallest-~\cite{DamatoEtAl2025FormalisingInductiveCoinductive} and largest fixed points~\cite{AhrensEtAl2015NonWellfoundedTrees} can be proved to exist.
+
+In this paper, we show that derivatives can be defined for untruncated containers,
+and that they satisfy an analogue of the universal property of discrete containers.
+This is mostly an exercise in reverse mathematics:
+\emph{What are the minimal assumptions on decidability that we can make such that a derivative is still well-defined?}
+To this end, we recall the notion of \emph{isolatedness} of a point in a type, and show how it interacts with various type formers.
+Being isolated is a local notion of discreteness, in the sense that around an isolated point, a type is discrete.
+Our derivative ranges only over isolated positions;
+this allows us to prove the following universal property
+by application of simple lemmata for isolated points:
+On the (wild) category \( \ContCart \) of containers and cartesian morphisms,
+\( \Der \) is an endofunctor that is right-adjoint to taking products, \( \Maybe{\Blank} \).
+As a consequence, we can solve a problem left open in \cite[14]{AbbottEtAl2005DataDifferentiating}:
+the wild adjunction restricts to an ordinary adjunction on the 1-category of set-truncated containers.
+In particular, this proves that \emph{every} set-truncated container has a well-behaved derivative, not just discrete ones.
+Our exercise paid off: by generalizing to arbitrary types, we learn something about sets.
+
+Verifying that this generalized derivative satisfies the expected basic laws is straightforward;
+we essentially repurpose the proofs for the special case of discrete containers,
+but distribute isolated points over type formers whenever necessary.
+This works to show that \( \Der \) distributes over sums and products,
+but fails for the chain rule:
+it generalizes only to a lax chain rule, that is a cartesian morphism
+from
+\( \Subst{(\Der{F})}{G} \CTimes \Der{G} \)
+to
+\( \Der{(\Subst{F}{G})} \).
+
+\begin{todo-block}
+  Continue here.
+\end{todo-block}
+
 \begin{itemize}
   \item
     Two perspectives:
@@ -23,30 +89,74 @@
       \end{itemize}
 \end{itemize}
 
-\begin{remark}
-If we restrict the above to set-truncated containers, we can solve a problem left open by \citeauthor{AbbottEtAl2005DataDifferentiating}:
-they \enquote{leave it to future work to identify the subcategory of differentiable containers}~\cite[14]{AbbottEtAl2005DataDifferentiating};
-indeed, \emph{every} container is differentiable in this sense, as long as we define derivatives in terms of isolated positions:
-\end{remark}
+\subsection*{Overview}
+
+\begin{enumerate}
+  \item Removing points:
+    \begin{itemize}
+      \item define isolated points: points around which a type is locally trivial
+      \item define removal of points, show that it works well for isolated points
+      \item define \enquote{grafting} that for functions out of types with a chosen isolated point
+    \end{itemize}
+  \item Introduce derivatives of untruncated containers
+    \begin{itemize}
+      \item recall that traditionally, derivatives of containers require discrete shapes,
+        or else they won't satisfy a good universal property.
+      \item
+        define derivatives for all container, but only involving isolated positions
+      \item
+        yields a (wild) adjunction for arbitrary containers, like in the set-truncated case
+      \item
+        derivative satisfies the same basic properties with respect to constants,
+        sums and products
+    \end{itemize}
+  \item The chain rule is more involved
+    \begin{itemize}
+      \item in general, only one direction works, we get a lax chain rule
+      \item the lax chain rule is always an embedding
+      \item strong iff isolated points distribute over \( \Sigma \)-types
+      \item a strong chain rule for arbitrary types is inconsistent; assuming it leads to a contradiction
+      \item a strong chain rule for arbitrary sets means that all sets are discrete
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Contributions}
+
 
 \subsection*{Notation}
 
 \begin{itemize}
   \item
-    Follow the HoTT-book for transports/substitutions:
-    For \( B : A \to \Type \) and \( p : x =_A y \), write \( p_* : B(x) \to B(y) \).
-    Not \( \Op{subst} \) or anything like that
+    Type formers: unit type \( 1 \),
+    empty type \( 0 \),
+    products \( A \times B \),
+    coproducts \( A + B \),
+    function types \( A \to B \)
+  \item Dependent type formers:
+    dependent function types \( \Pi_{A} B \) or \( \prod_{a : A} B(a) \),
+    dependent sum types \( \Sigma_{A} B \) or \( \sum_{a : A} B(A) \)
+  \item \( \W \)-types: mention, but introduce later when needed
   \item Map over \( \Sigma \)-types with
     \[
       \Sigma(\Blank, \Blank) : \prod_{f : A \to A'} (\prod_{a : A} B(a) \to B'(f(a))) \to \sum_{A} B \to \sum_{A'} B'
     \]
   \item
-    Define embeddings by two equivalent properties (invertible \( \Op{cong} \) and propositional fibers)
+    Follow the HoTT-book for transports/substitutions:
+    For \( B : A \to \Type \) and \( p : x =_A y \), write \( p_* : B(x) \to B(y) \).
+    Not \( \Op{subst} \) or anything like that
+  \item
+    Truncation levels 
+  \item
+    Define embeddings by two equivalent properties (invertible \( \Op{cong} \), propositional fibers, propositional fibers over the image)
+  \item
+    Surjections are maps with merely inhabited fibers
+  \item
+    Embeddings and surjections form a factorization system for equivalences
+  \item equivalences satisfy a 3-for-2 property,
+    we apply the insights of \cite{Jong2025FormalizingEquivalencesTears} to minimizes the tears shed over such proofs.
   \item Recall notions of wild category and functor
   \item Use \enquote{filler} for paths of morphism in a wild category
     (since in general, there can be many distinct paths)
-
-  \item Say how to smartly prove that a certain map is an equivalence:
-    \cite{Jong2025FormalizingEquivalencesTears} minimizes the tears shed over such proofs.
+  \item wild functor categories are \( [\mathcal{C}, \mathcal{D}] \).
 \end{itemize}
 

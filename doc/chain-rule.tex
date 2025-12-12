@@ -204,12 +204,16 @@ then we can conclude that a globally strong chain rule exists if and only if arb
       for all pairs of containers \( F \) and \( G \).
   \end{enumerate}
   \begin{proof}
-    In the 1-category \( \ContCart_{0,0} \), being an isomorphism is a proposition,
-    which is equivalent to being an equivalence of containers.
+    In the 1-category \( \ContCart_{0,0} \), the types of equivalences- and isomorphisms of containers are equivalent.
     The claim follows by inspection of the proof of \autoref{globally-discrete-iff-strong-chain-rule},
     and ensuring that the same argument applies even when all types involved are sets.
   \end{proof}
 \end{corollary}
+This is of course still a very classical assumption, even if it is not inconsistent:
+In an impredicative setting, where \( \Op{Prop} \simeq \Omega \) for some small \( \Omega : \Type \),
+either condition implies the law of the excluded middle:
+\( \Op{Prop} \) is a set, so \( \Omega \) must be as well.
+If \( \Omega \) were discrete, \( P = \top \) would be decidable for any \( P : \Op{Prop} \).
 
 We have seen that our definition of derivative behaves nicely even in the presence of non-discrete types,
 in that we retain the ways it interacts with sums and products (\autoref{sum-product-rule}).

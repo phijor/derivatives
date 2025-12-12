@@ -267,7 +267,7 @@ there is an equivalence of types
 In particular, a fixed point of containers \( \varphi : \CartIso{\Subst{F}{G}}{G} \) induces a fixed point of \( \Ext{F}(\vec{X}, \Blank ) \).
 If initial, then this corresponds exactly to a container fixed point in the sense of \cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
 
-We thus define smallest fixed points of a signature functor \( F \) without reference to its associated functor \( \Ext{F} \),
+We thus define smallest fixed points of a signature container \( F \) without reference to its associated functor \( \Ext{F} \),
 namely as initial algebras of the wild functor \( \Subst{F}{\Blank} \).
 Let us set this up precisely:
 \begin{problem}[note={\( \Subst{F}{\Blank} \)-algebras}]
@@ -644,15 +644,15 @@ We would like to establish the converse to this as well, but cannot do so direct
 as the converse of \autoref{is-equiv-from-mu-rec} does not hold:
 in general, there are fixed points \( \varphi : \Cart{ \Subst{F}{G} }{ G } \) such that \( \mu F \) and \( G \) are not equivalent as containers.
 However, \( \mu F \) is the smallest among such fixed points, and hence embeds into any other (pre-)fixed point:
-\begin{lemma}\lemma{is-embedding-mu-rec}
+\begin{lemma}\label{is-embedding-mu-rec}
   If \( \alpha : \Cart{\Subst{F}{G}}{G} \) is an embedding of containers,
   then so is \( \Rec_F(\alpha) \).
   \begin{proof}
-    This is a direct application of the next result (\autoref{is-embedding-W-rec}) to the shape map \( \Rec_F(\alpha)_{\Sh} : \W(S,P) \to T \).
+    This is a direct application of the next result (\autoref{is-embedding-W-rec}) to the shape map \( \Rec_{F^{\prime}}(\alpha)_{\Sh} : \W(S,P) \to T \).
   \end{proof}
 \end{lemma}
 
-Non-dependent recursion on \( \W(S, P) \) into a type \( A \) can be given by
+Recall that non-dependent recursion on \( \W(S, P) \) into a type \( A \) is given by
 \begin{align*}
   \WRec &: \big(\big( { \textstyle \sum_{s : S} (P(s) \to A) } \big) \to A \big) \to (\W(S, P) \to A) \\
   \WRec&_h(\Sup(s, f)) \DefEq h(s, \WRec(h) \circ f)
@@ -717,7 +717,8 @@ This map preserves embeddings:
     \( \Op{fiber}_{\WRec_h}(\WRec_h(f(p)) \).
     But since \( f(p) : \W(S, P) \) is structurally smaller than \( \Sup(s, f) : \W(S, P) \),
     this type is a proposition.
-    Hence, all fibers over the image of \( \WRec_h \).
+    Hence, all fibers over the image of \( \WRec_h \) are propositions,
+    and \( \WRec_h \) is an embedding.
   \end{proof}
 \end{lemma}
 

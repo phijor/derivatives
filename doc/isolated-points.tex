@@ -28,7 +28,12 @@ We call such points \emph{isolated}:
   \)
   the subtype of isolated points.
 \end{definition}
-Note that, \emph{a priori}, the type \( \IsIsolated(a) \) might not be a proposition.
+In this section, we are going to study some properties of isolated points.
+We are particularly interested to see how they interact with the various type formers such as binary- and dependent sums.
+
+In general, a decision procedure of equality is extra structure on a type;
+after all, there are possibly many ways to affirm that, \emph{yes}, \( a = b \) in an arbitrary type \( A \).
+Therefore, the type \( \IsIsolated(a) \) might, \emph{a priori}, not be a proposition.
 Take for example the circle \( S^1 \): there are \( \mathbb{Z} \)-many proofs of \( \Op{Dec}(\Op{base} =_{S^1} \Op{base}) \).
 However, since equality has to be decidable uniformly for a point to be isolated, this does not happen:
 isolated points \emph{do} have trivial path spaces.\footnote{In fact \( S^1 \) is \emph{perfect}, i.e.\@ has no isolated points at all.}
@@ -155,7 +160,6 @@ hence \( \SigmaIsolate \) must be an embedding:
 \begin{lemma}\label{sigma-isolate-fibers}
   For all \( A : \Type \), \( B : A \to \Type \), and \( y \JudgeEq ((a, b), \Blank) : \Isolated{(\sum_{A} B)} \),
   there is an equivalence \( \Op{fiber}_{\SigmaIsolate}(y) \simeq \IsIsolated(a) \times \IsIsolated(b) \).
-  In particular, fibers of \( \SigmaIsolate_{A, B} \) are propositions, hence it is an embedding.
   \begin{proof}
     By extensionality of paths in \( \Sigma \)-types, we re-phrase the type of fibers over \( y \) in terms of singletons
     over \( a \) and \( b \), namely
