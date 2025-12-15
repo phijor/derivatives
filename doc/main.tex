@@ -112,6 +112,7 @@
 \def\blankskip{0mu minus 1fill}
 \NewDocumentCommand{\Blank}{}{{\mskip\blankskip\mathunderscore\mskip\blankskip}}
 
+\DeclareMathOperator{\Fiber}{\Op{fiber}}
 \DeclareMathOperator{\IsIsolated}{\Op{isIsolated}}
 \DeclareMathOperator{\Isolate}{\Op{isolate}}
 \DeclareMathOperator{\Replace}{\Op{replace}}
@@ -145,6 +146,11 @@
   {^{\uparrow}} % post-code
   {#1} % body
 \newcommand*{\Subst}[2]{#1[#2]}
+
+\DeclarePairedDelimiterX{\PropTrunc}[1]%
+  {\lVert} % left
+  {\rVert} % right
+  {#1} % body
 
 \NewDocumentCommand{\SimMultiMap}{}{%
   \mathrel{%

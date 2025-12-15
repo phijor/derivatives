@@ -15,10 +15,10 @@ This is extended to containers by \citeauthor{AbbottEtAl2003DerivativesContainer
 first in a categorical meta-language~\cite{AbbottEtAl2003DerivativesContainers},
 then in a type-theoretic one~\cite{AbbottEtAl2005DataDifferentiating}.
 They show that derivatives of containers satisfy a universal property with respect to a class of \enquote{linear}
-morphisms of containers,
-namely that for any container \( G \) on which equality of positions is decidable,
+morphisms \( F \multimap G \) of containers.
+Namely, for any container \( G \) on which equality of positions is decidable,
 linear morphisms \( F \multimap \Der{G} \) are in 1-to-1 correspondence with morphisms \( F \CTimes \Id \multimap G \).
-Furthermore, the laws of derivatives are encoded as (linear) isomorphisms:
+Furthermore, the laws of derivatives are encoded as isomorphisms:
 the chain rule, for example, becomes an isomorphism of containers
 \( \Der{(\Subst{F}{G})} \cong \Subst{(\Der{F})}{G} \CTimes \Der{G} \).
 
@@ -31,132 +31,150 @@ and generalized containers~\cite{AltenkirchKaposi2021containermodeltype} describ
 
 When working in Univalent Foundations, the most direct generalization of containers is that from sets to arbitrary types
 with potentially non-trivial higher path types.
-What can we say about containers whose shapes and positions are such untruncated types?
-Much of the theory transfers directly, since it never assumed that types were sets in the first place.
+Much of the theory of set-truncated containers transfers directly, since it never assumed that types were sets in the first place.
 Even smallest-~\cite{DamatoEtAl2025FormalisingInductiveCoinductive} and largest fixed points~\cite{AhrensEtAl2015NonWellfoundedTrees} can be proved to exist.
 
-In this paper, we show that derivatives can be defined for untruncated containers,
-and that they satisfy an analogue of the universal property of discrete containers.
-This is mostly an exercise in reverse mathematics:
-\emph{What are the minimal assumptions on decidability that we can make such that a derivative is still well-defined?}
-To this end, we recall the notion of \emph{isolatedness} of a point in a type, and show how it interacts with various type formers.
-Being isolated is a local notion of discreteness, in the sense that around an isolated point, a type is discrete.
-Our derivative ranges only over isolated positions;
+\subsection{Overview}
+In this paper, we tackle two problems.
+At first, an exercise in reverse mathematics:
+\emph{%
+  What are the minimal assumptions on decidability that we can make such that a derivative is still well-defined?
+}
+The second is to ensure that such a derivative behaves correctly:
+\emph{%
+  Does this derivative satisfy an analogue of the universal property for discrete containers?
+  Do laws of derivatives hold? Is there a chain rule?
+}
+
+To this end, in \autoref{isolated-points} we recall the notion of \emph{isolatedness} of a point in a type.
+This is a local notion of discreteness, considered in type theory, for example, by \citeauthor{KrausEtAl2013GeneralizationsHedberg’sTheorem} in \cite{KrausEtAl2013GeneralizationsHedberg’sTheorem}.
+To each type \( A \), we associate its \emph{set} of isolated points \( \Isolated{A} \),
+and show how it distributes over various type formers.
+We make two key observations:
+First, isolated points distributing over \( \Sigma \)-types is a constructive taboo which would imply discreteness of arbitrary types.
+Second, we show that removal of points from a type, \( A \setminus a \) is well-behaved for even for arbitrary \( A : \Type \),
+as long as \( a \) is an isolated point,
+and that we can define an induction-like principle for types pointed by an isolated point.
+
+In \autoref{derivatives}, we use this to define a derivative that only ranges over isolated positions;
 this allows us to prove the following universal property
 by application of simple lemmata for isolated points:
 On the (wild) category \( \ContCart \) of containers and cartesian morphisms,
-\( \Der \) is an endofunctor that is right-adjoint to taking products, \( \Maybe{\Blank} \).
+\( \Der \) is an endofunctor,
+and it is right-adjoint to \( \Maybe{\Blank} \), the functor taking products with the identity container, \( \Id \).
 As a consequence, we can solve a problem left open in \cite[14]{AbbottEtAl2005DataDifferentiating}:
 the wild adjunction restricts to an ordinary adjunction on the 1-category of set-truncated containers.
 In particular, this proves that \emph{every} set-truncated container has a well-behaved derivative, not just discrete ones.
-Our exercise paid off: by generalizing to arbitrary types, we learn something about sets.
-
-Verifying that this generalized derivative satisfies the expected basic laws is straightforward;
+Our exercise pays off: by generalizing to arbitrary types, we learn something about sets.
+We verify that this generalized derivative satisfies the basic laws for constants, sums and products is straightforward;
 we essentially repurpose the proofs for the special case of discrete containers,
 but distribute isolated points over type formers whenever necessary.
-This works to show that \( \Der \) distributes over sums and products,
-but fails for the chain rule:
-it generalizes only to a lax chain rule, that is a cartesian morphism
+
+The goal of \autoref{chain-rule} is to derive a chain rule.
+While it is possible to give a \emph{lax} chain rule, i.e. a cartesian morphism
 from
 \( \Subst{(\Der{F})}{G} \CTimes \Der{G} \)
 to
-\( \Der{(\Subst{F}{G})} \).
+\( \Der{(\Subst{F}{G})} \),
+we prove that it cannot be inverted in general:
+A strong chain rule for arbitrary containers is inconsistent in the presence of non-set types.
+Even when restricted to set-truncated containers implies a constructive taboo.
+We can, however, show constructively that it is an embedding of containers.
+
+In \autoref{fixed-points}, we apply the previous results to show that derivatives of smallest fixed point containers can be characterized entirely by the chain rule.
 
 \begin{todo-block}
-  Continue here.
+  \begin{itemize}
+    \item say that we define fixed points internally
+    \item prove them correct
+  \end{itemize}
 \end{todo-block}
 
+\subsection{Contributions}
+
+\subsection{Notation}
+
+\paragraph{Type theory.}
+We work in Homotopy Type Theory, an extension to intensional Martin--Löf type theory.
+Our notation and conventions mostly follow that of the HoTT Book~\cite{UnivalentFoundationsProgram2013HomotopyTypeTheory}.
+All of our types live in a single univalent universe, \( \Type \), unless stated otherwise.
+We assume the existence of a unit type \( 1 \), empty type \( 0 \), products \( A \times B \), coproducts \( A + B \), and function types \( A \to B \),
+as well as their dependent analogues:
+For \( A : \Type \) and a family \( B : A \to \Type \),
+we denote dependent function types by \( \Pi_{A} B \) or \( \prod_{a : A} B(a) \),
+and dependent sum types by \( \Sigma_{A} B \) or \( \sum_{a : A} B(A) \).
+We do not assume the existence of higher inductive types apart from a propositional truncation \( \PropTrunc{\Blank} \),
+or to illustrate examples.
+We say that \( A \) is merely inhabited if \( \PropTrunc{A} \) is inhabited.
+
+Function application is written \( f(a, b) \).
+We move arguments into subscripts, \( f_a(b) \), or even drop them, \( f(b) \), if they can be inferred from context without ambiguity.
+The unit type is inhabited by \( \bullet : 1 \),
+the coproduct has constructors \( \Inl : A \to A + B \) and \( \Inr : B \to A + B \).
+Projections out of \( \times \) and \( \Sigma \) are denoted by \( \Op{fst} \) and \( \Op{snd} \).
+We write \( \Sigma(f, g) : \Sigma_A B \to \Sigma_{A'} B' \) for the map that applies
+\( f : A \to A' \) and \( g : \prod_{a : A} B(a) \to B'(f(a)) \) to the components of a \( \Sigma \)-type.
+
+\paragraph{Equality.}
+We denote by \( x \DefEq y \) a defining equality that binds a new name \( x \) to a term \( y \).
+Defining equalities hold judgmentally, written \( x \JudgeEq y \), as do the usual \( \eta \)- and \( \beta \)-laws for \( \Sigma \)- and \( \Pi \)-types.
+We use the same notation for \enquote{pattern matching} in proofs by induction on an inductive type.
+For example, we split a proof by induction on \( x : A + B \) into cases \( x \JudgeEq \Inl(a) \) and \( x \JudgeEq \Inr(b) \).
+
+The identity type between \( x, y : A \) is written \( x =_A y \), with the subscript dropped unless ambiguous.
+For \( p : x = y \), we write \( p_* : B(x) \to B(y) \) for transport along \( p \) in a family \( B : A \to \Type \).
+We write \( u =_p v \) for the type of dependent paths over \( p \) in \( B \) between points \( u : B(x) \) and \( v : B(y) \).
+
+A type \( A \) is said to be contractible if \( \Op{isContr}(A) \DefEq \sum_{a : A} \prod_{b : A} a = b \) is inhabited.
+It is a proposition if \( \Op{isProp}(A) \DefEq \prod_{a, b : A} a = b \) is inhabited.
+We say that a type is \( n \)-truncated if it is contractible (\( n = -2 \)), a proposition (\( n = -1 \))
+or its path types are \( (n-1) \)-truncated (\( n \geq 0 \)).
+To avoid confusion, we name the truncation level of for low \( n \):
+0-truncated types are called sets, and 1-truncated types are groupoids.
+If \( P : A \to \Type \) is a family of propositions, \( \Sigma_A P \) defines a subtype of \( A \).
+We implicitly coerce terms \( a : \Sigma_A P \) to type \( A \) and write, for example,
+\( f(a) : B \) instead of \( f(\Op{fst}(a)) \) when applying a function \( f : A \to B \).
+
+\paragraph{Equivalences.}
+A function \( f : A \to B \) is an equivalence if for all \( y : B \) the type of fibers \( \Fiber_f(y) \DefEq \sum_{x : A} f(x) = y \) is contractible.
+Being an equivalence is a proposition, and we denote the induced subtype of functions by \( A \simeq B \).
+
+We employ various techniques to show that a given map \( f : A \to B \) is an equivalence.
+In simple cases it suffices to give some \( g : B \to A \) and show that it and \( f \) are mutually inverse,
+i.e.\@ that \( f \circ g = \Op{id}_B \) and \( g \circ f = \Op{id}_A \).
+Whenever possible, we decompose \( f \) into intermediate steps,
+after which we appeal to the 3-for-2 property: In any commutative triangle
+\[
+  \begin{tikzcd}[column sep=small]
+      & B & \\
+    A &   & C
+    \ar[from=2-1,to=1-2, "g"]
+    \ar[from=1-2,to=2-3, "h"]
+    \ar[from=2-1,to=2-3, "f"']
+  \end{tikzcd}
+\]
+if any two maps are equivalences, then so is the third.
+From this one can derive a number of techniques that minimize the tears shed over such proofs,
+best illustrated in~\cite{Jong2025FormalizingEquivalencesTears}.
+Similarly, \( f \) is an equivalence if and only if it is both an embedding and a surjection:
+it is a surjection if all of its fibers are merely inhabited, and an embedding if one of the following equivalent properties holds:
 \begin{itemize}
-  \item
-    Two perspectives:
-      \begin{itemize}
-        \item \emph{(Reverse mathematics)}.
-          What are the minimal assumptions on decidability that we can make such
-          that a derivative is still well-defined?
-        \item \emph{(Topology)}.
-          If we think of types as spaces, which points can we remove in a \emph{continuous} manner?
-      \end{itemize}
-    \item
-      Recall notion of isolated points
-      \begin{itemize}
-        \item not a new notion (\cite{EscardocontributorsTypeTopology}, \cite{KrausEtAl2013GeneralizationsHedberg’sTheorem})
-        \item used to define derivatives of arbitrary containers
-        \item laws of containers reduce to properties of isolated points
-        \item
-          Later on (\autoref{lax-chain-rule}),
-          it will become necessary to investigate whether isolated points distribute over other type formers,
-          in particular dependent sums.
-      \end{itemize}
+  \item \( \Fiber_f(y) \) is a proposition for all \( y : B \),
+  \item \( \Fiber_f(f(x)) \) is a proposition for all \( x : A \), or
+  \item \( \Op{cong}_{x,y} : x = y \to f(x) = f(y) \) is an equivalence
 \end{itemize}
 
-\subsection*{Overview}
-
-\begin{enumerate}
-  \item Removing points:
-    \begin{itemize}
-      \item define isolated points: points around which a type is locally trivial
-      \item define removal of points, show that it works well for isolated points
-      \item define \enquote{grafting} that for functions out of types with a chosen isolated point
-    \end{itemize}
-  \item Introduce derivatives of untruncated containers
-    \begin{itemize}
-      \item recall that traditionally, derivatives of containers require discrete shapes,
-        or else they won't satisfy a good universal property.
-      \item
-        define derivatives for all container, but only involving isolated positions
-      \item
-        yields a (wild) adjunction for arbitrary containers, like in the set-truncated case
-      \item
-        derivative satisfies the same basic properties with respect to constants,
-        sums and products
-    \end{itemize}
-  \item The chain rule is more involved
-    \begin{itemize}
-      \item in general, only one direction works, we get a lax chain rule
-      \item the lax chain rule is always an embedding
-      \item strong iff isolated points distribute over \( \Sigma \)-types
-      \item a strong chain rule for arbitrary types is inconsistent; assuming it leads to a contradiction
-      \item a strong chain rule for arbitrary sets means that all sets are discrete
-    \end{itemize}
-\end{enumerate}
-
-\subsection*{Contributions}
-
-
-\subsection*{Notation}
-
-\begin{itemize}
-  \item
-    Type formers: unit type \( 1 \),
-    empty type \( 0 \),
-    products \( A \times B \),
-    coproducts \( A + B \),
-    function types \( A \to B \)
-  \item Dependent type formers:
-    dependent function types \( \Pi_{A} B \) or \( \prod_{a : A} B(a) \),
-    dependent sum types \( \Sigma_{A} B \) or \( \sum_{a : A} B(A) \)
-  \item \( \W \)-types: mention, but introduce later when needed
-  \item Map over \( \Sigma \)-types with
-    \[
-      \Sigma(\Blank, \Blank) : \prod_{f : A \to A'} (\prod_{a : A} B(a) \to B'(f(a))) \to \sum_{A} B \to \sum_{A'} B'
-    \]
-  \item
-    Follow the HoTT-book for transports/substitutions:
-    For \( B : A \to \Type \) and \( p : x =_A y \), write \( p_* : B(x) \to B(y) \).
-    Not \( \Op{subst} \) or anything like that
-  \item
-    Truncation levels 
-  \item
-    Define embeddings by two equivalent properties (invertible \( \Op{cong} \), propositional fibers, propositional fibers over the image)
-  \item
-    Surjections are maps with merely inhabited fibers
-  \item
-    Embeddings and surjections form a factorization system for equivalences
-  \item equivalences satisfy a 3-for-2 property,
-    we apply the insights of \cite{Jong2025FormalizingEquivalencesTears} to minimizes the tears shed over such proofs.
-  \item Recall notions of wild category and functor
-  \item Use \enquote{filler} for paths of morphism in a wild category
-    (since in general, there can be many distinct paths)
-  \item wild functor categories are \( [\mathcal{C}, \mathcal{D}] \).
-\end{itemize}
-
+\paragraph{Wild categories.}
+A 1-category \( \mathcal{C} \) consists of a type of objects \( \mathcal{C}_0 \) and a \emph{set} of morphisms
+\( \mathcal{C}_1(x, y) \) for all \( x, y : \mathcal{C}_0 \),
+together with a composition operation \( \Blank \circ \Blank \) and identity morphisms \( \Op{id} \)
+satisfying the standard equalities.
+A \emph{wild} category~\cite{CapriottiKraus2017UnivalentHigherCategories} consists of the same data,
+except that the assumption that \( \mathcal{C}_1 \) is a family of sets is dropped.
+We understand a wild category as the first approximation of an \( \infty \)-category ---
+a useful tool in the absence of a fully coherent notion of higher category internal to Homotopy Type Theory:
+Unlike in a 1-category, where commutativity of any diagram is a proposition,
+equalities of morphisms in a wild category are \emph{data},
+and we speak of them as \emph{fillers}.
+When porting 1-categorical concepts to wild categories,
+it is our obligation to ensure that these fillers compose coherently.

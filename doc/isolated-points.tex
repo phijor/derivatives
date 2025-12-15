@@ -1,8 +1,14 @@
-\section{Removing Points in Univalent Foundations}
+\section{Removing Points in Univalent Foundations}\label{isolated-points}
 
 \begin{todo-block}
   Write a short intro on the challenges of removing points from types in Univalent Foundations.
 \end{todo-block}
+
+Second, isolated points can be (continuously) removed from an arbitrary type:
+If \( a : A \) is isolated, then \( (A \to B) \simeq (A \setminus a \to B) \times B \)
+--- any function \( f : A \to B \) is determined exactly by its restriction to \( A \setminus a \) and its value \( f(a) : B \).
+This property is in general false for non-isolated points in types of higher truncation level,
+since the decomposition discards the behaviour of \( f \) on the higher path spaces around \( a \).
 
 \subsection{Isolated Points}
 
