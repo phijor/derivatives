@@ -27,12 +27,16 @@ whose shapes and positions have different kinds of structure:
 quotient- \cite{AbbottEtAl2004ConstructingPolymorphicPrograms} and action containers~\cite{JoramVeltri2025DataTypesSymmetries}
 express symmetries by having groups act on sets of positions,
 symmetric containers internalize symmetries in a groupoid of shapes~\cite{Gylterud2011},
-and generalized containers~\cite{AltenkirchKaposi2021containermodeltype} describe directed relations of shapes as a category.
+and categorified containers~\cite{AltenkirchKaposi2021containermodeltype} describe directed relations of shapes as a category.
 
 When working in Univalent Foundations, the most direct generalization of containers is that from sets to arbitrary types
 with potentially non-trivial higher path types.
 Much of the theory of set-truncated containers transfers directly, since it never assumed that types were sets in the first place.
 Even smallest-~\cite{DamatoEtAl2025FormalisingInductiveCoinductive} and largest fixed points~\cite{AhrensEtAl2015NonWellfoundedTrees} can be proved to exist.
+
+\begin{todo-block}
+  Include a link to the formalization and discuss.
+\end{todo-block}
 
 \subsection{Overview}
 In this paper, we tackle two problems.
@@ -60,13 +64,13 @@ In \autoref{derivatives}, we use this to define a derivative that only ranges ov
 this allows us to prove the following universal property
 by application of simple lemmata for isolated points:
 On the (wild) category \( \ContCart \) of containers and cartesian morphisms,
-\( \Der \) is an endofunctor,
-and it is right-adjoint to \( \Maybe{\Blank} \), the functor taking products with the identity container, \( \Id \).
+\( \Der \), is an endofunctor,
+and it is right-adjoint to taking products with the identity container, \( \Maybe{\Blank} \).
 As a consequence, we can solve a problem left open in \cite[14]{AbbottEtAl2005DataDifferentiating}:
 the wild adjunction restricts to an ordinary adjunction on the 1-category of set-truncated containers.
 In particular, this proves that \emph{every} set-truncated container has a well-behaved derivative, not just discrete ones.
 Our exercise pays off: by generalizing to arbitrary types, we learn something about sets.
-We verify that this generalized derivative satisfies the basic laws for constants, sums and products is straightforward;
+Verifying that this generalized derivative satisfies the basic laws for constants, sums and products is straightforward;
 we essentially repurpose the proofs for the special case of discrete containers,
 but distribute isolated points over type formers whenever necessary.
 
@@ -78,19 +82,18 @@ to
 \( \Der{(\Subst{F}{G})} \),
 we prove that it cannot be inverted in general:
 A strong chain rule for arbitrary containers is inconsistent in the presence of non-set types.
-Even when restricted to set-truncated containers implies a constructive taboo.
+Even when restricted to set-truncated containers, this implies a constructive taboo.
 We can, however, show constructively that it is an embedding of containers.
 
-In \autoref{fixed-points}, we apply the previous results to show that derivatives of smallest fixed point containers can be characterized entirely by the chain rule.
-
-\begin{todo-block}
-  \begin{itemize}
-    \item say that we define fixed points internally
-    \item prove them correct
-  \end{itemize}
-\end{todo-block}
-
-\subsection{Contributions}
+In \autoref{fixed-points}, we apply the previous results to show that derivatives of smallest fixed points can be characterized entirely by the chain rule.
+We ensure that every container \( F \) has a smallest fixed point \( \mu F \) in the wild category of containers:
+We prove that every (wild) substitution functor \( \Subst{F}{\Blank} : \ContCart \to \ContCart \) admits an initial algebra.
+This is different from the usual approach in which \( \mu F \) is defined in terms of an associated container functor \( \Ext{F} \) of sets or types \cite{AbbottEtAl2005ContainersConstructingstrictly,DamatoEtAl2025FormalisingInductiveCoinductive}.
+We do so to avoid coherence problems in the translation from containers to container functors.
+We then construct a lax \( \mu \)-rule as an embedding of a fixed point \( \mu F' \) into \( \Der(\mu F) \), in which \( F' \) is derived naturally from \( F \).
+This embedding characterizes \( \Der(\mu F) \) entirely in terms of the chain rule:
+it is an equivalence if and only if the chain rule for \( F \) and \( \mu F \) is an equivalence.
+In other words, the \( \mu \)-rule is strong exactly when the associated chain rule is.
 
 \subsection{Notation}
 
@@ -98,14 +101,16 @@ In \autoref{fixed-points}, we apply the previous results to show that derivative
 We work in Homotopy Type Theory, an extension to intensional Martin--Löf type theory.
 Our notation and conventions mostly follow that of the HoTT Book~\cite{UnivalentFoundationsProgram2013HomotopyTypeTheory}.
 All of our types live in a single univalent universe, \( \Type \), unless stated otherwise.
-We assume the existence of a unit type \( 1 \), empty type \( 0 \), products \( A \times B \), coproducts \( A + B \), and function types \( A \to B \),
+We assume the existence of a unit type \( 1 \), empty type \( 0 \), natural numbers \( \mathbb{N} \), products \( A \times B \), coproducts \( A + B \), and function types \( A \to B \),
 as well as their dependent analogues:
 For \( A : \Type \) and a family \( B : A \to \Type \),
 we denote dependent function types by \( \Pi_{A} B \) or \( \prod_{a : A} B(a) \),
 and dependent sum types by \( \Sigma_{A} B \) or \( \sum_{a : A} B(A) \).
 We do not assume the existence of higher inductive types apart from a propositional truncation \( \PropTrunc{\Blank} \),
 or to illustrate examples.
-We say that \( A \) is merely inhabited if \( \PropTrunc{A} \) is inhabited.
+A type \( A \) is merely inhabited if \( \PropTrunc{A} \) is inhabited.
+For all \( n : \mathbb{N} \), we write \( \Fin{n} : \Type \) for the standard finite type of \( n \) elements,
+i.e. \( \Fin{0} \DefEq 0 \) and \( \Fin{1+n} \DefEq 1 + \Fin{n} \).
 
 Function application is written \( f(a, b) \).
 We move arguments into subscripts, \( f_a(b) \), or even drop them, \( f(b) \), if they can be inferred from context without ambiguity.
@@ -121,7 +126,7 @@ Defining equalities hold judgmentally, written \( x \JudgeEq y \), as do the usu
 We use the same notation for \enquote{pattern matching} in proofs by induction on an inductive type.
 For example, we split a proof by induction on \( x : A + B \) into cases \( x \JudgeEq \Inl(a) \) and \( x \JudgeEq \Inr(b) \).
 
-The identity type between \( x, y : A \) is written \( x =_A y \), with the subscript dropped unless ambiguous.
+The identity type in a type \( A \) is written \( x =_A y \), with the subscript dropped unless ambiguous.
 For \( p : x = y \), we write \( p_* : B(x) \to B(y) \) for transport along \( p \) in a family \( B : A \to \Type \).
 We write \( u =_p v \) for the type of dependent paths over \( p \) in \( B \) between points \( u : B(x) \) and \( v : B(y) \).
 
@@ -129,7 +134,7 @@ A type \( A \) is said to be contractible if \( \Op{isContr}(A) \DefEq \sum_{a :
 It is a proposition if \( \Op{isProp}(A) \DefEq \prod_{a, b : A} a = b \) is inhabited.
 We say that a type is \( n \)-truncated if it is contractible (\( n = -2 \)), a proposition (\( n = -1 \))
 or its path types are \( (n-1) \)-truncated (\( n \geq 0 \)).
-To avoid confusion, we name the truncation level of for low \( n \):
+To avoid confusion, we name the truncation level for low \( n \):
 0-truncated types are called sets, and 1-truncated types are groupoids.
 If \( P : A \to \Type \) is a family of propositions, \( \Sigma_A P \) defines a subtype of \( A \).
 We implicitly coerce terms \( a : \Sigma_A P \) to type \( A \) and write, for example,

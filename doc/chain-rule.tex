@@ -127,21 +127,20 @@ We will make this factorization explicit in the derivation of the chain rule for
 We say that the chain rule for \( F \) and \( G \) is \emph{strong} if \( \Chain_{F,G} \) is an equivalence of containers.
 Using any of the equivalent properties listed in \autoref{is-equiv-sigma-isolate-iff-isolated-pair},
 we can express when exactly we have a strong chain rule.
-First, note that \( \SigmaIsolate \) is always an embedding (cf.~\autoref{is-embedding-sigma-isolate}),
+Note that \( \SigmaIsolate \) is always an embedding (cf.~\autoref{is-embedding-sigma-isolate}),
 hence we can think of \( \Chain_{F,G} \) as embedding \( \Subst{(\Der{F})}{G} \CTimes \Der{G} \)
 as a sub-container inside \( \Der(\Subst{F}{G}) \):
+\begin{definition}
+  A morphism \( f : \Cart{F}{G} \) is an embedding of containers if \( f_{\Sh} : F_{\Sh} \to G_{\Sh} \) is an embedding.
+\end{definition}
 \begin{proposition}\label{is-embedding-chain-rule}
-  For all \( F, G : \Cont \), the shape map \( \Chain_{F,G}^{\Sh} \) is an embedding.
+  For all \( F, G : \Cont \), \( \Chain_{F,G} : \Cart{ \Subst{(\Der{F})}{G} \CTimes \Der{G} }{\Der{(\Subst{F}{G})}} \) is an embedding.
   \begin{proof}
     By \autoref{is-embedding-sigma-isolate}, \( \SigmaIsolate \) is an embedding.
   \end{proof}
 \end{proposition}
 
-\begin{todo-block}
-  Define the notion of \enquote{embedding of containers}.
-\end{todo-block}
-
-Second, this strengthens to an equivalence of containers depending on \( \SigmaIsolate \) alone:
+This strengthens to an equivalence of containers depending on \( \SigmaIsolate \) alone:
 \begin{proposition}\label{strong-chain-rule-iff-is-equiv-sigma-isolate}
   Let \( F = (\MkCont{S}{P}) \) and \( G = (\MkCont{T}{Q}) \).
   The following are equivalent propositions:
@@ -169,7 +168,7 @@ the chain rule is strong for \emph{discrete} containers:
   \end{proof}
 \end{theorem}
 
-Secondly, we conclude that globally having a strong chain rule is an inherently classical property:
+Secondly, we conclude that globally having a strong chain rule is impossible in the presence of provably non-discrete types:
 \begin{theorem}\label{globally-discrete-iff-strong-chain-rule}
   The following are equivalent propositions:
   \begin{enumerate}
@@ -187,7 +186,7 @@ Secondly, we conclude that globally having a strong chain rule is an inherently 
   \end{proof}
 \end{theorem}
 
-As a consequence, globally assuming that the chain rule is strong is inconsistent in the presence of types of higher truncation level:
+As a consequence, globally assuming a strong chain rule is inconsistent in the presence of types of higher truncation level:
 The circle \( S^1 \) is provably not discrete (if it were, it would be a set!),
 hence
 \(
@@ -220,4 +219,5 @@ in that we retain the ways it interacts with sums and products (\autoref{sum-pro
 Its interaction with substitution, however, is more subtle.
 While we do obtain a chain rule, it is now \emph{directed} or \emph{lax} (\autoref{lax-chain-rule}),
 and whether we can strengthen it to an equivalence depends on the pair of containers involved (\autoref{strong-chain-rule-iff-is-equiv-sigma-isolate}).
-Indeed, assuming the latter for any pair of containers is inconsistent in the presence of higher inductive types such as the circle \( S^1 \).
+Indeed, assuming the latter for any pair of containers is inconsistent in the presence of higher inductive types such as the circle \( S^1 \),
+or a non-constructive if restricted to sets.

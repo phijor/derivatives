@@ -318,6 +318,16 @@ with underlying map
 \end{align*}
 Interestingly, the proof of \cite[{Theorem 5.1}]{AbbottEtAl2005DataDifferentiating} already uses \( {\Blank}^{\sharp} \) to show naturality of the hom-set isomorphism in \( F \).
 
+Furthermore, we can iterate the adjunction and easily obtain a notion of \( n \)-fold derivatives.
+Denote by \( \Op{y}(A) \DefEq (\MkCont{1}{A}) \) the container of \enquote{\( A \)-tuples}.
+We see that \( \Der^n(G) \) encodes a type of \( G \)-terms with \( n \) holes:
+\begin{corollary}
+  For all \( n : \mathbb{N} \), there is an adjunction \( \Blank \CTimes \Op{y}[n] \dashv \Der^n \)
+  in the 1-category \( \ContCart_{0,0} \).
+\end{corollary}
+We believe that this extends to the entire wild category \( \ContCart \),
+but one has to carefully check that the data of the wild adjunction in \autoref{derivative-adjunction} composes coherently.
+
 \subsection{Basic Laws of Derivates}
 
 Derivatives of containers earn their name by observing how they interact with other operations on containers:
@@ -379,13 +389,15 @@ To some extent we can also solve differential equations involving \( \Der \).
 In particular, given a container \( F \), we can ask if it has an anti-derivative,
 i.e. some \( G \) for which \( \CartIso{\Der{G}}{F} \).
 Interestingly, \( \Der \) has fixed-points, that is containers that are their own derivative.
-The prototypical example of such a fixed-point is the container of finite multisets, or \emph{bags}.\todo{Say that we're reproducing \cite[{Ex.~3.6.1}]{Gylterud2011}, but internally.}
+The prototypical example of such a fixed-point is the container of finite multisets, or \emph{bags}.
+Famously, bags cannot be expressed as set-truncated containers, but can be if one allows shapes of higher truncation level.
+Let here reproduce \citeauthor{Gylterud2011}'s construction~\cite[{example~3.6.1}]{Gylterud2011} of bags as a symmetric containers (with a groupoid of shapes),
+but in the language of HoTT.
 Recall that a type is considered finite
-if there is some \( n : \mathbb{N} \) for which it is merely equivalent to \( \Op{Fin}(n) \).%
-% \footnote{This is the notion of Bishop-finiteness~\cite[{Definition~4.4}]{FruminEtAl2018FiniteSetsHomotopy}, one of many notions of finiteness in a constructive setting.}
+if there is some \( n : \mathbb{N} \) for which it is merely equivalent to \( \Fin{n} : \Type \).%
 \footnote{Specifically, such types are called Bishop-finite~\cite[{Definition~4.4}]{FruminEtAl2018FiniteSetsHomotopy}.}
 The universe of finite sets,
-\( \FinSet \DefEq \sum_{X : \Type} \sum_{n : \mathbb{N}} \lVert X \simeq \Op{Fin}(n) \rVert \),
+\( \FinSet \DefEq \sum_{X : \Type} \sum_{n : \mathbb{N}} \lVert X \simeq \Fin{n} \rVert \),
 comes with a map \( \El \DefEq \Op{fst} : \FinSet \to \Type \) projecting out the underlying type.
 Together, these form the container of \emph{bags}, \( \Op{Bag} \DefEq (\MkCont{\FinSet}{\El}) \).
 As written, the shapes of this container quantify over all types, hence live in a higher universe.
@@ -437,5 +449,5 @@ of types closed under addition and removal of single points:
   such that \( \CartIso{\Der{\Op{Bag}_P}}{\Op{Bag}_P} \). \qedhere
 \end{proposition}
 For the details of the proof we refer the reader to the formalization;
-there one can find an example of this applied to countable sets
+there one can find an example of this applied to countable multisets
 defined by the predicate \( P(A) \DefEq \lVert A \hookrightarrow \mathbb{N} \rVert \).
