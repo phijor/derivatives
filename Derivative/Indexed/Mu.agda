@@ -314,14 +314,11 @@ module _ (F : Container ℓ (Maybe Ix)) where
     → (α : (F [ G ]) ⊸ G)
     → isEmbedding (α ._⊸_.shape)
     → isEmbedding (μ-rec G α ._⊸_.shape)
-  isEmbedding-μ-rec G α = {! !} where
+  isEmbedding-μ-rec G α = goal where
     module α = _⊸_ α
 
-    step₁ : isEmbedding (([-]-map F (μ-rec G α) ⋆ α) ._⊸_.shape)
-    step₁ = {! !}
-
-    goal : isEmbedding (W-rec α.shape)
-    goal = {! !}
+    goal : isEmbedding α.shape → isEmbedding (W-rec α.shape)
+    goal = isEmbedding-W-rec α.shape
 
   isSurjection-μ-rec : (G : Container ℓ Ix)
     → (α : (F [ G ]) ⊸ G)
