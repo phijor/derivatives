@@ -1,3 +1,4 @@
+{-# OPTIONS --safe #-}
 module Derivative.Remove where
 
 open import Derivative.Prelude

@@ -1,3 +1,4 @@
+{-# OPTIONS --safe #-}
 module Derivative.Decidable where
 
 open import Derivative.Prelude
