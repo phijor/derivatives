@@ -1,6 +1,7 @@
 module Derivative.Indexed.Container where
 
 open import Derivative.Prelude
+open import Derivative.Embedding using (isEmbedding-Σ-map-snd ; isEmbeddingPostComp)
 open import Derivative.Maybe
 open import Derivative.Sum
 open import Derivative.Decidable as Dec
@@ -22,6 +23,7 @@ open import Cubical.Foundations.Equiv.Properties
     )
 open import Cubical.Foundations.Univalence using (ua)
 open import Cubical.Foundations.Transport using (substEquiv ; subst2Equiv)
+open import Cubical.Functions.Embedding using (isEmbedding ; isEquiv→isEmbedding)
 
 record Container (ℓ : Level) (Ix : Type ℓ) : Type (ℓ-suc ℓ) where
   constructor _◁_
@@ -150,6 +152,9 @@ isPropIsContainerEquiv {f} = isPropIsEquiv (f ._⊸_.shape)
 equivIsContainerEquiv : {F G : Container ℓ Ix} → (e : Equiv F G) → isContainerEquiv (Equiv.as-⊸ e)
 equivIsContainerEquiv e = equivIsEquiv (e .Equiv.shape)
 
+isContainerEquivId : (F : Container ℓ Ix) → isContainerEquiv (id F)
+isContainerEquivId F = idIsEquiv _
+
 isContainerEquivComp : {F G H : Container ℓ Ix}
   → (f : F ⊸ G)
   → (g : G ⊸ H)
@@ -204,6 +209,14 @@ containerAdjointEquiv : {F G H : Container ℓ Ix}
   → (f₁ : G ⊸ H)
   → (f₀ ≡ (Equiv.as-⊸ e) ⋆ f₁) ≃ (Equiv.as-⊸ (Equiv.inv e) ⋆ f₀ ≡ f₁)
 containerAdjointEquiv e f₀ f₁ = {!  !}
+
+isContainerEmbedding : {F G : Container ℓ Ix} → F ⊸ G → Type _
+isContainerEmbedding f = isEmbedding (_⊸_.shape f)
+
+isContainerEquiv→isContainerEmbedding : {F G : Container ℓ Ix} → {e : F ⊸ G}
+  → isContainerEquiv e
+  → isContainerEmbedding e
+isContainerEquiv→isContainerEmbedding {e} = isEquiv→isEmbedding
 
 module _ where
   private
@@ -290,6 +303,20 @@ isEquiv-[-]-map F φ is-equiv-φ = is-equiv-shape where
 
   is-equiv-shape : isEquiv shape
   is-equiv-shape = isEquiv-Σ-map-snd is-equiv-postcomp
+
+isEmbedding-[-]-map : (F : Container ℓ (Maybe Ix)) {G G′ : Container ℓ Ix}
+  → (φ : G ⊸ G′)
+  → isContainerEmbedding φ
+  → isContainerEmbedding ([-]-map F φ)
+isEmbedding-[-]-map F {G} {G′} φ is-emb-φ = is-emb-shape where
+  module φ = _⊸_ φ
+  open [-]-map F φ using (shape)
+
+  is-emb-postcomp : (s : Shape F) → isEmbedding (φ.shape ∘_)
+  is-emb-postcomp s = isEmbeddingPostComp φ.shape is-emb-φ
+
+  is-emb-shape : isEmbedding shape
+  is-emb-shape = isEmbedding-Σ-map-snd is-emb-postcomp
 
 _⊗_ : (F G : Container ℓ Ix) → Container ℓ Ix
 _⊗_ F G = shape ◁ pos module ⊗ where
