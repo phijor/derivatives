@@ -1,3 +1,4 @@
+{-# OPTIONS --safe #-}
 module Derivative.Square where
 
 open import Cubical.Foundations.Prelude

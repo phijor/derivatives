@@ -1,3 +1,4 @@
+{-# OPTIONS --safe #-}
 module Derivative.Prelude where
 
 open import Derivative.Square
@@ -29,7 +30,7 @@ open import Cubical.HITs.PropositionalTruncation as PT using (∥_∥₁)
 private
   variable
     ℓ : Level
-    A B C : Type ℓ
+    A A′ B C : Type ℓ
 
 hcompᴵ : (φ : I) (u : ∀ i → Partial (φ ∨ ~ i) A) → A
 hcompᴵ {A} φ u = Primitives.hcomp {φ = φ} sys base module hcomp where
@@ -80,13 +81,12 @@ module _
 refl′ : (a : A) → a ≡ a
 refl′ a i = a
 
-module _
-  {a₀₀ a₀₁ a₁₋ : A}
-  {l : a₀₀ ≡ a₀₁}
-  {b : a₀₀ ≡ a₁₋} {t : a₀₁ ≡ a₁₋}
-  where
-  -- mangleSquare : Square l (refl′ a₁₋) b t → Square (sym l) (sym t) (refl′ a₁₋) {! !}
-  -- mangleSquare = {! !}
+Jᴰ : ∀ {ℓ ℓ'} {A : I → Type ℓ}
+  → (x : A i0)
+  → (P : ∀ {i : I} → (y : A i) → PathP (λ j → A (i ∧ j)) x y → Type ℓ')
+  → (d : P x refl)
+  → {y : A i1} (p : PathP A x y) → P y p
+Jᴰ _ P d p = transport (λ i → P (p i) λ j → p (i ∧ j)) d
 
 -- type ascription `the A a : A`
 the : (A : Type ℓ) → (a : A) → A
@@ -101,16 +101,6 @@ a ≢ b = ¬ a ≡ b
 
 isProp≢ : ∀ {a b : A} → isProp (a ≢ b)
 isProp≢ {a} {b} p q i x = Empty.isProp⊥ (p x) (q x) i
-
-module PathReasoning where
-  ≡⟨⟩∎-syntax : ∀ (x y : A) → x ≡ y → x ≡ y
-  ≡⟨⟩∎-syntax _ _ p = p
-  {-# INLINE ≡⟨⟩∎-syntax #-}
-
-  infixr 3 ≡⟨⟩∎-syntax
-  syntax ≡⟨⟩∎-syntax x y p = x ≡⟨ p ⟩∎ y ∎
-
-open PathReasoning using (≡⟨⟩∎-syntax) public
 
 -- A step in equivalence reasoning for definitional identity equivalences
 _≃⟨⟩_ : ∀ {ℓ ℓ'} (A : Type ℓ) {B : Type ℓ'} → A ≃ B → A ≃ B
@@ -194,13 +184,6 @@ neqCongEquiv e = preCompEquiv (invEquiv e)
 equivExt : {e f : A ≃ B} → (∀ x → equivFun e x ≡ equivFun f x) → e ≡ f
 equivExt = equivEq ∘ funExt
 
--- equivPathP' : ∀ {ℓ ℓ′} {A : I → Type ℓ} {B : I → Type ℓ′}
---   → {e₀ : A i0 ≃ B i0} {e₁ : A i1 ≃ B i1}
---   → PathP (λ i → A i → B i) (equivFun e₀) (equivFun e₁)
---   → PathP (λ i → A i ≃ B i) e₀ e₁
--- equivPathP' {A} {B} {e₀} {e₁} p i .fst = p i
--- equivPathP' {A} {B} {e₀} {e₁} p i .snd .equiv-proof y = compᴵ (λ j → isContr (Σ[ x ∈ A (i ∧ j) ] PathP (λ k → B {! !}) (p (i ∧ j) x) y)) (∂ᴵ i) {! !}
-
 contractDomainEquiv : isContr A → (A → B) ≃ B
 contractDomainEquiv is-contr-A = isoToEquiv (isContr→Iso2 is-contr-A)
 
@@ -222,10 +205,6 @@ postCompFiberEquiv {A} {C} f ψ =
     ≃⟨ Σ-cong-equiv-snd (λ φ → funExtEquiv) ⟩
   Σ[ φ ∈ (C → A) ] f ∘ φ ≡ ψ
     ≃∎
-
-private
-  variable
-    A′ : Type ℓ
 
 Σ-contractSndIso : {B : A → Type ℓ} → (∀ a → isContr (B a)) → Iso (Σ A B) A
 Σ-contractSndIso contr-snd .Iso.fun = fst
