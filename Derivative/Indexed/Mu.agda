@@ -80,7 +80,7 @@ module _ (F : Container ℓ (Maybe Ix)) where
   μ-rec : (G : Container ℓ Ix)
     → (F [ G ]) ⊸ G
     → μ F ⊸ G
-  μ-rec G φ = [ shape ⊸ {! !} ] module μ-rec where
+  μ-rec G φ = [ shape ⊸ pos ] module μ-rec where
     open Container G renaming (Shape to T ; Pos to Q)
 
     module φ = _⊸_ φ
@@ -290,7 +290,7 @@ module _ (F : Container ℓ (Maybe Ix)) where
     μ-rec-β : (G : Container ℓ Ix)
       → (α : (F [ G ]) ⊸ G)
       → μ-in ⋆ μ-rec G α ≡ [-]-map F (μ-rec G α) ⋆ α
-    μ-rec-β G α = {! !}
+    μ-rec-β G α = μ-rec-unique G α .fst .snd
 
   isEquivFrom-μ-rec : (G : Container ℓ Ix)
     → (φ : (F [ G ]) ⊸ G)
