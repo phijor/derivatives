@@ -1,3 +1,4 @@
+{-# OPTIONS --safe #-}
 module Derivative.Embedding where
 
 open import Derivative.Prelude
@@ -26,16 +27,17 @@ isEmbeddingPrecompEquiv→isEmbedding e f emb-ef = hasPropFibers→isEmbedding p
   prop-fibers c = isOfHLevelRespectEquiv 1 (preCompEquivFiberEquiv e f c)
     $ isEmbedding→hasPropFibers emb-ef c
 
+postCompEmbeddingFiberEquiv : (f : A → B) (e : B → C) → isEmbedding e
+  → ∀ b → fiber (f ⨟ e) (e b) ≃ fiber f b
+postCompEmbeddingFiberEquiv f e emb-e b = Σ-cong-equiv-snd λ a → invEquiv $ cong e , emb-e (f a) b
+
 isEmbeddingPostCompEmbedding→isEmbedding : (f : A → B) (e : B → C)
   → isEmbedding e
   → isEmbedding (f ⨟ e)
   → isEmbedding f
 isEmbeddingPostCompEmbedding→isEmbedding f e emb-e emb-fe = hasPropFibers→isEmbedding prop-fibers where
-  fiber-equiv : ∀ b → fiber (f ⨟ e) (e b) ≃ fiber f b
-  fiber-equiv b = Σ-cong-equiv-snd λ a → invEquiv $ cong e , emb-e (f a) b
-
   prop-fibers : ∀ b → isProp (fiber f b)
-  prop-fibers b = isOfHLevelRespectEquiv 1 (fiber-equiv b)
+  prop-fibers b = isOfHLevelRespectEquiv 1 (postCompEmbeddingFiberEquiv f e emb-e b)
     $ isEmbedding→hasPropFibers emb-fe (e b)
 
 isEmbeddingPostCompEquiv→isEmbedding : (f : A → B) (e : B ≃ C)

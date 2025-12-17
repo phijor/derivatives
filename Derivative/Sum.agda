@@ -1,6 +1,8 @@
+{-# OPTIONS --safe #-}
 module Derivative.Sum where
 
 open import Derivative.Prelude
+open import Derivative.Embedding
 
 open import Cubical.Data.Sigma
 open import Cubical.Data.Sum public
@@ -75,29 +77,6 @@ isEquiv→isEquiv-⊎-map-right : ∀ {C : Type ℓ} {f : B → C}
   → isEquiv (⊎-map-right {A = A} f)
 isEquiv→isEquiv-⊎-map-right {C} {f} is-equiv-f = equivIsEquiv (⊎-right-≃ (f , is-equiv-f))
 
-⊎-right-≃' : ∀ {C : Type ℓ} → (e : B ≃ C) → (A ⊎ B) ≃ (A ⊎ C)
-⊎-right-≃' e .fst = ⊎-map-right (equivFun e)
-⊎-right-≃' {B} {A} {C} e .snd .equiv-proof = goal where
-  goal : (y : A ⊎ C) → isContr (fiber (⊎-map-right {B = B} (equivFun e)) y)
-  goal (inl a) = isContrRetract {B = singl a}
-    (const (a , refl))
-    (λ (a′ , p) → inl a′ , cong inl (sym p))
-    (λ { (inl a′ , p) → ΣPathP (sym {!p!} , {! !}) ; (inr b , x) → {! !} })
-    {! !}
-  goal (inr c) = {! !}
-
-isEquiv-⊎-map-right→isEquiv : ∀ {C : Type ℓ}
-  → (f : B → C)
-  → isEquiv (⊎-map-right {A = A} f)
-  → isEquiv f
-isEquiv-⊎-map-right→isEquiv {A} {C} f is-equiv-map .equiv-proof = goal where
-
-  fiber-equiv : (c : C) → fiber (⊎-map-right {A = A} f) (inr c) ≃ fiber f c
-  fiber-equiv c = {! !}
-
-  goal : (c : C) → isContr (fiber f c)
-  goal c = isOfHLevelRespectEquiv 0 {! !} (is-equiv-map .equiv-proof (inr c))
-
 ⊎-empty-left-Iso : (¬ A) → Iso B (A ⊎ B)
 ⊎-empty-left-Iso ¬A .Iso.fun = inr
 ⊎-empty-left-Iso ¬A .Iso.inv (inl a) = ex-falso $ ¬A a
@@ -118,3 +97,23 @@ isEquiv-⊎-map-right→isEquiv {A} {C} f is-equiv-map .equiv-proof = goal where
 
 ⊎-fiber-≃ : {C : Type ℓ} {f : A ⊎ B → C} → ∀ y → fiber f y ≃ (fiber (f ∘ inl) y) ⊎ (fiber (f ∘ inr) y)
 ⊎-fiber-≃ y = Σ-⊎-fst-≃
+
+⊎-map-right-fiber-equiv : ∀ {C : Type ℓ} → (f : B → C)
+  → (c : C) → fiber (⊎-map-right {A = A} f) (inr c) ≃ fiber f c
+⊎-map-right-fiber-equiv {B} {A} {C} f c =
+  Σ[ x ∈ A ⊎ B ] ⊎-map-right f x ≡ inr c
+    ≃⟨ ⊎-fiber-≃ (inr c) ⟩
+  (Σ[ a ∈ A ] inl a ≡ inr c) ⊎ (fiber (f ⨟ inr) (inr c))
+    ≃⟨ invEquiv $ ⊎-empty-left $ uncurry (λ _ → inr≢inl ∘ sym) ⟩
+  fiber (f ⨟ inr) (inr c)
+    ≃⟨ postCompEmbeddingFiberEquiv f inr isEmbedding-inr c ⟩
+  fiber f c
+    ≃∎
+
+isEquiv-⊎-map-right→isEquiv : ∀ {C : Type ℓ}
+  → (f : B → C)
+  → isEquiv (⊎-map-right {A = A} f)
+  → isEquiv f
+isEquiv-⊎-map-right→isEquiv {A} {C} f is-equiv-map .equiv-proof = goal where
+  goal : (c : C) → isContr (fiber f c)
+  goal c = isOfHLevelRespectEquiv 0 (⊎-map-right-fiber-equiv f c) (is-equiv-map .equiv-proof (inr c))

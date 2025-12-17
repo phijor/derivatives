@@ -1,3 +1,4 @@
+{-# OPTIONS --safe #-}
 module Derivative.Equiv where
 
 open import Derivative.Prelude
