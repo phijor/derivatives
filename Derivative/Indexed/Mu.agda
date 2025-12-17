@@ -312,8 +312,8 @@ module _ (F : Container ℓ (Maybe Ix)) where
 
   isEmbedding-μ-rec : (G : Container ℓ Ix)
     → (α : (F [ G ]) ⊸ G)
-    → isEmbedding (α ._⊸_.shape)
-    → isEmbedding (μ-rec G α ._⊸_.shape)
+    → isContainerEmbedding α
+    → isContainerEmbedding (μ-rec G α)
   isEmbedding-μ-rec G α = goal where
     module α = _⊸_ α
 
