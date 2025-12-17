@@ -1,11 +1,10 @@
 \section{Conclusion}
 
-We have seen that extending a derivative operation to \( \Type \)-valued containers is possible,
-even with a somewhat na{\"i}ve approach:
+We have seen that extending a derivative operation to \( \Type \)-valued containers is possible:
 If the obstruction to a general derivative is that positions are not necessarily discrete,
 simply restrict a derivative to the subtype of those positions that are!
 This generalization does not come for free, however.
-Although we retain basic properties, the chain rule is no longer in general invertible,
+Although it is universal and retains basic properties, the chain rule is no longer in general invertible,
 and neither is the \( \mu \)-rule.
 In fact, a global chain rule is impossible, and at least constructively taboo when restricted to sets.
 Interestingly, the status of the \( \mu \)-rule is somewhat weaker:
@@ -20,7 +19,7 @@ Is a strong \( \mu \)-rule a constructive taboo in the same way that a strong ch
 
 In the future we would also like to work out the behaviour of \( \Der \) on fixed points other than \( \mu \).
 In their original work~\cite{AbbottEtAl2005DataDifferentiating}, \citeauthor{AbbottEtAl2005DataDifferentiating} derive a fixed-point rule also for the largest fixed point, \( \nu F \).
-Recently, \citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} show that \( \Type \)-valued container functors preserve both smallest and largest fixed points.
+Recently, \citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} show that \( \Type \)-valued container functors preserve both smallest and largest fixed points~\cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
 In either work, many of the intermediate lemmata hold for arbitrary fixed points,
 and the same is true for a number of our results:
 The construction of the lax chain rule in \autoref{lax-chain-rule}, for example, only depends on the property of \( \In_F : \Cart{\Subst{F}{\mu F}}{\mu F} \) being \emph{some}
@@ -38,10 +37,15 @@ as an embedding \( \operatorname{\Op{\varphi-rule}} : \Cart{\mu F'}{\Der(\varphi
     )
 \).
 
-% \begin{itemize}
-%   \item
-%     In \cite{AbbottEtAl2003DerivativesContainers}, \citeauthor{AbbottEtAl2003DerivativesContainers} consider the general adjunction \( \Blank \CTimes H \dashv [H, \Blank] \),
-%     perhaps we can make more progress towards that? By iterating ours, it should be possible to derive \( \Blank \CTimes \Op{K}(n) \dashv \Der^n \).
-%     For combinatorial species, this is enough to derive the fully general adjunction, since (1) the \( \Op{K}(n) \) are exactly the representables
-%     \( \Op{y}(n) \), (2) every species is a colimit of some \( \Op{y}(n_i) \)'s, and (3) the product (in this case, Day-convolution) is co-continuous.
-% \end{itemize}
+In another direction, we are curious whether we can describe more than just one-hole contexts.
+In \cite{AbbottEtAl2003DerivativesContainers}, \citeauthor{AbbottEtAl2003DerivativesContainers} consider a general adjunction \( \Blank \CTimes H \dashv [H, \Blank] \),
+describing \enquote{\( H \)-shaped} holes.
+\Autoref{derivative-adjunction-sets} shows that for \( H \JudgeEq \Id \), such an adjunction exists.
+Iterating it, we can describe \( n \)-hole contexts at \( H \JudgeEq \Op{y}\Fin{n} \).
+We conjecture that this holds also for set-truncated \( H \) with finitary positions,
+since any such \( H \) is \enquote{just} a big coproduct of representables \( \Op{y}\Fin{n_i} \).
+
+% In \cite{AbbottEtAl2003DerivativesContainers}, \citeauthor{AbbottEtAl2003DerivativesContainers} consider the general adjunction \( \Blank \CTimes H \dashv [H, \Blank] \),
+% perhaps we can make more progress towards that? By iterating ours, it should be possible to derive \( \Blank \CTimes \Op{K}(n) \dashv \Der^n \).
+% For combinatorial species, this is enough to derive the fully general adjunction, since (1) the \( \Op{K}(n) \) are exactly the representables
+% \( \Op{y}(n) \), (2) every species is a colimit of some \( \Op{y}(n_i) \)'s, and (3) the product (in this case, Day-convolution) is co-continuous.

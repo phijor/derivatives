@@ -1,23 +1,24 @@
 \section{Introduction}
 
-A container \cite{AbbottEtAl2005ContainersConstructingstrictly} is a concise encoding
-of an inductive data type:
+A container \cite{AbbottEtAl2005ContainersConstructingstrictly} encodes the signature of an inductive data type:
 it consists of a collection of shapes \( S \), each \( s : S \) representing a constructor,
-and for each a collection of positions \( P(s) \), indexing arguments to the constructor.
+and for each a collection of positions \( P(s) \), indexing arguments of the constructor.
 Many operations on data types can be made precise as operations on containers,
 including sums \( F \CPlus G \), products \( F \CTimes G \) and substitution \( \Subst{F}{G} \), allowing us to reason about them.
-\Citeauthor{Huet1997Zipper} presents \citetitle{Huet1997Zipper}~\cite{Huet1997Zipper},
-an informal procedure for computing a type of contexts around a subtree in a tree-like data type.
-In~\cite{McBride2001DerivativeRegularType}, \Citeauthor{McBride2001DerivativeRegularType} turns this into an algorithm for the inductively defined class of \enquote{regular types},
-and notices that this type of one-hole contexts behaves like a derivative with respect to constants,
-sums and products, and that substitution of types follows a chain rule.
-This is extended to containers by \citeauthor{AbbottEtAl2003DerivativesContainers},
+
+Another important operation on containers is that of a derivative.
+It traces back to \citeauthor{Huet1997Zipper}'s \citetitle{Huet1997Zipper}~\cite{Huet1997Zipper},
+a procedure for computing a type of contexts around a subtree in a tree-shaped data type.
+In~\cite{McBride2001DerivativeRegularType}, \citeauthor{McBride2001DerivativeRegularType}
+notices that for the class of \enquote{regular types}, one-hole contexts behave like a derivative of functions in calculus:
+they satisfy similar rules for constants, sums and products, and their substitution follows a chain rule.
+\Citeauthor{AbbottEtAl2003DerivativesContainers} extend this to a derivative operation on containers,
 first in a categorical meta-language~\cite{AbbottEtAl2003DerivativesContainers},
 then in a type-theoretic one~\cite{AbbottEtAl2005DataDifferentiating}.
-They show that derivatives of containers satisfy a universal property with respect to a class of \enquote{linear}
+They show that derivatives of containers satisfy a universal property with respect to a class of \enquote{cartesian}
 morphisms \( F \multimap G \) of containers.
 Namely, for any container \( G \) on which equality of positions is decidable,
-linear morphisms \( F \multimap \Der{G} \) are in 1-to-1 correspondence with morphisms \( F \CTimes \Id \multimap G \).
+cartesian morphisms \( F \multimap \Der{G} \) are in 1-to-1 correspondence with cartesian morphisms \( F \CTimes \Id \multimap G \).
 Furthermore, the laws of derivatives are encoded as isomorphisms:
 the chain rule, for example, becomes an isomorphism of containers
 \( \Der{(\Subst{F}{G})} \cong \Subst{(\Der{F})}{G} \CTimes \Der{G} \).
@@ -29,42 +30,39 @@ express symmetries by having groups act on sets of positions,
 symmetric containers internalize symmetries in a groupoid of shapes~\cite{Gylterud2011},
 and categorified containers~\cite{AltenkirchKaposi2021containermodeltype} describe directed relations of shapes as a category.
 
-When working in Univalent Foundations, the most direct generalization of containers is that from sets to arbitrary types
-with potentially non-trivial higher path types.
+When working in Univalent Foundations, the most direct generalization of containers is the one from sets to arbitrary types
+with potentially non-trivial higher path types:
+an \emph{untruncated} container \( (\MkCont{S}{P}) \) consists of a \emph{type} of shapes \( S \), and a \emph{type} of positions \( P(s) \) for each shape \( s : S \).
+Untruncated containers subsume many notions of containers that express symmetries of constructors by encoding them in the (higher) path types of shapes.
 Much of the theory of set-truncated containers transfers directly, since it never assumed that types were sets in the first place.
-Even smallest-~\cite{DamatoEtAl2025FormalisingInductiveCoinductive} and largest fixed points~\cite{AhrensEtAl2015NonWellfoundedTrees} can be proved to exist.
+Does the same apply to derivatives of containers?
+At a glance this seems unlikely because, unlike other constructions on containers, traditional derivatives are special:
+They are only well-behaved for \emph{discrete} containers, i.e. those whose positions are discrete.
+By Hedberg's Theorem, positions of discrete containers must be sets, meaning that a generalization to a type of untruncated positions seems impossible.
 
-\begin{todo-block}
-  Include a link to the formalization and discuss.
-\end{todo-block}
-
-\subsection{Overview}
-In this paper, we tackle two problems.
+In this paper, we show how to define derivatives of untruncated containers in spite of this apparent obstacle.
+We tackle the problem in to steps.
 At first, an exercise in reverse mathematics:
-\emph{%
-  What are the minimal assumptions on decidability that we can make such that a derivative is still well-defined?
-}
-The second is to ensure that such a derivative behaves correctly:
-\emph{%
-  Does this derivative satisfy an analogue of the universal property for discrete containers?
-  Do laws of derivatives hold? Is there a chain rule?
-}
+In our definition of a derivative, what are the minimal assumptions on decidability that we can make which do not force positions to be sets?
+Having found a potential generalized derivative, we ask whether it behaves correctly:
+Does it satisfy a universal property like discrete containers do?
+Do laws of derivatives hold? Is there a chain rule?
 
 To this end, in \autoref{isolated-points} we recall the notion of \emph{isolatedness} of a point in a type.
-This is a local notion of discreteness, considered in type theory, for example, by \citeauthor{KrausEtAl2013GeneralizationsHedberg’sTheorem} in \cite{KrausEtAl2013GeneralizationsHedberg’sTheorem}.
-To each type \( A \), we associate its \emph{set} of isolated points \( \Isolated{A} \),
+This is a local notion of discreteness, considered in type theory, for example, by \citeauthor{KrausEtAl2013GeneralizationsHedberg’sTheorem}~\cite{KrausEtAl2013GeneralizationsHedberg’sTheorem}.
+To each type \( A \), we associate its \emph{set} of isolated points \( \Isolated{A} \)\kern-0.20em,
 and show how it distributes over various type formers.
-We make two key observations:
+We make three observations:
 First, isolated points distributing over \( \Sigma \)-types is a constructive taboo which would imply discreteness of arbitrary types.
-Second, we show that removal of points from a type, \( A \setminus a \) is well-behaved for even for arbitrary \( A : \Type \),
-as long as \( a \) is an isolated point,
-and that we can define an induction-like principle for types pointed by an isolated point.
+Second, removal of points from a type, \( A \setminus a \), is well-behaved for even for arbitrary \( A : \Type \),
+as long as \( a \) is an isolated point.
+Third, functions out of types pointed by an isolated point are characterized by an induction-like principle.
 
 In \autoref{derivatives}, we use this to define a derivative that only ranges over isolated positions;
 this allows us to prove the following universal property
 by application of simple lemmata for isolated points:
 On the (wild) category \( \ContCart \) of containers and cartesian morphisms,
-\( \Der \), is an endofunctor,
+\( \Der \) is an endofunctor,
 and it is right-adjoint to taking products with the identity container, \( \Maybe{\Blank} \).
 As a consequence, we can solve a problem left open in \cite[14]{AbbottEtAl2005DataDifferentiating}:
 the wild adjunction restricts to an ordinary adjunction on the 1-category of set-truncated containers.
@@ -88,18 +86,20 @@ We can, however, show constructively that it is an embedding of containers.
 In \autoref{fixed-points}, we apply the previous results to show that derivatives of smallest fixed points can be characterized entirely by the chain rule.
 We ensure that every container \( F \) has a smallest fixed point \( \mu F \) in the wild category of containers:
 We prove that every (wild) substitution functor \( \Subst{F}{\Blank} : \ContCart \to \ContCart \) admits an initial algebra.
-This is different from the usual approach in which \( \mu F \) is defined in terms of an associated container functor \( \Ext{F} \) of sets or types \cite{AbbottEtAl2005ContainersConstructingstrictly,DamatoEtAl2025FormalisingInductiveCoinductive}.
-We do so to avoid coherence problems in the translation from containers to container functors.
-We then construct a lax \( \mu \)-rule as an embedding of a fixed point \( \mu F' \) into \( \Der(\mu F) \), in which \( F' \) is derived naturally from \( F \).
+This is different from the usual approach in which \( \mu F \) is defined in terms of an associated container functor \( \Ext{F} \) of sets \cite{AbbottEtAl2005ContainersConstructingstrictly,DamatoEtAl2025FormalisingInductiveCoinductive}.
+We do so to avoid coherence problems in the translation from container functors back to containers:
+usually, properties of container functors are pulled back along \( \Ext{\Blank} \), a full and faithful functor of 1-categories.
+In our setting, this is a functor of wild categories, and proving that it preserves the necessary structure is not straightforward.
+Lastly, we construct a lax \( \mu \)-rule as an embedding of a fixed point \( \mu F' \) into \( \Der(\mu F) \), in which \( F' \) is derived naturally from \( F \).
 This embedding characterizes \( \Der(\mu F) \) entirely in terms of the chain rule:
 it is an equivalence if and only if the chain rule for \( F \) and \( \mu F \) is an equivalence.
 In other words, the \( \mu \)-rule is strong exactly when the associated chain rule is.
 
-\subsection{Notation}
+In this paper, we work in Homotopy Type Theory, an extension of intensional Martin--Löf type theory.
+Our notation and conventions mostly follow that of the HoTT Book~\cite{UnivalentFoundationsProgram2013HomotopyTypeTheory},
+some of which we are going to recall now:
 
-\paragraph{Type theory.}
-We work in Homotopy Type Theory, an extension to intensional Martin--Löf type theory.
-Our notation and conventions mostly follow that of the HoTT Book~\cite{UnivalentFoundationsProgram2013HomotopyTypeTheory}.
+\paragraph{Types and terms.}
 All of our types live in a single univalent universe, \( \Type \), unless stated otherwise.
 We assume the existence of a unit type \( 1 \), empty type \( 0 \), natural numbers \( \mathbb{N} \), products \( A \times B \), coproducts \( A + B \), and function types \( A \to B \),
 as well as their dependent analogues:
@@ -145,7 +145,7 @@ A function \( f : A \to B \) is an equivalence if for all \( y : B \) the type o
 Being an equivalence is a proposition, and we denote the induced subtype of functions by \( A \simeq B \).
 
 We employ various techniques to show that a given map \( f : A \to B \) is an equivalence.
-In simple cases it suffices to give some \( g : B \to A \) and show that it and \( f \) are mutually inverse,
+In simple cases it suffices to give some \( g : B \to A \) and show that \( g \) and \( f \) are mutually inverse,
 i.e.\@ that \( f \circ g = \Op{id}_B \) and \( g \circ f = \Op{id}_A \).
 Whenever possible, we decompose \( f \) into intermediate steps,
 after which we appeal to the 3-for-2 property: In any commutative triangle
