@@ -39,22 +39,6 @@ module _ {S : Type ℓS} {P : S → Type ℓP} where
     → (w : W) → B w
   W-elim {B} sup* (sup s f) = sup* s f λ p → W-elim {B = B} sup* (f p)
 
-  isContrWElimFiber : ∀ {ℓ} {B : W → Type ℓ}
-    → (φ : ∀ w → B w) → isContr (fiber W-elim φ)
-  isContrWElimFiber φ .fst .fst s f b = φ {! !}
-  isContrWElimFiber φ .fst .snd = {! !} -- funExt λ { (sup s f) → refl′ (φ (sup s f)) }
-  isContrWElimFiber φ .snd (sup* , sup*-β) = ΣPathP ({! sup*-β !} , {! !}) where
-    foo : (λ s f b → φ (sup s f)) ≡ sup*
-    foo = funExt₃ λ s f b → {!sup*-β ≡$ (sup s f) !}
-
-  W-elim-Iso : ∀ {ℓ} {B : W → Type ℓ}
-    → Iso ((s : S) → (f : P s → W) → ((p : P s) → B (f p)) → B (sup s f)) (∀ w → B w)
-  W-elim-Iso {B} .Iso.fun = W-elim
-  W-elim-Iso {B} .Iso.inv φ s f b = {!  !}
-  W-elim-Iso {B} .Iso.rightInv φ = funExt λ where
-    (sup s f) → {! !} -- refl′ (φ (sup s f))
-  W-elim-Iso {B} .Iso.leftInv sup* = funExt₂ λ s f → {! !}
-
   W-elim2 : ∀ {ℓ} {B : W → W → Type ℓ}
     → (sup* : (s₀ s₁ : S) (f₀ : P s₀ → W) (f₁ : P s₁ → W)
       → (sup* : (p₀ : P s₀) → (p₁ : P s₁) → B (f₀ p₀) (f₁ p₁))
@@ -62,9 +46,6 @@ module _ {S : Type ℓS} {P : S → Type ℓP} where
       )
     → (w₀ w₁ : W) → B w₀ w₁
   W-elim2 {B} sup* (sup s₀ f₀) (sup s₁ f₁) = sup* s₀ s₁ f₀ f₁ λ p₀ p₁ → W-elim2 {B = B} sup* (f₀ p₀) (f₁ p₁)
-
-  -- W-rec-equiv : ∀ {ℓ} {A : Type ℓ}
-  --   → Σ[ 
 
   W-out : W → (Σ[ s ∈ S ] (P s → W))
   W-out (sup s f) = s , f
@@ -178,22 +159,6 @@ module _ (S : Type ℓS) (P : S → Type ℓP) (Q : S → Type ℓQ) where
     isEquiv-Wᴰ-in : isEquiv Wᴰ-in
     isEquiv-Wᴰ-in = equivIsEquiv Wᴰ-in-equiv
 
-  {-
-  Wᴰ-retract-elim : ∀ {ℓD ℓB} {D : Type ℓD}
-    → (f : D → W)
-    → (f* : ∀ d → P (W-shape (f d)) → D)
-    → (f-lift : ∀ d → W-branch (f d) ≡ f* d ⨟ f)
-    → {B : (d : D) → Wᴰ (f d) → Type ℓB}
-    → (top* : ∀ {d} → (q : Q (W-shape $ f d)) → B d $ subst Wᴰ (secEq W-in-equiv (f d)) (top {f = W-branch (f d)} q))
-    → (below* : ∀ {d}
-        → (p : P (W-shape (f d)))
-        → (wᴰ : Wᴰ (W-branch (f d) p))
-        → B (f* d p) $ subst Wᴰ (f-lift d ≡$ p) wᴰ
-      )
-    → ∀ d (wᴰ : Wᴰ (f d)) → B d wᴰ
-  Wᴰ-retract-elim f f* f-lift top* below* d x = {! !}
-  -}
-
   module _ (disc-P : ∀ s → Discrete (P s)) (disc-Q : ∀ s → Discrete (Q s)) where
     discrete-Wᴰ : ∀ w → Discrete (Wᴰ w)
     discrete-Wᴰ (sup s f) = EquivPresDiscrete (Wᴰ-in-equiv s f) $
@@ -221,87 +186,6 @@ W-map : ∀ {S S′ : Type ℓS} {P : S → Type ℓP} {P′ : S′ → Type ℓ
   → W S P → W S′ P′
 W-map f fᴰ = W-elim λ s x map → sup (f s) (map ∘ fᴰ s)
 
-{-
-_←[_]_ : ∀ {ℓ ℓ′ ℓᴰ ℓ′ᴰ} {A : Type ℓ} {B : Type ℓ′}
-  → (Aᴰ : A → Type ℓᴰ) (f : A → B) (Bᴰ : B → Type ℓ′ᴰ)
-  → Type _
-Aᴰ ←[ f ] Bᴰ = ∀ a → Bᴰ (f a) → Aᴰ a
-
-record Isoᴰ {S S′ : Type ℓS}
-  (f : Iso S S′)
-  (P : S → Type ℓP)
-  (P′ : S′ → Type ℓP)
-  : Type (ℓ-max ℓS ℓP) where
-  field
-    fun : P ←[ f .Iso.fun ] P′
-    inv : P′ ←[ f .Iso.inv ] P
-    -- rinv : {! !}
-
-
-
-W-subst-Iso : ∀ {S S′ : Type ℓS} {P : S → Type ℓP} {P′ : S′ → Type ℓP}
-  → (f : Iso S S′)
-  → (fᴰ : IsoOver (invIso f) P′ P)
-  → Iso (W S P) (W S′ P′)
-W-subst-Iso {S} {S′} {P} {P′} f fᴰ = iso module W-subst-Iso where
-  module f = Iso f
-  module fᴰ = IsoOver fᴰ
-
-  iso : Iso _ _
-  iso .Iso.fun = W-map f.fun {! fᴰ.fun !}
-  iso .Iso.inv = {! !}
-  iso .Iso.rightInv = {! !}
-  iso .Iso.leftInv = {! !}
-
-W-subst-haequiv : ∀ {S S′ : Type ℓS} {P : S → Type ℓP} {P′ : S′ → Type ℓP}
-  → (e : HAEquiv S S′)
-  → (f : ∀ s → HAEquiv (P′ (e .fst s)) (P s))
-  → HAEquiv (W S P) (W S′ P′)
-W-subst-haequiv {S} {S′} {P} {P′} (e , is-equiv-e) f* = ha-equiv module W-subst-haequiv where
-  module _ (s : S) where
-    open Σ (f* s) renaming (fst to f ; snd to is-equiv-f) public
-    module f = isHAEquiv is-equiv-f
-
-  module e = isHAEquiv is-equiv-e
-
-  g : W S′ P′ → W S P
-  g = W-map e.g λ s′ → subst P′ (e.rinv s′) ∘ f.g (e.g s′)
-
-  ha-equiv : HAEquiv _ _
-  ha-equiv .fst = W-map e f
-  ha-equiv .snd .isHAEquiv.g = g
-  ha-equiv .snd .isHAEquiv.linv = W-elim λ s x linv → cong₂ sup (e.linv s) {! !}
-  ha-equiv .snd .isHAEquiv.rinv = {! !}
-  ha-equiv .snd .isHAEquiv.com = {! !}
-
-W-subst-equiv : ∀ {S S′ : Type ℓS} {P : S → Type ℓP} {P′ : S′ → Type ℓP}
-  → (e : S ≃ S′)
-  → (f : ∀ s → P′ (equivFun e s) ≃ P s)
-  → W S P ≃ W S′ P′
-W-subst-equiv {S} {S′} {P} {P′} e eᴰ = isoToEquiv iso module W-subst-equiv where
-  fun : W S P → W S′ P′
-  fun = W-map (equivFun e) (equivFun ∘ eᴰ)
-
-  inv : W S′ P′ → W S P
-  inv = W-map (invEq e) {! !}
-
-  iso : Iso _ _
-  iso .Iso.fun = W-elim λ s f ε → sup (equivFun e s) (ε ∘ equivFun (eᴰ s))
-  iso .Iso.inv = W-elim λ s f ε → sup (invEq e s) (ε ∘ subst (λ - → P (invEq e s) → P′ -) (secEq e s) (invEq (eᴰ (invEq e s))))
-  iso .Iso.rightInv = W-elim λ s f rinv → cong₂ sup (secEq e s) $ funExtNonDep λ p₀≡p₁ → rinv (p′ s p₀≡p₁) ∙ cong f {!rinv!}
-    where module _ (s : S′) {p₀} {p₁} (p₀≡p₁ : PathP (λ z → P′ (secEq e s z)) p₀ p₁) where
-      p′ : P′ s
-      p′ = subst (λ - → P (invEq e s) → P′ -) (secEq e s) (invEq (eᴰ (invEq e s))) (equivFun (eᴰ (invEq e s)) p₀)
-
-      -- step₁ : ? ≡ p′
-      -- step₁ = rinv p′
-
-      -- lemma : ∀ {x₀} {x₁} (pᴰ : PathP (λ z → P′ (secEq e s z)) x₀ x₁) → ?
-      -- lemma = {! !}
-  iso .Iso.leftInv = {! !}
-
--}
-
 W-fiber-equiv : ∀ {ℓ} {S : Type ℓS} {P : S → Type ℓP} {Y : Type ℓ}
   → {f : W S P → Y}
   → (y : Y) → fiber f y ≃ (Σ[ s ∈ S ] fiber (f ∘ sup s) y)
@@ -313,67 +197,44 @@ W-fiber-equiv {S} {P} {Y} {f} y =
   Σ[ s ∈ S ] Σ[ x ∈ (P s → W S P) ] f (sup s x) ≡ y
     ≃∎
 
+isEmbedding→W-rec-fiber-equiv : ∀ {ℓ} {S : Type ℓS} {P : S → Type ℓP} {A : Type ℓ}
+  → (sup* : (Σ[ s ∈ S ] (P s → A)) → A)
+  → isEmbedding sup*
+  → (s : S) (f : P s → W S P)
+  → fiber (W-rec sup*) (W-rec sup* (sup s f)) ≃ ((p : P s) → fiber (W-rec sup*) (W-rec sup* (f p)))
+isEmbedding→W-rec-fiber-equiv {S} {P} {A} sup* is-emb-sup* s f =
+  Σ[ x ∈ W S P ] W-rec sup* x ≡ sup* (s , W-rec sup* ∘ f)
+    ≃⟨ Σ-cong-equiv-snd (λ x → compPathlEquiv (sym $ W-rec-β sup* ≡$ x)) ⟩
+  Σ[ x ∈ W S P ] sup* (W-out x .fst , _) ≡ sup* (s , W-rec sup* ∘ f)
+    ≃⟨ Σ-cong-equiv-snd (λ x → invEquiv $ cong sup* , is-emb-sup* _ _) ⟩
+  Σ[ w ∈ W S P ] (W-out w .fst , W-rec sup* ∘ W-out w .snd) ≡ (s , W-rec sup* ∘ f)
+    ≃⟨ invEquiv $ Σ-cong-equiv-fst $ W-in-equiv ⟩
+  Σ[ (s′ , f′) ∈ (Σ[ s ∈ S ] (P s → W S P)) ] (s′ , W-rec sup* ∘ f′) ≡ (s , W-rec sup* ∘ f)
+    ≃⟨ Σ-cong-equiv-snd (λ _ → invEquiv ΣPathP≃PathPΣ) ⟩
+  Σ[ (s′ , f′) ∈ (Σ[ s ∈ S ] (P s → W S P)) ] Σ _ _
+    ≃⟨ strictEquiv
+      (λ { ((s′ , f′) , s′≡s , f≡f′) → ((s′ , sym s′≡s) , (f′ , f≡f′)) })
+      (λ { ((s′ , s≡s′) , (f′ , f≡f′)) → ((s′ , f′) , sym s≡s′ , f≡f′) })
+    ⟩
+  Σ[ (s′ , s≡s′) ∈ singl s ] Σ[ f′ ∈ (P s′ → W S P) ] PathP (λ i → P (s≡s′ (~ i)) → A) (W-rec sup* ∘ f′) (W-rec sup* ∘ f)
+    ≃⟨ Σ-contractFst (isContrSingl s) ⟩
+  Σ[ f′ ∈ (P s → W S P) ] (W-rec sup* ∘ f′) ≡ (W-rec sup* ∘ f)
+    ≃⟨ Σ-cong-equiv-snd (λ f′ → invEquiv funExtEquiv) ⟩
+  Σ[ f′ ∈ (P s → W S P) ] ((p : P s) → W-rec sup* (f′ p) ≡ W-rec sup* (f p))
+    ≃⟨ invEquiv Σ-Π-≃ ⟩
+  ((p : P s) → fiber (W-rec sup*) (W-rec sup* (f p)))
+    ≃∎
+
 isEmbedding-W-rec : ∀ {ℓ} {S : Type ℓS} {P : S → Type ℓP} {A : Type ℓ}
   → (sup* : (Σ[ s ∈ S ] (P s → A)) → A)
   → isEmbedding sup*
   → isEmbedding (W-rec sup*)
-isEmbedding-W-rec {S} {P} sup* is-emb-sup* = hasPropFibersOfImage→isEmbedding prop-fibers where
-  fiber-equiv : ∀ s f → fiber (W-rec sup*) (W-rec sup* (sup s f)) ≃ {! !}
-  fiber-equiv s f =
-    Σ[ x ∈ W S P ] W-rec sup* x ≡ sup* (s , W-rec sup* ∘ f)
-      ≃⟨ Σ-cong-equiv-snd (λ x → compPathlEquiv (sym $ W-rec-β sup* ≡$ x)) ⟩
-    Σ[ x ∈ W S P ] sup* (W-out x .fst , _) ≡ sup* (s , W-rec sup* ∘ f)
-      ≃⟨ Σ-cong-equiv-snd (λ x → invEquiv $ cong sup* , is-emb-sup* _ _) ⟩
-    Σ[ w ∈ W S P ] (W-out w .fst , λ x → W-rec sup* (W-out w .snd x)) ≡ (s , W-rec sup* ∘ f)
-      ≃⟨ invEquiv $ Σ-cong-equiv-fst $ W-in-equiv ⟩
-    Σ[ (s′ , f′) ∈ (Σ[ s ∈ S ] (P s → W S P)) ] (s′ , W-rec sup* ∘ f′) ≡ (s , W-rec sup* ∘ f)
-      ≃⟨ {! !} ⟩
-    Σ[ f′ ∈ (P s → W S P) ] (W-rec sup* ∘ f′) ≡ (W-rec sup* ∘ f)
-      ≃⟨ {! !} ⟩
-    Σ[ f′ ∈ (P s → W S P) ] (∀ x → W-rec sup* (f′ x) ≡ W-rec sup* (f x))
-      ≃⟨ {! !} ⟩
-    {! !}
-      ≃∎
+isEmbedding-W-rec {S} {P} {A} sup* is-emb-sup* = hasPropFibersOfImage→isEmbedding prop-fibers where
+  fiber-equiv : ∀ s f → fiber (W-rec sup*) (W-rec sup* (sup s f)) ≃ ((p : P s) → fiber (W-rec sup*) (W-rec sup* (f p)))
+  fiber-equiv = isEmbedding→W-rec-fiber-equiv sup* is-emb-sup*
 
   prop-fibers : ∀ w → isProp (fiber (W-rec sup*) (W-rec sup* w))
-  prop-fibers (sup s f) = {! !}
-
-  bar : isEmbedding (Σ-map-snd {B = λ s → P s → W S P} (λ _ → W-rec sup* ∘_))
-  bar = isEmbedding-Σ-map-snd λ s → {!isEquivPostComp  !}
-
-  foo : isEmbedding (W-out ⨟ Σ-map-snd (λ _ → W-rec sup* ∘_) ⨟ sup*)
-  foo = {! !}
-
-{-
-module V where
-  open import Derivative.Remove
-  open import Cubical.Data.Unit
-
-  V : Type₁
-  V = W Type (λ X → X)
-
-  El : V → Type
-  El = W-shape
-
-  _-_ : (x : V) → El x → V
-  sup A f - a = sup (A ∖ a) (f ∘ fst)
-
-  𝟘 : V
-  𝟘 = sup ⊥* λ ()
-
-  sing : V → V
-  sing A = sup (⊤ _) (const A)
-
-  𝟙 : V
-  𝟙 = sing 𝟘
-
-  +1-El : ∀ {A : Type} → (f : A → V) → A ⊎ ⊤ ℓ-zero → V
-  +1-El f (inl a) = f a
-  +1-El f (inr tt*) = 𝟙
-
-  _+1 : V → V
-  sup A f +1 = sup (A ⊎ ⊤ _) (+1-El f)
- 
-  inh-suc : ∀ A → El (A +1)
-  inh-suc (sup A f) = inr tt*
-  -}
+  prop-fibers (sup s f) = isOfHLevelRespectEquiv 1 (invEquiv $ fiber-equiv s f) is-prop-fibers'
+    where
+      is-prop-fibers' : isProp (∀ p → fiber (W-rec sup*) (W-rec sup* (f p)))
+      is-prop-fibers' = isPropΠ λ p → prop-fibers (f p)
