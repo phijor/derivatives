@@ -18,6 +18,7 @@ open import Cubical.Foundations.Equiv.Properties
 open import Cubical.Foundations.GroupoidLaws
 open import Cubical.Foundations.Path
 open import Cubical.Foundations.Transport
+open import Cubical.Functions.FunExtEquiv
 open import Cubical.Data.Sigma hiding (hcomp ; comp)
 import      Cubical.Data.Empty as Empty
 open import Cubical.Data.Nat.Base using (ℕ ; zero ; suc)
@@ -212,6 +213,15 @@ equivPathPEquiv {A} {B} {e₀} {e₁} = isoToEquiv iso module equivPathPEquiv wh
   iso .Iso.inv = congP (λ i → equivFun)
   iso .Iso.rightInv _ = ΣSquarePProp isPropIsEquiv refl
   iso .Iso.leftInv _ = refl
+
+postCompFiberEquiv : (f : A → B) → (ψ : C → B) → (∀ c → fiber f (ψ c)) ≃ fiber (f ∘_) ψ
+postCompFiberEquiv {A} {C} f ψ =
+  (∀ c → Σ[ a ∈ A ] f a ≡ ψ c)
+    ≃⟨ Σ-Π-≃ ⟩
+  Σ[ φ ∈ (C → A) ] (∀ c → f (φ c) ≡ ψ c)
+    ≃⟨ Σ-cong-equiv-snd (λ φ → funExtEquiv) ⟩
+  Σ[ φ ∈ (C → A) ] f ∘ φ ≡ ψ
+    ≃∎
 
 private
   variable
