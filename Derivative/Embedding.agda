@@ -1,8 +1,11 @@
 module Derivative.Embedding where
 
 open import Derivative.Prelude
+open import Derivative.Equiv
 
+open import Cubical.Data.Sigma
 open import Cubical.Functions.Embedding
+open import Cubical.Functions.FunExtEquiv
 
 private
   variable
@@ -18,12 +21,38 @@ isEmbeddingComp f g emb-f emb-g = isEmbedding-∘ {f = g} {h = f} emb-g emb-f
 isEmbeddingPrecompEquiv→isEmbedding : (e : A ≃ B) (f : B → C)
   → isEmbedding (equivFun e ⨟ f)
   → isEmbedding f
-isEmbeddingPrecompEquiv→isEmbedding = {! !}
+isEmbeddingPrecompEquiv→isEmbedding e f emb-ef = hasPropFibers→isEmbedding prop-fibers where
+  prop-fibers : ∀ c → isProp (fiber f c)
+  prop-fibers c = isOfHLevelRespectEquiv 1 (preCompEquivFiberEquiv e f c)
+    $ isEmbedding→hasPropFibers emb-ef c
 
-isEmbeddingPostecompEquiv→isEmbedding : (f : A → B) (e : B ≃ C)
+isEmbeddingPostCompEmbedding→isEmbedding : (f : A → B) (e : B → C)
+  → isEmbedding e
+  → isEmbedding (f ⨟ e)
+  → isEmbedding f
+isEmbeddingPostCompEmbedding→isEmbedding f e emb-e emb-fe = hasPropFibers→isEmbedding prop-fibers where
+  fiber-equiv : ∀ b → fiber (f ⨟ e) (e b) ≃ fiber f b
+  fiber-equiv b = Σ-cong-equiv-snd λ a → invEquiv $ cong e , emb-e (f a) b
+
+  prop-fibers : ∀ b → isProp (fiber f b)
+  prop-fibers b = isOfHLevelRespectEquiv 1 (fiber-equiv b)
+    $ isEmbedding→hasPropFibers emb-fe (e b)
+
+isEmbeddingPostCompEquiv→isEmbedding : (f : A → B) (e : B ≃ C)
   → isEmbedding (f ⨟ equivFun e)
   → isEmbedding f
-isEmbeddingPostecompEquiv→isEmbedding = {! !}
+isEmbeddingPostCompEquiv→isEmbedding f e = isEmbeddingPostCompEmbedding→isEmbedding
+  f
+  (equivFun e)
+  (isEquiv→isEmbedding (equivIsEquiv e))
+
+isEmbeddingPostComp : (f : A → B)
+  → isEmbedding f
+  → isEmbedding (λ (φ : C → A) → f ∘ φ)
+isEmbeddingPostComp {A} {B} {C} f emb-f = hasPropFibers→isEmbedding prop-fibers where
+  prop-fibers : ∀ ψ → isProp (fiber (f ∘_) ψ)
+  prop-fibers ψ = isOfHLevelRespectEquiv 1 (postCompFiberEquiv f ψ)
+    $ isPropΠ λ c → isEmbedding→hasPropFibers emb-f (ψ c)
 
 isEmbedding-Σ-map-fst : {B : C → Type ℓ} (f : A → C) → isEmbedding f → isEmbedding (Σ-map-fst {B′ = B} f)
 isEmbedding-Σ-map-fst f emb-f = hasPropFibers→isEmbedding λ where
