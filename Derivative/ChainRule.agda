@@ -165,3 +165,33 @@ isEquivChainMap≃AllTypesDiscrete = propBiimpl→Equiv isPropHasChainEquiv (isP
   
   discrete-S¹ : Discrete S¹
   discrete-S¹ = isEquivChainMap→AllTypesDiscrete is-equiv-chain-map S¹
+
+impredicativeProp→hasChainEquiv→LEM : (ℓ : Level)
+  → (Ω : Type ℓ)
+  → (resize : Ω ≃ hProp ℓ)
+  → hasChainEquiv ℓ
+  → (P : hProp ℓ) → Dec ⟨ P ⟩
+impredicativeProp→hasChainEquiv→LEM ℓ Ω resize has-chain-equiv = dec-prop where
+  open import Cubical.Relation.Nullary.Properties using (EquivPresDiscrete)
+
+  all-types-discrete : (A : Type ℓ) → Discrete A
+  all-types-discrete = isEquivChainMap→AllTypesDiscrete has-chain-equiv
+
+  Ω-discrete : Discrete Ω
+  Ω-discrete = all-types-discrete Ω
+
+  hProp-discrete : Discrete (hProp ℓ)
+  hProp-discrete = EquivPresDiscrete resize Ω-discrete
+
+  ⊤ᴾ : hProp ℓ
+  ⊤ᴾ .fst = ⊤ ℓ
+  ⊤ᴾ .snd _ _ = refl
+
+  dec-equal-⊤ : (P : hProp ℓ) → Dec (P ≡ ⊤ᴾ)
+  dec-equal-⊤ P = hProp-discrete P ⊤ᴾ
+
+  dec-prop : ∀ P → Dec ⟨ P ⟩
+  dec-prop P = Dec.map
+    (λ P≡⊤ → subst ⟨_⟩ (sym P≡⊤) tt*)
+    (λ P≢⊤ p → P≢⊤ $ Σ≡Prop (λ _ → isPropIsProp) (isContr→≡Unit* (inhProp→isContr p (str P))))
+    (dec-equal-⊤ P)
