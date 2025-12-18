@@ -22,6 +22,7 @@
           cmll
           csquotes
           enumitem
+          preprint # For authblk
           stmaryrd
           tcolorbox
           tikz-cd
