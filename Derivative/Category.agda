@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 open import Derivative.Prelude
 
 module Derivative.Category (ℓ : Level) where

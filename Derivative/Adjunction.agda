@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Derivative.Adjunction where
 
 open import Derivative.Prelude

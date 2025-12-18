@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Derivative.Properties where
 
 open import Derivative.Prelude

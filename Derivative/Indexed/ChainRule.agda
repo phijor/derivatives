@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Derivative.Indexed.ChainRule where
 
 open import Derivative.Indexed.Container

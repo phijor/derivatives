@@ -1,4 +1,4 @@
-{-# OPTIONS -WnoUnsupportedIndexedMatch --lossy-unification #-}
+{-# OPTIONS -WnoUnsupportedIndexedMatch --lossy-unification --allow-unsolved-metas #-}
 module Derivative.Indexed.MuRule where
 
 open import Derivative.Indexed.Container

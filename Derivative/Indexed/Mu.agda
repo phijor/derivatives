@@ -1,5 +1,5 @@
 -- TODO: Clean up imports
-{-# OPTIONS -WnoUnsupportedIndexedMatch #-}
+{-# OPTIONS -WnoUnsupportedIndexedMatch --allow-unsolved-metas #-}
 module Derivative.Indexed.Mu where
 
 open import Derivative.Indexed.Container

@@ -1,4 +1,4 @@
 name: derivative
 include: .
 depend: cubical
-flags: --cubical --guardedness --postfix-projections --hidden-argument-puns --exact-split --allow-unsolved-metas --no-require-unique-meta-solutions
+flags: --cubical --guardedness --postfix-projections --hidden-argument-puns --exact-split --no-require-unique-meta-solutions

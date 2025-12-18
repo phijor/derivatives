@@ -1,3 +1,4 @@
+{-# OPTIONS --safe #-}
 module Derivative.Grafting where
 
 open import Derivative.Prelude
