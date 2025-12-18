@@ -10,13 +10,14 @@ derivatives of discrete containers (whose positions have decidable equality) sat
 
 Working in Univalent Foundations, we extend the derivative operation to _untruncated_ containers (whose shapes and positions are arbitrary types).
 We prove that this derivative, defined in terms of a set of _isolated positions_,
-satisfies an appropriate universal property in the (wild) category of untruncated containers and cartesian morphisms,
+satisfies an appropriate universal property in the wild category of untruncated containers and cartesian morphisms,
 as well as basic laws with respect to constants, sums and products.
 A chain rule exists, but is in general non-invertible.
 In fact, a globally invertible chain rule is inconsistent in the presence of non-set types,
 and equivalent to a classical principle when restricted to set-truncated containers.
 We derive a rule for derivatives of smallest fixed points from the chain rule,
 and characterize its invertibility.
+All of our results are formalized in Cubical Agda.
 
 ## Agda formalization
 
