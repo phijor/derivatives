@@ -136,12 +136,13 @@ For traditional containers, this can be implemented as an operation \( G \mapsto
 Given \( G \JudgeEq (\MkCont{T}{Q}) \), \citeauthor{AbbottEtAl2005DataDifferentiating} define \( \Der{G} \)
 to have as shapes pairs \( (t , q) : \sum_{T} Q \), over which the positions are \( Q_t \setminus q \).
 To ensure that \( \Der \) is well-behaved, it is characterized by a universal property:
-on a suitable subcategory of containers,\footnote{namely that of discrete containers} \( \Der \) extends to an endofunctor,
-and one shows the existence of an adjunction \( \Maybe{\Blank} \dashv \Der \)
-that describes morphisms into \( \Der{G} \):
-If such an adjunction exists, then morphisms \( \Cart{F}{\Der{G}} \) are in 1-to-1 correspondence with morphisms of shape \( (f, u) : \Cart{\Maybe{F}}{G} \).
-On positions, such morphisms are equivalences \( u_s : G_{\Ps}(fs) \simeq F_{\Ps}(s) + 1 \),
-i.e.\@ maps that \enquote{avoid} the removed position \( u_s^{\Inv}(\Inr(\bullet)) : G_{\Ps}(fs) \).
+on the subcategory of discrete containers, \( \Der \) extends to an endofunctor,
+and induces an adjunction \( \Maybe{\Blank} \dashv \Der \).
+This describes \( \Der{G} \) as \enquote{\( G \) with a hole} by a mapping-in property:
+morphisms \( \Cart{F}{\Der{G}} \) are in 1-to-1 correspondence with morphisms of shape \( (f, u) : \Cart{\Maybe{F}}{G} \),
+hence the position maps are equivalences \( u_s : G_{\Ps}(fs) \simeq F_{\Ps}(s) + 1 \).
+In particular, there is a position \( u_s^{\Inv}(\Inr(\bullet)) : G_{\Ps}(fs) \) in the output
+which does not correspond to a position in the input, \( F_{\Ps}(s) \), indicating the hole.
 
 As we have seen in the previous section, removing points from a type is a subtle process in a univalent setting:
 a position \( q : G_{\Ps}(t) \) is not simply a discrete point, but comes with a potentially complicated type of paths around it.
@@ -391,7 +392,7 @@ i.e. some \( G \) for which \( \CartIso{\Der{G}}{F} \).
 Interestingly, \( \Der \) has fixed-points, that is containers that are their own derivative.
 The prototypical example of such a fixed-point is the container of finite multisets, or \emph{bags}.
 Famously, bags cannot be expressed as set-truncated containers, but can be if one allows shapes of higher truncation level.
-Let here reproduce \citeauthor{Gylterud2011}'s construction~\cite[{example~3.6.1}]{Gylterud2011} of bags as a symmetric containers (with a groupoid of shapes),
+Let us reproduce \citeauthor{Gylterud2011}'s construction~\cite[{example~3.6.1}]{Gylterud2011} of bags as a symmetric container,
 but in the language of HoTT.
 Recall that a type is considered finite
 if there is some \( n : \mathbb{N} \) for which it is merely equivalent to \( \Fin{n} : \Type \).%

@@ -331,7 +331,7 @@ We observe that we can replicate the classical behavior exactly when \( a_0 \) i
   is an equivalence if and only if \( a_0 \) is isolated in \( A \).
   \begin{proof}
     First, assume that \( a_0 \) is isolated.
-    We give a two-sided inverse \( g : A \to (A \setminus a_0) + 1 \) as follows.
+    We give an inverse \( g : A \to (A \setminus a_0) + 1 \) as follows.
     Define \( \Op{r} : \prod_{a : A} \Dec{(a_0 = a)} \to (A \setminus a_0) + 1 \)
     by
     \[
@@ -388,9 +388,9 @@ on the paths of the indexing type \( A \):
       \SigmaRemove_p(\Inr{(b, h_b)}) \DefEq ((a_0, b) , h^\prime_b),
     \]
     and show \( h^\prime_b : (a_0 , b_0) \neq (a_0 , b) \) as follows:
-    Assume to the contrary that \( p_b : (a_0 , b_0) = (a_0 , b) \).
-    From this we obtain (dependent) paths \( p_b^1 : a_0 = a_0 \) and \( p_b^2 : b_0 =_{p_b^1} b \).
-    Since \( a_0 = a_0 \) is a proposition, we know that \( p_b^1 = \Op{refl} \),
+    Assume to the contrary that there is some \( p_b : (a_0 , b_0) = (a_0 , b) \).
+    From this we obtain (dependent) paths \( p'_b : a_0 = a_0 \) and \( p''_b : b_0 =_{p_b^1} b \).
+    Since \( a_0 = a_0 \) is a proposition, we know that \( p'_b = \Op{refl} \),
     hence \( b_0 = b \).
     This is contradictory since we are given \( h_b : b_0 \neq b \).
   \end{construction}

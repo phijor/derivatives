@@ -10,7 +10,7 @@ Another important operation on containers is that of a derivative.
 It traces back to \citeauthor{Huet1997Zipper}'s \citetitle{Huet1997Zipper}~\cite{Huet1997Zipper},
 a procedure for computing a type of contexts around a subtree in a tree-shaped data type.
 In~\cite{McBride2001DerivativeRegularType}, \citeauthor{McBride2001DerivativeRegularType}
-notices that for the class of \enquote{regular types}, one-hole contexts behave like a derivative of functions in calculus:
+notices that for the class of \enquote{regular types}, one-hole contexts behave like derivatives of functions in calculus:
 they satisfy similar rules for constants, sums and products, and their substitution follows a chain rule.
 \Citeauthor{AbbottEtAl2003DerivativesContainers} extend this to a derivative operation on containers,
 first in a categorical meta-language~\cite{AbbottEtAl2003DerivativesContainers},
@@ -41,7 +41,7 @@ They are only well-behaved for \emph{discrete} containers, i.e. those whose posi
 By Hedberg's Theorem, positions of discrete containers must be sets, meaning that a generalization to a type of untruncated positions seems impossible.
 
 In this paper, we show how to define derivatives of untruncated containers in spite of this apparent obstacle.
-We tackle the problem in to steps.
+We tackle the problem in two steps.
 At first, an exercise in reverse mathematics:
 In our definition of a derivative, what are the minimal assumptions on decidability that we can make which do not force positions to be sets?
 Having found a potential generalized derivative, we ask whether it behaves correctly:
@@ -54,7 +54,7 @@ To each type \( A \), we associate its \emph{set} of isolated points \( \Isolate
 and show how it distributes over various type formers.
 We make three observations:
 First, isolated points distributing over \( \Sigma \)-types is a constructive taboo which would imply discreteness of arbitrary types.
-Second, removal of points from a type, \( A \setminus a \), is well-behaved for even for arbitrary \( A : \Type \),
+Second, removal of points from a type, \( A \setminus a \), is well-behaved even for arbitrary \( A : \Type \),
 as long as \( a \) is an isolated point.
 Third, functions out of types pointed by an isolated point are characterized by an induction-like principle.
 

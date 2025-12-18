@@ -227,7 +227,7 @@ Like in \autoref{discrete-strong-chain-rule}, this is the case for discrete cont
   If \( F : \Cont_2 \) and \( G : \Cont_1 \) are discrete, then \( \Chain_{F,G} \) is an equivalence. \qed
 \end{proposition}
 
-\subsection{Fixed Point Containers}\label{fixed-point-containers}
+\subsection{Fixed Points of Containers}\label{fixed-point-containers}
 
 To show how derivatives of untruncated containers interact with fixed points,
 we first have to give a suitable specification of what we mean by such a \enquote{fixed point}.
@@ -440,9 +440,9 @@ which yields a morphism into \emph{any} other algebra:
     \Rec_{\Sh} &: \W(S, P) \to T \\
     \Rec_{\Sh} &\DefEq \lambda(\Sup(s, f)).\, \alpha_{\Sh} (s, \Rec_{\Sh} \circ f)
   \end{align*}
-  For any \( i : I \) and \( w : \W(S, P) \), there is a map of positions
-  typed \( u : Q_i(\Rec_{\Sh}(w)) \to \bar{\W}_{S,P,\vec{P}}(w) \),
-  again defined by induction on \( w \JudgeEq \Sup(s, f) \) as the composite
+  On positions, we define map
+  \( {u : Q_i(\Rec_{\Sh}(w)) \to \bar{\W}_{S,P,\vec{P}}(w)} \) by induction on \( w : \W(S, P) \).
+  For \( w \JudgeEq \Sup(s, f) \), it is the composite
   \[
     \begin{tikzcd}
       Q_i(\alpha_{\Sh}(s , \Rec_{\Sh} \circ f)
@@ -460,7 +460,7 @@ which yields a morphism into \emph{any} other algebra:
   \]
   in which \( u^* \) applies \( u(f(p)) \) recursively in the second component of the \( \Sigma \)-type.
   By induction, all maps in this composite are equivalences, hence it is the map underlying
-  the desired equivalence \( \Rec_{\Ps}(i, w) \) of positions.
+  the desired equivalence of positions, \( \Rec_{\Ps}(i, w) \).
 
   To show that \eqref{mu-rec-comm} commutes, it suffices to find a filler for
   \begin{equation}\label{mu-rec-out-filler}
@@ -662,7 +662,7 @@ This map preserves embeddings:
 \begin{lemma}\label{is-embedding-W-rec}
   Let \( S : \Type \) and \( P : S \to \Type \).
   For all \( A : \Type \),
-  if \( h : ( \sum_{s : S} (P(s) \to A) ) \to A \) is an embedding,
+  if \( { h : ( \sum_{s : S} (P(s) \to A) ) \to A } \) is an embedding,
   then so is \( \WRec_h : \W(S, P) \to A \).
   \begin{proof}
     It suffices to show that fibers over the image of \( \WRec_h \) are propositions,
