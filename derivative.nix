@@ -14,12 +14,12 @@
         pname = "derivative";
         version = "0.1.0";
 
-        src = builtins.path {
-          name = "derivative-source";
-          path = lib.sources.cleanSourceWith {
-            src = ./.;
-            filter = path: type: type != "directory" || baseNameOf path != "doc";
-          };
+        src = with lib.fileset; toSource {
+          root = ./.;
+          fileset = unions [
+            ./derivative.agda-lib
+            ./Derivative
+          ];
         };
 
         buildInputs = [ cubical ];
@@ -27,6 +27,7 @@
         meta = {
           description = "Derivatives of containers in UF";
           platforms = lib.platforms.all;
+          license = lib.licenses.mit;
         };
       };
     in

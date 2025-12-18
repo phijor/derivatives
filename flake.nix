@@ -29,7 +29,11 @@
       perSystem =
         { pkgs, ... }:
         {
-          config.treefmt.projectRootFile = "flake.nix";
+          config.treefmt = {
+            projectRootFile = "flake.nix";
+            programs.mdformat.enable = true;
+            programs.nixfmt.enable = true;
+          };
         };
     };
 }

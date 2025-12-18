@@ -32,6 +32,10 @@
       packages.paper = pkgs.stdenvNoCC.mkDerivation {
         pname = "derivatives-paper";
         version = config.packages.derivative.version;
+
+        meta = {
+          license = lib.licenses.cc-by-40;
+        };
         src =
           with fileset;
           toSource {
