@@ -38,12 +38,15 @@ as an embedding \( \operatorname{\Op{\varphi-rule}} : \Cart{\mu F'}{\Der(\varphi
 \).
 
 In another direction, we are curious whether we can describe more than just one-hole contexts.
-In \cite{AbbottEtAl2003DerivativesContainers}, \citeauthor{AbbottEtAl2003DerivativesContainers} consider a general adjunction \( \Blank \CTimes H \dashv [H, \Blank] \),
-describing \enquote{\( H \)-shaped} holes.
-\Autoref{derivative-adjunction-sets} shows that for \( H \JudgeEq \Id \), such an adjunction exists.
-Iterating it, we can describe \( n \)-hole contexts at \( H \JudgeEq \Op{y}\Fin{n} \).
-We conjecture that this holds also for set-truncated \( H \) with finitary positions,
-since any such \( H \) is \enquote{just} a big coproduct of representables \( \Op{y}\Fin{n_i} \).
+\Citeauthor{AbbottEtAl2003DerivativesContainers} define \emph{linear exponentials} \cite[{Def.~4.1}]{AbbottEtAl2003DerivativesContainers}:
+for containers \( F \) and \( H \), the linear exponential of \( [H, F] \) exists if there is a universal morphism from \( \Blank \CTimes H \) to \( F \).
+They show that \( \Der{F} = [\Id, F] \) if \( F \) is discrete.
+The adjunction of \autoref{derivative-adjunction-sets} is such a universal morphism, natural in all \( F \),
+hence \( \Der = [\Id, \Blank] \) as functors.
+Iterating the adjunction, we can describe \( n \)-hole contexts as linear exponentials \( \Der^n = [\Op{y}\Fin{n}, \Blank] \).
+We conjecture that \( [H, \Blank] \) exists for set-truncated \( H \) with finitary positions,
+since any such \( H \) is \enquote{just} a big coproduct of representables \( \Op{y}\Fin{n_i} \),
+This would give us a type of contexts with \enquote{\( H \)-shaped} holes.
 
 % In \cite{AbbottEtAl2003DerivativesContainers}, \citeauthor{AbbottEtAl2003DerivativesContainers} consider the general adjunction \( \Blank \CTimes H \dashv [H, \Blank] \),
 % perhaps we can make more progress towards that? By iterating ours, it should be possible to derive \( \Blank \CTimes \Op{K}(n) \dashv \Der^n \).
