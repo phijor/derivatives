@@ -1,4 +1,4 @@
-{-# OPTIONS -WnoUnsupportedIndexedMatch #-}
+{-# OPTIONS -WnoUnsupportedIndexedMatch --safe #-}
 module Derivative.W where
 
 open import Derivative.Prelude

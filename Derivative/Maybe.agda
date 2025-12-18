@@ -1,3 +1,4 @@
+{-# OPTIONS --safe #-}
 module Derivative.Maybe where
 
 open import Derivative.Prelude
