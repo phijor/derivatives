@@ -24,7 +24,7 @@ All of our results are formalized in Cubical Agda.
 This repository contains an Agda library demonstrating our results.
 The module [`README.lagda.md`](./README.lagda.md) provides an overwiev of the library, and links it to the claims in the paper.
 
-This library depends on Agda (version 2.8.0) and the [`cubical`](https://github.com/agda/cubical) library (v0.8).
+This library depends on Agda (version 2.8.0) and the [`cubical`](https://github.com/agda/cubical) library (v0.9).
 The recommended way to type-check and investigate this library is via [Nix](https://nixos.org/download/).
 All dependencies are pinned to working versions, hopefully aiding reproducibility.
 
