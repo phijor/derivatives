@@ -95,6 +95,15 @@ This embedding characterizes \( \Der(\mu F) \) entirely in terms of the chain ru
 it is an equivalence if and only if the chain rule for \( F \) and \( \mu F \) is an equivalence.
 In other words, the \( \mu \)-rule is strong exactly when the associated chain rule is.
 
+We develop our results as an Agda library,
+implemented in its \href{https://agda.readthedocs.io/en/v2.8.0/language/cubical.html}{cubical} mode,
+building on top of the \texttt{agda/cubical} library~\cite{AgdaCommunity2025CubicalAgdaLibrary}.
+The library, together with a mapping of all results of this paper to their definitions in code,
+is available at
+\begin{center}
+  \url{https://codeberg.org/phijor/derivatives}
+\end{center}
+
 In this paper, we work in Homotopy Type Theory, an extension of intensional Martin--Löf type theory.
 Our notation and conventions mostly follow that of the HoTT Book~\cite{UnivalentFoundationsProgram2013HomotopyTypeTheory},
 some of which we are going to recall now:
