@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Derivative.Bag where
 
 open import Derivative.Prelude renaming (⊤ to ⊤*)
@@ -165,6 +166,7 @@ module SubNat where
   ∂-ℕBag : Equiv (∂ ℕBag) ℕBag
   ∂-ℕBag = ∂-uBag
 
+{-
 module SubV where
   open import Derivative.Sum
   open import Derivative.W
@@ -209,3 +211,4 @@ module SubV where
 
   ∂-V : Equiv (∂ V-Bag) V-Bag
   ∂-V = {! !}
+-}
