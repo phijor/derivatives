@@ -1,4 +1,4 @@
-{-# OPTIONS -WnoUnsupportedIndexedMatch #-}
+{-# OPTIONS -WnoUnsupportedIndexedMatch --safe #-}
 module Derivative.Isolated where
 
 open import Derivative.Prelude
@@ -156,6 +156,9 @@ opaque
 
   EmbeddingReflectIsolated : (f : A → B) → isEmbedding f → ∀ {a} → isIsolated (f a) → isIsolated a
   EmbeddingReflectIsolated f emb-f = InjReflectIsolated f (isEmbedding→Inj emb-f)
+
+  EmbeddingReflectIsolated' : (f : A → B) → isEmbedding f → ∀ {a} → isIsolated (f a) → isIsolated a
+  EmbeddingReflectIsolated' f emb-f {a} isolated-fa a′ = EquivPresDec (invEquiv $ cong f , emb-f a a′) (isolated-fa (f a′))
 
   DecEmbeddingCreateIsolated : (f : A → B) → isEmbedding f → (∀ b → Dec (fiber f b)) → ∀ {a} → isIsolated a → isIsolated (f a)
   DecEmbeddingCreateIsolated f emb-f dec-fib {a} isolated-a b with (dec-fib b)
@@ -414,21 +417,7 @@ isIsolatedFst→isIsolatedSnd≃isIsolatedPair {A} {B} {a₀} isolated-a₀ b₀
   (isPropIsIsolated b₀)
   (isPropIsIsolated (a₀ , b₀))
   (isIsolatedΣ isolated-a₀)
-  (InjReflectIsolated (a₀ ,_) is-inj-map-snd)
-  where
-    is-inj-map-snd : (b₁ b₂ : B a₀) → (a₀ , b₁) ≡ (a₀ , b₂) → b₁ ≡ b₂
-    is-inj-map-snd b₁ b₂ q = goal where
-      q₁ : a₀ ≡ a₀
-      q₁ = cong fst q
-
-      q₂ : PathP (λ i → B (q₁ i)) b₁ b₂
-      q₂ = cong snd q
-
-      h : q₁ ≡ refl
-      h = isIsolated→isPropPath a₀ isolated-a₀ a₀ _ _
-
-      goal : b₁ ≡ b₂
-      goal = subst (λ (- : a₀ ≡ a₀) → PathP (λ i → B (- i)) b₁ b₂) h q₂
+  (EmbeddingReflectIsolated (a₀ ,_) $ isIsolated→isEmbeddingInjSnd a₀ isolated-a₀)
 
 isEquiv-Σ-isolate→DiscreteFst : (A : Type ℓ)
   → ((B : A → Type ℓ) → isEquiv (Σ-isolate A B))
@@ -679,7 +668,7 @@ module _ {ℓS ℓP ℓQ} {S : Type ℓS} {P : S → Type ℓP} {Q : S → Type 
 
   opaque
     isEmbeddingTop : ∀ {s f} → isEmbedding {B = Wᴰ S P Q (sup s f)} top
-    isEmbeddingTop {s} {f} = isEmbeddingPostecompEquiv→isEmbedding top (Wᴰ-out-equiv _ _ _ s f) Sum.isEmbedding-inl
+    isEmbeddingTop {s} {f} = isEmbeddingPostCompEquiv→isEmbedding top (Wᴰ-out-equiv _ _ _ s f) Sum.isEmbedding-inl
 
     isEmbeddingTop° : ∀ {s} {f} → isEmbedding {B = Wᴰ S P Q (sup s f) °} top°
     isEmbeddingTop° {s} {f} = isPropSnd→isEmbedding-Σ-map isEmbeddingTop isPropIsIsolated (isPropIsIsolated ∘ top)
@@ -691,7 +680,7 @@ module _ {ℓS ℓP ℓQ} {S : Type ℓS} {P : S → Type ℓP} {Q : S → Type 
     --     (isIsolated→isEmbeddingInjSnd p is-isolated-p) Sum.isEmbedding-inr
 
     isEmbeddingBelow : ∀ {s f} → isEmbedding {A = Σ[ p ∈ P s ] Wᴰ S P Q (f p)} {B = Wᴰ S P Q (sup s f)} (uncurry below)
-    isEmbeddingBelow {s} {f} = isEmbeddingPostecompEquiv→isEmbedding (uncurry below) (Wᴰ-out-equiv _ _ _ s f) Sum.isEmbedding-inr
+    isEmbeddingBelow {s} {f} = isEmbeddingPostCompEquiv→isEmbedding (uncurry below) (Wᴰ-out-equiv _ _ _ s f) Sum.isEmbedding-inr
 
     -- isEmbeddingBelow° : ∀ {s f} (p : P s °) → isEmbedding {B = Wᴰ S P Q (sup s f) °} (λ wᴰ → below° (p ,° wᴰ))
     -- isEmbeddingBelow° (p , isolated-p) = isPropSnd→isEmbedding-Σ-map (isEmbeddingBelow p isolated-p) isPropIsIsolated (isPropIsIsolated ∘ below p)
@@ -737,6 +726,7 @@ module Compact where
   isCompact : (A : Type ℓ) → Type _
   isCompact {ℓ} A = ∀ (B : A → Type ℓ) → isComplemented B → Dec (Σ A B)
 
+{-
   isEquiv-Σ-isolate→isCompact : (A : Type ℓ) → (B : A → Type ℓ)
     → isEquiv (Σ-isolate A B)
     → ∀ a → isCompact (B a)
@@ -748,7 +738,7 @@ module Compact where
   isCompact→isEquiv-Σ-isolate A B is-compact-B = isIsolatedPair→isEquiv-Σ-isolated is-isolated-pair where
     is-isolated-pair : {a₀ : A} {b₀ : B a₀} → isIsolated (a₀ , b₀) → isIsolated a₀ × isIsolated b₀
     is-isolated-pair {a₀} {b₀} isolated-ab = {! !}
-
+-}
 
 module Comodality where
   _⇀_ : (A B : Type ℓ) → Type ℓ
@@ -802,6 +792,7 @@ module Comodality where
   contract .fst a = a , a
   contract .snd iso-a = isIsolatedΣ iso-a iso-a
 
+{-
   [_×_] : ∀ {A₀ A₁ B₀ B₁ : Type ℓ}
     → (f₀ : A₀ ° ⇀ B₀ °)
     → (f₁ : A₁ ° ⇀ B₁ °)
@@ -818,3 +809,4 @@ module Comodality where
   par : A ° × A ⇀ A °
   par .fst (a° , a) = {! !}
   par .snd = {! !}
+-}
