@@ -1,5 +1,6 @@
 \documentclass{article}
 
+\usepackage[american]{babel}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage[
@@ -7,8 +8,11 @@
   style=alphabetic,
   maxbibnames=99, % Ensure all authors are listed in the bibliography
   maxcitenames=2,
+  useprefix=true, % Use prefixes (de, von, ...) in citation keys
+  hyperref=true,
+  backref=true,
   seconds=true,
-  alldates=iso
+  alldates=iso,
 ]{biblatex}
 \usepackage{mathtools}
 \usepackage{bussproofs}
