@@ -3,6 +3,7 @@ module Derivative.Remove where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
+open import Derivative.Basics.Sigma
 open import Derivative.Basics.Sum as Sum
 
 open import Cubical.Foundations.Equiv.Properties using (preCompEquiv ; equivAdjointEquiv ; congEquiv)

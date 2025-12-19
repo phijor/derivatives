@@ -4,6 +4,7 @@ module Derivative.Basics.W where
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
 open import Derivative.Basics.Embedding
+open import Derivative.Basics.Sigma
 open import Derivative.Basics.Sum
 
 open import Cubical.Foundations.Equiv.HalfAdjoint

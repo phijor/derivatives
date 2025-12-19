@@ -2,6 +2,7 @@
 module Derivative.Basics.Equiv where
 
 open import Derivative.Prelude
+open import Derivative.Basics.Sigma
 
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Equiv.Properties
@@ -13,6 +14,30 @@ private
   variable
     ℓ : Level
     A B C : Type ℓ
+
+equivSquareP :
+  {A B : I → I → Type ℓ}
+  {e₀₀ : (A i0 i0) ≃ (B i0 i0)}
+  {e₀₁ : (A i0 i1) ≃ (B i0 i1)}
+  {e₀₋ : PathP (λ j → (A i0 j) ≃ (B i0 j)) e₀₀ e₀₁}
+  {e₁₀ : (A i1 i0) ≃ (B i1 i0)}
+  {e₁₁ : (A i1 i1) ≃ (B i1 i1)}
+  {e₁₋ : PathP (λ j → (A i1 j) ≃ (B i1 j)) e₁₀ e₁₁}
+  {e₋₀ : PathP (λ i → (A i i0) ≃ (B i i0)) e₀₀ e₁₀}
+  {e₋₁ : PathP (λ i → (A i i1) ≃ (B i i1)) e₀₁ e₁₁}
+  → SquareP (λ i j → A i j → B i j) (congP (λ _ → equivFun) e₀₋) (congP (λ _ → equivFun) e₁₋) (congP (λ _ → equivFun) e₋₀) (congP (λ _ → equivFun) e₋₁)
+  → SquareP (λ i j → A i j ≃ B i j) e₀₋ e₁₋ e₋₀ e₋₁
+equivSquareP = ΣSquarePProp isPropIsEquiv
+
+equivPathPEquiv : ∀ {ℓ ℓ′} {A : I → Type ℓ} {B : I → Type ℓ′}
+  → {e₀ : A i0 ≃ B i0} {e₁ : A i1 ≃ B i1}
+  → PathP (λ i → A i → B i) (equivFun e₀) (equivFun e₁) ≃ PathP (λ i → A i ≃ B i) e₀ e₁
+equivPathPEquiv {A} {B} {e₀} {e₁} = isoToEquiv iso module equivPathPEquiv where
+  iso : Iso _ _
+  iso .Iso.fun = equivPathP
+  iso .Iso.inv = congP (λ i → equivFun)
+  iso .Iso.rightInv _ = ΣSquarePProp isPropIsEquiv refl
+  iso .Iso.leftInv _ = refl
 
 preCompEquivFiberEquiv : (e : A ≃ B) (f : B → C) → ∀ c → fiber (equivFun e ⨟ f) c ≃ fiber f c
 preCompEquivFiberEquiv {A} {B} {C} e f c =

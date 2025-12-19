@@ -3,6 +3,7 @@ module Derivative.ChainRule where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable as Dec
+open import Derivative.Basics.Sigma
 open import Derivative.Basics.Sum as Sum using (_⊎_ ; inl ; inr)
 
 open import Derivative.Container

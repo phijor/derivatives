@@ -3,6 +3,7 @@ module Derivative.Basics.Embedding where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Equiv
+open import Derivative.Basics.Sigma
 
 open import Cubical.Data.Sigma
 open import Cubical.Functions.Embedding

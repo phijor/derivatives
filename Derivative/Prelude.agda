@@ -1,8 +1,6 @@
 {-# OPTIONS --safe #-}
 module Derivative.Prelude where
 
-open import Derivative.Square
-
 open import Cubical.Foundations.Prelude hiding (_◁_ ; hcomp ; comp) public
 open import Cubical.Foundations.Function public
 open import Cubical.Foundations.Structure public
@@ -187,16 +185,6 @@ equivExt = equivEq ∘ funExt
 contractDomainEquiv : isContr A → (A → B) ≃ B
 contractDomainEquiv is-contr-A = isoToEquiv (isContr→Iso2 is-contr-A)
 
-equivPathPEquiv : ∀ {ℓ ℓ′} {A : I → Type ℓ} {B : I → Type ℓ′}
-  → {e₀ : A i0 ≃ B i0} {e₁ : A i1 ≃ B i1}
-  → PathP (λ i → A i → B i) (equivFun e₀) (equivFun e₁) ≃ PathP (λ i → A i ≃ B i) e₀ e₁
-equivPathPEquiv {A} {B} {e₀} {e₁} = isoToEquiv iso module equivPathPEquiv where
-  iso : Iso _ _
-  iso .Iso.fun = equivPathP
-  iso .Iso.inv = congP (λ i → equivFun)
-  iso .Iso.rightInv _ = ΣSquarePProp isPropIsEquiv refl
-  iso .Iso.leftInv _ = refl
-
 ⨟-fiber-equiv : (f : A → B) → (g : B → C) → ∀ c → fiber (f ⨟ g) c ≃ (Σ[ (b , _) ∈ fiber g c ] fiber f b)
 ⨟-fiber-equiv {A} {B} {C} f g c =
   Σ[ a ∈ A ] g (f a) ≡ c
@@ -218,96 +206,11 @@ postCompFiberEquiv {A} {C} f ψ =
   Σ[ φ ∈ (C → A) ] f ∘ φ ≡ ψ
     ≃∎
 
-Σ-contractSndIso : {B : A → Type ℓ} → (∀ a → isContr (B a)) → Iso (Σ A B) A
-Σ-contractSndIso contr-snd .Iso.fun = fst
-Σ-contractSndIso contr-snd .Iso.inv a = a , contr-snd a .fst
-Σ-contractSndIso contr-snd .Iso.rightInv _ = refl
-Σ-contractSndIso contr-snd .Iso.leftInv (a , b) = cong (a ,_) (contr-snd a .snd b)
-
-module _ {ℓA ℓB ℓC ℓD} {A : Type ℓA} {B : A → Type ℓB} {C : ∀ a → B a → Type ℓC} {D : ∀ a → (b : B a) → (c : C a b) → Type ℓD} where
-  Σ-Π₂-Iso : Iso ((a : A) → (b : B a) → Σ (C a b) (D a b)) (Σ[ f ∈ (∀ a → (b : B a) → C a b) ] ∀ a → (b : B a) → D a b (f a b))
-  Σ-Π₂-Iso .Iso.fun f = (λ a b → f a b .fst) , (λ a b → f a b .snd)
-  Σ-Π₂-Iso .Iso.inv (f , g) a b = f a b , g a b
-  Σ-Π₂-Iso .Iso.rightInv _ = refl
-  Σ-Π₂-Iso .Iso.leftInv _ = refl
-
-  Σ-Π₂-≃ : ((a : A) → (b : B a) → Σ (C a b) (D a b)) ≃ (Σ[ f ∈ (∀ a → (b : B a) → C a b) ] ∀ a → (b : B a) → D a b (f a b))
-  unquoteDef Σ-Π₂-≃ = defStrictIsoToEquiv Σ-Π₂-≃ Σ-Π₂-Iso
-    
-module _ {B′ : A′ → Type ℓ} where
-  Σ-map-fst : (f : A → A′) → (Σ A (B′ ∘ f)) → (Σ A′ B′)
-  Σ-map-fst f (a , b′) = (f a , b′)
-
-  Σ-map-fst-fiber-iso : (f : A → A′)
-    → {a′ : A′} {b′ : B′ a′}
-    → Iso (fiber (Σ-map-fst f) (a′ , b′)) (fiber f a′)
-  Σ-map-fst-fiber-iso {A} f {a′} {b′} =
-    Σ[ (a , b) ∈ Σ A (B′ ∘ f) ] (f a , b) ≡ (a′ , b′)
-      Iso⟨ shuffle ⟩
-    Σ[ (a , p) ∈ fiber f a′ ] singlP (λ i → B′ (p (~ i))) b′
-      Iso⟨ Σ-contractSndIso (λ _ → isContrSinglP _ b′) ⟩
-    Σ[ a ∈ A ] f a ≡ a′
-      ∎Iso
-    where
-      shuffle : Iso _ (Σ[ (a , p) ∈ Σ[ a ∈ A ] f a ≡ a′ ] Σ[ b ∈ B′ (f a) ] PathP (λ i → B′ (p (~ i))) b′ b)
-      shuffle .Iso.fun ((a , b) , p) = (a , cong fst p) , b , cong snd (sym p)
-      shuffle .Iso.inv ((a , p) , b , q) = (a , b) , λ i → p i , q (~ i)
-      shuffle .Iso.rightInv _ = refl
-      shuffle .Iso.leftInv _ = refl
-
 isEquiv-∘ : ∀ {f : A → B} {g : B → C}
   → isEquiv g
   → isEquiv f
   → isEquiv (g ∘ f)
 isEquiv-∘ {f} {g} is-equiv-g is-equiv-f = equivIsEquiv (compEquiv (f , is-equiv-f) (g , is-equiv-g))
-
-module _ {ℓB ℓB′} {A : Type ℓ} {B : A → Type ℓB} {B′ : A → Type ℓB′} where
-  Σ-map-snd : (f : ∀ a → B a → B′ a) → (Σ A B) → (Σ A B′)
-  Σ-map-snd f (a , b) = (a , f a b)
-
-  Σ-map-snd-fiber-iso : ∀ {f : ∀ a → B a → B′ a} {a′ : A} {b′ : B′ a′} → Iso (fiber (Σ-map-snd f) (a′ , b′)) (fiber (f a′) b′)
-  Σ-map-snd-fiber-iso {f} {a′} {b′} = fiber-iso where
-      shuffle : Iso _ (Σ[ (a , p) ∈ singl a′ ] Σ[ b ∈ B a ] PathP (λ i → B′ (p (~ i))) (f a b) b′)
-      shuffle .Iso.fun ((a , b) , (p , q)) = (a , sym p) , b , q
-      shuffle .Iso.inv ((a , p) , b , q) = (a , b) , sym p , q
-      shuffle .Iso.rightInv _ = refl
-      shuffle .Iso.leftInv _ = refl
-
-      fiber-iso : Iso (fiber (Σ-map-snd f) (a′ , b′)) (fiber (f a′) b′)
-      fiber-iso =
-        _
-          Iso⟨ Σ-cong-iso-snd (λ (a , b) → invIso ΣPathPIsoPathPΣ) ⟩
-        Σ[ (a , b) ∈ Σ A B ] Σ[ p ∈ a ≡ a′ ] PathP (λ i → B′ (p i)) (f a b) b′
-          Iso⟨ shuffle ⟩
-        Σ[ (a , p) ∈ singl a′ ] Σ[ b ∈ B a ] PathP (λ i → B′ (p (~ i))) (f a b) b′
-          Iso⟨ Σ-contractFstIso (isContrSingl a′) ⟩
-        _
-          ∎Iso
-
-  isEquiv-Σ-map-snd : {f : ∀ a → B a → B′ a} → (∀ a → isEquiv (f a)) → isEquiv (Σ-map-snd f)
-  isEquiv-Σ-map-snd {f} is-equiv-f .equiv-proof (a′ , b′) = isOfHLevelRetractFromIso 0 Σ-map-snd-fiber-iso (is-equiv-f a′ .equiv-proof b′)
-
-  opaque
-    isEquiv-Σ-map-snd→isEquiv : {f : ∀ a → B a → B′ a} → isEquiv (Σ-map-snd f) → ∀ a → isEquiv (f a)
-    isEquiv-Σ-map-snd→isEquiv {f} is-equiv-Σ-map-snd a′ .equiv-proof b′ = isOfHLevelRetractFromIso 0
-      (invIso Σ-map-snd-fiber-iso)
-      (is-equiv-Σ-map-snd .equiv-proof (a′ , b′))
-
-Σ-map : ∀ {ℓB ℓB′} {B : A → Type ℓB} {B′ : A′ → Type ℓB′}
-  → (e : A → A′)
-  → (f : ∀ a → B a → B′ (e a))
-  → Σ A B → Σ A′ B′
-Σ-map e f = Σ-map-snd f ⨟ Σ-map-fst e
-
-isOfHLevelSucΣSndProp : ∀ {ℓB} {B : A → Type ℓB} (n : HLevel)
-  → isOfHLevel (suc n) A
-  → (∀ a → isProp (B a))
-  → isOfHLevel (suc n) (Σ A B)
-isOfHLevelSucΣSndProp n is-trunc-A is-prop-B = isOfHLevelΣ (suc n) is-trunc-A λ a → isProp→isOfHLevelSuc n (is-prop-B a)
-
-Σ-swap-fst-≃ : ∀ {ℓA ℓB ℓC} {A : Type ℓA} {B : Type ℓB} {C : A → B → Type ℓC}
-  → (Σ[ a ∈ A ] Σ[ b ∈ B ] C a b) ≃(Σ[ b ∈ B ] Σ[ a ∈ A ] C a b)
-Σ-swap-fst-≃ = strictEquiv (λ (a , b , c) → (b , a , c)) (λ (b , a , c) → (a , b , c))
 
 hSet≡ : ∀ {X Y : hSet ℓ} → ⟨ X ⟩ ≡ ⟨ Y ⟩ → X ≡ Y
 hSet≡ = Σ≡Prop (λ X → isPropIsSet)

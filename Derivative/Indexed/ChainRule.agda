@@ -3,6 +3,7 @@ module Derivative.Indexed.ChainRule where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
+open import Derivative.Basics.Sigma
 open import Derivative.Basics.Sum
 
 open import Derivative.Isolated
