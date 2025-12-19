@@ -9,6 +9,7 @@ open import Derivative.Basics.Sum as Sum using (_⊎_ ; inl ; inr)
 open import Derivative.Container
 open import Derivative.Derivative
 open import Derivative.Isolated
+import      Derivative.Isolated.S1 as S1
 open import Derivative.Remove
 
 open import Cubical.Foundations.Equiv.Properties

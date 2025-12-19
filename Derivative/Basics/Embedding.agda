@@ -6,7 +6,7 @@ open import Derivative.Basics.Equiv
 open import Derivative.Basics.Sigma
 
 open import Cubical.Data.Sigma
-open import Cubical.Functions.Embedding
+open import Cubical.Functions.Embedding public
 open import Cubical.Functions.FunExtEquiv
 
 private
