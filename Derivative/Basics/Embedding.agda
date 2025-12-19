@@ -1,8 +1,8 @@
 {-# OPTIONS --safe #-}
-module Derivative.Embedding where
+module Derivative.Basics.Embedding where
 
 open import Derivative.Prelude
-open import Derivative.Equiv
+open import Derivative.Basics.Equiv
 
 open import Cubical.Data.Sigma
 open import Cubical.Functions.Embedding

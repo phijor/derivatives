@@ -3,7 +3,7 @@ module Derivative.W where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
-open import Derivative.Embedding
+open import Derivative.Basics.Embedding
 open import Derivative.Sum
 
 open import Cubical.Foundations.Equiv.HalfAdjoint

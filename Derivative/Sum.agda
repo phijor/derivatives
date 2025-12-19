@@ -2,7 +2,7 @@
 module Derivative.Sum where
 
 open import Derivative.Prelude
-open import Derivative.Embedding
+open import Derivative.Basics.Embedding
 
 open import Cubical.Data.Sigma
 open import Cubical.Data.Sum public

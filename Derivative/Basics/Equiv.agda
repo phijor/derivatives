@@ -1,5 +1,5 @@
 {-# OPTIONS --safe #-}
-module Derivative.Equiv where
+module Derivative.Basics.Equiv where
 
 open import Derivative.Prelude
 

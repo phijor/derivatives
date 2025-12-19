@@ -10,7 +10,7 @@ open import Derivative.Basics.Decidable
     ; Discrete
     ; isProp¬
     )
-open import Derivative.Embedding
+open import Derivative.Basics.Embedding
 open import Derivative.Remove
 open import Derivative.Sum as Sum using (_⊎_ ; inl ; inr)
 open import Derivative.W as W
