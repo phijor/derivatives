@@ -102,7 +102,7 @@ Note that the above proof essentially factors \( \Chain_{F,G} \) into
   \begin{tikzcd}[column sep=large]
     { \Subst{(\Der{F})}{G} \CTimes \Der{G} }%
       \ar[r, -multimap, "\Chain_{F,G}"]
-      \ar[d, -multimap, "\sim"{swap}]
+      \ar[d, multimap-multimap]
       &
     {\Der{(\Subst{F}{G})}}
       \\
@@ -110,7 +110,7 @@ Note that the above proof essentially factors \( \Chain_{F,G} \) into
       \ar[r, -multimap, "\eta"{swap}]
       &
     H_1
-      \ar[u, -multimap, "\sim"{swap}]
+      \ar[u, multimap-multimap]
   \end{tikzcd}
 \]
 in which
@@ -213,9 +213,9 @@ either condition implies the law of the excluded middle:
 If \( \Omega \) were discrete, \( P = \top \) would be decidable for any \( P : \Prop \).
 
 We have seen that our definition of derivative behaves nicely even in the presence of non-discrete types,
-in that we retain the ways it interacts with sums and products (\autoref{sum-product-rule}).
+in that we retain the ways in which it interacts with sums and products (\autoref{sum-product-rule}).
 Its interaction with substitution, however, is more subtle.
 While we do obtain a chain rule, it is now \emph{directed} or \emph{lax} (\autoref{lax-chain-rule}),
 and whether we can strengthen it to an equivalence depends on the pair of containers involved (\autoref{strong-chain-rule-iff-is-equiv-sigma-isolate}).
 Indeed, assuming the latter for any pair of containers is inconsistent in the presence of higher inductive types such as the circle \( S^1 \),
-or a non-constructive if restricted to sets.
+or equivalent to a non-constructive principle if restricted to sets.

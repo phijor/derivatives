@@ -101,7 +101,7 @@ In particular, we write \( \Der_0 \) and \( \Der_1 \) for the two possible deriv
 that is \( \Der_{\Inl(\bullet)} \) and \( \Der_{\Inr(\bullet)} \).
 In the unary case, we omit the subscript and simply write \( \Der \) for \( \Der_{\bullet} \).
 
-Derivatives of indexed containers satisfy the same basic laws for constants, sums and products and in the unary case.
+Derivatives of indexed containers satisfy the same basic laws for constants, sums and products as in the unary case.
 Derivatives of composites follow a lax chain rule, which now accounts for multiple indices.
 As promised in the discussion of \autoref{lax-chain-rule},
 its construction factors into smaller steps that make it obvious why, in general, it is not invertible:
@@ -599,9 +599,9 @@ There is however hope to recover at least a morphism out of \( \mu F' \) into \(
         }
           &
         \Der(F[\mu F])
-        \ar[from=1-1, to=2-1, -multimap, "\gamma_{\Highlight{\Der(\mu F)}}"{swap}, "\sim"]
+        \ar[from=1-1, to=2-1, multimap-multimap, "\gamma_{\Highlight{\Der(\mu F)}}"{swap}]
         \ar[from=2-1, to=2-2, -multimap, "\Chain_{F,{\mu\!F}}"{swap}]
-        \ar[from=2-2, to=1-2, -multimap, "\Der(\In_F)"{swap}, "\sim"]
+        \ar[from=2-2, to=1-2, multimap-multimap, "\Der(\In_F)"{swap}]
         \ar[from=1-1, to=1-2, dashed, -multimap, "\alpha"]
       \end{tikzcd}
     \end{equation*}
