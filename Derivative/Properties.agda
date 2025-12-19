@@ -2,14 +2,15 @@
 module Derivative.Properties where
 
 open import Derivative.Prelude
+open import Derivative.Basics.Decidable as Dec
+open import Derivative.Basics.Maybe
+open import Derivative.Basics.Sum as Sum using (_⊎_ ; inl ; inr)
+
+open import Derivative.Isolated
+open import Derivative.Remove
+
 open import Derivative.Container
 open import Derivative.Derivative
-
-open import Derivative.Basics.Decidable as Dec
-open import Derivative.Isolated
-open import Derivative.Maybe
-open import Derivative.Remove
-open import Derivative.Sum as Sum using (_⊎_ ; inl ; inr)
 
 open import Cubical.Foundations.Equiv.Properties
 open import Cubical.Data.Empty as Empty using (⊥*)

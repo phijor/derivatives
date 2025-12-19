@@ -2,7 +2,7 @@
 module Derivative.Container where
 
 open import Derivative.Prelude
-import      Derivative.Maybe as Maybe
+import      Derivative.Basics.Maybe as Maybe
 
 open import Cubical.Foundations.Transport using (substEquiv)
 open import Cubical.Data.Empty as Empty using (⊥*)

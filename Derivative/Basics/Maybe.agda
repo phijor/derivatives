@@ -1,11 +1,11 @@
 {-# OPTIONS --safe #-}
-module Derivative.Maybe where
+module Derivative.Basics.Maybe where
 
 open import Derivative.Prelude
 open import Derivative.Isolated
 open import Derivative.Basics.Decidable as Dec
 open import Derivative.Remove
-open import Derivative.Sum as Sum using (_⊎_ ; inl ; inr)
+open import Derivative.Basics.Sum as Sum using (_⊎_ ; inl ; inr)
 
 private
   variable

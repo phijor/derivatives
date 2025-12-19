@@ -7,7 +7,7 @@ open import Derivative.Derivative
 open import Derivative.Isolated
 open import Derivative.Remove
 open import Derivative.Basics.Decidable as Dec
-open import Derivative.Maybe
+open import Derivative.Basics.Maybe
 
 open import Cubical.Foundations.Univalence
 open import Cubical.Relation.Nullary using (isProp¬)

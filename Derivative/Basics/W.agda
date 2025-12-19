@@ -1,10 +1,10 @@
 {-# OPTIONS -WnoUnsupportedIndexedMatch --safe #-}
-module Derivative.W where
+module Derivative.Basics.W where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
 open import Derivative.Basics.Embedding
-open import Derivative.Sum
+open import Derivative.Basics.Sum
 
 open import Cubical.Foundations.Equiv.HalfAdjoint
 open import Cubical.Foundations.Equiv.Dependent

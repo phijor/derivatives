@@ -3,9 +3,10 @@ module Derivative.Indexed.Container where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Embedding using (isEmbedding-Σ-map-snd ; isEmbeddingPostComp)
-open import Derivative.Maybe
-open import Derivative.Sum
+open import Derivative.Basics.Maybe
+open import Derivative.Basics.Sum
 open import Derivative.Basics.Decidable as Dec
+
 open import Derivative.Isolated
 open import Derivative.Remove
 

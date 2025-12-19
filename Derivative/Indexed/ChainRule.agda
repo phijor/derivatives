@@ -1,14 +1,15 @@
 {-# OPTIONS --allow-unsolved-metas #-}
 module Derivative.Indexed.ChainRule where
 
-open import Derivative.Indexed.Container
-open import Derivative.Indexed.Derivative
-
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
+open import Derivative.Basics.Sum
+
 open import Derivative.Isolated
 open import Derivative.Remove
-open import Derivative.Sum
+
+open import Derivative.Indexed.Container
+open import Derivative.Indexed.Derivative
 
 open import Cubical.Foundations.Transport using (substEquiv ; substEquiv' ; subst⁻)
 open import Cubical.Data.Sigma

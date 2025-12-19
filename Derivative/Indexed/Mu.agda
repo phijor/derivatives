@@ -8,12 +8,13 @@ open import Derivative.Indexed.ChainRule
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
+open import Derivative.Basics.Maybe
+open import Derivative.Basics.Sum
+open import Derivative.Basics.W
+
 open import Derivative.Isolated
-open import Derivative.Maybe
 open import Derivative.Remove
 open import Derivative.Square
-open import Derivative.Sum
-open import Derivative.W
 
 open import Cubical.Foundations.Path
 open import Cubical.Foundations.Transport using (substEquiv)

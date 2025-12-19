@@ -1,5 +1,5 @@
 {-# OPTIONS --safe #-}
-module Derivative.Sum where
+module Derivative.Basics.Sum where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Embedding

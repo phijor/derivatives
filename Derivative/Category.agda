@@ -3,11 +3,12 @@ open import Derivative.Prelude
 
 module Derivative.Category (ℓ : Level) where
 
+open import Derivative.Basics.Maybe
+open import Derivative.Basics.Sum
+
 open import Derivative.Container
 open import Derivative.Isolated
 open import Derivative.Remove
-open import Derivative.Sum
-open import Derivative.Maybe
 import      Derivative.Derivative as ∂
 open import Derivative.Adjunction
 

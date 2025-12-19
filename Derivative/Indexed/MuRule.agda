@@ -1,19 +1,20 @@
 {-# OPTIONS -WnoUnsupportedIndexedMatch --lossy-unification --allow-unsolved-metas #-}
 module Derivative.Indexed.MuRule where
 
+open import Derivative.Prelude
+open import Derivative.Basics.Decidable
+open import Derivative.Basics.Embedding
+open import Derivative.Basics.Maybe
+open import Derivative.Basics.Sum
+open import Derivative.Basics.W
+
+open import Derivative.Isolated
+open import Derivative.Remove
+
 open import Derivative.Indexed.Container
 open import Derivative.Indexed.Mu
 open import Derivative.Indexed.Derivative
 open import Derivative.Indexed.ChainRule
-
-open import Derivative.Prelude
-open import Derivative.Basics.Decidable
-open import Derivative.Basics.Embedding
-open import Derivative.Isolated
-open import Derivative.Maybe
-open import Derivative.Remove
-open import Derivative.Sum
-open import Derivative.W
 
 open import Cubical.Foundations.Path
 import      Cubical.Data.Empty as Empty

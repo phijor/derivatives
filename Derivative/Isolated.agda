@@ -11,9 +11,9 @@ open import Derivative.Basics.Decidable
     ; isProp¬
     )
 open import Derivative.Basics.Embedding
+open import Derivative.Basics.Sum as Sum using (_⊎_ ; inl ; inr)
+open import Derivative.Basics.W as W
 open import Derivative.Remove
-open import Derivative.Sum as Sum using (_⊎_ ; inl ; inr)
-open import Derivative.W as W
 
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.Properties using (equivAdjointEquiv ; hasRetract ; hasSection ; congEquiv)
