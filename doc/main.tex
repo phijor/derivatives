@@ -49,7 +49,6 @@
 }
 \newkeytheoremstyle{boxed-definition}{
   inherit-style=boxed,
-  % qed=$\lrcorner$,
   numbered=false,
 }
 \newkeytheoremstyle{marked-definition}{
@@ -100,29 +99,31 @@
 
 \addbibresource{bibliography.bib}
 
-% https://damaru2.github.io/general/notations_with_links/
-% \NewDocumentCommand{\newlink}{m m}{\protect\hyperlink{#1}{#2}}
-
-
 \DeclareMathSymbol{\shortminus}{\mathbin}{AMSa}{"39}
 
 \newcommand*{\Op}[1]{\mathsf{#1}}
-\DeclareMathOperator{\Type}{\mathsf{Type}}
-\DeclareMathOperator{\W}{\mathsf{W}}
+\DeclareMathOperator{\Type}{\Op{Type}}
+\DeclareMathOperator{\Prop}{\Op{Prop}}
+\DeclareMathOperator{\Set}{\Op{Set}}
+\DeclareMathOperator{\W}{\Op{W}}
 \DeclareMathOperator{\WRec}{\Op{W-rec}}
 \DeclarePairedDelimiter{\Fin}{[}{]}
 \DeclareMathOperator{\FinSet}{\Op{FinSet}}
 \DeclareMathOperator{\El}{\Op{El}}
-\DeclareMathOperator{\Sup}{\mathsf{sup}}
-\DeclareMathOperator{\Dec}{\mathsf{Dec}}
+\DeclareMathOperator{\Sup}{\Op{sup}}
+\DeclareMathOperator{\Dec}{\Op{Dec}}
 \DeclareMathOperator{\DefEq}{\mathrel{\coloneq}}
 \DeclareMathOperator{\JudgeEq}{\mathrel{\doteq}}
+\DeclareMathOperator{\Fst}{\Op{fst}}
+\DeclareMathOperator{\Snd}{\Op{snd}}
+\DeclareMathOperator{\id}{\Op{id}}
+\DeclareMathOperator{\Refl}{\Op{refl}}
 \NewDocumentCommand{\Inv}{}{{\shortminus 1}}
-% \NewDocumentCommand{\Blank}{}{\shortminus}
 \def\blankskip{0mu minus 1fill}
 \NewDocumentCommand{\Blank}{}{{\mskip\blankskip\mathunderscore\mskip\blankskip}}
 
 \DeclareMathOperator{\Fiber}{\Op{fiber}}
+\DeclareMathOperator{\Singl}{\Op{singl}}
 \DeclareMathOperator{\IsIsolated}{\Op{isIsolated}}
 \DeclareMathOperator{\Isolate}{\Op{isolate}}
 \DeclareMathOperator{\Replace}{\Op{replace}}
@@ -143,12 +144,13 @@
 \DeclareMathOperator{\Rec}{\Op{rec}}
 
 \newcommand*{\MkCont}[2]{#1\mathbin{\triangleleft}#2}
-\DeclareMathOperator{\Sh}{\mathsf{Sh}}
-\DeclareMathOperator{\Ps}{\mathsf{Ps}}
+\DeclareMathOperator{\Sh}{\Op{Sh}}
+\DeclareMathOperator{\Ps}{\Op{Ps}}
 
 \NewDocumentCommand{\CTimes}{}{\mathbin{\times}}
 \NewDocumentCommand{\CPlus}{}{\mathbin{+}}
 \NewDocumentCommand{\CConst}{}{\Op{k}}
+\NewDocumentCommand{\CYo}{}{\Op{y}}
 \DeclarePairedDelimiterXPP{\Wk}[1]%
   {} % pre-code
   {\langle} % left
@@ -156,59 +158,41 @@
   {^{\uparrow}} % post-code
   {#1} % body
 \newcommand*{\Subst}[2]{#1[#2]}
+\DeclareMathOperator{\Bag}{\Op{Bag}}
 
 \DeclarePairedDelimiterX{\PropTrunc}[1]%
   {\lVert} % left
   {\rVert} % right
   {#1} % body
 
-\NewDocumentCommand{\SimMultiMap}{}{%
-  \mathrel{%
-    \vbox{%
-      \offinterlineskip%
-      \mathsurround=0pt
-      \ialign{%
-        \hfil##\hfil\cr
-        \normalfont\scalebox{0.9}{\kern-.33ex{$\sim$}}\cr
-        \noalign{\kern-.25ex}
-        $\scriptstyle\multimap$\cr%
-      }%
-    }%
-  }%
-}
-
 \newcommand*{\Cart}[2]{#1\mathrel{\multimap}#2}
 \NewDocumentCommand{\CartEquiv}{}{\multimapboth}
 \newcommand*{\CartIso}[2]{#1 \mathrel{\CartEquiv} #2}
 
-\DeclareMathOperator{\Cont}{\mathsf{Cont}}
+\DeclareMathOperator{\Cont}{\Op{Cont}}
 \NewDocumentCommand{\ContCart}{}{\operatorname{\Cont}^{{\scriptscriptstyle\multimap}}}
 \NewDocumentCommand{\IContCart}{m}{#1\operatorname{\Op{-Cont}}^{{\scriptscriptstyle\multimap}}}
 
 \NewDocumentCommand{\Der}{}{\partial}
-\NewDocumentCommand{\Id}{}{\mathsf{Id}}
+\NewDocumentCommand{\Id}{}{\Op{Id}}
 \NewDocumentCommand{\Proj}{m}{\pi_{#1}}
 \DeclareMathOperator{\Chain}{\Op{chain}}
 \DeclareMathOperator{\In}{\Op{in}}
+\DeclareMathOperator{\Out}{\Op{out}}
 \DeclareMathOperator{\MuRule}{\Op{\mu-rule}}
 
-\DeclareMathOperator{\Inl}{\mathsf{inl}}
-\DeclareMathOperator{\Inr}{\mathsf{inr}}
+\DeclareMathOperator{\WIn}{\Op{W-in}}
+\DeclareMathOperator{\WPathIn}{\Op{\bar{W}-in}}
+\DeclareMathOperator{\WPath}{\Op{\bar{W}}}
+\DeclareMathOperator{\WTop}{\Op{top}}
+\DeclareMathOperator{\WBelow}{\Op{below}}
+
+\DeclareMathOperator{\Inl}{\Op{inl}}
+\DeclareMathOperator{\Inr}{\Op{inr}}
 
 \NewDocumentCommand{\Maybe}{m}{#1 \CTimes \Id}
-\DeclareMathOperator{\Nothing}{\mathsf{nothing}}
-\DeclareMathOperator{\Just}{\mathsf{just}}
-
-\makeatletter
-\newcommand{\proofsubparagraph}{%
-  \@startsection{subparagraph}%
-  {5}%
-  {\z@}%
-  {3.25ex \@plus1ex \@minus .2ex}%
-  {-1em}%
-  {\sffamily\normalsize\bfseries}%
-}
-\makeatother
+\DeclareMathOperator{\Nothing}{\Op{nothing}}
+\DeclareMathOperator{\Just}{\Op{just}}
 
 \begin{document}
 

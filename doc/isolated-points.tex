@@ -22,7 +22,6 @@ since the decomposition discards the behaviour of \( f \) on the higher path spa
 
 While we demonstrate properties of isolated points by freely assuming univalence and function extensionality,
 we believe that a majority also hold with more fine-grained assumptions. %;
-% perhaps in the style of the \enquote{Spartan MLTT} as used in the \href{https://www.cs.bham.ac.uk/~mhe/TypeTopology/index.html}{\texttt{TypeTopology}} development of \citeauthor{EscardocontributorsTypeTopology}.
 
 \subsection{Isolated Points}\label{isolated-points-intro}
 
@@ -182,8 +181,8 @@ hence \( \SigmaIsolate \) must be an embedding:
     over \( a \) and \( b \), namely
     \[
         \textstyle
-        \sum_{(a', \Blank) : \Op{singl}(a)}
-        \sum_{(b', \Blank) : \Op{singl}(p_{*}{b})}
+        \sum_{(a', \Blank) : \Singl(a)}
+        \sum_{(b', \Blank) : \Singl(p_{*}{b})}
           \IsIsolated(a') \times \IsIsolated(b')
     \]
     The claim follows by contracting away these singletons.
@@ -248,21 +247,21 @@ to arbitrary sums:
 
 In general, however, it seems difficult to describe exactly when isolated points distribute this way.
 In extreme cases, both \( A \) and \( B \) can be complicated types, whereas their sum \( \Sigma_A B \) is entirely trivial.
-This applies in particular to the type of singletons, \( \Op{singl}(a_0) \DefEq \sum_{a : A} a_0 = a \):
+This applies in particular to the type of singletons, \( \Singl(a_0) \DefEq \sum_{a : A} a_0 = a \):
 \begin{proposition}\label{discrete-iff-is-equiv-singl-isolate}
   For all types \( A \), the following are equivalent:
   \begin{enumerate}
     \item \( A \) is discrete.
     \item For all \( a_0 : A \), the map
       \[
-        \SigmaIsolate_{A, a_0 = {\Blank}} : \sum_{a : \Isolated{A}} \Isolated{(a_0 = a)} \to \Isolated{\Op{singl}(a_0)}
+        \SigmaIsolate_{A, a_0 = {\Blank}} : \sum_{a : \Isolated{A}} \Isolated{(a_0 = a)} \to \Isolated{\Singl(a_0)}
       \]
       is an equivalence.
   \end{enumerate}
   \begin{proof}
     If \( A \) is discrete, then so are its path types, hence \( \SigmaIsolate_{A, a_0 = \Blank} \) is an equivalence by \autoref{discrete-is-equiv-sigma-isolated}.
     In the other direction, we can show that every \( a_0 : A \) is isolated:
-    Since \( \Op{singl}(a_0) \) is a contractible type, its center \( (a_0, \Op{refl}) \) is isolated.
+    Since \( \Singl(a_0) \) is a contractible type, its center \( (a_0, \Op{refl}) \) is isolated.
     Thus, by \autoref{is-equiv-sigma-isolate-iff-isolated-pair}, the first component \( a_0 \) must be isolated.
   \end{proof}
 \end{proposition}
@@ -321,7 +320,6 @@ Consider for example the circle \( S^1 \) with \( \mathsf{base} : S^1 \).
 Here \( S^1 \setminus \mathsf{base} \simeq 0 \),
 hence \( (S^1 \setminus \mathsf{base}) + 1 \simeq 1 \not\simeq S^1 \):
 removing \( \mathsf{base} \) removes the entire circle, which is \emph{not} contractible.
-% This intui
 
 We observe that we can replicate the classical behavior exactly when \( a_0 \) is an isolated point:
 
@@ -422,27 +420,6 @@ This map is an equivalence whenever we can decide if we are removing from a chos
     It is straightforward to verify that these maps are inverses of each other.
   \end{proof}
 \end{proposition}
-
-% \begin{tikzpicture}
-%   % \filldraw[
-%   %   rounded corners=10pt,
-%   %   fill=blue!30,
-%   %   draw=blue!80!black,
-%   %   thick,
-%   % ]
-%   %   (0,0) rectangle (7,4);
-
-%   \coordinate (O) at (-0.5,-0.5);
-
-%   \draw[->] (O) -- ++(0,1) node[above] {\( b : B(a) \)};
-%   \draw[->] (O) -- ++(1,0) node[right] {\( a : A \)};
-
-%   \foreach \x/\X in {0/6, 1/3, 2/5, 3/1, 4/4, 5/7} {
-%     \foreach \y in {1,...,\X} {
-%       \fill[black] (0.5+\x, \y*0.5) circle (2pt);
-%     }
-%   }
-% \end{tikzpicture}
 
 \subsection{Grafting}\label{grafting}
 

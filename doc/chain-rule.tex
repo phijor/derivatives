@@ -15,7 +15,7 @@ Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
 \begin{problem}[note={The lax chain rule}]\label{lax-chain-rule}
   For any two containers \( F, G \), define a morphism
   \[
-    \Op{chain}_{F,G} :
+    \Chain_{F,G} :
     \Cart%
       { \Subst{(\Der{F})}{G} \CTimes \Der{G} }%
       {\Der{(\Subst{F}{G})}}
@@ -45,8 +45,6 @@ Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
     \\
     &\simeq
       \sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} \sum\nolimits_{(f, t) : (P_s \setminus p \to T) \times T} \Isolated{Q_t}
-    % &\simeq
-    %   \adjustlimits\sum_{s : S} \sum_{p : \Isolated{P_s}} \smashoperator[r]{\sum_{(\Blank, t) : (P_s \setminus p \to T \times T)}} \Isolated{Q_t}
   \intertext{%
     The induction principle for \( \Graft \) tells us that the types \( (P_s \setminus p \to T) \times T \) and \( P_s \to T \) are equivalent (\autoref{graft-equiv}),
     thus we simplify to
@@ -76,8 +74,8 @@ Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
   hence
   \(
     \cramped{
-      \Op{chain}_{F,G}^{\Sh} \DefEq
-        \Op{\Sigma}(\Op{id}, \SigmaIsolate_{P_s,Q_{f(\Blank)}}) \circ \lambda
+      \Chain_{F,G}^{\Sh} \DefEq
+        \Sigma(\id, \SigmaIsolate_{P_s,Q_{f(\Blank)}}) \circ \lambda
     }
   \).
 
@@ -99,11 +97,11 @@ Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
   and by applying the computation rules of grafting to \( \GraftSyntaxX{f}{t}{p_0} : P_s \to T \).
 \end{construction}
 
-Note that the above proof essentially factors \( \Op{chain}_{F,G} \) into
+Note that the above proof essentially factors \( \Chain_{F,G} \) into
 \[
   \begin{tikzcd}[column sep=large]
     { \Subst{(\Der{F})}{G} \CTimes \Der{G} }%
-      \ar[r, -multimap, "\Op{chain}_{F,G}"]
+      \ar[r, -multimap, "\Chain_{F,G}"]
       \ar[d, -multimap, "\sim"{swap}]
       &
     {\Der{(\Subst{F}{G})}}
@@ -151,20 +149,20 @@ This strengthens to an equivalence of containers depending on \( \SigmaIsolate \
       \( \SigmaIsolate_{P_s,Q_{f(\Blank)}} \) is an equivalence for all \( s : S \) and \( f : P_s \to T \)
   \end{enumerate}
   \begin{proof}
-    By inspection of the definition of \( \Op{chain} \) in terms of \( \SigmaIsolate \).
+    By inspection of the definition of \( \Chain \) in terms of \( \SigmaIsolate \).
   \end{proof}
 \end{proposition}
 
 As expected by \cite[{Proposition~6.6}]{AbbottEtAl2005DataDifferentiating},
 the chain rule is strong for \emph{discrete} containers:
 \begin{theorem}\label{discrete-strong-chain-rule}
-  For discrete containers \( F, G \), \( \Op{chain}_{F,G} \) is an equivalence.
+  For discrete containers \( F, G \), \( \Chain_{F,G} \) is an equivalence.
   In particular, it is an isomorphism in the 1-category of set-truncated containers.
   \begin{proof}
     Positions of \( F \) and \( G \) are discrete,
     so by \autoref{discrete-is-equiv-sigma-isolated}
     \( \SigmaIsolate \) is an equivalence.
-    By \autoref{strong-chain-rule-iff-is-equiv-sigma-isolate}, \( \Op{chain}_{F,G} \) is an equivalence of containers.
+    By \autoref{strong-chain-rule-iff-is-equiv-sigma-isolate}, \( \Chain_{F,G} \) is an equivalence of containers.
   \end{proof}
 \end{theorem}
 
@@ -173,7 +171,7 @@ Secondly, we conclude that globally having a strong chain rule is impossible in 
   The following are equivalent propositions:
   \begin{enumerate}
     \item \emph{every} type is discrete
-    \item for all containers \( F \) and \( G\), \( \Op{chain}_{F,G} \) is an equivalence
+    \item for all containers \( F \) and \( G\), \( \Chain_{F,G} \) is an equivalence
   \end{enumerate}
   \begin{proof}
     If every type is discrete, then so is every container, hence the chain rule is always an equivalence by \autoref{discrete-strong-chain-rule}.
@@ -190,7 +188,7 @@ As a consequence, globally assuming a strong chain rule is inconsistent in the p
 The circle \( S^1 \) is provably not discrete (if it were, it would be a set!),
 hence
 \(
-  \neg ( \prod_{F, G : \Cont} \Op{isEquiv}(\Op{chain}_{F,G}) )
+  \neg ( \prod_{F, G : \Cont} \Op{isEquiv}(\Chain_{F,G}) )
 \).
 
 If instead we restrict ourselves to the world of sets,
@@ -209,10 +207,10 @@ then we can conclude that a globally strong chain rule exists if and only if arb
   \end{proof}
 \end{corollary}
 This is of course still a very classical assumption, even if it is not inconsistent:
-In an impredicative setting, where \( \Op{Prop} \simeq \Omega \) for some small \( \Omega : \Type \),
+In an impredicative setting, where \( \Prop \simeq \Omega \) for some small \( \Omega : \Type \),
 either condition implies the law of the excluded middle:
-\( \Op{Prop} \) is a set, so \( \Omega \) must be as well.
-If \( \Omega \) were discrete, \( P = \top \) would be decidable for any \( P : \Op{Prop} \).
+\( \Prop \) is a set, so \( \Omega \) must be as well.
+If \( \Omega \) were discrete, \( P = \top \) would be decidable for any \( P : \Prop \).
 
 We have seen that our definition of derivative behaves nicely even in the presence of non-discrete types,
 in that we retain the ways it interacts with sums and products (\autoref{sum-product-rule}).

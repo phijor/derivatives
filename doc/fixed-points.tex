@@ -35,15 +35,17 @@ Each index \( i : I \) corresponds to a variable in the type that a container de
 In particular, \( (I + 1) \)-indexed containers are used to transcribe fixed-point expressions that contain an extra recursion variable.
 We call \( (I + 1) \)-indexed containers \emph{signature containers}; their fixed points describe inductive types.
 \begin{example}
+  \newcommand*{\Nil}{\Op{nil}}
+  \newcommand*{\Cons}{\Op{cons}}
   In the informal specification \( \Op{List}(X) = \mu Y.\, 1 + X \times Y \),
   the expression \( L(X, Y) = 1 + X \times Y \) is transcribed into a binary container \( L \), indexed by the type \( 2 \).
   Its positions at index \( \Op{y} \DefEq \Inr(\bullet) : 2 \) encode occurrences of the recursion variable \( Y \),
   those at \( \Op{x} \DefEq \Inl(\bullet) : 2 \) occurrences of \( X \).
-  It has two shapes, \( \Op{nil} \) and \( \Op{cons} \),
+  It has two shapes, \( \Nil \) and \( \Cons \),
   over which there are positions
   \begin{align*}
-    L_{\Ps}(\Op{nil}, \Op{x}) &\DefEq 0 & L_{\Ps}(\Op{cons}, \Op{x}) &\DefEq 1 \\
-    L_{\Ps}(\Op{nil}, \Op{y}) &\DefEq 0 & L_{\Ps}(\Op{cons}, \Op{y}) &\DefEq 1 \qedhere
+    L_{\Ps}(\Nil, \Op{x}) &\DefEq 0 & L_{\Ps}(\Cons, \Op{x}) &\DefEq 1 \\
+    L_{\Ps}(\Nil, \Op{y}) &\DefEq 0 & L_{\Ps}(\Cons, \Op{y}) &\DefEq 1 \qedhere
   \end{align*}
 \end{example}
 
@@ -107,7 +109,7 @@ its construction factors into smaller steps that make it obvious why, in general
   Let \( F : \Cont_2 \) and \( G : \Cont_1 \).
   Define a cartesian morphism
   \[
-    \Op{chain}_{F,G}
+    \Chain_{F,G}
       :
     \Cart%
       {{\Der_0{F}}[G] \CPlus \big( {\Der_1{F}}[G] \CTimes \Der{G} \big)}%
@@ -233,15 +235,15 @@ To show how derivatives of untruncated containers interact with fixed points,
 we first have to give a suitable specification of what we mean by such a \enquote{fixed point}.
 Traditionally, the (smallest) fixed point associated to a signature container is constructed as follow:
 Given an \( I \)-indexed and set-truncated container \( (\MkCont{S}{P}) \),
-it is interpreted as a functor \( \llbracket \MkCont{S}{P} \rrbracket : [\Op{Set}^I, \Op{Set}] \),
-which takes families \( \vec{X} : I \to \Op{Set} \) to
+it is interpreted as a functor \( \llbracket \MkCont{S}{P} \rrbracket : [\Set^I, \Set] \),
+which takes families \( \vec{X} : I \to \Set \) to
 \[
   \llbracket \MkCont{S}{P} \rrbracket \vec{X} \DefEq \sum_{s : S} \prod_{i : I} P_i(s) \to \vec{X}_i
 \]
-This defines a full and faithful embedding of the category \( \IContCart{I}_{0,0} \) into the category of functors \( [\Op{Set}^I, \Op{Set}] \)~\cite[Thm.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
-Notably, this embedding reflects much of the structure of the functor category \( [\Op{Set}^I, \Op{Set}] \) back into containers,
+This defines a full and faithful embedding of the category \( \IContCart{I}_{0,0} \) into the category of functors \( [\Set^I, \Set] \)~\cite[Thm.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
+Notably, this embedding reflects much of the structure of the functor category \( [\Set^I, \Set] \) back into containers,
 allowing concise proofs for a number of properties.
-In particular, given a signature container \( F : \Cont_{I+1} \), its interpretation \( \llbracket F \rrbracket(\vec{X}, \Blank) : [ \Op{Set}, \Op{Set} ] \)
+In particular, given a signature container \( F : \Cont_{I+1} \), its interpretation \( \llbracket F \rrbracket(\vec{X}, \Blank) : [ \Set, \Set ] \)
 admits an initial algebra for any \( \vec{X} \).
 This initial algebra can be shown to lie in the image of the interpretation functor, hence it defines a necessarily unique \( I \)-indexed container \( \mu F \),
 which is regarded as the smallest fixed point of \( F \).
@@ -309,16 +311,16 @@ Let us set this up precisely:
   \[
     \begin{tikzcd}
       \Subst{F}{G} \ar[r, -multimap, "\Subst{F}{f}", ""{swap,name=Ff}]
-        & \Subst{F}{H} \ar[r, -multimap, "\Subst{F}{\Op{id}}", ""{swap,name=Fid}]
+        & \Subst{F}{H} \ar[r, -multimap, "\Subst{F}{\id}", ""{swap,name=Fid}]
         & \Subst{F}{H}  \\
       G \ar[r, -multimap, "f"{swap}, ""{name=f}]
-        & H \ar[r, -multimap, "\Op{id}"{swap}, ""{name=id}]
+        & H \ar[r, -multimap, "\id"{swap}, ""{name=id}]
         & H
       \ar[from=1-1, to=2-1, -multimap, "h"{swap}]
       \ar[from=1-2, to=2-2, -multimap, "g"]
       \ar[from=1-3, to=2-3, -multimap, "g"]
       \ar[from=Ff, to=f, phantom, "{\scriptstyle f_\sharp}"]
-      \ar[from=Fid, to=id, phantom, "{\scriptstyle \Op{id}_\sharp}"]
+      \ar[from=Fid, to=id, phantom, "{\scriptstyle \id_\sharp}"]
     \end{tikzcd}
     =
     \begin{tikzcd}
@@ -363,7 +365,7 @@ can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \)
   \hspace*{\fill}
   {
     \AxiomC{\( c : C(a) \)}
-    \UnaryInfC{\( \Op{top}(c) : \bar{\W}_{A, B, C}(\Sup(a, f)) \)}
+    \UnaryInfC{\( \WTop(c) : \bar{\W}_{A, B, C}(\Sup(a, f)) \)}
     \DisplayProof
   }
   \hfill%
@@ -371,8 +373,8 @@ can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \)
   \hfill%
   {
     \AxiomC{\( b : B(a) \)}
-    \AxiomC{\( w : \bar{\W}_{A,B,C}(f(b)) \)}
-    \BinaryInfC{\( \Op{below}(b, w) : \bar{\W}_{A, B, C}(\Sup(a, f)) \)}
+    \AxiomC{\( w : \WPath_{A,B,C}(f(b)) \)}
+    \BinaryInfC{\( \WBelow(b, w) : \bar{\W}_{A, B, C}(\Sup(a, f)) \)}
     \DisplayProof
   }
   \hspace*{\fill}
@@ -382,9 +384,9 @@ Both \( \W \) and \( \bar{\W} \) can be described by unfolding them by one level
 ---
 the constructors define equivalences
 \begin{align*}
-  \operatorname{\Op{W-in}} &: \sum_{a : A} (B(a) \to \W(A, B)) \simeq \W(A, B)
+  \WIn &: \sum_{a : A} (B(a) \to \W(A, B)) \simeq \W(A, B)
     \\
-  \operatorname{\Op{\bar{W}-in}}_{a, f} &: C(a) + \smashoperator{\sum_{b : B(a)}} \bar{\W}_{A,B,C}(f(b)) \simeq \bar{\W}_{A,B,C}(\Sup(a, f))
+  \WPathIn_{a, f} &: C(a) + \smashoperator{\sum_{b : B(a)}} \bar{\W}_{A,B,C}(f(b)) \simeq \bar{\W}_{A,B,C}(\Sup(a, f))
 \end{align*}
 for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
 
@@ -400,12 +402,12 @@ We use \( \W \) and \( \bar{\W} \) to define the shapes and position, respective
 
 These let us derive a fixed-point to substitution:
 \begin{problem}
-  Define an equivalence of containers \( \Op{in}_F : F[{\mu F}] \CartEquiv {\mu F} \).
+  Define an equivalence of containers \( \In_F : F[{\mu F}] \CartEquiv {\mu F} \).
   \begin{construction}
     Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) \).
     Shapes of \( \Subst{F}{\mu F} \) are \( \sum_{s : S} (P(s) \to \W(S, P)) \),
-    hence \( \operatorname{\Op{W-in}} \) establishes an equivalence with the shapes of \( \mu F \).
-    Similarly, the positions of \( \Subst{F}{\mu F} \) are equivalent to those of \( \mu F \) via \( \operatorname{\Op{\bar{W}-in}} \).
+    hence \( \WIn \) establishes an equivalence with the shapes of \( \mu F \).
+    Similarly, the positions of \( \Subst{F}{\mu F} \) are equivalent to those of \( \mu F \) via \( \WPathIn \).
   \end{construction}
 \end{problem}
 
@@ -417,16 +419,16 @@ which yields a morphism into \emph{any} other algebra:
   That is, for any \( F : \Cont_{I+1} \), \( G : \Cont_I \) and \( \alpha : \Cart{F[G]}{G} \),
   give a morphism
   \[
-      \Op{rec}_{F}(\alpha) : \Cart{\mu F}{G}
+      \Rec_{F}(\alpha) : \Cart{\mu F}{G}
   \]
   and a filler of
     \begin{equation}\label{mu-rec-comm}
       \begin{tikzcd}[column sep=huge]
         \Subst{F}{\mu F} & \Subst{F}{G} \\
         {\mu F}          & G
-        \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\Op{rec}_F(\alpha)}"]
-        \ar[from=1-1, to=2-1, -multimap, "\Op{in}_F"{swap}]
-        \ar[from=2-1, to=2-2, -multimap, "\Op{rec}_F(\alpha)"{swap}]
+        \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\Rec_F(\alpha)}"]
+        \ar[from=1-1, to=2-1, -multimap, "\In_F"{swap}]
+        \ar[from=2-1, to=2-2, -multimap, "\Rec_F(\alpha)"{swap}]
         \ar[from=1-2, to=2-2, -multimap, "\alpha"]
       \end{tikzcd}
     \end{equation}
@@ -434,7 +436,7 @@ which yields a morphism into \emph{any} other algebra:
 \end{problem}
 \begin{construction}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
-  Abbreviate \( \Op{rec}_{F}(\alpha) \) by \( \Op{rec} \).
+  Abbreviate \( \Rec_{F}(\alpha) \) by \( \Rec \).
   On shapes, \( \Rec \)  is defined by \( \W \)-recursion,
   \begin{align*}
     \Rec_{\Sh} &: \W(S, P) \to T \\
@@ -455,7 +457,7 @@ which yields a morphism into \emph{any} other algebra:
         \ar[r, "u^*"{swap}]
         &
       \vec{P}_i(s) + \sum_{p \in P(s)} \bar{\W}_{S,P,\vec{P}}(\Sup(s, f))
-        \ar[u, "\operatorname{\Op{\bar{W}-in}}"{swap}]
+        \ar[u, "\WPathIn"{swap}]
     \end{tikzcd}
   \]
   in which \( u^* \) applies \( u(f(p)) \) recursively in the second component of the \( \Sigma \)-type.
@@ -467,13 +469,13 @@ which yields a morphism into \emph{any} other algebra:
     \begin{tikzcd}[column sep=huge]
       \Subst{F}{\mu F} & \Subst{F}{G} \\
       {\mu F}          & G
-      \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\Op{rec}_F(\alpha)}"]
-      \ar[from=1-1, to=2-1, multimap-, "\Op{out}_F"{swap}]
-      \ar[from=2-1, to=2-2, -multimap, "\Op{rec}_F(\alpha)"{swap}]
+      \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\Rec_F(\alpha)}"]
+      \ar[from=1-1, to=2-1, multimap-, "\Out_F"{swap}]
+      \ar[from=2-1, to=2-2, -multimap, "\Rec_F(\alpha)"{swap}]
       \ar[from=1-2, to=2-2, -multimap, "\alpha"]
     \end{tikzcd}
   \end{equation}
-  as \( \Op{in}_F \) is an equivalence with inverse \( \Op{out}_F \).
+  as \( \In_F \) is an equivalence with inverse \( \Out_F \).
   This is done by \( \W \)-induction on the shapes of \( \mu F \).
 \end{construction}
 
@@ -483,18 +485,18 @@ In fact, this morphism is uniquely determined, hence we get a fixed point for an
   hence a smallest fixed-point of \( F \).
   \begin{proof}
     Let \( (G, \alpha) \) be a second \( \Subst{F}{\Blank} \)-algebra.
-    By definition, \( \Op{rec}_F(\alpha) : \Cart{\mu F}{G} \) is an algebra morphism.
+    By definition, \( \Rec_F(\alpha) : \Cart{\mu F}{G} \) is an algebra morphism.
     It suffices to show that \( \Rec_F(\alpha) \) together with the filler \eqref{mu-rec-out-filler} is unique.
     That is, for any other algebra morphism \( \alpha^* : \Cart{\mu F}{G} \),
-    there is a path \( p : \Op{rec}_F(\alpha) = \alpha^* \),
+    there is a path \( p : \Rec_F(\alpha) = \alpha^* \),
     and over this path, there is a path \( q \) connecting the commuting squares
     \[
       \begin{tikzcd}[column sep=huge]
         \Subst{F}{\mu F} & \Subst{F}{G} \\
         {\mu F}          & G
-        \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\Op{rec}_F(\alpha)}"]
-        \ar[from=1-1, to=2-1, multimap-, "\Op{out}_F"{swap}]
-        \ar[from=2-1, to=2-2, -multimap, "\Op{rec}_F(\alpha)"{swap}]
+        \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\Rec_F(\alpha)}"]
+        \ar[from=1-1, to=2-1, multimap-, "\Out_F"{swap}]
+        \ar[from=2-1, to=2-2, -multimap, "\Rec_F(\alpha)"{swap}]
         \ar[from=1-2, to=2-2, -multimap, "\alpha"]
       \end{tikzcd}
       \qquad\text{and}\qquad
@@ -502,7 +504,7 @@ In fact, this morphism is uniquely determined, hence we get a fixed point for an
         \Subst{F}{\mu F} & \Subst{F}{G} \\
         {\mu F}          & G
         \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\alpha^*}"]
-        \ar[from=1-1, to=2-1, multimap-, "\Op{out}_F"{swap}]
+        \ar[from=1-1, to=2-1, multimap-, "\Out_F"{swap}]
         \ar[from=2-1, to=2-2, -multimap, "\alpha^*"{swap}]
         \ar[from=1-2, to=2-2, -multimap, "\alpha"]
       \end{tikzcd}
@@ -598,19 +600,19 @@ There is however hope to recover at least a morphism out of \( \mu F' \) into \(
           &
         \Der(F[\mu F])
         \ar[from=1-1, to=2-1, -multimap, "\gamma_{\Highlight{\Der(\mu F)}}"{swap}, "\sim"]
-        \ar[from=2-1, to=2-2, -multimap, "\Op{chain}_{F,{\mu\!F}}"{swap}]
-        \ar[from=2-2, to=1-2, -multimap, "\Der(\Op{in}_F)"{swap}, "\sim"]
+        \ar[from=2-1, to=2-2, -multimap, "\Chain_{F,{\mu\!F}}"{swap}]
+        \ar[from=2-2, to=1-2, -multimap, "\Der(\In_F)"{swap}, "\sim"]
         \ar[from=1-1, to=1-2, dashed, -multimap, "\alpha"]
       \end{tikzcd}
     \end{equation*}
-    Lastly, let \( \MuRule_F \DefEq \Op{rec}_{F'}(\alpha) : \Cart{ \mu F' }{ \Der{(\mu F)} } \).
+    Lastly, let \( \MuRule_F \DefEq \Rec_{F'}(\alpha) : \Cart{ \mu F' }{ \Der{(\mu F)} } \).
   \end{construction}
 
 One advantage of defining the \( \mu \)-rule by recursion is that it highlights the dependency on the chain-rule.
 First, observe that recursion reflects equivalence, in the following sense:
 \begin{lemma}\label{is-equiv-from-mu-rec}
   Let \( \alpha : \Cart{\Subst{F}{G}}{G} \).
-  If \( \Op{rec}_{F}(\alpha) \) is an equivalence, then so is \( \alpha \).
+  If \( \Rec_{F}(\alpha) \) is an equivalence, then so is \( \alpha \).
   \begin{proof}
     Substitution \( \Subst{F}{-} \) preserves equivalences,
     so by 3-for-2 for equivalences of containers, \( \alpha \) on the right is an equivalence:
@@ -618,9 +620,9 @@ First, observe that recursion reflects equivalence, in the following sense:
       \begin{tikzcd}[column sep=huge]
         \Subst{F}{\mu F} & \Subst{F}{G} \\
         {\mu F}          & G
-        \ar[from=1-1, to=1-2, multimap-multimap, "\Subst{F}{\Op{rec}_F(\alpha)}"]
-        \ar[from=1-1, to=2-1, multimap-multimap, "\Op{in}_F"{swap}]
-        \ar[from=2-1, to=2-2, multimap-multimap, "\Op{rec}_F(\alpha)"{swap}]
+        \ar[from=1-1, to=1-2, multimap-multimap, "\Subst{F}{\Rec_F(\alpha)}"]
+        \ar[from=1-1, to=2-1, multimap-multimap, "\In_F"{swap}]
+        \ar[from=2-1, to=2-2, multimap-multimap, "\Rec_F(\alpha)"{swap}]
         \ar[from=1-2, to=2-2, -multimap, "\alpha"]
       \end{tikzcd}
       \qedhere
@@ -631,12 +633,12 @@ First, observe that recursion reflects equivalence, in the following sense:
 Thus, a strong \( \mu \)-rule for some container necessarily implies a strong chain rule between \( F \) and \( \mu F \):
 \begin{proposition}\label{strong-chain-rule-from-strong-mu-rule}
   Let \( F : \Cont_{I + 1} \).
-  If \( \MuRule_F \) is an equivalence, then so is \( \Op{chain}_{F,{\mu F}} \).
+  If \( \MuRule_F \) is an equivalence, then so is \( \Chain_{F,{\mu F}} \).
   \begin{proof}
     Assume that \( \MuRule_F \) is an equivalence.
     In \autoref{mu-rule}, \( \MuRule_F \) is defined by recursion from some \( \alpha \),
     hence \( \alpha \) is an equivalence by \autoref{is-equiv-from-mu-rec}.
-    But \( \alpha \) is just \( \Op{chain}_{F, {\mu F}} \) wedged between equivalences,
+    But \( \alpha \) is just \( \Chain_{F, {\mu F}} \) wedged between equivalences,
     so the latter is an equivalence.
   \end{proof}
 \end{proposition}
@@ -666,13 +668,13 @@ This map preserves embeddings:
   then so is \( \WRec_h : \W(S, P) \to A \).
   \begin{proof}
     It suffices to show that fibers over the image of \( \WRec_h \) are propositions,
-    i.e. that \( \prod_{w : \W(S, P)} \Op{isProp}(\Op{fiber}_{\WRec_h}(\WRec_h(w)))  \).
+    i.e. that \( \prod_{w : \W(S, P)} \Op{isProp}(\Fiber_{\WRec_h}(\WRec_h(w)))  \).
     We do so by \( \W \)-induction.
     Let \( s : S \), \( f : P(s) \to \W(S, P) \),
     and consider the type of fibers over \( \Sup(s, f) \):
     \begin{align*}
       {} &\mathrel{\hphantom{\simeq}}
-        \Op{fiber}_{\WRec_h}(\WRec_h(\Sup(s, f)))
+        \Fiber_{\WRec_h}(\WRec_h(\Sup(s, f)))
       \intertext{
         By the computation rule for \( \W \)-recursion, it is equivalent to
       }
@@ -685,7 +687,7 @@ This map preserves embeddings:
         &\simeq
         \sum_{w : \W(S, P)} x = (s, \WRec_h \circ f)
       \intertext{
-        Unfolding \( w : \W(S, P) \) via \( \operatorname{\Op{W-in}} \) and expanding \( x \),
+        Unfolding \( w : \W(S, P) \) via \( \WIn \) and expanding \( x \),
         we obtain
       }
         &\simeq
@@ -695,10 +697,10 @@ This map preserves embeddings:
         Breaking up the path of pairs into a pair of paths, we rearrange:
       }
         &\simeq
-        \adjustlimits\sum_{(s\mathrlap{'} , q) : \Op{singl}(s)} \sum_{f' : P(s') \to \W(S, P)}
+        \adjustlimits\sum_{(s\mathrlap{'} , q) : \Singl(s)} \sum_{f' : P(s') \to \W(S, P)}
           \WRec_h \circ f' =_{q} \WRec_h \circ f
       \intertext{
-        Contracting \( \Op{singl}(s) \) and applying function extensionality to the right,
+        Contracting \( \Singl(s) \) and applying function extensionality to the right,
         we are left with
       }
         &\simeq
@@ -715,7 +717,7 @@ This map preserves embeddings:
             \WRec_h(w) = \WRec_h(f(p))
     \end{align*}
     For any \( p : P(s) \), the codomain of this type is
-    \( \Op{fiber}_{\WRec_h}(\WRec_h(f(p)) \).
+    \( \Fiber_{\WRec_h}(\WRec_h(f(p)) \).
     But since \( f(p) : \W(S, P) \) is structurally smaller than \( \Sup(s, f) : \W(S, P) \),
     this type is a proposition by the induction hypothesis.
     Hence, all fibers over the image of \( \WRec_h \) are propositions,
@@ -741,7 +743,7 @@ From this, we can conclude that a strong chain rule alone is enough to prove a s
     Since \( \MuRule_F \) is always an embedding (\autoref{is-embedding-mu-rule}),
     it suffices to show that its shape map is a surjection.
     In fact, it is a split surjection: it has a section, hence all of its fibers are inhabited, not just merely inhabited.
-    Assume \( \Op{chain}_{F,{\mu F}} \) to be an equivalence.
+    Assume \( \Chain_{F,{\mu F}} \) to be an equivalence.
     By \autoref{strong-binary-chain-rule-iff-is-equiv-sigma-isolate}, this is equivalent to isolated pairs
     \( (p_1, \bar{w}) \)
     having isolated components \( p_1 : P_1(s) \) and \( \bar{w} : \bar{\W}(f{p_1}) \),
@@ -755,7 +757,7 @@ Thus, whether the \( \mu \)-rule is strong depends only on the chain-rule:
   For any container \( F : \Cont_{I + 1} \), the following are equivalent:
   \begin{enumerate}
     \item \( \MuRule_F \) is an equivalence.
-    \item \( \Op{chain}_{F,{\mu F}} \) is an equivalence.
+    \item \( \Chain_{F,{\mu F}} \) is an equivalence.
   \end{enumerate}
   \begin{proof}
     One direction is \autoref{strong-chain-rule-from-strong-mu-rule},
@@ -770,7 +772,7 @@ First, note that \( \bar{\W} \) preserves discreteness:
   If \( B, C : A \to \Type \) are families of discrete types,
   then \( \bar{\W}_{A,B,C} \) is a discrete family.
   \begin{proof}
-    By induction on \( \W(A, B) \) and unfolding via \( \operatorname{\Op{\bar{W}-in}} \).
+    By induction on \( \W(A, B) \) and unfolding via \( \WPathIn \).
   \end{proof}
 \end{lemma}
 This implies that discrete containers are closed under \( \mu \):

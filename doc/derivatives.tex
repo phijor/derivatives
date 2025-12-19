@@ -66,12 +66,12 @@ one in which positions are mapped 1-to-1 between input and output:
 
 In the remainder of this paper we will only consider cartesian morphisms.
 We are going to drop \enquote{cartesian} in writing, but retain the notation \( \Cart{F}{G} \).
-Morphisms of containers compose as expected, and together with an identity morphism \( \Op{id}_F : \Cart{F}{F} \)
+Morphisms of containers compose as expected, and together with an identity morphism \( \id_F : \Cart{F}{F} \)
 they form a wild category \( \ContCart \):
 composition is associative and unital, but we make no assumption on the truncation level of the hom-types \( \Cart{F}{G} \).
 Note that this wild category is \emph{not} univalent in the na{\"i}ve sense:
 The canonical map taking paths of containers \( F = G \) to categorical isomorphisms,\footnote{%
-  that is, pairs \( f : \Cart{F}{G}, g : \Cart{G}{F} \) with chosen paths \( fg = \Op{id}_F \) and \( gf = \Op{id}_G \)
+  that is, pairs \( f : \Cart{F}{G}, g : \Cart{G}{F} \) with chosen paths \( fg = \id_F \) and \( gf = \id_G \)
 }
 is \emph{not} an equivalence, unless shapes and positions of the involved containers are sets.
 Instead, we are going to use the following definition when comparing containers:
@@ -168,7 +168,7 @@ We can not only take the derivative of a container, but also act functorially on
   Define a wild endofunctor \( \Der : \ContCart \to \ContCart \).
   That is,
   for all \( f : \Cart{F}{G} \), a morphisms \( \Der{f} : \Cart{\Der{F}}{\Der{G}} \),
-  such that \( \Der(\Op{id}_F) = \Op{id}_{\Der{F}} \) and \(\Der(fg) = (\Der{f})(\Der{g}) \).
+  such that \( \Der(\id_F) = \id_{\Der{F}} \) and \(\Der(fg) = (\Der{f})(\Der{g}) \).
   \begin{construction}
     For any \( (f, u) : \Cart{(\MkCont{S}{P})}{(\MkCont{T}{Q})} \),
     there is a canonical morphism \( \Der{(f, u)} \DefEq (f' , u') : \Cart{\Der{(\MkCont{S}{P})}}{\Der{(\MkCont{T}{Q})}} \)
@@ -258,7 +258,7 @@ and discuss how this relates to the original construction of \citeauthor{AbbottE
         \begin{tikzcd}[ampersand replacement=\&, column sep=tiny, row sep=large]
           \Maybe{F} \& \& \Maybe{F} \\
                     \& \Maybe{(\Der{(\Maybe{F})})} \& %
-          \ar[from=1-1, to=1-3, -multimap, "\Op{id}"]
+          \ar[from=1-1, to=1-3, -multimap, "\id"]
           \ar[from=1-1, to=2-2, -multimap, "\Maybe{{\eta_F}}"{'}]
           \ar[from=2-2, to=1-3, -multimap, "\varepsilon_{\Maybe{F}}"{'}]
         \end{tikzcd}
@@ -269,7 +269,7 @@ and discuss how this relates to the original construction of \citeauthor{AbbottE
         \begin{tikzcd}[ampersand replacement=\&, column sep=tiny, row sep=large]
                     \& \Der{(\Maybe{\Der{G}})} \& \\
           \Der{G} \& \& \Der{G} %
-          \ar[from=2-1, to=2-3, -multimap, "\Op{id}"]
+          \ar[from=2-1, to=2-3, -multimap, "\id"]
           \ar[from=2-1, to=1-2, -multimap, "\eta_{\Der{G}}"]
           \ar[from=1-2, to=2-3, -multimap, "\Der{(\varepsilon_{G})}"]
         \end{tikzcd}
@@ -293,7 +293,7 @@ and discuss how this relates to the original construction of \citeauthor{AbbottE
 
     To construct the zigzag-fillers,
     we apply the necessary extensionality principles for functions, equivalences and sum types.
-    We are left to construct paths that are almost \( \Op{refl} \);
+    We are left to construct paths that are almost \( \Refl \);
     only some proofs of isolation and removal need to be compared up to propositional equality.
     Construction of the naturality squares for \( \eta \) and \( \varepsilon \) is done similarly.
   \end{construction}
@@ -320,10 +320,10 @@ with underlying map
 Interestingly, the proof of \cite[{Theorem 5.1}]{AbbottEtAl2005DataDifferentiating} already uses \( {\Blank}^{\sharp} \) to show naturality of the hom-set isomorphism in \( F \).
 
 Furthermore, we can iterate the adjunction and easily obtain a notion of \( n \)-fold derivatives.
-Denote by \( \Op{y}(A) \DefEq (\MkCont{1}{A}) \) the container of \enquote{\( A \)-tuples}.
+Denote by \( \CYo(A) \DefEq (\MkCont{1}{A}) \) the container of \enquote{\( A \)-tuples}.
 We see that \( \Der^n(G) \) encodes a type of \( G \)-terms with \( n \) holes:
 \begin{corollary}
-  For all \( n : \mathbb{N} \), there is an adjunction \( \Blank \CTimes \Op{y}[n] \dashv \Der^n \)
+  For all \( n : \mathbb{N} \), there is an adjunction \( \Blank \CTimes \CYo{[n]} \dashv \Der^n \)
   in the 1-category \( \ContCart_{0,0} \).
 \end{corollary}
 We believe that this extends to the entire wild category \( \ContCart \),
@@ -339,7 +339,7 @@ It is easy to see that derivatives of constants are always zero,
 and that \( \Der{\Id} \) is the constant \( \CConst(1) \).
 Both factor through the following observation:
 \begin{proposition}\label{derivative-prop-trunc}
-  Let \( S : \Type \) and \( P : S \to \Op{Prop} \).
+  Let \( S : \Type \) and \( P : S \to \Prop \).
   There is an equivalence of containers
   \[
     { \Der{(\MkCont{S}{P})} }
@@ -399,15 +399,15 @@ if there is some \( n : \mathbb{N} \) for which it is merely equivalent to \( \F
 \footnote{Specifically, such types are called Bishop-finite~\cite[{Definition~4.4}]{FruminEtAl2018FiniteSetsHomotopy}.}
 The universe of finite sets,
 \( \FinSet \DefEq \sum_{X : \Type} \sum_{n : \mathbb{N}} \lVert X \simeq \Fin{n} \rVert \),
-comes with a map \( \El \DefEq \Op{fst} : \FinSet \to \Type \) projecting out the underlying type.
-Together, these form the container of \emph{bags}, \( \Op{Bag} \DefEq (\MkCont{\FinSet}{\El}) \).
+comes with a map \( \El \DefEq \Fst : \FinSet \to \Type \) projecting out the underlying type.
+Together, these form the container of \emph{bags}, \( \Bag \DefEq (\MkCont{\FinSet}{\El}) \).
 As written, the shapes of this container quantify over all types, hence live in a higher universe.
 There are however equivalent small replacements of this type,
 such as the one given by \citeauthor{FinsterEtAl2021CartesianBicategoryPolynomial} in \cite[Theorem~25]{FinsterEtAl2021CartesianBicategoryPolynomial}.
 
 \begin{proposition}\label{bag-fixed-point}
   The bag-container is a fixed-point of derivation:
-  there is an equivalence \( \CartIso{\Der{\Op{Bag}}}{\Op{Bag}} \).
+  there is an equivalence \( \CartIso{\Der{\Bag}}{\Bag} \).
   \begin{proof}
     First, note that finite sets are closed under addition and removal of points:
     if \( X \) is finite, then so are \( X + 1 \) and \( X \setminus x \) for all \( x : X \).
@@ -423,7 +423,7 @@ such as the one given by \citeauthor{FinsterEtAl2021CartesianBicategoryPolynomia
     Given \( X : \FinSet \) and \( x_0 : \El(X) \), positions are related by the identity equivalence,
     that is
     \(
-      \Op{Bag}_{\Ps}(f(X, x_0)) = \El(f(X, x_0)) = X \setminus x_0 = \Der{\Op{Bag}}_{\Ps}(X, x_0)
+      \Bag_{\Ps}(f(X, x_0)) = \El(f(X, x_0)) = X \setminus x_0 = \Der{\Bag}_{\Ps}(X, x_0)
     \).
   \end{proof}
 \end{proposition}
@@ -431,7 +431,7 @@ such as the one given by \citeauthor{FinsterEtAl2021CartesianBicategoryPolynomia
 Unlike in classical analysis, where the exponential function is the unique solution to
 the differential equation \( f^{\prime} = f \) with initial condition \( f(0) = 1 \),
 the situation for containers is more nuanced:
-While \( \Op{Bag} \) is a solution for \( \CartIso{\Der{F}}{F} \) such that \( { F[\CConst{0}] \CartEquiv \CConst{1} } \),
+While \( \Bag \) is a solution for \( \CartIso{\Der{F}}{F} \) such that \( { F[\CConst{0}] \CartEquiv \CConst{1} } \),
 it is far from being the only one.
 This is not entirely unexpected:
 containers are closely related to Joyal's \emph{combinatorial species}
@@ -442,12 +442,12 @@ as shown by Labelle in~\cite{Labelle1986combinatorialdifferentialequations}.
 Modulo size issues, the proof of \autoref{bag-fixed-point} goes through for any subuniverse
 of types closed under addition and removal of single points:
 \begin{proposition}
-  Let \( P : \Type \to \Op{Prop} \) a predicate
+  Let \( P : \Type \to \Prop \) a predicate
   for which for all \( A : \Type \), \( P(A) \) implies both \( P(A + 1) \)
   and \( \prod_{a : A} P(A \setminus a) \).
   This defines a container
-  \( \Op{Bag}_P \DefEq (\MkCont{\sum_{\Type} P}{\Op{fst}}) \)
-  such that \( \CartIso{\Der{\Op{Bag}_P}}{\Op{Bag}_P} \). \qedhere
+  \( \Bag_P \DefEq (\MkCont{\sum_{\Type} P}{\Fst}) \)
+  such that \( \CartIso{\Der{\Bag_P}}{\Bag_P} \). \qedhere
 \end{proposition}
 For the details of the proof we refer the reader to the formalization;
 there one can find an example of this applied to countable multisets
