@@ -3,7 +3,7 @@ module Derivative.Derivative where
 
 open import Derivative.Prelude
 open import Derivative.Container
-open import Derivative.Decidable as Dec
+open import Derivative.Basics.Decidable as Dec
 open import Derivative.Isolated
 open import Derivative.Remove
 open import Derivative.Maybe

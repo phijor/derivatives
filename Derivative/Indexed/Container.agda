@@ -5,7 +5,7 @@ open import Derivative.Prelude
 open import Derivative.Embedding using (isEmbedding-Σ-map-snd ; isEmbeddingPostComp)
 open import Derivative.Maybe
 open import Derivative.Sum
-open import Derivative.Decidable as Dec
+open import Derivative.Basics.Decidable as Dec
 open import Derivative.Isolated
 open import Derivative.Remove
 

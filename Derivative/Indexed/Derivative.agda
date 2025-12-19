@@ -2,7 +2,7 @@
 module Derivative.Indexed.Derivative where
 
 open import Derivative.Prelude
-open import Derivative.Decidable
+open import Derivative.Basics.Decidable
 open import Derivative.Isolated
 open import Derivative.Remove
 

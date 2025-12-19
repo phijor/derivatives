@@ -1,5 +1,5 @@
 {-# OPTIONS --safe #-}
-module Derivative.Decidable where
+module Derivative.Basics.Decidable where
 
 open import Derivative.Prelude
 

@@ -3,7 +3,7 @@ module Derivative.Maybe where
 
 open import Derivative.Prelude
 open import Derivative.Isolated
-open import Derivative.Decidable as Dec
+open import Derivative.Basics.Decidable as Dec
 open import Derivative.Remove
 open import Derivative.Sum as Sum using (_⊎_ ; inl ; inr)
 

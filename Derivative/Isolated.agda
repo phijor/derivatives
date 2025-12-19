@@ -2,7 +2,7 @@
 module Derivative.Isolated where
 
 open import Derivative.Prelude
-open import Derivative.Decidable
+open import Derivative.Basics.Decidable
   as Dec
   using
     ( locallyDiscrete→locallyIsPropPath

@@ -7,7 +7,7 @@ open import Derivative.Indexed.Derivative
 open import Derivative.Indexed.ChainRule
 
 open import Derivative.Prelude
-open import Derivative.Decidable
+open import Derivative.Basics.Decidable
 open import Derivative.Embedding
 open import Derivative.Isolated
 open import Derivative.Maybe

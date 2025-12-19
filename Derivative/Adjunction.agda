@@ -3,7 +3,7 @@ module Derivative.Adjunction where
 
 open import Derivative.Prelude
 open import Derivative.Container
-open import Derivative.Decidable
+open import Derivative.Basics.Decidable
 open import Derivative.Derivative
 open import Derivative.Isolated
 open import Derivative.Maybe

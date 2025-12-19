@@ -5,7 +5,7 @@ open import Derivative.Indexed.Container
 open import Derivative.Indexed.Derivative
 
 open import Derivative.Prelude
-open import Derivative.Decidable
+open import Derivative.Basics.Decidable
 open import Derivative.Isolated
 open import Derivative.Remove
 open import Derivative.Sum

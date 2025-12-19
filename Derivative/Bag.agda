@@ -6,7 +6,7 @@ open import Derivative.Container
 open import Derivative.Derivative
 open import Derivative.Isolated
 open import Derivative.Remove
-open import Derivative.Decidable as Dec
+open import Derivative.Basics.Decidable as Dec
 open import Derivative.Maybe
 
 open import Cubical.Foundations.Univalence

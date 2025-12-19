@@ -2,7 +2,7 @@
 module Derivative.Grafting where
 
 open import Derivative.Prelude
-open import Derivative.Decidable as Dec
+open import Derivative.Basics.Decidable as Dec
 open import Derivative.Isolated
 open import Derivative.Remove
 
