@@ -1,4 +1,8 @@
-.Agda { color: var(--md-code-fg-color); background-color: var(--md-code-bg-color) }
+.Agda {
+  color: var(--md-code-fg-color);
+  background-color: var(--md-code-bg-color);
+  overflow-x: auto;
+}
 
 /* Aspects. */
 .Agda .Comment       { color: #B22222 }
