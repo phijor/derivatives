@@ -18,7 +18,7 @@
           root = ./.;
           fileset = unions [
             ./derivative.agda-lib
-            ./Derivative
+            ./agda
           ];
         };
 

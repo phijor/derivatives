@@ -1,4 +1,4 @@
 name: derivative
-include: .
+include: agda
 depend: cubical
 flags: --cubical --guardedness --postfix-projections --hidden-argument-puns --exact-split --no-require-unique-meta-solutions
