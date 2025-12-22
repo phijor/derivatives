@@ -1,0 +1,11 @@
+nav:
+  - Overview:
+    - Overview.md
+  - Library:
+    - 'Derivative.*.md'
+ingore: 'Derivative.Basics.*.md'
+
+preserve_directory_names: true
+
+sort:
+  sections: mixed
