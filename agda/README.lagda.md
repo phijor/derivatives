@@ -5,7 +5,9 @@ module README where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
+open import Derivative.Basics.Embedding
 open import Derivative.Basics.Equiv
+open import Derivative.Basics.Sum
 
 private
   variable
@@ -41,14 +43,45 @@ _ = isPropIsIsolated
 
 Proposition 2.4: Isolated points form a set.
 ```agda
-Proposition-2-4 : isSet (A °)
-Proposition-2-4 = isSetIsolated
+_ : isSet (A °)
+_ = isSetIsolated
 ```
 
-Lemma 2.5: Equivalences preserve and reflect isolated points, hence induce an equivalence.
+**Lemma 2.5**:
+Equivalences preserve and reflect isolated points, hence induce an equivalence.
 ```agda
-Lemma-2-5 : (e : A ≃ B) → A ° ≃ B °
-Lemma-2-5 = IsolatedSubstEquiv
+_ : (e : A ≃ B) → ∀ a → isIsolated a ≃ isIsolated (equivFun e a)
+_ = isIsolated≃isIsolatedEquivFun
+```
+
+This induces an equivalence on sets of isolated points:
+```agda
+_ : (e : A ≃ B) → A ° ≃ B °
+_ = IsolatedSubstEquiv
+```
+
+**Proposition 2.6**:
+Embeddings reflect isolated points.
+```agda
+_ : (f : A → B) → isEmbedding f → ∀ {a} → isIsolated (f a) → isIsolated a
+_ = EmbeddingReflectIsolated
+```
+
+**Proposition 2.7**:
+The constructors `inl : A → A ⊎ B` and `inr : B → A ⊎ B` preserve and reflect isolated points.
+```agda
+_ : ∀ {a : A} → isIsolated a ≃ isIsolated (inl {B = B} a)
+_ = isIsolated≃isIsolatedInl
+
+_ : ∀ {b : B} → isIsolated b ≃ isIsolated (inr {A = A} b)
+_ = isIsolated≃isIsolatedInr
+```
+
+**Problem 2.8**:
+The above induces an equivalence that distributes isolated points over binary sums:
+```agda
+_ : (A ⊎ B) ° ≃ (A °) ⊎ (B °)
+_ = IsolatedSumEquiv
 ```
 
 # Derivatives of Containers

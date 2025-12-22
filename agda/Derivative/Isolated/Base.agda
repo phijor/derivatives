@@ -142,10 +142,13 @@ opaque
   isIsolatedPreserveEquiv' : (e : A ≃ B) → (a : A) → isIsolated (equivFun e a) → isIsolated a
   isIsolatedPreserveEquiv' e a isolated a′ = EquivPresDec (invEquiv (congEquiv e)) (isolated (equivFun e a′))
 
+  isIsolated≃isIsolatedEquivFun : (e : A ≃ B) → ∀ a → isIsolated a ≃ isIsolated (equivFun e a)
+  isIsolated≃isIsolatedEquivFun e a = propBiimpl→Equiv (isPropIsIsolated _) (isPropIsIsolated _)
+    (isIsolatedPreserveEquiv e a)
+    (isIsolatedPreserveEquiv' e a)
+
 IsolatedSubstEquiv : (e : A ≃ B) → A ° ≃ B °
-IsolatedSubstEquiv e = Σ-cong-equiv e lemma where
-  lemma : ∀ a → isIsolated a ≃ isIsolated (equivFun e a)
-  lemma a = propBiimpl→Equiv (isPropIsIsolated _) (isPropIsIsolated _) (isIsolatedPreserveEquiv e a) (isIsolatedPreserveEquiv' e a)
+IsolatedSubstEquiv e = Σ-cong-equiv e (isIsolated≃isIsolatedEquivFun e)
 
 opaque
   InjReflectIsolated : (f : A → B) → (∀ a b → f a ≡ f b → a ≡ b) → ∀ {a} → isIsolated (f a) → isIsolated a

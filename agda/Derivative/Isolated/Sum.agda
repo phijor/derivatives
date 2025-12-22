@@ -26,6 +26,20 @@ isIsolatedInr : ∀ {b : B} → isIsolated b → isIsolated (inr {A = A} b)
 isIsolatedInr {b} isolated-b (inl a) = no λ inr≡inl → Sum.⊎Path.encode _ _ inr≡inl .lower
 isIsolatedInr {b} isolated-b (inr b′) = Dec.decEquiv (cong inr , Sum.isEmbedding-inr b b′) (isolated-b b′)
 
+isIsolated≃isIsolatedInl : ∀ {a : A} → isIsolated a ≃ isIsolated (inl {B = B} a)
+isIsolated≃isIsolatedInl {a} = propBiimpl→Equiv
+  (isPropIsIsolated a)
+  (isPropIsIsolated (inl a))
+  isIsolatedInl
+  isIsolatedFromInl
+
+isIsolated≃isIsolatedInr : ∀ {b : B} → isIsolated b ≃ isIsolated (inr {A = A} b)
+isIsolated≃isIsolatedInr {b} = propBiimpl→Equiv
+  (isPropIsIsolated b)
+  (isPropIsIsolated (inr b))
+  isIsolatedInr
+  isIsolatedFromInr
+
 IsolatedSumIso : Iso ((A ⊎ B) °) ((A °) ⊎ (B °))
 IsolatedSumIso .Iso.fun (inl a , isolated-inl-a) = inl (a , isIsolatedFromInl isolated-inl-a)
 IsolatedSumIso .Iso.fun (inr b , isolated-inr-b) = inr (b , isIsolatedFromInr isolated-inr-b)
