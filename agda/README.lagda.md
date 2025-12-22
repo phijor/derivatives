@@ -7,7 +7,10 @@ open import Derivative.Prelude
 open import Derivative.Basics.Decidable
 open import Derivative.Basics.Embedding
 open import Derivative.Basics.Equiv
+open import Derivative.Basics.Maybe
 open import Derivative.Basics.Sum
+
+open import Cubical.Data.Unit.Properties using (isPropUnit*)
 
 private
   variable
@@ -83,6 +86,32 @@ The above induces an equivalence that distributes isolated points over binary su
 _ : (A ⊎ B) ° ≃ (A °) ⊎ (B °)
 _ = IsolatedSumEquiv
 ```
+
+The type `A ⊎ 𝟙` is used so often that we abbreviate it as `Maybe A`:
+```agda
+_ : (A : Type) → Maybe A ≡ (A ⊎ ⊤ _)
+_ = λ A → refl
+```
+
+The point `nothing : Maybe A` is always isolated:
+```agda
+_ : isIsolated {A = Maybe A} nothing
+_ = isIsolatedNothing
+
+_ : (Maybe A) °
+_ = nothing°
+```
+
+**Problem 2.8**:
+The isolated points of `Maybe A` are those of `A` or `nothing`:
+```agda
+_ : (A : Type) → (Maybe A) ° ≃ Maybe (A °)
+_ = λ A →
+  (Maybe A) °     ≃⟨ IsolatedSumEquiv ⟩
+  (A °) ⊎ (⊤ _ °) ≃⟨ ⊎-right-≃ (isProp→IsolatedEquiv isPropUnit*) ⟩
+  Maybe (A °)     ≃∎
+```
+
 
 # Derivatives of Containers
 
