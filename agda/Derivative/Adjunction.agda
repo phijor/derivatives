@@ -23,8 +23,7 @@ module _ (F : Container ℓ ℓ) where
 
   unit-shape : S → Σ[ s ∈ S × ⊤ ℓ ] (P (s .fst) ⊎ (⊤ ℓ)) °
   unit-shape s .fst = s , _
-  unit-shape s .snd .fst = nothing
-  unit-shape s .snd .snd = isIsolatedNothing
+  unit-shape s .snd = nothing°
 
   unit-pos : (s : S) → Maybe (P s) ∖ nothing ≃ P s
   unit-pos s = removeNothingEquiv
