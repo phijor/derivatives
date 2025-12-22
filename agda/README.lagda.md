@@ -11,6 +11,7 @@ open import Derivative.Basics.Maybe
 open import Derivative.Basics.Sum
 
 open import Cubical.Data.Unit.Properties using (isPropUnit*)
+open import Cubical.Functions.Surjection
 
 private
   variable
@@ -26,25 +27,25 @@ private
 open import Derivative.Isolated
 ```
 
-Definition 2.1: Isolated points.
+**Definition 2.1**: Isolated points.
 ```agda
 _ : (a : A) → Type _
 _ = isIsolated
 ```
 
-Lemma 2.2: Isolated points have propositional paths.
+**Lemma 2.2**: Isolated points have propositional paths.
 ```agda
 _ : (a : A) → isIsolated a → (b : A) → isProp (a ≡ b)
 _ = isIsolated→isPropPath
 ```
 
-Corollary 2.3: Being isolated is a proposition.
+**Corollary 2.3**: Being isolated is a proposition.
 ```agda
 _ : (a : A) → isProp (isIsolated a)
 _ = isPropIsIsolated
 ```
 
-Proposition 2.4: Isolated points form a set.
+**Proposition 2.4**: Isolated points form a set.
 ```agda
 _ : isSet (A °)
 _ = isSetIsolated
@@ -112,6 +113,59 @@ _ = λ A →
   Maybe (A °)     ≃∎
 ```
 
+<!--
+```agda
+module _ (A : Type) (B : A → Type) where
+```
+-->
+
+**Proposition 2.10**:
+There is a map taking (dependent) pairs of isolated points to an
+isolated point in the corresponding type of pairs:
+```agda
+  _ : (Σ[ a° ∈ A ° ] (B (a° .fst)) °) → (Σ[ a ∈ A ] B a) °
+  _ = Σ-isolate A B
+```
+
+**Proposition 2.11, Proposition 2.12**:
+The fibers of this map are propositions, hence it is an embedding.
+```agda
+  _ : (a : A) (b : B a) (h : isIsolated {A = Σ A B} (a , b))
+    → fiber (Σ-isolate A B) ((a , b) , h) ≃ (isIsolated a × isIsolated b)
+  _ = Σ-isolate-fiber-equiv A B
+
+  _ : isEmbedding (Σ-isolate A B)
+  _ = isEmbedding-Σ-Isolate A B
+```
+
+**Lemma 2.13**:
+`Σ-isolate` is a surjection (hence equivalence) iff pairing `(_,_)` reflects isolated points.
+```agda
+  _ : isSurjection (Σ-isolate A B) ≃ (∀ a → (b : B a) → isIsolated {A = Σ A B} (a , b) → isIsolated a × isIsolated b)
+  _ = isSurjection-Σ-isolate≃isIsolatedPair A B
+```
+
+**Corollary 2.14**:
+Over discrete types, `Σ-isolate` is an equivalence.
+```agda
+  _ : Discrete A → (∀ a → Discrete (B a)) → isEquiv (Σ-isolate A B)
+  _ = Discrete→isEquiv-Σ-isolate
+```
+
+**Proposition 2.15**:
+Over a fixed *isolated* point `a : A`, pairing `λ b → (a , b)` preserves and reflects isolated points.
+```agda
+  _ : {a₀ : A} → isIsolated a₀ → (b₀ : B a₀) → isIsolated b₀ ≃ isIsolated {A = Σ A B} (a₀ , b₀)
+  _ = isIsolatedFst→isIsolatedSnd≃isIsolatedPair
+```
+
+**Proposition 2.16**:
+Discreteness of a type can be characterized by the behaviour of
+`Σ-isolate` for the family `B(a) ≔ (a₀ ≡ a)`.
+```agda
+_ : Discrete A ≃ ((a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_)))
+_ = Discrete≃isEquiv-Σ-isolate-singl
+```
 
 # Derivatives of Containers
 
