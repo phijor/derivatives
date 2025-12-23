@@ -23,9 +23,11 @@ private
 ```
 -->
 
-# Removing Isolated Points in Univalent Foundations
+# Overview
 
-## Isolated points
+## Removing Isolated Points in Univalent Foundations
+
+### Isolated points
 
 ```agda
 open import Derivative.Isolated
@@ -170,7 +172,7 @@ _ : Discrete A ≃ ((a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_)))
 _ = Discrete≃isEquiv-Σ-isolate-singl
 ```
 
-## Removing points
+### Removing points
 ```agda
 open import Derivative.Remove
 ```
@@ -235,7 +237,7 @@ If `a₀` is isolated, then it is *h-isolated*, and `Σ-remove a₀ b₀` is an 
   _ = isIsolatedFst→isEquiv-Σ-remove
 ```
 
-## Grafting
+### Grafting
 
 **Problem 2.22**:
 For all `a : A °`, *grafting* extends the domain a function `f : A ∖ a₀ → B` to all of `A`, given some `b₀ : B`.
@@ -266,7 +268,7 @@ import Derivative.Isolated.DependentGrafting
     Since `transport refl` does not definitionially reduce to the identity function,
     we would have to manually get rid of it everywhere.
 
-# Derivatives of Containers
+## Derivatives of Containers
 
 ```agda
 open import Derivative.Container
@@ -342,25 +344,25 @@ _ : (f g : Cart F G)
 _ = Cart≡Equiv
 ```
 
-## Derivatives, Universally
+### Derivatives, Universally
 
 ```agda
 import Derivative.Adjunction
 ```
 
-## Basic Laws of Derivatives
+### Basic Laws of Derivatives
 
 ```agda
 import Derivative.Properties
 ```
 
-# The Chain Rule
+## The Chain Rule
 
 ```agda
 import Derivative.ChainRule
 ```
 
-# Derivatives of Fixed Points
+## Derivatives of Fixed Points
 
 ```agda
 import Derivative.Indexed.ChainRule
