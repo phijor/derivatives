@@ -323,16 +323,8 @@ _ = Equiv
 Containers and cartesian morphism assemble into a wild category.
 Set-truncated containers form a 1-category.
 ```agda
-import Derivative.Category
-```
+open import Derivative.Category ℓ-zero
 
-<!--
-```agda
-open import Derivative.Category ℓ-zero renaming (∂ to ∂₀) hiding (∂₀)
-```
--->
-
-```agda
 _ : WildCat _ _
 _ = ℂont∞
 
