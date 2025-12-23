@@ -162,8 +162,7 @@ Over a fixed *isolated* point `a : A`, pairing `λ b → (a , b)` preserves and 
 ```
 
 **Proposition 2.16**:
-Discreteness of a type can be characterized by the behaviour of
-`Σ-isolate` for the family `B(a) ≔ (a₀ ≡ a)`.
+Discreteness of a type can be characterized by `Σ-isolate` at the family `B(a) ≔ (a₀ ≡ a)`.
 ```agda
 _ : Discrete A ≃ ((a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_)))
 _ = Discrete≃isEquiv-Σ-isolate-singl
