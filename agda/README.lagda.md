@@ -288,7 +288,7 @@ _ = λ S P → (S ◁ P)
 ```
 
 ??? note "Universe polymorphism"
-    Containers are define for shapes and positions in any universe.
+    Containers are defined for shapes and positions in any universe.
     For most constructions, we consider containers at a fixed level `ℓ`,
     that is the type `Container ℓ ℓ`.
     Some examples consider containers with large shapes (i.e. `Container (ℓ-suc ℓ) ℓ`), but this is mostly for convenience.
