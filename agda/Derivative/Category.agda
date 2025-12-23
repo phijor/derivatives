@@ -15,6 +15,7 @@ open import Derivative.Adjunction
 
 open import Cubical.Data.Unit using (isSetUnit*)
 open import Cubical.WildCat.Base
+open import Cubical.WildCat.Functor hiding (_$_)
 open import Cubical.Categories.Category.Base
 open import Cubical.Categories.Functor.Base
 open import Cubical.Categories.NaturalTransformation.Base using (_⇒_ ; NatTrans)
@@ -39,6 +40,12 @@ open import Cubical.Categories.Adjoint
 ℂont .Category.⋆Assoc F G H = Cart≡ refl $ funExt λ s → equivEq refl
 ℂont .Category.isSetHom {x = F} {y = G} = isOfHLevelCart 2 {F} {G}
 
+∂∞ : WildFunctor ℂont∞ ℂont∞
+∂∞ .WildFunctor.F-ob = ∂.∂
+∂∞ .WildFunctor.F-hom = ∂.∂[_]
+∂∞ .WildFunctor.F-id = Cart≡ (funExt λ { (s , p , _) → ΣPathP (refl′ s , Isolated≡ (refl′ p)) }) $ funExt λ (s , p , _) → equivExt λ (p' , _) → Remove≡ (refl′ p')
+∂∞ .WildFunctor.F-seq f g = Cart≡ (funExt λ _ → ΣPathP (refl , Isolated≡ refl)) $ funExt λ _ → equivExt λ _ → Remove≡ refl
+
 ∂₀ : SetContainer ℓ ℓ → SetContainer ℓ ℓ
 ∂₀ (F , _) .fst = ∂.∂ F
 ∂₀ (F , is-set-shape , is-set-pos) .snd = ∂.isOfHLevelDerivative {n = 0} {k = 1} is-set-shape is-set-pos
@@ -46,8 +53,8 @@ open import Cubical.Categories.Adjoint
 ∂ : Functor ℂont ℂont
 ∂ .Functor.F-ob = ∂₀
 ∂ .Functor.F-hom = ∂.∂[_]
-∂ .Functor.F-id = Cart≡ (funExt λ { (s , p , _) → ΣPathP (refl′ s , Isolated≡ (refl′ p)) }) $ funExt λ (s , p , _) → equivExt λ (p' , _) → Remove≡ (refl′ p')
-∂ .Functor.F-seq f g = Cart≡ (funExt λ _ → ΣPathP (refl , Isolated≡ refl)) $ funExt λ _ → equivExt λ _ → Remove≡ refl
+∂ .Functor.F-id = ∂∞ .WildFunctor.F-id
+∂ .Functor.F-seq = ∂∞ .WildFunctor.F-seq
 
 open UnitCounit {C = ℂont} {D = ℂont}
 

@@ -52,3 +52,8 @@ isOfHLevelDerivative {F} {n} {k} is-trunc-shape is-trunc-pos = is-trunc-∂-shap
 
   is-trunc-∂-pos : ∀ s (p : P s) → isOfHLevel (1 + k) (P s ∖ p)
   is-trunc-∂-pos s p = isOfHLevelRemove k (is-trunc-pos s)
+
+isTruncatedDerivative : {F : Container ℓS ℓP} (n k : HLevel)
+  → isTruncatedContainer (2 + n) (1 + k) F
+  → isTruncatedContainer (2 + n) (1 + k) (∂ F)
+isTruncatedDerivative n k = uncurry isOfHLevelDerivative

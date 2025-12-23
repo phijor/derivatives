@@ -10,10 +10,13 @@ open import Derivative.Basics.Equiv
 open import Derivative.Basics.Maybe
 open import Derivative.Basics.Sum
 
+open import Cubical.Data.Nat.Base
 open import Cubical.Data.Unit.Properties using (isPropUnit*)
 open import Cubical.Functions.Surjection
 open import Cubical.Categories.Category.Base
+open import Cubical.Categories.Functor.Base
 open import Cubical.WildCat.Base
+open import Cubical.WildCat.Functor hiding (_$_)
 
 private
   variable
@@ -320,8 +323,16 @@ _ = Equiv
 Containers and cartesian morphism assemble into a wild category.
 Set-truncated containers form a 1-category.
 ```agda
-open import Derivative.Category ℓ-zero
+import Derivative.Category
+```
 
+<!--
+```agda
+open import Derivative.Category ℓ-zero renaming (∂ to ∂₀) hiding (∂₀)
+```
+-->
+
+```agda
 _ : WildCat _ _
 _ = ℂont∞
 
@@ -345,6 +356,42 @@ _ = Cart≡Equiv
 ```
 
 ### Derivatives, Universally
+
+```agda
+open import Derivative.Derivative
+```
+
+**Definition 3.6**:
+The derivative of an untruncated container.
+Its shapes contain an _isolated_ position.
+```agda
+_ : (S : Type) (P : S → Type)
+  → ∂ (S ◁ P) ≡ ((Σ[ s ∈ S ] P s °) ◁ λ (s , p) → (P s ∖° p))
+_ = λ S P → refl
+```
+
+**Problem 3.7**:
+Extend the derivative to a wild functor on `ℂont∞`.
+```agda
+_ : WildFunctor ℂont∞ ℂont∞
+_ = ∂∞
+```
+
+**Proposition 3.8**:
+Taking derivatives preserves the truncation level of containers (except for very low levels).
+```agda
+_ : ∀ (n k : HLevel)
+  → isTruncatedContainer (2 + n) (1 + k) F
+  → isTruncatedContainer (2 + n) (1 + k) (∂ F)
+_ = isTruncatedDerivative
+```
+
+**Corollary 3.9**:
+`∂` restricts to an endofunctor of the 1-category of set-truncated containers.
+```agda
+_ : Functor ℂont ℂont
+_ = ∂₀
+```
 
 ```agda
 import Derivative.Adjunction
