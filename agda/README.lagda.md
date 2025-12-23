@@ -197,6 +197,42 @@ _ :  ∀ {b : B} → (A ⊎ (B ∖ b)) ≃ ((A ⊎ B) ∖ (inr b))
 _ = remove-right-equiv
 ```
 
+The other way around there is a map that takes `(A ∖ a₀) ⊎ 𝟙` and replaces `nothing` with `a₀`:
+```agda
+_ : (a₀ : A) → Maybe (A ∖ a₀) → A
+_ = replace
+```
+
+**Proposition 2.19**:
+The map `replace a₀` is an equivalence if and only if `a₀` is isolated.
+```agda
+_ : (a₀ : A) → isIsolated a₀ ≃ isEquiv (replace a₀)
+_ = isIsolated≃isEquiv-replace
+```
+
+<!--
+```agda
+module _ (A : Type) (B : A → Type) where
+```
+-->
+
+**Problem 2.20**:
+If `a₀` is *h-isolated* (i.e. `isProp (a₀ ≡ a₀)`), then there is a map that
+looks like it characterizes removal of points from `Σ`-types.
+```agda
+  _ : ∀ (a₀ : A) (b₀ : B a₀)
+    → (isProp (a₀ ≡ a₀))
+    → (Σ[ (a , _) ∈ A ∖ a₀ ] B a) ⊎ (B a₀ ∖ b₀) → (Σ A B ∖ (a₀ , b₀))
+  _ = Σ-remove
+```
+
+**Proposition 2.21**:
+If `a₀` is isolated, then it is *h-isolated*, and `Σ-remove a₀ b₀` is an equivalence.
+```agda
+  _ : ∀ {a₀ : A} {b₀ : B a₀} → (h : isIsolated a₀) → isEquiv (Σ-remove {B = B} a₀ b₀ _)
+  _ = isIsolatedFst→isEquiv-Σ-remove
+```
+
 # Derivatives of Containers
 
 ```agda
