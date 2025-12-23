@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --safe #-}
 module Derivative.Adjunction where
 
 open import Derivative.Prelude
@@ -111,18 +111,19 @@ zag≡ G = Cart≡ (funExt shape-path) (funExt λ ∂s → equivExt (pos-path �
         p
           ∎
 
+{-
 cart-Iso : (F G : Container ℓ ℓ) → Iso (Cart (F ⊗Id) G) (Cart F (∂ G))
 cart-Iso F G = go where
-  Φ : (f : Cart (F ⊗Id) G) → Cart F (∂ G)
-  Φ f = unit F ⋆ ∂[ f ]
+  _♭ : (g : Cart (F ⊗Id) G) → Cart F (∂ G)
+  _♭ g = unit F ⋆ ∂[ g ]
 
-  Ψ : (g : Cart F (∂ G)) → Cart (F ⊗Id) G
-  Ψ g = [ g ]⊗Id ⋆ counit G
+  _♯ : (f : Cart F (∂ G)) → Cart (F ⊗Id) G
+  _♯ f = [ f ]⊗Id ⋆ counit G
 
-  rinv : section Φ Ψ
+  rinv : section _♭ _♯
   rinv g =
     unit F ⋆ ∂[ [ g ]⊗Id ⋆ counit G ]
-      ≡⟨ {! !} ⟩
+      ≡⟨ {! ⋆-assoc !} ⟩
     unit F ⋆ (∂[ [ g ]⊗Id ] ⋆ ∂[ counit G ])
       ≡⟨ {! !} ⟩
     (unit F ⋆ ∂[ [ g ]⊗Id ]) ⋆ ∂[ counit G ]
@@ -136,11 +137,18 @@ cart-Iso F G = go where
     g
       ∎
 
+  opaque
+    unfolding isIsolatedRespectEquiv
+
+    linv : retract _♭ _♯
+    linv g@([ gₛ ◁ gₚ ]) = Cart≡ refl $ funExt λ where
+      (s , tt*) → equivExt λ q → {! !}
+
   go : Iso _ _
-  go .Iso.fun = Φ
-  go .Iso.inv = Ψ
+  go .Iso.fun = _♭
+  go .Iso.inv = _♯
   go .Iso.rightInv = rinv
-  go .Iso.leftInv = {! !}
+  go .Iso.leftInv = linv
 
 cart-equiv : (F G : Container ℓ ℓ) → (Cart (F ⊗Id) G) ≃ (Cart F (∂ G))
 cart-equiv F G .fst f = unit F ⋆ ∂[ f ]
@@ -160,18 +168,4 @@ cart-equiv' F G .snd = isoToIsEquiv (invIso (cart-Iso F G))
 
 universal-arrow : (G : Container ℓ ℓ) → ∀ F → (g : Cart (F ⊗Id) G) → ∃![ g* ∈ Cart F (∂ G) ] [ g* ]⊗Id ⋆ counit G ≡ g
 universal-arrow G F g = cart-equiv' F G .snd .equiv-proof g
-
-module Generalized (G : Container ℓ ℓ) where
-  open Container G renaming (Shape to T ; Pos to Q)
-
-  ∂* : Container ℓ ℓ → Container ℓ ℓ
-  ∂* (S ◁ P) = (T → Σ[ s ∈ S ] (P s °)) ◁ λ f → (t : T) → P (f t .fst) ∖° (f t .snd)
-
-  module _ (F : Container ℓ ℓ) where
-    unit' : Cart F (∂* (F ⊗ G))
-    unit' .shape s t = (s , t) , {! !}
-    unit' .pos = {! !}
-
-    counit' : Cart ((∂* F) ⊗ G) F
-    counit' .shape (f , t) = f t .fst
-    counit' .pos (f , t) = {! !}
+-}

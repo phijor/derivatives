@@ -3,6 +3,7 @@ module Derivative.Isolated.Maybe where
 
 open import Derivative.Prelude
 open import Derivative.Isolated.Base
+open import Derivative.Isolated.Sum
 
 open import Derivative.Basics.Decidable as Dec
 open import Derivative.Basics.Maybe
@@ -29,6 +30,9 @@ isIsolatedJust {a = a} a≟_ nothing = no (nothing≢just ∘ sym)
 just° : A ° → (Maybe A) °
 just° (a , a≟_) .fst = just a
 just° (a , a≟_) .snd = isIsolatedJust a≟_
+
+isIsolatedFromJust : ∀ {a : A} → isIsolated (the (Maybe A) $ just a) → isIsolated a
+isIsolatedFromJust = isIsolatedFromInl
 
 module _ {ℓ} {A : Type ℓ} (a₀ : A) (a₀≟_ : isIsolated a₀) where
   unreplace : A → Maybe (A ∖ a₀)
@@ -76,3 +80,34 @@ isIsolated≃isEquiv-replace a₀ = propBiimpl→Equiv
   (isPropIsIsolated a₀) (isPropIsEquiv (replace a₀))
   (equivIsEquiv ∘ replace-isolated-equiv a₀)
   (isEquiv-replace→isIsolated a₀)
+
+remove-just : (a₀ : A) → Maybe A ∖ just a₀ → A
+remove-just a₀ (just a , _) = a
+remove-just a₀ (nothing , _) = a₀
+
+removeJustIso : (a₀ : A) → isIsolated a₀ → Iso (Maybe A ∖ just a₀) A
+removeJustIso a₀ a₀≟_ .Iso.fun = remove-just a₀
+removeJustIso {A} a₀ a₀≟_ .Iso.inv = λ a → g a (a₀≟ a) module removeJustIso-inv where
+  g : (a : A) → Dec (a₀ ≡ a) → Maybe A ∖ just a₀
+  g a (yes a₀≡a) = nothing , nothing≢just ∘ sym
+  g a (no ¬a₀≡a) = just a , ¬a₀≡a ∘ inlInj
+removeJustIso a₀ a₀≟_ .Iso.rightInv a = rinv a (a₀≟ a) where
+  open removeJustIso-inv a₀ a₀≟_
+  rinv : ∀ a → (a₀≟a : Dec (a₀ ≡ a)) → remove-just a₀ (g a a₀≟a) ≡ a
+  rinv a (yes a₀≡a) = a₀≡a
+  rinv a (no ¬a₀≡a) = refl′ a
+removeJustIso a₀ a₀≟_ .Iso.leftInv (just a , just-a₀≢just-a) = linv a just-a₀≢just-a (a₀≟ a) where
+  open removeJustIso-inv a₀ a₀≟_
+
+  linv : ∀ a → (h : just a₀ ≢ just a) → (a₀≟a : Dec (a₀ ≡ a)) → g a a₀≟a ≡ (just a , h)
+  linv a h (yes a₀≡a) = ≢-rec (cong just a₀≡a) h
+  linv a _ (no     _) = Remove≡ $ refl′ $ just a
+removeJustIso a₀ a₀≟_ .Iso.leftInv (nothing , just-a₀≢nothing) = linv (a₀≟ a₀) where
+  open removeJustIso-inv a₀ a₀≟_
+
+  linv : (a₀≟a₀ : Dec (a₀ ≡ a₀)) → g a₀ a₀≟a₀ ≡ (nothing , just-a₀≢nothing)
+  linv (yes a₀≡a₀) = Remove≡ $ refl′ $ nothing
+  linv (no ¬a₀≡a₀) = ≢-rec refl ¬a₀≡a₀
+
+removeJustEquiv : (a₀ : A) → isIsolated a₀ → (Maybe A ∖ just a₀) ≃ A
+removeJustEquiv a₀ a₀≟_ = isoToEquiv $ removeJustIso a₀ a₀≟_

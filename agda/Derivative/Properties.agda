@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --safe #-}
 module Derivative.Properties where
 
 open import Derivative.Prelude
@@ -76,23 +76,21 @@ open Cart
     ⊸≃∎
 
 ∂-𝕪 : (A : Type ℓ) → Discrete A → Equiv (∂ 𝕪[ A ⊎ (𝟙 ℓ) ]) (𝕂 (A ⊎ 𝟙 ℓ) ⊗ 𝕪[ A ])
-∂-𝕪 {ℓ} A discrete-A =
-  ∂ (𝟙 _ ◁ const (A ⊎ 𝟙 _))
-    ⊸≃⟨⟩
-  ([ (_ , x , _) ∈ 𝟙 ℓ × ((A ⊎ 𝟙 ℓ) °) ]◁ ((A ⊎ 𝟙 _) ∖ x))
-    ⊸≃⟨ Equiv-fst (isoToEquiv lUnit*×Iso) ⟩
-  ([ (x , _) ∈ ((A ⊎ 𝟙 ℓ) °) ]◁ ((A ⊎ 𝟙 _) ∖ x))
-    ⊸≃⟨ Equiv-inv $ Equiv-fst (Sum.⊎-right-≃ (invEquiv (isProp→IsolatedEquiv isPropUnit*)) ∙ₑ invEquiv IsolatedSumEquiv) ⟩
-  ([ x ∈ (A °) ⊎ 𝟙 ℓ ]◁ ((A ⊎ 𝟙 _) ∖ _))
-    ⊸≃⟨ Equiv-inv $ Equiv-fst (Sum.⊎-left-≃ (invEquiv $ Discrete→IsolatedEquiv discrete-A)) ⟩
-  ([ x ∈ A ⊎ 𝟙 ℓ ]◁ ((A ⊎ 𝟙 _) ∖ _))
-    ⊸≃⟨ Equiv-snd (λ x → RemoveRespectEquiv _ Sum.⊎-swap-≃) ⟩
-  ([ x ∈ A ⊎ 𝟙 ℓ ]◁ ((𝟙 _ ⊎ A) ∖ _))
-    ⊸≃⟨ Equiv-snd (λ { (just a) → {! replace-isolated-equiv !} ; nothing → {! !} }) ⟩
-  ((A ⊎ 𝟙 ℓ) ◁ (λ { (just a) → A ∖ a ; nothing → {! !} }))
-    ⊸≃⟨ [ isoToEquiv (invIso rUnit*×Iso) ◁≃ (λ { (just a) → {! invEquiv removeNothingEquiv !} ; nothing → {! !} }) ] ⟩
-  ((A ⊎ 𝟙 _) ◁ const (𝟘 _)) ⊗ (𝟙 _ ◁ const A)
-    ⊸≃∎
+∂-𝕪 {ℓ} A discrete-A = [ isoToEquiv shape-Iso ◁≃ invEquiv ∘ pos-equiv ] where
+  shape-Iso : Iso _ _
+  shape-Iso .Iso.fun (_ , x , _) = x , _
+  shape-Iso .Iso.inv (just a , _) = _ , just° (a , discrete-A a)
+  shape-Iso .Iso.inv (nothing , _) = _ , nothing°
+  shape-Iso .Iso.rightInv (just a , _) = refl
+  shape-Iso .Iso.rightInv (nothing , _) = refl
+  shape-Iso .Iso.leftInv (_ , just a , _) = ≡-× refl (Isolated≡ $ refl′ $ just a)
+  shape-Iso .Iso.leftInv (_ , nothing , _) = ≡-× refl (Isolated≡ $ refl′ nothing)
+
+  pos-equiv : ((_ , x) : _ × (Maybe A °)) → ((Maybe A) ∖° x) ≃ (𝟘 _ ⊎ A)
+  pos-equiv (_ , x) = e x ∙ₑ (Sum.⊎-empty-left λ ()) where
+    e : (x : Maybe A °) → ((Maybe A) ∖° x) ≃ A
+    e (nothing , _) = removeNothingEquiv
+    e (just a , isolated-just-a) = removeJustEquiv a $ isIsolatedFromJust isolated-just-a
 
 module _ (F G : Container ℓ ℓ) where
   open Container F renaming (Shape to S ; Pos to P)
@@ -144,12 +142,3 @@ module _ {Ix : Type ℓ} (F : Ix → Container ℓ ℓ) where
   sum'-rule : Equiv (∂ (∑ F)) (∑ (∂ ∘ F))
   sum'-rule .Equiv.shape = Σ-assoc-≃
   sum'-rule .Equiv.pos ((ix , s) , p , _) = idEquiv $ F ix .Pos s ∖ p
-
-module _ (F : Container ℓ ℓ) where
-  dig : Cart (∂ F) (∂ (∂ F))
-  dig .shape (s , p°) = (s , {! !}) , {! !}
-  dig .pos = {! !}
-
-  derelict : Cart (∂ F) F
-  derelict .shape = fst
-  derelict .pos (s , p°) = {! !}

@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --safe #-}
 module Derivative.Bag where
 
 open import Derivative.Prelude renaming (⊤ to ⊤*)

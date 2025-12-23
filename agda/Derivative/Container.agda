@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --safe #-}
 module Derivative.Container where
 
 open import Derivative.Prelude
@@ -116,7 +116,10 @@ SetCart : (F G : TruncatedContainer 2 2 ℓS ℓP) → Type _
 SetCart = TruncatedCart {n = 2} {k = 2}
 
 isOfHLevelCart : (n : HLevel) → {F G : TruncatedContainer n n ℓS ℓP} → isOfHLevel n (TruncatedCart F G)
-isOfHLevelCart n {F} {G} = {! isOfHLevelΣ !}
+isOfHLevelCart n {F = _ , _ , trunc-pos-F} {G = _ , trunc-shape-G , trunc-pos-G} = isOfHLevelRetractFromIso n Cart-Σ-Iso
+  $ isOfHLevelΣ n
+    (isOfHLevelΠ n λ _ → trunc-shape-G)
+    λ f → isOfHLevelΠ n λ s → isOfHLevel≃ n (trunc-pos-G (f s)) (trunc-pos-F s)
 
 module CartReasoning where
   private
