@@ -233,6 +233,37 @@ If `a₀` is isolated, then it is *h-isolated*, and `Σ-remove a₀ b₀` is an 
   _ = isIsolatedFst→isEquiv-Σ-remove
 ```
 
+## Grafting
+
+**Problem 2.22**:
+For all `a : A °`, *grafting* extends the domain a function `f : A ∖ a₀ → B` to all of `A`, given some `b₀ : B`.
+```agda
+_ : (a° : A °) → (((A ∖° a°) → B) × B) → (A → B)
+_ = graft
+```
+
+**Problem 2.23**:
+This defines an *induction-like* principle for maps out of types `A` pointed by an isolated `a₀ : A °`.
+In particular, it has computation rules,
+```agda
+_ : (a° : A °) (f : (A ∖° a°) → B) {b₀ : B} → graft a° (f , b₀) (a° .fst) ≡ b₀
+_ = graft-β-yes
+
+_ : (a° : A °) (f : (A ∖° a°) → B) {b₀ : B} (a : A ∖° a°) → graft a° (f , b₀) (a .fst) ≡ f a
+_ = graft-β-no
+```
+
+Grafting for dependent functions is defined in:
+```agda
+import Derivative.Isolated.DependentGrafting
+```
+
+??? note
+    We do not use this more general definition as it contains an extra `transport`,
+    which, for non-dependent functions, is a transport over `refl`.
+    Since `transport refl` does not definitionially reduce to the identity function,
+    we would have to manually get rid of it everywhere.
+
 # Derivatives of Containers
 
 ```agda
