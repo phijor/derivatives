@@ -23,6 +23,8 @@ private
 
 # Removing Isolated Points in Univalent Foundations
 
+## Isolated points
+
 ```agda
 open import Derivative.Isolated
 ```
@@ -165,6 +167,35 @@ Discreteness of a type can be characterized by the behaviour of
 ```agda
 _ : Discrete A ≃ ((a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_)))
 _ = Discrete≃isEquiv-Σ-isolate-singl
+```
+
+## Removing points
+```agda
+open import Derivative.Remove
+```
+
+The type `A ∖ a₀` is the subtype of "`A` with `a₀` removed".
+```agda
+_ : (A : Type) → (a₀ : A) → (A ∖ a₀) ≡ (Σ[ a ∈ A ] a₀ ≢ a)
+_ = λ A a → refl
+```
+
+**Problem 2.17**:
+Show that first adding a point to `A`, then removing it gives a type equivalent to `A`.
+```agda
+_ : Maybe A ∖ nothing ≃ A
+_ = removeNothingEquiv
+```
+
+**Problem 2.18**:
+More generally, removing a point from a binary sum is equivalent to
+first removing the point from either side, then taking the sum.
+```agda
+_ : ∀ {a : A} → ((A ∖ a) ⊎ B) ≃ ((A ⊎ B) ∖ (inl a))
+_ = remove-left-equiv
+
+_ :  ∀ {b : B} → (A ⊎ (B ∖ b)) ≃ ((A ⊎ B) ∖ (inr b))
+_ = remove-right-equiv
 ```
 
 # Derivatives of Containers
