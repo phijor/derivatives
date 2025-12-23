@@ -22,7 +22,8 @@ All of our results are formalized in Cubical Agda.
 ## Agda formalization
 
 This repository contains an Agda library demonstrating our results.
-The module [`README`](./agda/README.lagda.md) provides an overwiev of the library, and links it to the claims in the paper.
+The module [`README`](./agda/README.lagda.md) provides an overview of the library, and links it to the claims in the paper.
+Documentation is also available online at <https://phijor.me/derivatives/>.
 
 This library depends on Agda (version 2.8.0) and the [`cubical`](https://github.com/agda/cubical) library (v0.9).
 The recommended way to type-check and investigate this library is via [Nix](https://nixos.org/download/).
