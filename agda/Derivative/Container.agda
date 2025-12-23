@@ -5,6 +5,7 @@ open import Derivative.Prelude
 import      Derivative.Basics.Maybe as Maybe
 
 open import Cubical.Foundations.Transport using (substEquiv)
+open import Cubical.Reflection.RecordEquiv
 open import Cubical.Data.Empty as Empty using (⊥*)
 open import Cubical.Data.Sigma.Base
 open import Cubical.Data.Sum.Base as Sum using (_⊎_)
@@ -73,6 +74,12 @@ record Cart {ℓS ℓT ℓP ℓQ} (F : Container ℓS ℓP) (G : Container ℓT 
 
 open Cart
 
+unquoteDecl Cart-Σ-Iso = declareRecordIsoΣ Cart-Σ-Iso (quote Cart)
+
+Cart-Σ-equiv : ∀ {ℓS ℓT ℓP ℓQ} {F : Container ℓS ℓP} {G : Container ℓT ℓQ}
+  → Cart F G ≃ (Σ[ fₛₕ ∈ (F .Shape → G .Shape) ] ∀ s → G .Pos (fₛₕ s) ≃ F .Pos s)
+Cart-Σ-equiv = isoToEquiv Cart-Σ-Iso
+
 Cart≡ : {F G : Container ℓS ℓP}
   → {f g : Cart F G}
   → (p : f .shape ≡ g .shape)
@@ -80,6 +87,17 @@ Cart≡ : {F G : Container ℓS ℓP}
   → f ≡ g
 Cart≡ p q i .shape = p i
 Cart≡ p q i .pos = q i
+
+Cart≡Equiv : {F G : Container ℓS ℓP}
+  → (f g : Cart F G)
+  → (Σ[ p ∈ f .shape ≡ g .shape ] (PathP (λ i → ∀ s → G .Pos (p i s) ≃ F .Pos s) (f .pos) (g .pos))) ≃ (f ≡ g)
+Cart≡Equiv f g = strictIsoToEquiv iso module Cart≡Equiv where
+  iso : Iso _ _
+  iso .Iso.fun = uncurry Cart≡
+  iso .Iso.inv p .fst = cong shape p
+  iso .Iso.inv p .snd = cong pos p
+  iso .Iso.rightInv _ = refl
+  iso .Iso.leftInv _ = refl
 
 _⋆_ : ∀ {F G H : Container ℓS ℓP} → Cart F G → Cart G H → Cart F H
 (f ⋆ g) .shape = g .shape ∘ f .shape

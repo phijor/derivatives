@@ -12,6 +12,8 @@ open import Derivative.Basics.Sum
 
 open import Cubical.Data.Unit.Properties using (isPropUnit*)
 open import Cubical.Functions.Surjection
+open import Cubical.Categories.Category.Base
+open import Cubical.WildCat.Base
 
 private
   variable
@@ -267,7 +269,77 @@ import Derivative.Isolated.DependentGrafting
 # Derivatives of Containers
 
 ```agda
-import Derivative.Container
+open import Derivative.Container
+```
+
+**Definition 3.1**:
+A container `(S ◁ P)` consists of shapes `S : Type` and over this a family of positions `P : S → Type`.
+```agda
+_ : (ℓ : Level) → Type (ℓ-suc ℓ)
+_ = λ ℓ → Container ℓ ℓ
+
+_ : (S : Type) → (P : S → Type) → Container _ _
+_ = λ S P → (S ◁ P)
+```
+
+??? note "Universe polymorphism"
+    Containers are define for shapes and positions in any universe.
+    For most constructions, we consider containers at a fixed level `ℓ`,
+    that is the type `Container ℓ ℓ`.
+    Some examples consider containers with large shapes (i.e. `Container (ℓ-suc ℓ) ℓ`), but this is mostly for convenience.
+    The shapes of those containers could be resized to a type at level `ℓ`.
+
+<!--
+```agda
+open Container
+open Cart
+private
+  variable
+    F G : Container ℓ-zero ℓ-zero
+```
+-->
+
+**Definition 3.2**:
+A (cartesian) morphism of containers consists of a map of shapes,
+and a family of equivalences of positions.
+```agda
+_ : Cart F G ≃ (Σ[ fₛₕ ∈ (F .Shape → G .Shape) ] ∀ s → G .Pos (fₛₕ s) ≃ F .Pos s)
+_ = Cart-Σ-equiv
+```
+
+**Definition 3.3**:
+A morphism is an equivalence of containers if its shape map is an equivalence of types.
+We bundle this into a record.
+```agda
+_ : (F G : Container _ _) → Type ℓ-zero
+_ = Equiv
+```
+
+Containers and cartesian morphism assemble into a wild category.
+Set-truncated containers form a 1-category.
+```agda
+open import Derivative.Category ℓ-zero
+
+_ : WildCat _ _
+_ = ℂont∞
+
+_ : Category _ _
+_ = ℂont
+```
+
+**Definition 3.4**:
+An `(n, k)`-truncated container has `n`-truncated shapes, and `k`-truncated positions.
+```agda
+_ : (n k : HLevel) → (F : Container _ _) → Type _
+_ = isTruncatedContainer {ℓS = ℓ-zero} {ℓP = ℓ-zero}
+```
+
+**Lemma 3.5**:
+Extensionality for morphisms says that we can compare them by their shape- and position maps.
+```agda
+_ : (f g : Cart F G)
+  → (Σ[ p ∈ f .shape ≡ g .shape ] (PathP (λ i → ∀ s → G .Pos (p i s) ≃ F .Pos s) (f .pos) (g .pos))) ≃ (f ≡ g)
+_ = Cart≡Equiv
 ```
 
 ## Derivatives, Universally
