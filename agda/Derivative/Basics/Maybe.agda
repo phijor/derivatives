@@ -41,6 +41,6 @@ removeNothingEquiv : Maybe A ∖ nothing ≃ A
 removeNothingEquiv .fst = remove-nothing
 removeNothingEquiv .snd = isEquivRemoveNothing
 
-unreplace-isolated : (a₀ : A) → Maybe (A ∖ a₀) → A
-unreplace-isolated a₀ (just (a , _)) = a
-unreplace-isolated a₀ nothing = a₀
+replace : (a₀ : A) → Maybe (A ∖ a₀) → A
+replace a₀ (just (a , _)) = a
+replace a₀ nothing = a₀

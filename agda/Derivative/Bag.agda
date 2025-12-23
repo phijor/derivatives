@@ -68,7 +68,7 @@ isIsolatedFin {X} = Discrete→isIsolated (isFinSet→Discrete (str X))
           .snd → pt-path
         where
           fin-equiv : ⟨ (X -ᶠ x₀) +ᶠ 𝟙 ⟩ ≃ ⟨ X ⟩
-          fin-equiv = invEquiv $ replace-isolated-equiv x₀ (isIsolatedFin {X = X} x₀)
+          fin-equiv = replace-isolated-equiv x₀ (isIsolatedFin {X = X} x₀)
 
           fin-path : (X -ᶠ x₀) +ᶠ 𝟙 ≡ X
           fin-path = equivFun (FinSet≡ _ _) $ ua fin-equiv
@@ -113,7 +113,7 @@ module Universe (P : Type → Type)
   ∂-uBag-shape-Iso .Iso.rightInv X = Σ≡Prop is-prop-P $ ua $ removeNothingEquiv
   ∂-uBag-shape-Iso .Iso.leftInv (X , x°@(x₀ , isolated-x₀)) = ΣPathP (U-path , pt-path) where
     U-equiv : (⟨ X ⟩ ∖ x₀) ⊎ ⊤ ≃ ⟨ X ⟩
-    U-equiv = invEquiv (replace-isolated-equiv x₀ isolated-x₀)
+    U-equiv = replace-isolated-equiv x₀ isolated-x₀
 
     U-path : (X -ᵁ x₀) +1 ≡ X
     U-path = Σ≡Prop is-prop-P $ ua U-equiv

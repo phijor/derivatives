@@ -38,7 +38,7 @@ module _ (G : Container ℓ ℓ) where
   counit-shape ((t , _ , _) , _) = t
 
   counit-pos : ∀ (t : T) (q : (Q t)) → isIsolated q → Q t ≃ ((Q t ∖ q) ⊎ ⊤ ℓ)
-  counit-pos t q isolated-q = replace-isolated'-equiv q isolated-q
+  counit-pos t q isolated-q = unreplace-isolated-equiv q isolated-q
 
   counit : Cart (∂ G ⊗Id) G
   counit .shape = counit-shape
@@ -60,9 +60,9 @@ is-natural-counit F G f = Cart≡ refl $ funExt λ { ((s , p°) , _) → equivEx
         → (let (q₀ , q₀≟_) = ∂[ f ] .shape (s , p°) .snd)
         → (q : G .Pos (f .shape s))
         →
-          equivFun (maybe-equiv (∂[ f ] .pos (s , p°))) (replace-isolated' q₀ q₀≟_ q)
+          equivFun (maybe-equiv (∂[ f ] .pos (s , p°))) (unreplace q₀ q₀≟_ q)
             ≡
-          replace-isolated' p₀ p₀≟_ (equivFun (f .pos s) q)
+          unreplace p₀ p₀≟_ (equivFun (f .pos s) q)
       goal s p°@(p₀ , p₀≟_) q
         using p ← equivFun (f .pos s) q
         with (p₀≟ p)
@@ -101,11 +101,11 @@ zag≡ G = Cart≡ (funExt shape-path) (funExt λ ∂s → equivExt (pos-path �
   opaque
     pos-path : (∂s : ∂ G .Shape) (∂p : ∂ G .Pos ∂s) → remove-nothing (equivFun (∂[ counit G ] .pos (unit-shape (∂ G) ∂s)) ∂p) ≡ ∂p
     pos-path (s , p°@(p₀ , p₀≟_)) (p , neq) =
-      let p′ = replace-isolated' p₀ p₀≟_ p , RemoveRespectEquiv.neq-equiv nothing (replace-isolated'-equiv p₀ p₀≟_) p .fst neq
+      let p′ = unreplace p₀ p₀≟_ p , RemoveRespectEquiv.neq-equiv nothing (unreplace-isolated-equiv p₀ p₀≟_) p .fst neq
           p″ = just (the (G .Pos s ∖ p₀) (p , neq)) , nothing≢just
       in Remove≡ $
         remove-nothing p′ .fst
-          ≡[ i ]⟨ remove-nothing (Remove≡ {x = p′} {y = p″} (replace-isolated'-β-no p₀ p₀≟_ neq) i) .fst ⟩
+          ≡[ i ]⟨ remove-nothing (Remove≡ {x = p′} {y = p″} (replace-isolated-β-no p₀ p₀≟_ neq) i) .fst ⟩
         remove-nothing p″ .fst
           ≡⟨⟩
         p
