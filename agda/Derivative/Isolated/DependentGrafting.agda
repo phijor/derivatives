@@ -1,9 +1,9 @@
 {-# OPTIONS --safe #-}
-module Derivative.Grafting where
+module Derivative.Isolated.DependentGrafting where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable as Dec
-open import Derivative.Isolated
+open import Derivative.Isolated.Base
 open import Derivative.Remove
 
 private
