@@ -31,13 +31,13 @@ module _ (F G : Container ℓ ℓ) where
   open Container G renaming (Shape to T ; Pos to Q)
 
   chain-shape-equiv-left :
-    ((Σ[ (s , p) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖ (p .fst) → T)) × (Σ[ t ∈ T ] Q t °))
+    ((Σ[ (s , p) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖° p → T)) × (Σ[ t ∈ T ] Q t °))
       ≃
     (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p° ∈ (P s) ° ] Q (f (p° .fst)) °))
   chain-shape-equiv-left =
-    ((Σ[ (s , p°) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖ (p° .fst) → T)) × (Σ[ t ∈ T ] Q t °))
+    ((Σ[ (s , p°) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖° p° → T)) × (Σ[ t ∈ T ] Q t °))
       ≃⟨ strictEquiv (λ (((s , p°) , f) , t , q°) → ((s , p°) , (f , t) , q°)) (λ ((s , p°) , (f , t) , q°) → (((s , p°) , f) , t , q°)) ⟩
-    ((Σ[ (s , p°) ∈ (Σ[ s ∈ S ] (P s °)) ] (Σ[ (_ , t) ∈ (P s ∖ (p° .fst) → T) × T ] Q t °)))
+    ((Σ[ (s , p°) ∈ (Σ[ s ∈ S ] (P s °)) ] (Σ[ (_ , t) ∈ (P s ∖° p° → T) × T ] Q t °)))
       ≃⟨ Σ-cong-equiv-snd (λ (s , p°) → invEquiv $ Σ-cong-equiv-fst $ ungraftEquiv p°) ⟩
     ((Σ[ (s , p°) ∈ (Σ[ s ∈ S ] (P s °)) ] (Σ[ f ∈ (P s → T) ] Q (f (p° .fst)) °)))
       ≃⟨ strictEquiv (λ ((s , p°) , (f , q)) → ((s , f) , p° , q)) (λ ((s , f) , p° , q) → ((s , p°) , (f , q))) ⟩
@@ -55,7 +55,7 @@ module _ (F G : Container ℓ ℓ) where
     where
       H : Container _ _
       H .Shape = Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p° ∈ (P s) ° ] Q (f (p° .fst)) °)
-      H .Pos ((s , f) , (p° , q°)) = (Σ[ (p , _) ∈ P s - p° ] Q (f p)) ⊎ (Q (f (p° .fst)) - q°)
+      H .Pos ((s , f) , (p° , q°)) = (Σ[ (p , _) ∈ P s ∖° p° ] Q (f p)) ⊎ (Q (f (p° .fst)) ∖° q°)
 
       η₀ : Equiv (((∂ F) [ G ]) ⊗ ∂ G) H
       η₀ = Equiv-inv $ Equiv-fst $ invEquiv chain-shape-equiv-left

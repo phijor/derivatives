@@ -61,18 +61,18 @@ open Container
 
     pos₀ : (s : S) (p° : P ₀ s °) (f₁ : P ₁ s → W S (P ₁)) (f₀ : 𝟘* → Shape Y)
       →
-        (P ₀ s - p°) ⊎ (Σ[ p ∈ P ₁ s ] μP (f₁ p))
+        (P ₀ s ∖° p°) ⊎ (Σ[ p ∈ P ₁ s ] μP (f₁ p))
           ≃
-        ((P ₀ s - p°) ⊎ (Σ[ p ∈ P ₁ s ] μP (f₁ p))) ⊎ (Σ[ x ∈ 𝟘* ] Pos Y _ (f₀ x))
+        ((P ₀ s ∖° p°) ⊎ (Σ[ p ∈ P ₁ s ] μP (f₁ p))) ⊎ (Σ[ x ∈ 𝟘* ] Pos Y _ (f₀ x))
     pos₀ _ _ _ _ = ⊎-empty-right (λ ())
 
-    pos₁ : (s : S) (p° : P ₁ s °) (f₁ : (P ₁ s - p°) → W S (P ₁)) (f₀ : 𝟘* ⊎ 𝟙 → Shape Y)
-      → (P ₀ s ⊎ (Σ[ p ∈ (P ₁ s) - p° ] μP (f₁ p))) ⊎ (Pos Y _ (f₀ (inr •)))
+    pos₁ : (s : S) (p° : P ₁ s °) (f₁ : (P ₁ s ∖° p°) → W S (P ₁)) (f₀ : 𝟘* ⊎ 𝟙 → Shape Y)
+      → (P ₀ s ⊎ (Σ[ p ∈ (P ₁ s) ∖° p° ] μP (f₁ p))) ⊎ (Pos Y _ (f₀ (inr •)))
           ≃
-        ((P ₀ s ⊎ (Σ[ p ∈ (P ₁ s) - p° ] μP (f₁ p))) ⊎ 𝟘) ⊎ (Σ[ i ∈ 𝟘* ⊎ 𝟙 ] Pos Y _ (f₀ i))
+        ((P ₀ s ⊎ (Σ[ p ∈ (P ₁ s) ∖° p° ] μP (f₁ p))) ⊎ 𝟘) ⊎ (Σ[ i ∈ 𝟘* ⊎ 𝟙 ] Pos Y _ (f₀ i))
     pos₁ s p° f₁ f₀ =
       let X = P ₀ s
-          W = (Σ[ p ∈ (P ₁ s) - p° ] μP (f₁ p))
+          W = (Σ[ p ∈ (P ₁ s) ∖° p° ] μP (f₁ p))
           Z : 𝟘* ⊎ 𝟙 → Type _
           Z i = Pos Y _ (f₀ i)
       in

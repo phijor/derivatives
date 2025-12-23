@@ -42,13 +42,13 @@ private
     (refl′ b)
 
 graft : (a₀ : A °)
-  → (f : (a : A - a₀) → B (a .fst))
+  → (f : (a : A ∖° a₀) → B (a .fst))
   → (b₀ : B (a₀ .fst))
   → (a : A) → B a
 graft {B} (a₀ , a₀≟_) f b₀ a = pre-graft a₀ f b₀ a (a₀≟ a)
 
 graftᵝ : (a₀ : A °)
-  → (f : (a : A - a₀) → B (a .fst))
+  → (f : (a : A ∖° a₀) → B (a .fst))
   → (b₀ : B (a₀ .fst))
   → ∀ a (b : B a)
   → (yes* : (a₀≡a : a₀ .fst ≡ a) → PathP (λ i → B (a₀≡a i)) b₀ b)
@@ -56,7 +56,7 @@ graftᵝ : (a₀ : A °)
   → graft a₀ f b₀ a ≡ b
 graftᵝ (a₀ , a₀≟_) f b₀ a b yes* no* = pre-graftᵝ a₀ f b₀ a b yes* no* (a₀≟ a)
 
-graft-Iso : (a₀ : A °) → Iso (((a : A - a₀) → B (a .fst)) × B (a₀ .fst)) ((a : A) → B a)
+graft-Iso : (a₀ : A °) → Iso (((a : A ∖° a₀) → B (a .fst)) × B (a₀ .fst)) ((a : A) → B a)
 graft-Iso a₀ .Iso.fun (f , b) = graft a₀ f b
 graft-Iso a₀ .Iso.inv f .fst = f ∘ fst
 graft-Iso a₀ .Iso.inv f .snd = f (a₀ .fst)
@@ -64,7 +64,7 @@ graft-Iso a₀ .Iso.rightInv f = funExt λ a → graftᵝ a₀ (f ∘ fst) (f (a
   (λ a₀≡a → cong f a₀≡a)
   (λ _ → refl′ (f a))
 graft-Iso {A} {B} a₀ .Iso.leftInv (f , b) = ΣPathP (funExt lemma₁ , lemma₂) where
-  lemma₁ : (a : A - a₀) → graft a₀ f b (a .fst) ≡ f a
+  lemma₁ : (a : A ∖° a₀) → graft a₀ f b (a .fst) ≡ f a
   lemma₁ (a , a₀≢a) = graftᵝ a₀ f b a (f (a , a₀≢a))
     (λ a₀≡a → ex-falso $ a₀≢a a₀≡a)
     (λ a₀≢a' → cong (λ - → f (a , -)) (isProp≢ a₀≢a' a₀≢a))
@@ -75,5 +75,5 @@ graft-Iso {A} {B} a₀ .Iso.leftInv (f , b) = ΣPathP (funExt lemma₁ , lemma�
     (λ a₀≢a₀ → ex-falso $ a₀≢a₀ refl)
 
 graft-equiv : (a₀ : A °)
-  → (((a : A - a₀) → B (a .fst)) × B (a₀ .fst)) ≃ ((a : A) → B a)
+  → (((a : A ∖° a₀) → B (a .fst)) × B (a₀ .fst)) ≃ ((a : A) → B a)
 graft-equiv = isoToEquiv ∘ graft-Iso

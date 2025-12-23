@@ -165,7 +165,7 @@ module Generalized (G : Container ℓ ℓ) where
   open Container G renaming (Shape to T ; Pos to Q)
 
   ∂* : Container ℓ ℓ → Container ℓ ℓ
-  ∂* (S ◁ P) = (T → Σ[ s ∈ S ] (P s °)) ◁ λ f → (t : T) → P (f t .fst) - (f t .snd)
+  ∂* (S ◁ P) = (T → Σ[ s ∈ S ] (P s °)) ◁ λ f → (t : T) → P (f t .fst) ∖° (f t .snd)
 
   module _ (F : Container ℓ ℓ) where
     unit' : Cart F (∂* (F ⊗ G))

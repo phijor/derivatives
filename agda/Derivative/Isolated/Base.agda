@@ -55,8 +55,8 @@ A ° = Isolated A
 forget-isolated : A ° → A
 forget-isolated = fst
 
-_-_ : (A : Type ℓ) (a : A °) → Type ℓ
-A - a = A ∖ (a .fst)
+_∖°_ : (A : Type ℓ) (a : A °) → Type ℓ
+A ∖° a = A ∖ (a .fst)
 
 isIsolated→K : (a : A °) (p : a .fst ≡ a .fst) → p ≡ refl
 isIsolated→K (a , is-isolated-a) p = isIsolated→isPropPath a is-isolated-a a p refl

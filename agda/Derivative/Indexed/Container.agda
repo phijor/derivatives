@@ -245,7 +245,7 @@ module _ where
   infixr 0 _⊸≃⟨_⟩_
   infix 1 _⊸∎
 
-_⟨_⟩[_] : (F : Container ℓ Ix) (i : Ix °) (G : Container ℓ (Ix - i)) → Container ℓ (Ix - i)
+_⟨_⟩[_] : (F : Container ℓ Ix) (i : Ix °) (G : Container ℓ (Ix ∖° i)) → Container ℓ (Ix ∖° i)
 _⟨_⟩[_] {Ix} F (i , i≟_) G = shape ◁ pos module ⟨-⟩[-] where
   shape : Type _
   shape = Σ[ s ∈ F .Shape ] (F .Pos i s → G .Shape)
@@ -268,7 +268,7 @@ F [ G ] = shape ◁ pos module [-] where
 
 private
   sanity : (F : Container ℓ (Maybe Ix)) (G : Container ℓ Ix)
-    → ∀ (ix : Maybe Ix - nothing°) s → (F [ G ]) .Pos (remove-nothing ix) s ≃ (F ⟨ nothing° ⟩[ subst (Container ℓ) (sym $ ua removeNothingEquiv) G ]) .Pos ix s
+    → ∀ (ix : Maybe Ix ∖° nothing°) s → (F [ G ]) .Pos (remove-nothing ix) s ≃ (F ⟨ nothing° ⟩[ subst (Container ℓ) (sym $ ua removeNothingEquiv) G ]) .Pos ix s
   sanity F G (just ix , _) (s , f) = ⊎-right-≃ (Σ-cong-equiv-snd λ p → subst2Equiv (G .Pos) (sym (transportRefl ix)) (sym (transportRefl (f p))))
   sanity F G (nothing , ₁≢₁) = ex-falso $ ₁≢₁ refl
 
