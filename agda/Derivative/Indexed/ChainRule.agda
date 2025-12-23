@@ -56,7 +56,7 @@ binary-chain-rule F G =
     ((Σ[ s ∈ S ] P ₀ s ° × (P ₁ s → T)) ⊎ (Σ[ s ∈ S ] Σ[ (p , _) ∈ P ₁ s ° ] Σ[ (_ , t) ∈ (P ₁ s ∖ p → T) × T ] (Q t °)))
       ≃⟨ invEquiv Σ-⊎-snd-≃ ⟩
     Σ[ s ∈ S ] (P ₀ s ° × (P ₁ s → T)) ⊎ (Σ[ (p , _) ∈ P ₁ s ° ] Σ[ (_ , t) ∈ (P ₁ s ∖ p → T) × T ] (Q t °))
-      ≃⟨ Σ-cong-equiv-snd (λ s → ⊎-right-≃ $ Σ-cong-equiv-snd λ p° → invEquiv $ Σ-cong-equiv-fst $ unstitchEquiv p°) ⟩
+      ≃⟨ Σ-cong-equiv-snd (λ s → ⊎-right-≃ $ Σ-cong-equiv-snd λ p° → invEquiv $ Σ-cong-equiv-fst $ ungraftEquiv p°) ⟩
     Σ[ s ∈ S ] (P ₀ s ° × (P ₁ s → T)) ⊎ (Σ[ (p , _) ∈ P ₁ s ° ] Σ[ f ∈ (P ₁ s → T) ] (Q (f p) °))
       ≃⟨ Σ-cong-equiv-snd (λ s → ⊎-equiv Σ-swap-≃ Σ-swap-fst-≃) ⟩
     Σ[ s ∈ S ] ((P ₁ s → T) × P ₀ s °) ⊎ (Σ[ f ∈ (P ₁ s → T) ] Σ[ (p , _) ∈ P ₁ s ° ] (Q (f p) °))

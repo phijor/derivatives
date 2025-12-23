@@ -38,7 +38,7 @@ module _ (F G : Container ℓ ℓ) where
     ((Σ[ (s , p°) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖ (p° .fst) → T)) × (Σ[ t ∈ T ] Q t °))
       ≃⟨ strictEquiv (λ (((s , p°) , f) , t , q°) → ((s , p°) , (f , t) , q°)) (λ ((s , p°) , (f , t) , q°) → (((s , p°) , f) , t , q°)) ⟩
     ((Σ[ (s , p°) ∈ (Σ[ s ∈ S ] (P s °)) ] (Σ[ (_ , t) ∈ (P s ∖ (p° .fst) → T) × T ] Q t °)))
-      ≃⟨ Σ-cong-equiv-snd (λ (s , p°) → invEquiv $ Σ-cong-equiv-fst $ unstitchEquiv p°) ⟩
+      ≃⟨ Σ-cong-equiv-snd (λ (s , p°) → invEquiv $ Σ-cong-equiv-fst $ ungraftEquiv p°) ⟩
     ((Σ[ (s , p°) ∈ (Σ[ s ∈ S ] (P s °)) ] (Σ[ f ∈ (P s → T) ] Q (f (p° .fst)) °)))
       ≃⟨ strictEquiv (λ ((s , p°) , (f , q)) → ((s , f) , p° , q)) (λ ((s , f) , p° , q) → ((s , p°) , (f , q))) ⟩
     (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p° ∈ P s ° ] Q (f (p° .fst)) °))
@@ -55,28 +55,31 @@ module _ (F G : Container ℓ ℓ) where
 
   chain-pos : (s : S) (p° : P s °) (f : P s ∖ p° .fst → T) (t : T) (q° : Q t °)
     →
-      ((Σ[ p ∈ P s ] Q (stitch p° (f , t) p)) ∖ (p° .fst , subst Q (sym (stitch-β p° f)) (q° .fst)))
+      ((Σ[ p ∈ P s ] Q (graft p° (f , t) p)) ∖ (p° .fst , subst Q (sym (graft-β-yes p° f)) (q° .fst)))
         ≃
       ((Σ[ p ∈ P s ∖ p° .fst ] Q (f p)) ⊎ (Q t ∖ q° .fst))
   chain-pos s p°@(p₀ , p₀≟_) f t q°@(q₀ , q₀≟_) =
-      ((Σ[ p ∈ P s ] Q (f' p)) ∖ (p₀ , subst Q (sym (stitch-β p° f)) q₀))
+      ((Σ[ p ∈ P s ] Q (f' p)) ∖ (p₀ , subst Q (sym graft-p₀-β) q₀))
         ≃⟨ invEquiv (isIsolatedFst→Σ-remove-equiv p₀≟_) ⟩
-      (Σ[ (p , _) ∈ P s ∖ p₀ ] Q (f' p)) ⊎ (Q (f' p₀) ∖ subst Q (sym $ stitch-β (p₀ , p₀≟_) f) q₀)
+      (Σ[ (p , _) ∈ P s ∖ p₀ ] Q (f' p)) ⊎ (Q (f' p₀) ∖ subst Q (sym graft-p₀-β) q₀)
         ≃⟨ Sum.⊎-equiv (Σ-cong-equiv-snd subst-I) (Σ-cong-equiv subst-II neq-III) ⟩
       ((Σ[ (p , h) ∈ P s ∖ p₀ ] Q (f (p , h))) ⊎ (Q t ∖ q₀))
         ≃∎
     where
       f' : P s → T
-      f' = stitch p° (f , t)
+      f' = graft p° (f , t)
+
+      graft-p₀-β : graft p° (f , t) p₀ ≡ t
+      graft-p₀-β = graft-β-yes p° f {t}
 
       subst-I : ((p , h) : P s ∖ p₀) → Q (f' p) ≃ Q (f (p , h))
-      subst-I p' = substEquiv Q (stitch-β' p° f p')
+      subst-I p' = substEquiv Q (graft-β-no p° f p')
     
       subst-II : Q (f' p₀) ≃ Q t
-      subst-II = substEquiv Q (stitch-β p° f)
+      subst-II = substEquiv Q graft-p₀-β
 
-      neq-III : (q : Q (f' p₀)) → (subst⁻ Q (stitch-β p° f) q₀ ≢ q) ≃ (q₀ ≢ subst Q (stitch-β p° f) q)
-      neq-III q = neqCongEquiv $ substAdjointEquiv Q (sym $ stitch-β p° f) {x′ = q₀} {y′ = q}
+      neq-III : (q : Q (f' p₀)) → (subst⁻ Q graft-p₀-β q₀ ≢ q) ≃ (q₀ ≢ subst Q graft-p₀-β q)
+      neq-III q = neqCongEquiv $ substAdjointEquiv Q (sym graft-p₀-β) {x′ = q₀} {y′ = q}
     
   chain-rule' : Cart (((∂ F) [ G ]) ⊗ ∂ G) (∂ (F [ G ]))
   chain-rule' .Cart.shape = chain-map

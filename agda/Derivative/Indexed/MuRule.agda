@@ -176,16 +176,16 @@ module _ (F : Container _ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binary-
               μᵖ-path : PathP (λ i → Pos (μ F) • (μˢ-path i)) μᵖ wᴰ
               μᵖ-path = cong (fst ∘ snd) (fib-rec .snd)
 
-              μˢ-adjust : μˢ ≡ stitch p₁° (f ∘ fst , μˢ) p₁
-              μˢ-adjust = sym $ stitch-β p₁° (f ∘ fst)
+              μˢ-adjust : μˢ ≡ graft p₁° (f ∘ fst , μˢ) p₁
+              μˢ-adjust = sym $ graft-β-yes p₁° (f ∘ fst)
 
               μˢ-adjust-filler : PathP (λ i → Pos (μ F) • (μˢ-adjust i)) μᵖ (subst (Pos (μ F) •) μˢ-adjust μᵖ)
               μˢ-adjust-filler = subst-filler (Pos (μ F) •) μˢ-adjust μᵖ
 
               -- This uses the second component (a path) of the recursive call:
               opaque
-                lemma₁ : stitch p₁° (f ∘ fst , μˢ) ≡ f
-                lemma₁ = stitch-eval p₁° f μˢ μˢ-path
+                lemma₁ : graft p₁° (f ∘ fst , μˢ) ≡ f
+                lemma₁ = graft-eval p₁° f μˢ μˢ-path
  
                 ---                  μᵖ-path
                 ---           μˢ -------------> f p₁
@@ -197,7 +197,7 @@ module _ (F : Container _ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binary-
                 ---            ' -------------> f p₁
                 ---               lemma₁ ≡$ p₁
                 lemma₁-filler : Square (sym μˢ-adjust) (refl′ (f p₁)) (lemma₁ ≡$ p₁) μˢ-path
-                lemma₁-filler = stitch-eval-yes-filler p₁° f μˢ μˢ-path
+                lemma₁-filler = graft-eval-yes-filler p₁° f μˢ μˢ-path
 
               --- q ≝ μˢ-path
               ---               lemma₁ ≡$ p₁
