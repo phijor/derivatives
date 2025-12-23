@@ -44,47 +44,6 @@ module _ (F G : Container ℓ ℓ) where
     (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p° ∈ P s ° ] Q (f (p° .fst)) °))
       ≃∎
 
-  chain-map :
-    (Σ[ (s , p) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖ (p .fst) → T)) × (Σ[ t ∈ T ] Q t °)
-      →
-    (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p ∈ (P s) ] Q (f p)) °)
-  chain-map =
-    _ →≃⟨ chain-shape-equiv-left ⟩
-    _ →⟨ Σ-map-snd (λ (s , f) → Σ-isolate (P s) (Q ∘ f)) ⟩
-    _ →∎
-
-  chain-pos : (s : S) (p° : P s °) (f : P s ∖ p° .fst → T) (t : T) (q° : Q t °)
-    →
-      ((Σ[ p ∈ P s ] Q (graft p° (f , t) p)) ∖ (p° .fst , subst Q (sym (graft-β-yes p° f)) (q° .fst)))
-        ≃
-      ((Σ[ p ∈ P s ∖ p° .fst ] Q (f p)) ⊎ (Q t ∖ q° .fst))
-  chain-pos s p°@(p₀ , p₀≟_) f t q°@(q₀ , q₀≟_) =
-      ((Σ[ p ∈ P s ] Q (f' p)) ∖ (p₀ , subst Q (sym graft-p₀-β) q₀))
-        ≃⟨ invEquiv (isIsolatedFst→Σ-remove-equiv p₀≟_) ⟩
-      (Σ[ (p , _) ∈ P s ∖ p₀ ] Q (f' p)) ⊎ (Q (f' p₀) ∖ subst Q (sym graft-p₀-β) q₀)
-        ≃⟨ Sum.⊎-equiv (Σ-cong-equiv-snd subst-I) (Σ-cong-equiv subst-II neq-III) ⟩
-      ((Σ[ (p , h) ∈ P s ∖ p₀ ] Q (f (p , h))) ⊎ (Q t ∖ q₀))
-        ≃∎
-    where
-      f' : P s → T
-      f' = graft p° (f , t)
-
-      graft-p₀-β : graft p° (f , t) p₀ ≡ t
-      graft-p₀-β = graft-β-yes p° f {t}
-
-      subst-I : ((p , h) : P s ∖ p₀) → Q (f' p) ≃ Q (f (p , h))
-      subst-I p' = substEquiv Q (graft-β-no p° f p')
-    
-      subst-II : Q (f' p₀) ≃ Q t
-      subst-II = substEquiv Q graft-p₀-β
-
-      neq-III : (q : Q (f' p₀)) → (subst⁻ Q graft-p₀-β q₀ ≢ q) ≃ (q₀ ≢ subst Q graft-p₀-β q)
-      neq-III q = neqCongEquiv $ substAdjointEquiv Q (sym graft-p₀-β) {x′ = q₀} {y′ = q}
-    
-  chain-rule' : Cart (((∂ F) [ G ]) ⊗ ∂ G) (∂ (F [ G ]))
-  chain-rule' .Cart.shape = chain-map
-  chain-rule' .pos (((s , p°) , f) , t , q°) = chain-pos s p° f t q°
-
   chain-rule : Cart (((∂ F) [ G ]) ⊗ ∂ G) (∂ (F [ G ]))
   chain-rule =
     (((∂ F) [ G ]) ⊗ ∂ G)
@@ -104,6 +63,12 @@ module _ (F G : Container ℓ ℓ) where
       η₁ : Cart H (∂ (F [ G ]))
       η₁ .shape = Σ-map-snd λ (s , f) → Σ-isolate (P s) (Q ∘ f)
       η₁ .pos ((s , f) , (p° , q°)) = invEquiv (isIsolatedFst→Σ-remove-equiv (p° .snd))
+
+  chain-map :
+    (Σ[ (s , p) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖ (p .fst) → T)) × (Σ[ t ∈ T ] Q t °)
+      →
+    (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p ∈ (P s) ] Q (f p)) °)
+  chain-map = chain-rule .shape
 
 DiscreteContainer : (ℓS ℓP : Level) → Type _
 DiscreteContainer ℓS ℓP = Σ[ F ∈ Container ℓS ℓP ] ∀ s → Discrete (F .Pos s)
