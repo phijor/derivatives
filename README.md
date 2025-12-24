@@ -55,4 +55,4 @@ nix-shell> agda --build-library
 ## License
 
 All Agda code in this repository is licensed under the terms of the _MIT license_, see [`LICENSE`](./LICENSE).
-The contents of the `doc/` directory are licensed under the terms of the _CC BY 4.0 license_, see [`doc/LICENSE`](./doc/LICENSE).
+The contents of the `paper/` directory are licensed under the terms of the _CC BY 4.0 license_, see [`paper/LICENSE`](./paper/LICENSE).
