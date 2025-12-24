@@ -51,6 +51,11 @@ module _ {B′ : A′ → Type ℓ} where
       shuffle .Iso.rightInv _ = refl
       shuffle .Iso.leftInv _ = refl
 
+  isEquiv-Σ-map-fst : {f : A → A′} → isEquiv f → isEquiv (Σ-map-fst f)
+  isEquiv-Σ-map-fst {f} is-equiv-f .equiv-proof (a′ , b′) = isOfHLevelRetractFromIso 0
+    (Σ-map-fst-fiber-iso f)
+    (is-equiv-f .equiv-proof a′)
+
 module _ {ℓB ℓB′} {A : Type ℓ} {B : A → Type ℓB} {B′ : A → Type ℓB′} where
   Σ-map-snd : (f : ∀ a → B a → B′ a) → (Σ A B) → (Σ A B′)
   Σ-map-snd f (a , b) = (a , f a b)
@@ -88,6 +93,18 @@ module _ {ℓB ℓB′} {A : Type ℓ} {B : A → Type ℓB} {B′ : A → Type 
   → (f : ∀ a → B a → B′ (e a))
   → Σ A B → Σ A′ B′
 Σ-map e f = Σ-map-snd f ⨟ Σ-map-fst e
+
+isEquiv-Σ-map : ∀ {ℓB ℓB′} {B : A → Type ℓB} {B′ : A′ → Type ℓB′}
+  → {e : A → A′}
+  → {f : ∀ a → B a → B′ (e a)}
+  → isEquiv e → (∀ a → isEquiv (f a))
+  → isEquiv (Σ-map {B′ = B′} e f)
+isEquiv-Σ-map {e} {f} is-equiv-e is-equiv-f =
+  isEquiv-∘
+    {f = Σ-map-snd f}
+    {g = Σ-map-fst e}
+    (isEquiv-Σ-map-fst is-equiv-e)
+    (isEquiv-Σ-map-snd is-equiv-f)
 
 isOfHLevelSucΣSndProp : ∀ {ℓB} {B : A → Type ℓB} (n : HLevel)
   → isOfHLevel (suc n) A

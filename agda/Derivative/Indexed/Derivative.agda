@@ -43,16 +43,19 @@ private
   pos j = pos-dec j (i≟ j)
 
 isEquiv-∂-map : (i : Ix °) {F G : Container ℓ Ix}
-  → {f : F ⊸ G}
-  → isContainerEquiv f
-  → isContainerEquiv (∂-map i f)
-isEquiv-∂-map = {! !}
+  → {φ : F ⊸ G}
+  → isContainerEquiv φ
+  → isContainerEquiv (∂-map i φ)
+isEquiv-∂-map (i , isolated-i) {φ} is-equiv-φ = isEquiv-Σ-map
+  is-equiv-φ
+  λ s → equivIsEquiv (invEquiv (IsolatedSubstEquiv (φ.pos i s)))
+    where open ∂-map i isolated-i φ using (module φ)
 
 ∂-map-equiv : (i : Ix °) {F G : Container ℓ Ix}
   → (e : F ⧟ G)
   → ∂ i F ⧟ ∂ i G
 ∂-map-equiv i f =
-  [ shape , isEquiv-∂-map i {f = Equiv.as-⊸ f} (equivIsContainerEquiv f)
+  [ shape , isEquiv-∂-map i {φ = Equiv.as-⊸ f} (equivIsContainerEquiv f)
     ◁≃ pos
   ]
   where
