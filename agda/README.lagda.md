@@ -144,7 +144,7 @@ The fibers of this map are propositions, hence it is an embedding.
   _ = Σ-isolate-fiber-equiv A B
 
   _ : isEmbedding (Σ-isolate A B)
-  _ = isEmbedding-Σ-Isolate A B
+  _ = isEmbedding-Σ-isolate A B
 ```
 
 **Lemma 2.13**:

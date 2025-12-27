@@ -150,13 +150,13 @@ isProp-fiber-Σ-isolate : ∀ (A : Type ℓ) (B : A → Type ℓ)
 isProp-fiber-Σ-isolate A B y = isOfHLevelRespectEquiv 1 (invEquiv $ Σ-isolate-fiber-equiv A B _ _ _)
   $ isProp× (isPropIsIsolated _) (isPropIsIsolated _)
 
-isEmbedding-Σ-Isolate : ∀ (A : Type ℓ) (B : A → Type ℓ) → isEmbedding (Σ-isolate A B)
-isEmbedding-Σ-Isolate A B = hasPropFibers→isEmbedding $ isProp-fiber-Σ-isolate A B
+isEmbedding-Σ-isolate : ∀ (A : Type ℓ) (B : A → Type ℓ) → isEmbedding (Σ-isolate A B)
+isEmbedding-Σ-isolate A B = hasPropFibers→isEmbedding $ isProp-fiber-Σ-isolate A B
 
 Σ-isolate-embedding : ∀ (A : Type ℓ) (B : A → Type ℓ)
   → (Σ[ a° ∈ A ° ] (B (a° .fst)) °) ↪ ((Σ[ a ∈ A ] B a) °)
 Σ-isolate-embedding A B .fst = Σ-isolate A B
-Σ-isolate-embedding A B .snd = isEmbedding-Σ-Isolate A B
+Σ-isolate-embedding A B .snd = isEmbedding-Σ-isolate A B
 
 isEquiv-Σ-isolate≃isSurjection-Σ-isolate : (A : Type ℓ) (B : A → Type ℓ) → isEquiv (Σ-isolate A B) ≃ isSurjection (Σ-isolate A B)
 isEquiv-Σ-isolate≃isSurjection-Σ-isolate A B =
