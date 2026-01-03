@@ -12,17 +12,25 @@ open import Derivative.Basics.Sum
 
 open import Cubical.Data.Nat.Base
 open import Cubical.Data.Unit.Properties using (isPropUnit*)
+open import Cubical.Data.Empty.Base using (⊥*)
 open import Cubical.Functions.Surjection
 open import Cubical.Categories.Category.Base
 open import Cubical.Categories.Functor.Base
+open import Cubical.Categories.Adjoint
 open import Cubical.WildCat.Base
 open import Cubical.WildCat.Functor hiding (_$_)
+
+open UnitCounit
 
 private
   variable
     ℓ : Level
     A B : Type ℓ
     a : A
+    Ix : Type
+
+  𝟙 = Unit*
+  𝟘 = ⊥*
 ```
 -->
 
@@ -99,7 +107,7 @@ _ = IsolatedSumEquiv
 
 The type `A ⊎ 𝟙` is used so often that we abbreviate it as `Maybe A`:
 ```agda
-_ : (A : Type) → Maybe A ≡ (A ⊎ ⊤ _)
+_ : (A : Type) → Maybe A ≡ (A ⊎ 𝟙)
 _ = λ A → refl
 ```
 
@@ -385,14 +393,88 @@ _ : Functor ℂont ℂont
 _ = ∂₀
 ```
 
+**Problem 3.10**:
+Define a wild adjunction `_⊗ Id ⊣ ∂`.
+This consists of two families of morphisms `unit` and `counit`,
 ```agda
-import Derivative.Adjunction
+open import Derivative.Adjunction
+
+_ : Cart F (∂ (F ⊗Id))
+_ = unit _
+
+_ : Cart (∂ G ⊗Id) G
+_ = counit _
+```
+natural in `F` and `G`, respectively,
+```agda
+_ = is-natural-unit
+_ = is-natural-counit
+```
+and zig-zag fillers
+```agda
+_ : [ unit F ]⊗Id ⋆ counit (F ⊗Id) ≡ id (F ⊗Id)
+_ = zig≡ _
+
+_ : unit (∂ G) ⋆ ∂[ counit G ] ≡ id (∂ G)
+_ = zag≡ _
+```
+
+**Theorem 3.11**:
+In the 1-category of set-truncated containers, `_⊗ Id ⊣ ∂`.
+```agda
+_ : -⊗Id ⊣ ∂₀
+_ = -⊗Id⊣∂
 ```
 
 ### Basic Laws of Derivatives
 
 ```agda
-import Derivative.Properties
+open import Derivative.Properties
+```
+
+**Proposition 3.13**:
+Derivative of containers whose positions are propositions.
+```agda
+_ : (S : Type) {P : S → Type}
+  → (∀ s → isProp (P s))
+  → Equiv (∂ (S ◁ P)) (Σ S P ◁ const 𝟘)
+_ = ∂-prop-trunc
+```
+
+**Proposition 3.14**:
+The sum- and product rules.
+```agda
+_ : Equiv (∂ (F ⊕ G)) (∂ F ⊕ ∂ G)
+_ = sum-rule _ _
+
+_ : Equiv (∂ (F ⊗ G)) ((∂ F ⊗ G) ⊕ (F ⊗ ∂ G))
+_ = prod-rule _ _
+```
+
+**Proposition 3.15**:
+The `Bag` container is a fixed point of `∂`.
+```agda
+open import Derivative.Bag
+
+_ : Equiv (∂ Bag) Bag
+_ = ∂-Bag-equiv
+```
+
+**Proposition 3.16**:
+Any predicate closed under addition and removal of single points induces a fixed point of `∂`.
+```agda
+module _
+  (P : Type → Type)
+  (is-prop-P : ∀ A → isProp (P A))
+  (is-P-+1 : ∀ {A : Type} → P A → P (A ⊎ 𝟙))
+  (is-P-∖ : ∀ {A : Type} → P A → ∀ a → P (A ∖ a))
+  where
+
+  open Derivative.Bag.Universe P is-prop-P is-P-+1 is-P-∖
+    renaming (uBag to Bagᴾ)
+
+  _ : Equiv (∂ Bagᴾ) Bagᴾ
+  _ = ∂-uBag
 ```
 
 ## The Chain Rule

@@ -3,6 +3,7 @@ module Derivative.ChainRule where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable as Dec
+open import Derivative.Basics.Embedding
 open import Derivative.Basics.Sigma
 open import Derivative.Basics.Sum as Sum using (_⊎_ ; inl ; inr)
 
@@ -52,7 +53,7 @@ module _ (F G : Container ℓ ℓ) where
       ⊸⟨ η₁ ⟩
     (∂ (F [ G ]))
       ⊸∎
-    where
+    module chain-rule where
       H : Container _ _
       H .Shape = Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p° ∈ (P s) ° ] Q (f (p° .fst)) °)
       H .Pos ((s , f) , (p° , q°)) = (Σ[ (p , _) ∈ P s ∖° p° ] Q (f p)) ⊎ (Q (f (p° .fst)) ∖° q°)
@@ -64,22 +65,29 @@ module _ (F G : Container ℓ ℓ) where
       η₁ .shape = Σ-map-snd λ (s , f) → Σ-isolate (P s) (Q ∘ f)
       η₁ .pos ((s , f) , (p° , q°)) = invEquiv (isIsolatedFst→Σ-remove-equiv (p° .snd))
 
-  chain-map :
+  chain-shape-map :
     (Σ[ (s , p) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖ (p .fst) → T)) × (Σ[ t ∈ T ] Q t °)
       →
     (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p ∈ (P s) ] Q (f p)) °)
-  chain-map = chain-rule .shape
+  chain-shape-map = chain-rule .shape
+
+  isEmbedding-chain-shape-map : isEmbedding chain-shape-map
+  isEmbedding-chain-shape-map = isEmbedding-∘
+    {f = Σ-map-snd λ (s , f) → Σ-isolate (P s) (Q ∘ f)}
+    {h = equivFun $ chain-rule.η₀ .Equiv.shape}
+    (isEmbedding-Σ-map-snd λ (s , f) → isEmbedding-Σ-isolate (P s) (Q ∘ f))
+    (isEquiv→isEmbedding $ equivIsEquiv $ chain-rule.η₀ .Equiv.shape)
 
 DiscreteContainer : (ℓS ℓP : Level) → Type _
 DiscreteContainer ℓS ℓP = Σ[ F ∈ Container ℓS ℓP ] ∀ s → Discrete (F .Pos s)
 
 hasChainEquiv : (ℓ : Level) → Type (ℓ-suc ℓ)
-hasChainEquiv ℓ = (F G : Container ℓ ℓ) → isEquiv (chain-map F G)
+hasChainEquiv ℓ = (F G : Container ℓ ℓ) → isEquiv (chain-shape-map F G)
 
 isPropHasChainEquiv : isProp (hasChainEquiv ℓ)
 isPropHasChainEquiv = isPropΠ2 λ F G → isPropIsEquiv _
 
-DiscreteContainer→isEquivChainMap : (F G : DiscreteContainer ℓ ℓ) → isEquiv (chain-map (F .fst) (G .fst))
+DiscreteContainer→isEquivChainMap : (F G : DiscreteContainer ℓ ℓ) → isEquiv (chain-shape-map (F .fst) (G .fst))
 DiscreteContainer→isEquivChainMap (F , disc-F) (G , disc-G) = equivIsEquiv chain-equiv where
   open Container F renaming (Shape to S ; Pos to P)
   open Container G renaming (Shape to T ; Pos to Q)
@@ -94,7 +102,7 @@ DiscreteContainer→isEquivChainMap (F , disc-F) (G , disc-G) = equivIsEquiv cha
     _ ≃∎
 
 isEquivChainMap→AllTypesDiscrete : hasChainEquiv ℓ → (A : Type ℓ) → Discrete A
-isEquivChainMap→AllTypesDiscrete {ℓ} is-equiv-chain-map A = discrete-A where
+isEquivChainMap→AllTypesDiscrete {ℓ} is-equiv-chain-shape-map A = discrete-A where
   lemma : (F G : Container ℓ ℓ) → (s : F .Shape) (f : F .Pos s → G .Shape) → isEquiv (Σ-isolate (F .Pos s) (G .Pos ∘ f))
   lemma F G = is-equiv-Σ-isolate where
     open Container F renaming (Shape to S ; Pos to P)
@@ -104,7 +112,7 @@ isEquivChainMap→AllTypesDiscrete {ℓ} is-equiv-chain-map A = discrete-A where
     is-equiv-Σ-Σ-isolate = isEquiv[f∘equivFunA≃B]→isEquiv[f]
       (Σ-map-snd _)
       (chain-shape-equiv-left F G)
-      (is-equiv-chain-map F G)
+      (is-equiv-chain-shape-map F G)
 
     is-equiv-Σ-isolate : ∀ s f → isEquiv (Σ-isolate (P s) (Q ∘ f))
     is-equiv-Σ-isolate = curry $ isEquiv-Σ-map-snd→isEquiv is-equiv-Σ-Σ-isolate
@@ -132,11 +140,11 @@ isEquivChainMap≃AllTypesDiscrete = propBiimpl→Equiv isPropHasChainEquiv (isP
   AllTypesDiscrete→isEquivChainMap
 
 ¬hasChainEquiv : ¬ hasChainEquiv ℓ-zero
-¬hasChainEquiv is-equiv-chain-map = S1.¬isIsolated-base $ Discrete→isIsolated discrete-S¹ base where
+¬hasChainEquiv is-equiv-chain-shape-map = S1.¬isIsolated-base $ Discrete→isIsolated discrete-S¹ base where
   open import Cubical.HITs.S1.Base
   
   discrete-S¹ : Discrete S¹
-  discrete-S¹ = isEquivChainMap→AllTypesDiscrete is-equiv-chain-map S¹
+  discrete-S¹ = isEquivChainMap→AllTypesDiscrete is-equiv-chain-shape-map S¹
 
 impredicativeProp→hasChainEquiv→LEM : (ℓ : Level)
   → (Ω : Type ℓ)

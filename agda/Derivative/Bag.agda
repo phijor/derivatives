@@ -79,9 +79,9 @@ isIsolatedFin {X} = Discrete→isIsolated (isFinSet→Discrete (str X))
 ∂-pos-equiv : (X : FinSet) (x : ⟨ X ⟩ °) → (⟨ X ⟩ ∖ (x .fst)) ≃ ⟨ X -ᶠ (x .fst) ⟩
 ∂-pos-equiv X x = idEquiv _
 
-∂-Bag-map : Equiv (∂ Bag) Bag
-∂-Bag-map .Equiv.shape = ∂-shape-equiv
-∂-Bag-map .Equiv.pos = uncurry ∂-pos-equiv
+∂-Bag-equiv : Equiv (∂ Bag) Bag
+∂-Bag-equiv .Equiv.shape = ∂-shape-equiv
+∂-Bag-equiv .Equiv.pos = uncurry ∂-pos-equiv
 
 private
   ⊤ = ⊤* ℓ-zero

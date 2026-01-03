@@ -63,23 +63,23 @@ _⊗Id₀ : SetContainer ℓ ℓ → SetContainer ℓ ℓ
 ((F , is-set-shape , is-set-pos) ⊗Id₀) .snd .fst = isSet× is-set-shape isSetUnit*
 ((F , is-set-shape , is-set-pos) ⊗Id₀) .snd .snd (s , _) = isSet⊎ (is-set-pos s) isSetUnit*
 
-[-]⊗Id : Functor ℂont ℂont
-[-]⊗Id .Functor.F-ob = _⊗Id₀
-[-]⊗Id .Functor.F-hom = [_]⊗Id
-[-]⊗Id .Functor.F-id = Cart≡ refl $ funExt λ s → equivExt λ { (just s) → refl ; nothing → refl }
-[-]⊗Id .Functor.F-seq f g = Cart≡ refl $ funExt λ s → equivExt λ { (just s) → refl ; nothing → refl }
+-⊗Id : Functor ℂont ℂont
+-⊗Id .Functor.F-ob = _⊗Id₀
+-⊗Id .Functor.F-hom = [_]⊗Id
+-⊗Id .Functor.F-id = Cart≡ refl $ funExt λ s → equivExt λ { (just s) → refl ; nothing → refl }
+-⊗Id .Functor.F-seq f g = Cart≡ refl $ funExt λ s → equivExt λ { (just s) → refl ; nothing → refl }
 
-η : 𝟙⟨ ℂont ⟩ ⇒ ∂₀ ∘F [-]⊗Id
+η : 𝟙⟨ ℂont ⟩ ⇒ ∂₀ ∘F -⊗Id
 η .NatTrans.N-ob (F , _) = unit F
 η .NatTrans.N-hom f = sym (is-natural-unit _ _ f)
 
-ε : [-]⊗Id ∘F ∂₀ ⇒ 𝟙⟨ ℂont ⟩
+ε : -⊗Id ∘F ∂₀ ⇒ 𝟙⟨ ℂont ⟩
 ε .NatTrans.N-ob (G , _) = counit G
 ε .NatTrans.N-hom f = is-natural-counit _ _ f
 
 open TriangleIdentities using (Δ₁ ; Δ₂)
 
--⊗Id⊣∂ : [-]⊗Id ⊣ ∂₀
+-⊗Id⊣∂ : -⊗Id ⊣ ∂₀
 -⊗Id⊣∂ ._⊣_.η = η
 -⊗Id⊣∂ ._⊣_.ε = ε
 -⊗Id⊣∂ ._⊣_.triangleIdentities .Δ₁ (F , _) = zig≡ F
