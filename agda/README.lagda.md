@@ -439,14 +439,6 @@ _ : unit (∂ G) ⋆ ∂[ counit G ] ≡ id (∂ G)
 _ = zag≡ _
 ```
 
-**Theorem 3.11**:
-In the 1-category of set-truncated containers, `_⊗ Id ⊣ ∂`.
-```agda
-_ : -⊗Id ⊣ ∂₀
-_ = -⊗Id⊣∂
-```
-
-
 ### Basic Laws of Derivatives
 
 ```agda
