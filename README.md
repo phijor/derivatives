@@ -52,6 +52,18 @@ To interactively type-check all source modules in a development shell:
 nix-shell> agda --build-library
 ```
 
+## The Repository
+
+The canonical upstream of this repository is hosted on Codeberg:
+```url
+https://codeberg.org/phijor/derivatives
+```
+
+A mirror can be found on GitHub:
+```url
+https://github.com/phijor/derivatives/
+```
+
 ## License
 
 All Agda code in this repository is licensed under the terms of the _MIT license_, see [`LICENSE`](./LICENSE).
