@@ -3,7 +3,7 @@
 {-# OPTIONS --allow-unsolved-metas #-}
 module README where
 
-open import Derivative.Prelude
+open import Derivative.Prelude hiding (∂ᴵ)
 open import Derivative.Basics.Decidable
 open import Derivative.Basics.Embedding
 open import Derivative.Basics.Equiv
@@ -390,7 +390,7 @@ _ = isTruncatedDerivative
 `∂` restricts to an endofunctor of the 1-category of set-truncated containers.
 ```agda
 _ : Functor ℂont ℂont
-_ = ∂₀
+_ = ∂ₛ
 ```
 
 **Problem 3.10**:
@@ -420,9 +420,9 @@ _ = zag≡ _
 ```
 
 **Theorem 3.11**:
-In the 1-category of set-truncated containers, `_⊗ Id ⊣ ∂`.
+In the 1-category of set-truncated containers, `_⊗ Id ⊣ ∂ₛ`.
 ```agda
-_ : -⊗Id ⊣ ∂₀
+_ : -⊗Id ⊣ ∂ₛ
 _ = -⊗Id⊣∂
 ```
 natural in `F` and `G`, respectively,
@@ -559,8 +559,106 @@ _ = isEquivChainMapSets≃AllSetsDiscrete
 
 ## Derivatives of Fixed Points
 
+### Indexed Containers
+
 ```agda
-import Derivative.Indexed.ChainRule
+import Derivative.Indexed.Container as IndexedContainer
+```
+
+<!--
+```agda
+open IndexedContainer
+  using (₀ ; ₁ ; ₀° ; ₁° ; tt° ; 𝟚 ; _⊸_ ; isContainerEquiv)
+  renaming (_⊗_ to _⊗ᴵ_ ; _⊕_ to _⊕ᴵ_ ; isContainerEmbedding to isContainerEmbeddingᴵ)
+open IndexedContainer.Container
+```
+-->
+
+**Definition 5.1**:
+Indexed containers have positions indexed by some `Ix : Type`.
+```agda
+IndexedContainer : (Ix : Type) → Type _
+IndexedContainer = IndexedContainer.Container ℓ-zero
+
+_ : IndexedContainer Ix ≃ (Σ[ S ∈ Type ] (Ix → S → Type))
+_ = IndexedContainer.Container-Σ-equiv
+```
+
+??? note "Overloading notation"
+    Unfortunately, Agda does not allow to overload the names of definitions for indexed and non-indexed containers.
+    The indexed versions are suffixed with `ᴵ`, if necessary.
+
+**Definition 5.3**:
+Substitution for indexed containers.
+```agda
+_[_]ᴵ : (F : IndexedContainer (Maybe Ix)) (G : IndexedContainer Ix) → IndexedContainer Ix
+_[_]ᴵ = IndexedContainer._[_]
+```
+
+**Definition 5.4**:
+The derivative of an indexed container is defined for each _isolated_ index `i : Ix °`.
+```agda
+import Derivative.Indexed.Derivative
+
+∂ᴵ : (i : Ix °) → (F : IndexedContainer Ix) → IndexedContainer Ix
+∂ᴵ = Derivative.Indexed.Derivative.∂
+```
+
+Shorthands for the derivative of unary containers (`∂ᴵ tt°`),
+and the two derivatives of binary containers.
+```agda
+∂• = ∂ᴵ tt°
+∂₀ = ∂ᴵ ₀°
+∂₁ = ∂ᴵ ₁°
+```
+
+**Problem 5.5**:
+The chain rule for binary containers.
+```agda
+open import Derivative.Indexed.ChainRule as IndexedChainRule
+
+_ :
+  ∀ (F : IndexedContainer 𝟚)
+  → (G : IndexedContainer _)
+  → ((∂₀ F [ G ]ᴵ) ⊕ᴵ ((∂₁ F [ G ]ᴵ) ⊗ᴵ ∂• G)) ⊸ ∂• (F [ G ]ᴵ)
+_ = binary-chain-rule
+```
+
+**Proposition 5.6**:
+The binary chain rule is an embedding.
+```agda
+_ : ∀ F G → isContainerEmbeddingᴵ (binary-chain-rule F G)
+_ = isContainerEmbeddingChainRule
+```
+
+**Proposition 5.7**:
+Like for unary containers, the binary chain rule is an equivalence iff `Σ-isolate` is.
+```agda
+_ : ∀ F G →
+  isContainerEquiv (binary-chain-rule F G)
+    ≃
+  (∀ s f → isEquiv (Σ-isolate (F .Pos ₁ s) (G .Pos _ ∘ f)))
+_ = isEquivBinaryChainRule≃isEquiv-Σ-isolate
+```
+
+**Proposition 5.8**:
+For discrete containers, the binary chain rule is an equivalence.
+```agda
+_ : ∀ F G
+  → (∀ s → Discrete (Pos F ₁ s))
+  → (∀ t → Discrete (Pos G _ t))
+  → isContainerEquiv (binary-chain-rule F G)
+_ = DiscreteContainer→isEquivBinaryChainRule
+```
+
+### Fixed Points of Containers
+
+```agda
 import Derivative.Indexed.Mu
+```
+
+### The Fixed Point Rule
+
+```agda
 import Derivative.Indexed.MuRule
 ```

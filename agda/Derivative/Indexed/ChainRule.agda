@@ -3,6 +3,7 @@ module Derivative.Indexed.ChainRule where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
+open import Derivative.Basics.Embedding
 open import Derivative.Basics.Sigma
 open import Derivative.Basics.Sum
 
@@ -130,6 +131,17 @@ binary-chain-rule F G =
 module _ (F : Container _ 𝟚) (G : Container _ 𝟙) where
   open binary-chain-rule F G
 
+  isContainerEmbeddingChainRule : isContainerEmbedding (binary-chain-rule F G)
+  isContainerEmbeddingChainRule = isEmbeddingComp (equivFun f₁) (η ._⊸_.shape ⨟ equivFun f₂)
+    (isEquiv→isEmbedding $ equivIsEquiv $ f₁)
+    $ isEmbeddingComp (η ._⊸_.shape) (equivFun f₂)
+      (isEmbedding-Σ-map-snd λ s →
+        isEmbedding-Σ-map-snd λ f →
+        isEmbedding-⊎-map-right (Σ-isolate _ _)
+        $ isEmbedding-Σ-isolate (P ₁ s) (Q ∘ f)
+      )
+      (isEquiv→isEmbedding $ equivIsEquiv $ f₂)
+
   isEquivBinaryChainRule→isEquiv-η : isContainerEquiv (binary-chain-rule F G) → isContainerEquiv η
   isEquivBinaryChainRule→isEquiv-η is-equiv-rule = goal where
     lemma : isContainerEquiv (η ⋆ Equiv.as-⊸ e₂)
@@ -165,6 +177,16 @@ module _ (F : Container _ 𝟚) (G : Container _ 𝟙) where
 
     binary-chain-rule-equiv : Equiv _ _
     binary-chain-rule-equiv = e₁ ⋆ₑ η* ⋆ₑ e₂
+
+  isEquivBinaryChainRule≃isEquiv-Σ-isolate :
+    isContainerEquiv (binary-chain-rule F G)
+      ≃
+    ((s : S) → (f : P ₁ s → T) → isEquiv (Σ-isolate (P ₁ s) (Q ∘ f)))
+  isEquivBinaryChainRule≃isEquiv-Σ-isolate = propBiimpl→Equiv
+    (isPropIsContainerEquiv {f = binary-chain-rule F G})
+    (isPropΠ2 λ s f → isPropIsEquiv _)
+    isEquivBinaryChainRule→isEquiv-Σ-isolate
+    isEquiv-Σ-isolate→isEquivBinaryChainRule
 
   DiscreteContainer→isEquivBinaryChainRule :
       (∀ s → Discrete (Pos F ₁ s))

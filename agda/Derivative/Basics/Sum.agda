@@ -98,9 +98,9 @@ isEquiv→isEquiv-⊎-map-right {C} {f} is-equiv-f = equivIsEquiv (⊎-right-≃
 ⊎-fiber-≃ : {C : Type ℓ} {f : A ⊎ B → C} → ∀ y → fiber f y ≃ (fiber (f ∘ inl) y) ⊎ (fiber (f ∘ inr) y)
 ⊎-fiber-≃ y = Σ-⊎-fst-≃
 
-⊎-map-right-fiber-equiv : ∀ {C : Type ℓ} → (f : B → C)
+⊎-map-right-fiber-inr-equiv : ∀ {C : Type ℓ} → (f : B → C)
   → (c : C) → fiber (⊎-map-right {A = A} f) (inr c) ≃ fiber f c
-⊎-map-right-fiber-equiv {B} {A} {C} f c =
+⊎-map-right-fiber-inr-equiv {B} {A} {C} f c =
   Σ[ x ∈ A ⊎ B ] ⊎-map-right f x ≡ inr c
     ≃⟨ ⊎-fiber-≃ (inr c) ⟩
   (Σ[ a ∈ A ] inl a ≡ inr c) ⊎ (fiber (f ⨟ inr) (inr c))
@@ -110,10 +110,38 @@ isEquiv→isEquiv-⊎-map-right {C} {f} is-equiv-f = equivIsEquiv (⊎-right-≃
   fiber f c
     ≃∎
 
+⊎-map-right-fiber-inl-equiv : ∀ {C : Type ℓ}
+  → (f : B → C)
+  → (a : A)
+  → fiber (⊎-map-right {A = A} f) (inl a) ≃ singl a
+⊎-map-right-fiber-inl-equiv {B} {A} f a =
+  Σ[ x ∈ A ⊎ B ] ⊎-map-right f x ≡ inl a
+    ≃⟨ ⊎-fiber-≃ (inl a) ⟩
+  (Σ[ a′ ∈ A ] inl a′ ≡ inl a) ⊎ (fiber (f ⨟ inr) (inl a))
+    ≃⟨ invEquiv $ ⊎-empty-right $ uncurry (λ _ → inr≢inl) ⟩
+  (Σ[ a′ ∈ A ] inl a′ ≡ inl a)
+    ≃⟨ Σ-cong-equiv-snd (λ a′ → invEquiv $ cong inl , isEmbedding-inl a′ a) ⟩
+  (Σ[ a′ ∈ A ] a′ ≡ a)
+    ≃⟨ Σ-cong-equiv-snd (λ a′ → symEquiv) ⟩
+  singl a
+    ≃∎
+
 isEquiv-⊎-map-right→isEquiv : ∀ {C : Type ℓ}
   → (f : B → C)
   → isEquiv (⊎-map-right {A = A} f)
   → isEquiv f
 isEquiv-⊎-map-right→isEquiv {A} {C} f is-equiv-map .equiv-proof = goal where
   goal : (c : C) → isContr (fiber f c)
-  goal c = isOfHLevelRespectEquiv 0 (⊎-map-right-fiber-equiv f c) (is-equiv-map .equiv-proof (inr c))
+  goal c = isOfHLevelRespectEquiv 0 (⊎-map-right-fiber-inr-equiv f c) (is-equiv-map .equiv-proof (inr c))
+
+isEmbedding-⊎-map-right : ∀ {C : Type ℓ}
+  → (f : B → C)
+  → isEmbedding f
+  → isEmbedding (⊎-map-right {A = A} f)
+isEmbedding-⊎-map-right {A} f is-embedding-f = hasPropFibers→isEmbedding prop-fibers
+  where
+    prop-fibers : ∀ y → isProp (fiber (⊎-map-right {A = A} f) y)
+    prop-fibers (inl a) = isOfHLevelRespectEquiv 1 (invEquiv $ ⊎-map-right-fiber-inl-equiv f a)
+      $ isContr→isProp $ isContrSingl a
+    prop-fibers (inr c) = isOfHLevelRespectEquiv 1 (invEquiv $ ⊎-map-right-fiber-inr-equiv f c)
+      $ isEmbedding→hasPropFibers is-embedding-f c

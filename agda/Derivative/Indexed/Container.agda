@@ -69,6 +69,15 @@ _ = ₁
 ₁° .snd (inl _) = no inr≢inl
 ₁° .snd (inr (lift _)) = yes refl
 
+Container-Σ-Iso : Iso (Container ℓ Ix) (Σ[ S ∈ Type ℓ ] (Ix → S → Type ℓ))
+Container-Σ-Iso .Iso.fun (S ◁ P) = S , P
+Container-Σ-Iso .Iso.inv (S , P) = S ◁ P
+Container-Σ-Iso .Iso.rightInv _ = refl
+Container-Σ-Iso .Iso.leftInv _ = refl
+
+Container-Σ-equiv : Container ℓ Ix ≃ (Σ[ S ∈ Type ℓ ] (Ix → S → Type ℓ))
+Container-Σ-equiv = strictIsoToEquiv Container-Σ-Iso
+
 record _⊸_ (F G : Container ℓ Ix) : Type ℓ where
   constructor [_⊸_]
   field

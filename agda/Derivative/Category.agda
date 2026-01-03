@@ -46,15 +46,15 @@ open import Cubical.Categories.Adjoint
 ∂∞ .WildFunctor.F-id = Cart≡ (funExt λ { (s , p , _) → ΣPathP (refl′ s , Isolated≡ (refl′ p)) }) $ funExt λ (s , p , _) → equivExt λ (p' , _) → Remove≡ (refl′ p')
 ∂∞ .WildFunctor.F-seq f g = Cart≡ (funExt λ _ → ΣPathP (refl , Isolated≡ refl)) $ funExt λ _ → equivExt λ _ → Remove≡ refl
 
-∂₀-ob : SetContainer ℓ ℓ → SetContainer ℓ ℓ
-∂₀-ob (F , is-trunc-F) .fst = ∂.∂ F
-∂₀-ob (F , is-trunc-F) .snd = ∂.isTruncatedDerivative 0 1 is-trunc-F
+∂ₛ-ob : SetContainer ℓ ℓ → SetContainer ℓ ℓ
+∂ₛ-ob (F , is-trunc-F) .fst = ∂.∂ F
+∂ₛ-ob (F , is-trunc-F) .snd = ∂.isTruncatedDerivative 0 1 is-trunc-F
 
-∂₀ : Functor ℂont ℂont
-∂₀ .Functor.F-ob = ∂₀-ob
-∂₀ .Functor.F-hom = ∂.∂[_]
-∂₀ .Functor.F-id = ∂∞ .WildFunctor.F-id
-∂₀ .Functor.F-seq = ∂∞ .WildFunctor.F-seq
+∂ₛ : Functor ℂont ℂont
+∂ₛ .Functor.F-ob = ∂ₛ-ob
+∂ₛ .Functor.F-hom = ∂.∂[_]
+∂ₛ .Functor.F-id = ∂∞ .WildFunctor.F-id
+∂ₛ .Functor.F-seq = ∂∞ .WildFunctor.F-seq
 
 open UnitCounit {C = ℂont} {D = ℂont}
 
@@ -69,17 +69,17 @@ _⊗Id₀ : SetContainer ℓ ℓ → SetContainer ℓ ℓ
 -⊗Id .Functor.F-id = Cart≡ refl $ funExt λ s → equivExt λ { (just s) → refl ; nothing → refl }
 -⊗Id .Functor.F-seq f g = Cart≡ refl $ funExt λ s → equivExt λ { (just s) → refl ; nothing → refl }
 
-η : 𝟙⟨ ℂont ⟩ ⇒ ∂₀ ∘F -⊗Id
+η : 𝟙⟨ ℂont ⟩ ⇒ ∂ₛ ∘F -⊗Id
 η .NatTrans.N-ob (F , _) = unit F
 η .NatTrans.N-hom f = sym (is-natural-unit _ _ f)
 
-ε : -⊗Id ∘F ∂₀ ⇒ 𝟙⟨ ℂont ⟩
+ε : -⊗Id ∘F ∂ₛ ⇒ 𝟙⟨ ℂont ⟩
 ε .NatTrans.N-ob (G , _) = counit G
 ε .NatTrans.N-hom f = is-natural-counit _ _ f
 
 open TriangleIdentities using (Δ₁ ; Δ₂)
 
--⊗Id⊣∂ : -⊗Id ⊣ ∂₀
+-⊗Id⊣∂ : -⊗Id ⊣ ∂ₛ
 -⊗Id⊣∂ ._⊣_.η = η
 -⊗Id⊣∂ ._⊣_.ε = ε
 -⊗Id⊣∂ ._⊣_.triangleIdentities .Δ₁ (F , _) = zig≡ F
