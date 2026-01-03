@@ -480,7 +480,68 @@ module _
 ## The Chain Rule
 
 ```agda
-import Derivative.ChainRule
+open import Derivative.ChainRule
+```
+
+**Problem 4.1**:
+The lax chain rule.
+```agda
+_ : Cart (((∂ F) [ G ]) ⊗ ∂ G) (∂ (F [ G ]))
+_ = chain-rule _ _
+```
+
+**Definition 4.2**:
+A morphism of containers is an embedding if its shape map is an embedding.
+```agda
+isContainerEmbedding : Cart F G → Type _
+isContainerEmbedding = λ f → isEmbedding (Cart.shape f)
+```
+
+**Proposition 4.3**:
+Then chain rule is an embedding of containers.
+```agda
+_ : isContainerEmbedding (chain-rule F G)
+_ = isEmbedding-chain-shape-map _ _
+```
+
+**Proposition 4.4**:
+The chain rule is an equivalence iff `Σ-isolate` is.
+```agda
+module _ (F G : Container ℓ ℓ) where
+  open Container F renaming (Shape to S ; Pos to P)
+  open Container G renaming (Shape to T ; Pos to Q)
+
+  _ : isEquiv (chain-rule F G .shape) ≃ (∀ s → (f : P s → T) → isEquiv (Σ-isolate (P s) (Q ∘ f)))
+  _ = isEquivChainRule≃isEquiv-Σ-isolated F G
+```
+
+**Theorem 4.5**:
+For discrete containers, the chain rule is an equivalence.
+Therefore it is an isomorphism in the 1-category of set-truncated containers, `ℂont`.
+```agda
+_ : (F G : DiscreteContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape)
+_ = DiscreteContainer→isEquivChainMap
+```
+
+**Theorem 4.6**:
+If the chain rule is invertible for arbitrary containers if and only if arbitrary types are discrete.
+This is impossible in the presence of types of higher truncation level.
+```agda
+_ : ((F G : Container ℓ ℓ) → isEquiv (chain-rule F G .shape)) ≃ ((A : Type ℓ) → Discrete A)
+_ = isEquivChainMap≃AllTypesDiscrete
+
+_ : ¬ hasChainEquiv ℓ-zero
+_ = ¬hasChainEquiv
+```
+
+**Corollary 4.7**:
+The chain rule is an equivalence for all set-truncated containers if and only if all sets are discrete.
+```agda
+_ :
+  ((F G : SetContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape))
+    ≃
+  ((A : hSet ℓ) → Discrete ⟨ A ⟩)
+_ = isEquivChainMapSets≃AllSetsDiscrete
 ```
 
 ## Derivatives of Fixed Points

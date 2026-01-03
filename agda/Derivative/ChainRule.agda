@@ -78,6 +78,35 @@ module _ (F G : Container ℓ ℓ) where
     (isEmbedding-Σ-map-snd λ (s , f) → isEmbedding-Σ-isolate (P s) (Q ∘ f))
     (isEquiv→isEmbedding $ equivIsEquiv $ chain-rule.η₀ .Equiv.shape)
 
+  isEquivChainRule→isEquiv-Σ-isolated :
+    isEquiv (chain-rule .shape) → (∀ s → (f : P s → T) → isEquiv (Σ-isolate (P s) (Q ∘ f)))
+  isEquivChainRule→isEquiv-Σ-isolated is-equiv-chain-shape-map = is-equiv-Σ-isolate where
+    is-equiv-Σ-Σ-isolate : isEquiv (Σ-map-snd {A = Σ[ s ∈ S ] (P s → T)} (λ (s , f) → Σ-isolate (P s) (Q ∘ f)))
+    is-equiv-Σ-Σ-isolate = isEquiv[f∘equivFunA≃B]→isEquiv[f]
+      (Σ-map-snd _)
+      chain-shape-equiv-left
+      is-equiv-chain-shape-map
+
+    is-equiv-Σ-isolate : ∀ s f → isEquiv (Σ-isolate (P s) (Q ∘ f))
+    is-equiv-Σ-isolate = curry $ isEquiv-Σ-map-snd→isEquiv is-equiv-Σ-Σ-isolate
+
+  isEquiv-Σ-isolated→isEquivChainRule :
+    (∀ s → (f : P s → T) → isEquiv (Σ-isolate (P s) (Q ∘ f)))
+      →
+    isEquiv (chain-rule .shape)
+  isEquiv-Σ-isolated→isEquivChainRule is-equiv-Σ-isolate = isEquiv-∘
+    {f = equivFun $ chain-rule.η₀ .Equiv.shape}
+    {g = Σ-map-snd λ ((s , f)) → Σ-isolate (P s) (Q ∘ f)}
+    (isEquiv-Σ-map-snd $ uncurry is-equiv-Σ-isolate)
+    (equivIsEquiv $ chain-rule.η₀ .Equiv.shape)
+
+  isEquivChainRule≃isEquiv-Σ-isolated :
+    isEquiv (chain-rule .shape) ≃ (∀ s → (f : P s → T) → isEquiv (Σ-isolate (P s) (Q ∘ f)))
+  isEquivChainRule≃isEquiv-Σ-isolated = propBiimpl→Equiv
+    (isPropIsEquiv _) (isPropΠ2 λ s f → isPropIsEquiv _)
+    isEquivChainRule→isEquiv-Σ-isolated
+    isEquiv-Σ-isolated→isEquivChainRule
+
 DiscreteContainer : (ℓS ℓP : Level) → Type _
 DiscreteContainer ℓS ℓP = Σ[ F ∈ Container ℓS ℓP ] ∀ s → Discrete (F .Pos s)
 
@@ -88,35 +117,15 @@ isPropHasChainEquiv : isProp (hasChainEquiv ℓ)
 isPropHasChainEquiv = isPropΠ2 λ F G → isPropIsEquiv _
 
 DiscreteContainer→isEquivChainMap : (F G : DiscreteContainer ℓ ℓ) → isEquiv (chain-shape-map (F .fst) (G .fst))
-DiscreteContainer→isEquivChainMap (F , disc-F) (G , disc-G) = equivIsEquiv chain-equiv where
+DiscreteContainer→isEquivChainMap (F , disc-F) (G , disc-G) = isEquiv-Σ-isolated→isEquivChainRule F G is-equiv-Σ-isolate where
   open Container F renaming (Shape to S ; Pos to P)
   open Container G renaming (Shape to T ; Pos to Q)
 
-  chain-equiv :
-    (Σ[ (s , p) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖ (p .fst) → T)) × (Σ[ t ∈ T ] Q t °)
-      ≃
-    (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p ∈ (P s) ] Q (f p)) °)
-  chain-equiv =
-    _ ≃⟨ chain-shape-equiv-left F G ⟩
-    _ ≃⟨ Σ-map-snd (λ (s , f) → Σ-isolate (P s) (Q ∘ f)) , isEquiv-Σ-map-snd (λ (s , f) → Discrete→isEquiv-Σ-isolate (disc-F s) (disc-G ∘ f)) ⟩
-    _ ≃∎
+  is-equiv-Σ-isolate : ∀ s f → isEquiv (Σ-isolate (P s) (Q ∘ f))
+  is-equiv-Σ-isolate s f = Discrete→isEquiv-Σ-isolate (disc-F s) (disc-G ∘ f)
 
 isEquivChainMap→AllTypesDiscrete : hasChainEquiv ℓ → (A : Type ℓ) → Discrete A
 isEquivChainMap→AllTypesDiscrete {ℓ} is-equiv-chain-shape-map A = discrete-A where
-  lemma : (F G : Container ℓ ℓ) → (s : F .Shape) (f : F .Pos s → G .Shape) → isEquiv (Σ-isolate (F .Pos s) (G .Pos ∘ f))
-  lemma F G = is-equiv-Σ-isolate where
-    open Container F renaming (Shape to S ; Pos to P)
-    open Container G renaming (Shape to T ; Pos to Q)
-
-    is-equiv-Σ-Σ-isolate : isEquiv (Σ-map-snd {A = Σ[ s ∈ S ] (P s → T)} (λ (s , f) → Σ-isolate (P s) (Q ∘ f)))
-    is-equiv-Σ-Σ-isolate = isEquiv[f∘equivFunA≃B]→isEquiv[f]
-      (Σ-map-snd _)
-      (chain-shape-equiv-left F G)
-      (is-equiv-chain-shape-map F G)
-
-    is-equiv-Σ-isolate : ∀ s f → isEquiv (Σ-isolate (P s) (Q ∘ f))
-    is-equiv-Σ-isolate = curry $ isEquiv-Σ-map-snd→isEquiv is-equiv-Σ-Σ-isolate
-
   F : Container ℓ ℓ
   F .Shape = Unit*
   F .Pos _ = A
@@ -126,7 +135,10 @@ isEquivChainMap→AllTypesDiscrete {ℓ} is-equiv-chain-shape-map A = discrete-A
   G a₀ .Pos = a₀ ≡_
 
   is-equiv-Σ-isolate-singl : (a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_))
-  is-equiv-Σ-isolate-singl a₀ = lemma F (G a₀) tt* (λ a → a)
+  is-equiv-Σ-isolate-singl a₀ = isEquivChainRule→isEquiv-Σ-isolated F (G a₀)
+    (is-equiv-chain-shape-map F (G a₀))
+    tt*
+    (idfun A)
 
   discrete-A : Discrete A
   discrete-A = isEquiv-Σ-isolate-singl→Discrete is-equiv-Σ-isolate-singl
@@ -145,6 +157,56 @@ isEquivChainMap≃AllTypesDiscrete = propBiimpl→Equiv isPropHasChainEquiv (isP
   
   discrete-S¹ : Discrete S¹
   discrete-S¹ = isEquivChainMap→AllTypesDiscrete is-equiv-chain-shape-map S¹
+
+isEquivChainMapSets→AllSetsDiscrete :
+  ((F G : SetContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape))
+    →
+  ((A : hSet ℓ) → Discrete ⟨ A ⟩)
+isEquivChainMapSets→AllSetsDiscrete {ℓ} is-equiv-chain-shape-map (A , is-set-A) = discrete-A where
+  F : SetContainer ℓ ℓ
+  F .fst .Shape = Unit*
+  F .fst .Pos _ = A
+  F .snd .fst = isSetUnit*
+  F .snd .snd _ = is-set-A
+
+  G : (a₀ : A) → SetContainer ℓ ℓ
+  G a₀ .fst .Shape = A
+  G a₀ .fst .Pos = a₀ ≡_
+  G a₀ .snd .fst = is-set-A
+  G a₀ .snd .snd a = isOfHLevelPath 1 (is-set-A a₀ a)
+
+  is-equiv-Σ-isolate-singl : (a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_))
+  is-equiv-Σ-isolate-singl a₀ = isEquivChainRule→isEquiv-Σ-isolated _ _
+    (is-equiv-chain-shape-map F (G a₀))
+    tt*
+    (idfun A)
+
+  discrete-A : Discrete A
+  discrete-A = isEquiv-Σ-isolate-singl→Discrete is-equiv-Σ-isolate-singl
+
+AllSetsDiscrete→isEquivChainMapSets :
+  ((A : hSet ℓ) → Discrete ⟨ A ⟩)
+    →
+  ((F G : SetContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape))
+AllSetsDiscrete→isEquivChainMapSets discrete (F , is-set-F) (G , is-set-G) = DiscreteContainer→isEquivChainMap
+  (F , disc-F)
+  (G , disc-G)
+  where
+    disc-F : ∀ s → Discrete (F .Pos s)
+    disc-F s = discrete (F .Pos s , is-set-F .snd s)
+
+    disc-G : ∀ t → Discrete (G .Pos t)
+    disc-G t = discrete (G .Pos t , is-set-G .snd t)
+
+isEquivChainMapSets≃AllSetsDiscrete :
+  ((F G : SetContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape))
+    ≃
+  ((A : hSet ℓ) → Discrete ⟨ A ⟩)
+isEquivChainMapSets≃AllSetsDiscrete = propBiimpl→Equiv
+  (isPropΠ2 λ F G → isPropIsEquiv _)
+  (isPropΠ λ A → isPropDiscrete)
+  isEquivChainMapSets→AllSetsDiscrete
+  AllSetsDiscrete→isEquivChainMapSets
 
 impredicativeProp→hasChainEquiv→LEM : (ℓ : Level)
   → (Ω : Type ℓ)
