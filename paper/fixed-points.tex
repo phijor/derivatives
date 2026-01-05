@@ -291,13 +291,13 @@ Let us set this up precisely:
   \begin{itemize}
     \item objects are of type \( \sum_{G : \Cont_I} \Cart{\Subst{F}{G}}{G} \),
     \item morphisms \( \Alg{\Subst{F}{\Blank}}((G, g), (H, h)) \) are container morphisms
-      \( f : \Cart{G}{G'} \) together with a path \( f_\sharp : f \circ h = g \circ \Subst{F}{f} \) ensuring that the square
+      \( f : \Cart{G}{H} \) together with a path \( f_\sharp : f \circ g = h \circ \Subst{F}{f} \) ensuring that the square
       \[
         \begin{tikzcd}
           \Subst{F}{G} \ar[r, -multimap, "\Subst{F}{f}", ""{swap,name=Ff}] & \Subst{F}{H} \\
           G \ar[r, -multimap, "f"{swap}, ""{name=f}] & H
-          \ar[from=1-1, to=2-1, -multimap, "h"{swap}]
-          \ar[from=1-2, to=2-2, -multimap, "g"]
+          \ar[from=1-1, to=2-1, -multimap, "g"{swap}]
+          \ar[from=1-2, to=2-2, -multimap, "h"]
           \ar[from=Ff, to=f, phantom, "{\scriptstyle f_\sharp}"]
         \end{tikzcd}
       \]
