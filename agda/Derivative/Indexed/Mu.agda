@@ -21,9 +21,7 @@ open import Derivative.Remove
 open import Cubical.Foundations.Path
 open import Cubical.Foundations.Equiv.Properties using (congEquiv)
 open import Cubical.Foundations.Transport using (substEquiv)
-import      Cubical.Data.Empty as Empty
 open import Cubical.Data.Sigma
-import      Cubical.Data.Unit as Unit
 open import Cubical.Functions.FunExtEquiv
 open import Cubical.Functions.Embedding
 open import Cubical.Functions.Surjection

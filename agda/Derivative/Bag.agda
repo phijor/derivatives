@@ -1,7 +1,7 @@
 {-# OPTIONS --safe #-}
 module Derivative.Bag where
 
-open import Derivative.Prelude renaming (⊤ to ⊤*)
+open import Derivative.Prelude
 open import Derivative.Container
 open import Derivative.Derivative
 open import Derivative.Isolated
@@ -11,13 +11,12 @@ open import Derivative.Basics.Maybe
 
 open import Cubical.Foundations.Univalence
 open import Cubical.Relation.Nullary using (isProp¬)
+open import Cubical.HITs.PropositionalTruncation as PT
 open import Cubical.Data.Sigma
 open import Cubical.Data.Sum as Sum using (inl ; inr ; _⊎_)
 open import Cubical.Data.FinSet as FinSet renaming (FinSet to FinSet*)
-open import Cubical.Data.FinSet.Induction as Fin renaming (_+_ to _+ᶠ_)
+open import Cubical.Data.FinSet.Induction as Fin renaming (_+_ to _+ᶠ_) hiding (𝟙)
 open import Cubical.Data.FinSet.Constructors
-open import Cubical.Data.Empty using (⊥)
-open import Cubical.Data.Unit using (tt*)
 
 private
   FinSet = FinSet* ℓ-zero
@@ -55,8 +54,20 @@ isIsolatedFin {X} = Discrete→isIsolated (isFinSet→Discrete (str X))
       pred : Σ FinSet ⟨_⟩ → FinSet
       pred (X , x) = X -ᶠ x
 
+      𝟙ᶠ : FinSet
+      𝟙ᶠ .fst = 𝟙
+      𝟙ᶠ .snd .fst = 1
+      𝟙ᶠ .snd .snd = PT.∣ isoToEquiv iso ∣₁ where
+        iso : Iso 𝟙 (_ ⊎ _)
+        iso .Iso.fun _ = just _
+        iso .Iso.inv (inl _) = _
+        iso .Iso.inv (inr ())
+        iso .Iso.rightInv (inl _) = refl
+        iso .Iso.rightInv (inr ())
+        iso .Iso.leftInv _ = refl
+
       suc : FinSet → Σ FinSet ⟨_⟩
-      suc X .fst = X +ᶠ 𝟙
+      suc X .fst = X +ᶠ 𝟙ᶠ
       suc X .snd = nothing
 
       pred-iso : Iso (Σ FinSet ⟨_⟩) FinSet
@@ -67,10 +78,10 @@ isIsolatedFin {X} = Discrete→isIsolated (isFinSet→Discrete (str X))
           .fst → fin-path
           .snd → pt-path
         where
-          fin-equiv : ⟨ (X -ᶠ x₀) +ᶠ 𝟙 ⟩ ≃ ⟨ X ⟩
+          fin-equiv : ⟨ (X -ᶠ x₀) +ᶠ 𝟙ᶠ ⟩ ≃ ⟨ X ⟩
           fin-equiv = replace-isolated-equiv x₀ (isIsolatedFin {X = X} x₀)
 
-          fin-path : (X -ᶠ x₀) +ᶠ 𝟙 ≡ X
+          fin-path : (X -ᶠ x₀) +ᶠ 𝟙ᶠ ≡ X
           fin-path = equivFun (FinSet≡ _ _) $ ua fin-equiv
 
           pt-path : PathP (λ i → ⟨ fin-path i ⟩) nothing x₀
@@ -83,12 +94,9 @@ isIsolatedFin {X} = Discrete→isIsolated (isFinSet→Discrete (str X))
 ∂-Bag-equiv .Equiv.shape = ∂-shape-equiv
 ∂-Bag-equiv .Equiv.pos = uncurry ∂-pos-equiv
 
-private
-  ⊤ = ⊤* ℓ-zero
-
 module Universe (P : Type → Type)
   (is-prop-P : ∀ A → isProp (P A))
-  (is-P-+1 : ∀ {A : Type} → P A → P (A ⊎ ⊤))
+  (is-P-+1 : ∀ {A : Type} → P A → P (A ⊎ 𝟙))
   (is-P-∖ : ∀ {A : Type} → P A → ∀ a → P (A ∖ a))
   where
   U : Type₁
@@ -103,7 +111,7 @@ module Universe (P : Type → Type)
   (X -ᵁ x) .snd = is-P-∖ (str X) x
 
   _+1 : U → U
-  (X +1) .fst = ⟨ X ⟩ ⊎ ⊤
+  (X +1) .fst = ⟨ X ⟩ ⊎ 𝟙
   (X +1) .snd = is-P-+1 (str X)
 
   ∂-uBag-shape-Iso : Iso (Σ[ X ∈ U ] (⟨ X ⟩ °)) U
@@ -112,7 +120,7 @@ module Universe (P : Type → Type)
   ∂-uBag-shape-Iso .Iso.inv X .snd = nothing°
   ∂-uBag-shape-Iso .Iso.rightInv X = Σ≡Prop is-prop-P $ ua $ removeNothingEquiv
   ∂-uBag-shape-Iso .Iso.leftInv (X , x°@(x₀ , isolated-x₀)) = ΣPathP (U-path , pt-path) where
-    U-equiv : (⟨ X ⟩ ∖ x₀) ⊎ ⊤ ≃ ⟨ X ⟩
+    U-equiv : (⟨ X ⟩ ∖ x₀) ⊎ 𝟙 ≃ ⟨ X ⟩
     U-equiv = replace-isolated-equiv x₀ isolated-x₀
 
     U-path : (X -ᵁ x₀) +1 ≡ X
@@ -131,7 +139,6 @@ module Universe (P : Type → Type)
 module SubNat where
   open import Cubical.Data.Nat
   open import Cubical.Functions.Embedding
-  open import Cubical.HITs.PropositionalTruncation as PT
 
   isSub : (X : Type) → Type _
   isSub X = ∥ X ↪ ℕ ∥₁
@@ -139,19 +146,19 @@ module SubNat where
   isPropIsSub : ∀ X → isProp (isSub X)
   isPropIsSub X = isPropPropTrunc
 
-  isSub-⊤ : isSub ⊤
-  isSub-⊤ = PT.∣ const 0 , hasPropFibers→isEmbedding (λ { n (tt* , _) (tt* , _) → Σ≡Prop (λ _ → isSetℕ _ _) refl }) ∣₁
+  isSub-⊤ : isSub 𝟙
+  isSub-⊤ = PT.∣ const 0 , hasPropFibers→isEmbedding (λ { n (• , _) (• , _) → Σ≡Prop (λ _ → isSetℕ _ _) refl }) ∣₁
 
-  isSub-+1 : ∀ {X} → isSub X → isSub (X ⊎ ⊤)
+  isSub-+1 : ∀ {X} → isSub X → isSub (X ⊎ 𝟙)
   isSub-+1 {X} = PT.map _+1 where module _ (ι : X ↪ ℕ) where
-    suc-ι : (X ⊎ ⊤) → ℕ
+    suc-ι : (X ⊎ 𝟙) → ℕ
     suc-ι (just x) = suc (ι .fst x)
     suc-ι nothing = 0
 
-    _+1 : (X ⊎ ⊤) ↪ ℕ
+    _+1 : (X ⊎ 𝟙) ↪ ℕ
     _+1 .fst = suc-ι
     _+1 .snd = injEmbedding isSetℕ cancel where
-      cancel : ∀ {x y : X ⊎ ⊤} → suc-ι x ≡ suc-ι y → x ≡ y
+      cancel : ∀ {x y : X ⊎ 𝟙} → suc-ι x ≡ suc-ι y → x ≡ y
       cancel {x = just x} {y = just y} p = cong just (isEmbedding→Inj (ι .snd) x y (injSuc p))
       cancel {x = just x} {y = nothing} = ex-falso ∘ snotz
       cancel {x = nothing} {y = just y} = ex-falso ∘ znots

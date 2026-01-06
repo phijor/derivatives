@@ -4,8 +4,6 @@ module Derivative.Basics.Decidable where
 open import Derivative.Prelude
 
 open import Cubical.Data.Sum as Sum using (_⊎_ ; inl ; inr)
-import      Cubical.Data.Empty as Empty
-import      Cubical.Data.Unit as Unit
 open import Cubical.Relation.Nullary
 open import Cubical.Foundations.GroupoidLaws using (lCancel)
 open import Cubical.Functions.Embedding
@@ -50,12 +48,12 @@ decEquiv : (e : A ≃ B) → Dec A → Dec B
 decEquiv e = map (equivFun e) (_∘ invEq e)
 
 Dec→Type : Dec A → Type
-Dec→Type (yes _) = Unit.Unit
-Dec→Type (no  _) = Empty.⊥
+Dec→Type (yes _) = 𝟙
+Dec→Type (no  _) = 𝟘
 
 Dec→Type* : Dec A → Type ℓ
-Dec→Type* (yes _) = Unit.Unit*
-Dec→Type* (no  _) = Empty.⊥*
+Dec→Type* (yes _) = 𝟙*
+Dec→Type* (no  _) = 𝟘*
 
 opaque
   Dec→Collapsible : Dec A → Collapsible A
@@ -106,13 +104,13 @@ dec-⊎-equiv = isoToEquiv iso module dec-⊎-equiv where
 module DecPath where
   Cover : Dec A → Dec A → Type _
   Cover (yes p) (yes q) = p ≡ q
-  Cover (yes p) (no ¬q) = Empty.⊥*
-  Cover (no ¬p) (yes q) = Empty.⊥*
-  Cover (no ¬p) (no ¬q) = ⊤ _
+  Cover (yes p) (no ¬q) = 𝟘*
+  Cover (no ¬p) (yes q) = 𝟘*
+  Cover (no ¬p) (no ¬q) = 𝟙*
 
   reflCode : (x : Dec A) → Cover x x
   reflCode (yes p) = refl
-  reflCode (no ¬p) = tt*
+  reflCode (no ¬p) = •
 
   encode : (x y : Dec A) → x ≡ y → Cover x y
   encode x _ = J (λ y p → Cover x y) $ reflCode x

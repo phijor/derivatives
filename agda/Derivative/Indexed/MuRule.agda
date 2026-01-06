@@ -6,6 +6,7 @@ open import Derivative.Basics.Decidable
 open import Derivative.Basics.Embedding
 open import Derivative.Basics.Maybe
 open import Derivative.Basics.Sum
+open import Derivative.Basics.Unit
 open import Derivative.Basics.W
 
 open import Derivative.Isolated
@@ -17,9 +18,7 @@ open import Derivative.Indexed.Derivative
 open import Derivative.Indexed.ChainRule
 
 open import Cubical.Foundations.Path
-import      Cubical.Data.Empty as Empty
 open import Cubical.Data.Sigma
-import      Cubical.Data.Unit as Unit
 open import Cubical.Functions.FunExtEquiv
 open import Cubical.Functions.Embedding
 
@@ -79,8 +78,8 @@ open Container
       (X ⊎ W) ⊎ (Z (inr •))
         ≃⟨ ⊎-left-≃ (⊎-empty-right λ ()) ⟩
       ((X ⊎ W) ⊎ 𝟘) ⊎ (Z (inr •))
-        ≃⟨ ⊎-right-≃ $ invEquiv (Σ-contractFst (isOfHLevelRespectEquiv 0 (⊎-empty-left λ ()) Unit.isContrUnit)) ⟩
-      ((X ⊎ W) ⊎ 𝟘) ⊎ (Σ[ i ∈ 𝟘* ⊎ 𝟙 ] Z i)
+        ≃⟨ ⊎-right-≃ $ invEquiv (Σ-contractFst (isOfHLevelRespectEquiv 0 (⊎-empty-left λ ()) isContr-𝟙*)) ⟩
+      ((X ⊎ W) ⊎ 𝟘) ⊎ (Σ[ i ∈ 𝟘* ⊎ 𝟙* ] Z i)
         ≃∎
 
     pos : (i : 𝟙) → (s : Shape $ G [ Y ]) → Pos G[ Y ] i (equivFun shape s) ≃ Pos (G [ Y ]) i s

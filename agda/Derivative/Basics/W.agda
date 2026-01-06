@@ -10,7 +10,6 @@ open import Derivative.Basics.Sum
 open import Cubical.Foundations.Equiv.HalfAdjoint
 open import Cubical.Foundations.Equiv.Dependent
 open import Cubical.Foundations.Path
-open import Cubical.Data.Empty.Base as Empty using (⊥*)
 open import Cubical.Data.Sigma.Properties
 open import Cubical.Relation.Nullary.Properties using (EquivPresDiscrete)
 open import Cubical.Functions.Embedding
@@ -169,8 +168,8 @@ module _ (S : Type ℓS) (P : S → Type ℓP) (Q : S → Type ℓQ) where
 
   Wᴰ-Path : ∀ {w₀ w₁} (h : WPath w₀ w₁) → (x : Wᴰ w₀) → (y : Wᴰ w₁) → Type (ℓ-max ℓS (ℓ-max ℓP ℓQ))
   Wᴰ-Path (s₀≡s₁ , f₀≡f₁) (top q₀) (top q₁) = Lift {j = ℓ-max ℓS ℓP} $ PathP (λ i → Q (s₀≡s₁ i)) q₀ q₁
-  Wᴰ-Path (s₀≡s₁ , f₀≡f₁) (top q₀) (below p₁ y) = ⊥*
-  Wᴰ-Path (s₀≡s₁ , f₀≡f₁) (below p₀ x) (top q₁) = ⊥*
+  Wᴰ-Path (s₀≡s₁ , f₀≡f₁) (top q₀) (below p₁ y) = 𝟘*
+  Wᴰ-Path (s₀≡s₁ , f₀≡f₁) (below p₀ x) (top q₁) = 𝟘*
   Wᴰ-Path (s₀≡s₁ , f₀≡f₁) (below p₀ x) (below p₁ y)
     = Σ[ p₀≡p₁ ∈ PathP (λ i → P (s₀≡s₁ i)) p₀ p₁ ] PathP (λ i → Wᴰ (f₀≡f₁ i (p₀≡p₁ i))) x y
 

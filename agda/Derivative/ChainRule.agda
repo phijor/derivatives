@@ -6,6 +6,7 @@ open import Derivative.Basics.Decidable as Dec
 open import Derivative.Basics.Embedding
 open import Derivative.Basics.Sigma
 open import Derivative.Basics.Sum as Sum using (_⊎_ ; inl ; inr)
+open import Derivative.Basics.Unit
 
 open import Derivative.Container
 open import Derivative.Derivative
@@ -17,7 +18,6 @@ open import Cubical.Foundations.Equiv.Properties
 open import Cubical.Foundations.Path using (congPathIso)
 open import Cubical.Foundations.Transport using (substEquiv ; isSet-subst ; subst⁻)
 open import Cubical.Data.Sigma
-open import Cubical.Data.Unit
 open import Cubical.Relation.Nullary.HLevels using (isPropDiscrete)
 
 private
@@ -127,7 +127,7 @@ DiscreteContainer→isEquivChainMap (F , disc-F) (G , disc-G) = isEquiv-Σ-isola
 isEquivChainMap→AllTypesDiscrete : hasChainEquiv ℓ → (A : Type ℓ) → Discrete A
 isEquivChainMap→AllTypesDiscrete {ℓ} is-equiv-chain-shape-map A = discrete-A where
   F : Container ℓ ℓ
-  F .Shape = Unit*
+  F .Shape = 𝟙*
   F .Pos _ = A
 
   G : (a₀ : A) → Container ℓ ℓ
@@ -137,7 +137,7 @@ isEquivChainMap→AllTypesDiscrete {ℓ} is-equiv-chain-shape-map A = discrete-A
   is-equiv-Σ-isolate-singl : (a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_))
   is-equiv-Σ-isolate-singl a₀ = isEquivChainRule→isEquiv-Σ-isolated F (G a₀)
     (is-equiv-chain-shape-map F (G a₀))
-    tt*
+    •
     (idfun A)
 
   discrete-A : Discrete A
@@ -164,9 +164,9 @@ isEquivChainMapSets→AllSetsDiscrete :
   ((A : hSet ℓ) → Discrete ⟨ A ⟩)
 isEquivChainMapSets→AllSetsDiscrete {ℓ} is-equiv-chain-shape-map (A , is-set-A) = discrete-A where
   F : SetContainer ℓ ℓ
-  F .fst .Shape = Unit*
+  F .fst .Shape = 𝟙*
   F .fst .Pos _ = A
-  F .snd .fst = isSetUnit*
+  F .snd .fst = isSet-𝟙*
   F .snd .snd _ = is-set-A
 
   G : (a₀ : A) → SetContainer ℓ ℓ
@@ -178,7 +178,7 @@ isEquivChainMapSets→AllSetsDiscrete {ℓ} is-equiv-chain-shape-map (A , is-set
   is-equiv-Σ-isolate-singl : (a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_))
   is-equiv-Σ-isolate-singl a₀ = isEquivChainRule→isEquiv-Σ-isolated _ _
     (is-equiv-chain-shape-map F (G a₀))
-    tt*
+    •
     (idfun A)
 
   discrete-A : Discrete A
@@ -225,15 +225,15 @@ impredicativeProp→hasChainEquiv→LEM ℓ Ω resize has-chain-equiv = dec-prop
   hProp-discrete : Discrete (hProp ℓ)
   hProp-discrete = EquivPresDiscrete resize Ω-discrete
 
-  ⊤ᴾ : hProp ℓ
-  ⊤ᴾ .fst = ⊤ ℓ
-  ⊤ᴾ .snd _ _ = refl
+  𝟙ᴾ : hProp ℓ
+  𝟙ᴾ .fst = 𝟙*
+  𝟙ᴾ .snd _ _ = refl
 
-  dec-equal-⊤ : (P : hProp ℓ) → Dec (P ≡ ⊤ᴾ)
-  dec-equal-⊤ P = hProp-discrete P ⊤ᴾ
+  dec-equal-𝟙 : (P : hProp ℓ) → Dec (P ≡ 𝟙ᴾ)
+  dec-equal-𝟙 P = hProp-discrete P 𝟙ᴾ
 
   dec-prop : ∀ P → Dec ⟨ P ⟩
   dec-prop P = Dec.map
-    (λ P≡⊤ → subst ⟨_⟩ (sym P≡⊤) tt*)
-    (λ P≢⊤ p → P≢⊤ $ Σ≡Prop (λ _ → isPropIsProp) (isContr→≡Unit* (inhProp→isContr p (str P))))
-    (dec-equal-⊤ P)
+    (λ P≡𝟙 → subst ⟨_⟩ (sym P≡𝟙) •)
+    (λ P≢𝟙 p → P≢𝟙 $ Σ≡Prop (λ _ → isPropIsProp) (isContr→≡𝟙* (inhProp→isContr p (str P))))
+    (dec-equal-𝟙 P)

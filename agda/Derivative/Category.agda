@@ -5,6 +5,7 @@ module Derivative.Category (ℓ : Level) where
 
 open import Derivative.Basics.Maybe
 open import Derivative.Basics.Sum
+open import Derivative.Basics.Unit
 
 open import Derivative.Container
 open import Derivative.Isolated
@@ -13,7 +14,6 @@ import      Derivative.Derivative as ∂
 open import Derivative.Adjunction
 
 
-open import Cubical.Data.Unit using (isSetUnit*)
 open import Cubical.WildCat.Base
 open import Cubical.WildCat.Functor hiding (_$_)
 open import Cubical.Categories.Category.Base
@@ -60,8 +60,8 @@ open UnitCounit {C = ℂont} {D = ℂont}
 
 _⊗Id₀ : SetContainer ℓ ℓ → SetContainer ℓ ℓ
 ((F , is-set-shape , is-set-pos) ⊗Id₀) .fst = F ⊗Id
-((F , is-set-shape , is-set-pos) ⊗Id₀) .snd .fst = isSet× is-set-shape isSetUnit*
-((F , is-set-shape , is-set-pos) ⊗Id₀) .snd .snd (s , _) = isSet⊎ (is-set-pos s) isSetUnit*
+((F , is-set-shape , is-set-pos) ⊗Id₀) .snd .fst = isSet× is-set-shape isSet-𝟙*
+((F , is-set-shape , is-set-pos) ⊗Id₀) .snd .snd (s , _) = isSet⊎ (is-set-pos s) isSet-𝟙*
 
 -⊗Id : Functor ℂont ℂont
 -⊗Id .Functor.F-ob = _⊗Id₀

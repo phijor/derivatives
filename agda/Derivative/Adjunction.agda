@@ -21,7 +21,7 @@ open Cart
 module _ (F : Container ℓ ℓ) where
   open Container F renaming (Shape to S ; Pos to P)
 
-  unit-shape : S → Σ[ s ∈ S × ⊤ ℓ ] (P (s .fst) ⊎ (⊤ ℓ)) °
+  unit-shape : S → Σ[ s ∈ S × 𝟙* {ℓ} ] (P (s .fst) ⊎ 𝟙*) °
   unit-shape s .fst = s , _
   unit-shape s .snd = nothing°
 
@@ -34,10 +34,10 @@ module _ (F : Container ℓ ℓ) where
 
 module _ (G : Container ℓ ℓ) where
   open Container G renaming (Shape to T ; Pos to Q)
-  counit-shape : (Σ[ t ∈ T ] (Q t) °) × (⊤ ℓ) → T
+  counit-shape : (Σ[ t ∈ T ] (Q t) °) × 𝟙* {ℓ} → T
   counit-shape ((t , _ , _) , _) = t
 
-  counit-pos : ∀ (t : T) (q : (Q t)) → isIsolated q → Q t ≃ ((Q t ∖ q) ⊎ ⊤ ℓ)
+  counit-pos : ∀ (t : T) (q : (Q t)) → isIsolated q → Q t ≃ ((Q t ∖ q) ⊎ 𝟙*)
   counit-pos t q isolated-q = unreplace-isolated-equiv q isolated-q
 
   counit : Cart (∂ G ⊗Id) G
@@ -45,7 +45,7 @@ module _ (G : Container ℓ ℓ) where
   counit .pos ((t , q , isolated-q) , _) = counit-pos t q isolated-q
 
 is-natural-unit : (F G : Container ℓ ℓ) (f : Cart F G) → unit F ⋆ ∂[ [ f ]⊗Id ] ≡ f ⋆ unit G
-is-natural-unit F G f = Cart≡ (funExt λ s → ΣPathP (refl′ (f .shape s , tt*) , Isolated≡ refl))
+is-natural-unit F G f = Cart≡ (funExt λ s → ΣPathP (refl′ (f .shape s , •) , Isolated≡ refl))
   $ funExt λ s → equivExt λ where
     (just q , _) → refl′ (equivFun (f .pos s) q)
     (nothing , nothing≢nothing) → ex-falso $ nothing≢nothing refl

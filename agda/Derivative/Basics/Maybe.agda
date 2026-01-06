@@ -11,15 +11,14 @@ private
     ℓ : Level
     A B : Type ℓ
 
--- TODO: Banish nothing : Maybe A into the lowest universe.
 Maybe : (A : Type ℓ) → Type ℓ
-Maybe {ℓ} A = A ⊎ ⊤ ℓ
+Maybe {ℓ} A = A ⊎ 𝟙* {ℓ}
 
-pattern nothing = inr tt*
+pattern nothing = inr •
 pattern just x = inl x
 
-maybe-equiv : A ≃ B → Maybe A ≃ Maybe B
-maybe-equiv e = Sum.⊎-equiv e $ invEquiv LiftEquiv ∙ₑ LiftEquiv
+maybe-equiv : {A B : Type ℓ} → A ≃ B → Maybe A ≃ Maybe B
+maybe-equiv e = Sum.⊎-left-≃ e
 
 nothing≢just : {a : A} → the (Maybe A) nothing ≢ (just a)
 nothing≢just nothing≡just = Sum.⊎Path.encode _ _ nothing≡just .lower

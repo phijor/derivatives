@@ -12,10 +12,6 @@ open import Derivative.Basics.Decidable as Dec
 open import Derivative.Isolated
 open import Derivative.Remove
 
--- Re-export indexing types
-open import Cubical.Data.Empty.Base renaming (⊥ to 𝟘 ; ⊥* to 𝟘*) public
-open import Cubical.Data.Unit.Base renaming (Unit to 𝟙 ; tt to • ; tt* to •*) public -- • = \bub
-
 open import Cubical.Data.Bool.Base using (Bool* ; true ; false)
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv using (isPropIsEquiv)
@@ -56,8 +52,8 @@ pattern ₀ = inl •
 _ : 𝟚
 _ = ₀
 
-pattern ₁ = inr •*
-{-# DISPLAY inr •* = ₁ #-}
+pattern ₁ = inr •
+{-# DISPLAY inr • = ₁ #-}
 _ : 𝟚
 _ = ₁
 
@@ -69,7 +65,7 @@ _ = ₁
 ₁° : 𝟚 °
 ₁° .fst = ₁
 ₁° .snd (inl _) = no inr≢inl
-₁° .snd (inr (lift _)) = yes refl
+₁° .snd (inr _) = yes refl
 
 Container-Σ-Iso : Iso (Container ℓ Ix) (Σ[ S ∈ Type ℓ ] (Ix → S → Type ℓ))
 Container-Σ-Iso .Iso.fun (S ◁ P) = S , P

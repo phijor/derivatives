@@ -3,13 +3,11 @@ module Derivative.Container where
 
 open import Derivative.Prelude
 import      Derivative.Basics.Maybe as Maybe
+open import Derivative.Basics.Sum as Sum using (_⊎_)
 
 open import Cubical.Foundations.Transport using (substEquiv)
 open import Cubical.Reflection.RecordEquiv
-open import Cubical.Data.Empty as Empty using (⊥*)
 open import Cubical.Data.Sigma.Base
-open import Cubical.Data.Sum.Base as Sum using (_⊎_)
-import      Cubical.Data.Unit as Unit
 
 record Container (ℓS ℓP : Level) : Type (ℓ-suc (ℓ-max ℓS ℓP)) where
   -- no-eta-equality
@@ -47,8 +45,8 @@ _⊗_ : (F G : Container ℓS ℓP) → Container _ _
 infix 11 _⊗_
 
 Id : Container ℓS ℓP
-Id .Shape = ⊤ _
-Id .Pos = const $ ⊤ _
+Id .Shape = 𝟙*
+Id .Pos = const 𝟙*
 
 _⊗Id : Container ℓS ℓP → Container ℓS ℓP
 F ⊗Id = F ⊗ Id
@@ -61,10 +59,10 @@ infix 10 _⊕_
 
 Const : (S : Type ℓ) → Container ℓ ℓ
 Const S .Shape = S
-Const S .Pos _ = ⊥*
+Const S .Pos _ = 𝟘*
 
 One : (ℓ : Level) → Container ℓ ℓ
-One ℓ = Const Unit.Unit*
+One ℓ = Const 𝟙*
 
 record Cart {ℓS ℓT ℓP ℓQ} (F : Container ℓS ℓP) (G : Container ℓT ℓQ) : Type (ℓ-max (ℓ-max ℓS ℓP) (ℓ-max ℓT ℓQ)) where
   constructor [_◁_]
@@ -140,7 +138,7 @@ open CartReasoning public
 
 [_]⊗Id : {F G : Container ℓS ℓP} → Cart F G → Cart (F ⊗Id) (G ⊗Id)
 [_]⊗Id {F} {G} f .shape s = f .shape (s .fst) , _
-[_]⊗Id {F} {G} f .pos s = Maybe.maybe-equiv (f .pos (s .fst))
+[_]⊗Id {F} {G} f .pos s = Sum.⊎-left-≃ (f .pos (s .fst))
 
 record Equiv (F G : Container ℓS ℓP) : Type (ℓ-max ℓS ℓP) where
   constructor [_◁≃_]

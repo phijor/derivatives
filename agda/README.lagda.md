@@ -14,10 +14,9 @@ open import Derivative.Basics.Embedding
 open import Derivative.Basics.Equiv
 open import Derivative.Basics.Maybe
 open import Derivative.Basics.Sum
+open import Derivative.Basics.Unit
 
 open import Cubical.Data.Nat.Base
-open import Cubical.Data.Unit.Properties using (isPropUnit*)
-open import Cubical.Data.Empty.Base using (⊥*)
 open import Cubical.Functions.Surjection
 open import Cubical.Categories.Category.Base
 open import Cubical.Categories.Functor.Base
@@ -33,9 +32,6 @@ private
     A B : Type ℓ
     a : A
     Ix : Type
-
-  𝟙 = Unit*
-  𝟘 = ⊥*
 ```
 -->
 
@@ -129,7 +125,7 @@ The isolated points of `Maybe A` are those of `A` or `nothing`:
 _ : (A : Type) → (Maybe A) ° ≃ Maybe (A °)
 _ = λ A →
   (Maybe A) °     ≃⟨ IsolatedSumEquiv ⟩
-  (A °) ⊎ (⊤ _ °) ≃⟨ ⊎-right-≃ (isProp→IsolatedEquiv isPropUnit*) ⟩
+  (A °) ⊎ (𝟙 °) ≃⟨ ⊎-right-≃ (isProp→IsolatedEquiv isProp-𝟙*) ⟩
   Maybe (A °)     ≃∎
 ```
 

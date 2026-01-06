@@ -9,7 +9,6 @@ open import Cubical.Foundations.Equiv renaming (_■ to _≃∎) public
 open import Cubical.Foundations.HLevels public
 open import Cubical.Reflection.StrictEquiv public
 open import Cubical.Data.Sigma using (_×_ ; ΣPathP ; Σ≡Prop ; ∃-syntax ; ∃!-syntax) public
-open import Cubical.Data.Unit.Base using (tt ; tt*) public
 open import Cubical.Relation.Nullary.Base using (¬_) public
 
 import      Cubical.Core.Primitives as Primitives
@@ -21,7 +20,6 @@ open import Cubical.Functions.FunExtEquiv
 open import Cubical.Data.Sigma hiding (hcomp ; comp)
 import      Cubical.Data.Empty as Empty
 open import Cubical.Data.Nat.Base using (ℕ ; zero ; suc)
-open import Cubical.Data.Unit.Base
 open import Cubical.Data.Unit.Properties using (isContr→Iso2)
 open import Cubical.HITs.PropositionalTruncation as PT using (∥_∥₁)
 
@@ -74,6 +72,21 @@ module _
   where
   flipSquareH : Square l r b t → Square (sym l) (sym r) t b
   flipSquareH sq i j = sq i (~ j)
+
+data 𝟘* {ℓ : Level} : Type ℓ where
+
+𝟘 = 𝟘* {ℓ-zero}
+{-# DISPLAY 𝟘* {ℓ-zero} = 𝟘 #-}
+
+ex-falso : Empty.⊥ → A
+ex-falso ()
+
+record 𝟙* {ℓ : Level} : Type ℓ where
+  constructor • -- \bub
+
+𝟙 : Type
+𝟙 = 𝟙* {ℓ-zero}
+{-# DISPLAY 𝟙* {ℓ-zero} = 𝟙 #-}
 
 -- refl with explicit argument
 refl′ : (a : A) → a ≡ a
@@ -162,12 +175,6 @@ isContr≃inh×isProp : isContr A ≃ (A × isProp A)
 isContr≃inh×isProp .fst is-contr-A = is-contr-A .fst , isContr→isProp is-contr-A
 isContr≃inh×isProp .snd = isPointedTarget→isEquiv→isEquiv _ λ where
   (a₀ , is-prop-A) → equivIsEquiv $ propBiimpl→Equiv isPropIsContr (isProp× is-prop-A isPropIsProp) _ (uncurry inhProp→isContr)
-
-⊤ : (ℓ : Level) → Type ℓ
-⊤ _ = Unit*
-
-ex-falso : Empty.⊥ → A
-ex-falso ()
 
 substAdjointEquiv : (B : A → Type ℓ) {x y : A} (p : x ≡ y)
   → {x′ : B x} {y′ : B y}

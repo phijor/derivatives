@@ -11,7 +11,6 @@ open import Derivative.Remove
 open import Cubical.Foundations.Equiv.Properties
 open import Cubical.Data.Nat.Base using (_+_)
 open import Cubical.Data.Sigma
-open import Cubical.Data.Unit
 open import Cubical.Data.Sum.Base as Sum using (_⊎_ ; inl ; inr)
 
 private

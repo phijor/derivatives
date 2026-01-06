@@ -5,6 +5,7 @@ open import Derivative.Prelude
 open import Derivative.Basics.Decidable as Dec
 open import Derivative.Basics.Maybe
 open import Derivative.Basics.Sum as Sum using (_⊎_ ; inl ; inr)
+open import Derivative.Basics.Unit
 
 open import Derivative.Isolated
 open import Derivative.Remove
@@ -13,69 +14,62 @@ open import Derivative.Container
 open import Derivative.Derivative
 
 open import Cubical.Foundations.Equiv.Properties
-open import Cubical.Data.Empty as Empty using (⊥*)
 open import Cubical.Data.Sigma
-open import Cubical.Data.Unit
+open import Cubical.Data.Empty using (uninhabEquiv)
 
 private
   variable
     ℓ ℓS ℓP : Level
 
-  𝟘 : (ℓ : Level) → Type ℓ
-  𝟘 _ = ⊥*
-
-  𝟙 : (ℓ : Level) → Type ℓ
-  𝟙 _ = Unit*
-
 open Container
 open Cart
 
-∂-Const : (S : Type ℓ) → Equiv (∂ (Const S)) (Const (𝟘 _))
-∂-Const S .Equiv.shape = Empty.uninhabEquiv (λ ()) lower
+∂-Const : (S : Type ℓ) → Equiv (∂ (Const S)) (Const 𝟘*)
+∂-Const S .Equiv.shape = uninhabEquiv (λ ()) (λ ())
 ∂-Const S .Equiv.pos ()
 
 ∂-prop-trunc : (S : Type ℓ) {P : S → Type ℓ} → (∀ s → isProp (P s))
-  → Equiv (∂ (S ◁ P)) (Σ S P ◁ const (𝟘 _))
+  → Equiv (∂ (S ◁ P)) (Σ S P ◁ const 𝟘*)
 ∂-prop-trunc S {P} is-prop-P =
   ∂ (S ◁ P)
     ⊸≃⟨⟩
   [ (s , p , _) ∈ Σ[ s ∈ S ] (P s) ° ]◁ (P s ∖ p)
     ⊸≃⟨ Equiv-fst $ Σ-cong-equiv-snd (λ s → isProp→IsolatedEquiv (is-prop-P s)) ⟩
   [ (s , p) ∈ Σ S P ]◁ (P s ∖ p)
-    ⊸≃⟨ Equiv-snd (λ (s , p) → Empty.uninhabEquiv (λ ()) (isProp→isEmptyRemove (is-prop-P s) p)) ⟩
-  [ (s , p) ∈ Σ S P ]◁ (𝟘 _)
+    ⊸≃⟨ Equiv-snd (λ (s , p) → uninhabEquiv (λ ()) (isProp→isEmptyRemove (is-prop-P s) p)) ⟩
+  [ (s , p) ∈ Σ S P ]◁ 𝟘*
     ⊸≃∎
 
-∂-prop : (P : Type ℓ) → isProp P → Equiv (∂ (𝟙 ℓ ◁ const P)) (P ◁ const (𝟘 _))
+∂-prop : (P : Type ℓ) → isProp P → Equiv (∂ (𝟙* {ℓ} ◁ const P)) (P ◁ const 𝟘*)
 ∂-prop {ℓ} P is-prop-P =
-  ∂ (𝟙 ℓ ◁ const P)
-    ⊸≃⟨ ∂-prop-trunc (𝟙 _) {P = const P} (const is-prop-P) ⟩
-  ((𝟙 ℓ × P) ◁ const (𝟘 _))
-    ⊸≃⟨ Equiv-fst (isoToEquiv lUnit*×Iso) ⟩
-  (P ◁ const (𝟘 _))
+  ∂ (𝟙* {ℓ} ◁ const P)
+    ⊸≃⟨ ∂-prop-trunc 𝟙* {P = const P} (const is-prop-P) ⟩
+  ((𝟙* × P) ◁ const 𝟘*)
+    ⊸≃⟨ Equiv-fst 𝟙*-unit-×-left-equiv ⟩
+  (P ◁ const 𝟘*)
     ⊸≃∎
 
-∂-Id : Equiv (∂ Id) (Const (𝟙 ℓ))
-∂-Id = ∂-prop (𝟙 _) isPropUnit*
+∂-Id : Equiv (∂ Id) (Const (𝟙* {ℓ}))
+∂-Id = ∂-prop 𝟙* isProp-𝟙*
 
 𝕂 : (A : Type ℓ) → Container ℓ ℓ
 𝕂 A .Shape = A
-𝕂 A .Pos = const (𝟘 _)
+𝕂 A .Pos = const 𝟘*
 
 𝕪[_] : (A : Type ℓ) → Container ℓ ℓ
-𝕪[ A ] .Shape = 𝟙 _
+𝕪[ A ] .Shape = 𝟙*
 𝕪[ A ] .Pos = const A
 
 ∂-𝕪° : (A : Type ℓ) → (a° : A °) → Equiv (∂ 𝕪[ A ]) ([ a ∈ A ° ]◁ (A ∖° a))
 ∂-𝕪° {ℓ} A a°@(a₀ , a₀≟_) =
-  ∂ (𝟙 _ ◁ const A)
+  ∂ (𝟙* ◁ const A)
     ⊸≃⟨⟩
-  ([ (_ , a) ∈ 𝟙 ℓ × (A °) ]◁ (A ∖° a))
-    ⊸≃⟨ Equiv-fst (isoToEquiv lUnit*×Iso) ⟩
+  ([ (_ , a) ∈ 𝟙* × (A °) ]◁ (A ∖° a))
+    ⊸≃⟨ Equiv-fst 𝟙*-unit-×-left-equiv ⟩
   ([ a ∈ A ° ]◁ (A ∖° a))
     ⊸≃∎
 
-∂-𝕪 : (A : Type ℓ) → Discrete A → Equiv (∂ 𝕪[ A ⊎ (𝟙 ℓ) ]) (𝕂 (A ⊎ 𝟙 ℓ) ⊗ 𝕪[ A ])
+∂-𝕪 : (A : Type ℓ) → Discrete A → Equiv (∂ 𝕪[ A ⊎ 𝟙* ]) (𝕂 (A ⊎ 𝟙*) ⊗ 𝕪[ A ])
 ∂-𝕪 {ℓ} A discrete-A = [ isoToEquiv shape-Iso ◁≃ invEquiv ∘ pos-equiv ] where
   shape-Iso : Iso _ _
   shape-Iso .Iso.fun (_ , x , _) = x , _
@@ -86,7 +80,7 @@ open Cart
   shape-Iso .Iso.leftInv (_ , just a , _) = ≡-× refl (Isolated≡ $ refl′ $ just a)
   shape-Iso .Iso.leftInv (_ , nothing , _) = ≡-× refl (Isolated≡ $ refl′ nothing)
 
-  pos-equiv : ((_ , x) : _ × (Maybe A °)) → ((Maybe A) ∖° x) ≃ (𝟘 _ ⊎ A)
+  pos-equiv : ((_ , x) : _ × (Maybe A °)) → ((Maybe A) ∖° x) ≃ (𝟘* ⊎ A)
   pos-equiv (_ , x) = e x ∙ₑ (Sum.⊎-empty-left λ ()) where
     e : (x : Maybe A °) → ((Maybe A) ∖° x) ≃ A
     e (nothing , _) = removeNothingEquiv

@@ -10,8 +10,7 @@ open import Cubical.Foundations.Equiv.Properties using (preCompEquiv ; equivAdjo
 open import Cubical.Functions.Embedding using (_↪_ ; EmbeddingΣProp)
 open import Cubical.Data.Nat.Base
 open import Cubical.Data.Sigma
-open import Cubical.Data.Unit as Unit using (Unit*)
-open import Cubical.Data.Empty as Empty using (⊥*)
+import      Cubical.Data.Empty as Empty
 open import Cubical.Relation.Nullary using (isProp¬)
 
 private
@@ -49,12 +48,6 @@ isProp→isEmptyRemove is-prop a₀ (a , a₀≢a) = a₀≢a (is-prop a₀ a)
 
 isContr→isEmptyRemove : isContr A → ∀ a₀ → ¬ (A ∖ a₀)
 isContr→isEmptyRemove = isProp→isEmptyRemove ∘ isContr→isProp
-
-RemoveUnit : ¬ ((Unit* {ℓ}) ∖ tt*)
-RemoveUnit = isContr→isEmptyRemove Unit.isContrUnit* _
-
-RemoveUnitEquiv : ∀ {ℓ′} → ((Unit* {ℓ}) ∖ tt*) ≃ ⊥* {ℓ′}
-RemoveUnitEquiv = Empty.uninhabEquiv RemoveUnit lower
 
 remove-left-Iso : ∀ {a : A} → Iso ((A ∖ a) ⊎ B) ((A ⊎ B) ∖ (inl a))
 remove-left-Iso .Iso.fun (inl (a′ , neq)) = inl a′ , neq ∘ Sum.inlInj
