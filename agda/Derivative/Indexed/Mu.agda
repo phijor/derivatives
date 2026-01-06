@@ -218,7 +218,7 @@ module _ (F : Container ℓ (Maybe Ix)) where
         open shape-≡-ext s f using (p ; q)
 
         yᴰ : _ ≃ _
-        yᴰ = α.pos ix (s , ζ.shape ∘ f) ∙ₑ ⊎-right-≃ (Σ-cong-equiv-snd (ζ.pos ix ∘ f)) ∙ₑ Wᴰ-in-equiv _ _ _ s f
+        yᴰ = α.pos ix (s , ζ.shape ∘ f) ∙ₑ ⊎-right-≃ (Σ-cong-equiv-snd' (ζ.pos ix ∘ f)) ∙ₑ Wᴰ-in-equiv _ _ _ s f
 
         pᴰ-fun : PathP (λ i → Pos G ix (shape-≡-ext.p s f i) → μ.pos F ix (sup s f)) (equivFun $ μ-rec.pos G α ix (sup s f)) (equivFun yᴰ)
         pᴰ-fun i =

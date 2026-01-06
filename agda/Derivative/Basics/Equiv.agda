@@ -39,6 +39,22 @@ equivPathPEquiv {A} {B} {e₀} {e₁} = isoToEquiv iso module equivPathPEquiv wh
   iso .Iso.rightInv _ = ΣSquarePProp isPropIsEquiv refl
   iso .Iso.leftInv _ = refl
 
+invEquivPathP : ∀ {ℓ ℓ′} {A : I → Type ℓ} {B : I → Type ℓ′}
+  → {e₀ : A i0 ≃ B i0} {e₁ : A i1 ≃ B i1}
+  → PathP (λ i → B i → A i) (invEq e₀) (invEq e₁)
+  → PathP (λ i → A i ≃ B i) e₀ e₁
+invEquivPathP {A} {B} {e₀} {e₁} p = equivPathP p⁺ where
+  p⁻ : PathP (λ i → B i ≃ A i) (invEquiv e₀) (invEquiv e₁)
+  p⁻ = equivPathP p
+
+  p⁺-ext : {a₀ : A i0} {a₁ : A i1}
+    → PathP A a₀ a₁
+    → PathP B (equivFun e₀ a₀) (equivFun e₁ a₁)
+  p⁺-ext {a₀} {a₁} a₀≡a₁ i = invEq (p⁻ i) (a₀≡a₁ i)
+
+  p⁺ : PathP (λ i → A i → B i) (equivFun e₀) (equivFun e₁)
+  p⁺ = funExtNonDep p⁺-ext
+
 preCompEquivFiberEquiv : (e : A ≃ B) (f : B → C) → ∀ c → fiber (equivFun e ⨟ f) c ≃ fiber f c
 preCompEquivFiberEquiv {A} {B} {C} e f c =
   Σ[ a ∈ A ] f (equivFun e a) ≡ c

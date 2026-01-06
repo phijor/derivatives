@@ -1,8 +1,9 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --safe #-}
 module Derivative.Indexed.Container where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Embedding using (isEmbedding-Σ-map-snd ; isEmbeddingPostComp)
+open import Derivative.Basics.Equiv
 open import Derivative.Basics.Maybe
 open import Derivative.Basics.Sigma
 open import Derivative.Basics.Sum
@@ -26,6 +27,7 @@ open import Cubical.Foundations.Equiv.Properties
     )
 open import Cubical.Foundations.Univalence using (ua)
 open import Cubical.Foundations.Transport using (substEquiv ; subst2Equiv)
+open import Cubical.Functions.FunExtEquiv using (funExt₂)
 open import Cubical.Functions.Embedding using (isEmbedding ; isEquiv→isEmbedding)
 
 record Container (ℓ : Level) (Ix : Type ℓ) : Type (ℓ-suc ℓ) where
@@ -98,20 +100,30 @@ infix 1 _⊸_
 ⊸-Σ-equiv : ∀ {F G : Container ℓ Ix} → (F ⊸ G) ≃ (Σ[ shape ∈ (F .Shape → G .Shape) ] ∀ ix s → G .Pos ix (shape s) ≃ F .Pos ix s)
 ⊸-Σ-equiv = strictIsoToEquiv ⊸-Σ-Iso
 
-⊸≡ : {F G : Container ℓ Ix}
-  → {φ γ : F ⊸ G}
-  → (p : φ ._⊸_.shape ≡ γ ._⊸_.shape)
-  → (q : PathP (λ i → (ix : Ix) (s : F .Shape) → G .Pos ix (p i s) ≃ F .Pos ix s) (φ ._⊸_.pos) (γ ._⊸_.pos))
-  → φ ≡ γ
-⊸≡ p q i ._⊸_.shape = p i
-⊸≡ p q i ._⊸_.pos = q i
+module _ {F G : Container ℓ Ix} {φ γ : F ⊸ G} where
+  private
+    module φ = _⊸_ φ
+    module γ = _⊸_ γ
 
-⊸≡-ext : {F G : Container ℓ Ix}
-  → {φ γ : F ⊸ G}
-  → (p : φ ._⊸_.shape ≡ γ ._⊸_.shape)
-  → (q : (ix : Ix) (s : F .Shape) → PathP (λ i → G .Pos ix (p i s) → F .Pos ix s) (equivFun $ φ ._⊸_.pos ix s) (equivFun $ γ ._⊸_.pos ix s))
-  → φ ≡ γ
-⊸≡-ext p q = ⊸≡ p (funExt λ ix → funExt λ s → equivPathP (q ix s))
+  ⊸≡ :
+    ∀ (p : φ.shape ≡ γ.shape)
+    → (q : PathP (λ i → (ix : Ix) (s : F .Shape) → G .Pos ix (p i s) ≃ F .Pos ix s) φ.pos γ.pos)
+    → φ ≡ γ
+  ⊸≡ p q i ._⊸_.shape = p i
+  ⊸≡ p q i ._⊸_.pos = q i
+
+  ⊸≡-ext :
+    ∀ (p : φ ._⊸_.shape ≡ γ ._⊸_.shape)
+    → (q : (ix : Ix) (s : F .Shape) → PathP (λ i → G .Pos ix (p i s) → F .Pos ix s) (equivFun $ φ.pos ix s) (equivFun $ γ.pos ix s))
+    → φ ≡ γ
+  ⊸≡-ext p q = ⊸≡ p (funExt λ ix → funExt λ s → equivPathP (q ix s))
+
+  ⊸≡-ext⁻ : (p : φ.shape ≡ γ.shape)
+    → (q : (ix : Ix) (s : F .Shape) → PathP (λ i → F .Pos ix s → G .Pos ix (p i s)) (invEq $ φ.pos ix s) (invEq $ γ.pos ix s))
+    → φ ≡ γ
+  ⊸≡-ext⁻ p q⁻ = ⊸≡ p q⁺ where
+    q⁺ : PathP (λ i → ∀ ix s → G .Pos ix (p i s) ≃ F .Pos ix s) φ.pos γ.pos
+    q⁺ = funExt₂ λ ix s → invEquivPathP (q⁻ ix s)
 
 _⋆_ : ∀ {F G H : Container ℓ Ix} → (F ⊸ G) → (G ⊸ H) → (F ⊸ H)
 (f ⋆ g) ._⊸_.shape = g ._⊸_.shape ∘ f ._⊸_.shape
@@ -126,6 +138,12 @@ infixl 9 _⋆_
 id : (F : Container ℓ Ix) → F ⊸ F
 id F ._⊸_.shape s = s
 id F ._⊸_.pos s i = idEquiv _
+
+⋆-id-left : {F G : Container ℓ Ix} → (f : F ⊸ G) → id F ⋆ f ≡ f
+⋆-id-left f = ⊸≡-ext refl λ ix s → refl
+
+⋆-id-right : {F G : Container ℓ Ix} → (g : F ⊸ G) → g ⋆ id G ≡ g
+⋆-id-right g = ⊸≡-ext refl λ ix s → refl
 
 _Π⊸_ : (F G : Container ℓ Ix) → Type ℓ
 F Π⊸ G = (s : F .Shape) → Σ[ t ∈ G .Shape ] ∀ ix → G .Pos ix t ≃ F .Pos ix s
@@ -147,10 +165,23 @@ record Equiv (F G : Container ℓ Ix) : Type ℓ where
 _⧟_ : (F G : Container ℓ Ix) → Type ℓ
 _⧟_ = Equiv
 
+Equiv-Σ-Iso : (F G : Container ℓ Ix) → Iso (Equiv F G) (Σ[ shape ∈ F .Shape ≃ G .Shape ] ∀ ix s → G .Pos ix (equivFun shape s) ≃ F .Pos ix s)
+Equiv-Σ-Iso F G .Iso.fun [ shape ◁≃ pos ] = shape , pos
+Equiv-Σ-Iso F G .Iso.inv (shape , pos) = [ shape ◁≃ pos ]
+Equiv-Σ-Iso F G .Iso.rightInv _ = refl
+Equiv-Σ-Iso F G .Iso.leftInv _ = refl
+
+Equiv-Σ-equiv : (F G : Container ℓ Ix) → (Equiv F G) ≃ (Σ[ shape ∈ F .Shape ≃ G .Shape ] ∀ ix s → G .Pos ix (equivFun shape s) ≃ F .Pos ix s)
+Equiv-Σ-equiv F G = strictIsoToEquiv (Equiv-Σ-Iso F G)
+
 _⋆ₑ_ : ∀ {F G H : Container ℓ Ix} → (F ⧟ G) → (G ⧟ H) → (F ⧟ H)
 (f ⋆ₑ g) .Equiv.shape = f .Equiv.shape ∙ₑ g .Equiv.shape
 (f ⋆ₑ g) .Equiv.pos i s = g .Equiv.pos i (equivFun (f .Equiv.shape) s) ∙ₑ f .Equiv.pos i s
 infixl 9 _⋆ₑ_
+
+idₑ : (F : Container ℓ Ix) → F ⧟ F
+idₑ F .Equiv.shape = idEquiv _
+idₑ F .Equiv.pos ix s = idEquiv _
 
 isContainerEquiv : {F G : Container ℓ Ix} → F ⊸ G → Type _
 isContainerEquiv f = isEquiv (_⊸_.shape f)
@@ -214,13 +245,6 @@ isContainerEquivCompLeftRight : {F F′ G G′ : Container ℓ Ix}
 isContainerEquivCompLeftRight f g e is-equiv-comp = isContainerEquivCompLeft e g is-equiv-comp' where
   is-equiv-comp' : isContainerEquiv (e ⋆ Equiv.as-⊸ g)
   is-equiv-comp' = isContainerEquivCompRight f (e ⋆ Equiv.as-⊸ g) is-equiv-comp
-
-containerAdjointEquiv : {F G H : Container ℓ Ix}
-  → (e : F ⧟ G)
-  → (f₀ : F ⊸ H)
-  → (f₁ : G ⊸ H)
-  → (f₀ ≡ (Equiv.as-⊸ e) ⋆ f₁) ≃ (Equiv.as-⊸ (Equiv.inv e) ⋆ f₀ ≡ f₁)
-containerAdjointEquiv e f₀ f₁ = {!  !}
 
 isContainerEmbedding : {F G : Container ℓ Ix} → F ⊸ G → Type _
 isContainerEmbedding f = isEmbedding (_⊸_.shape f)
@@ -300,7 +324,7 @@ private
       F .Pos (just i) s ⊎ (Σ[ p ∈ F .Pos nothing s ] G′ .Pos i (φ.shape (f p)))
         ≃
       F .Pos (just i) s ⊎ (Σ[ p ∈ F .Pos nothing s ] G .Pos i (f p))
-  pos i (s , f) = ⊎-right-≃ $ Σ-cong-equiv-snd λ p → φ.pos i (f p)
+  pos i (s , f) = ⊎-right-≃ $ Σ-cong-equiv-snd' λ p → φ.pos i (f p)
 
 isEquiv-[-]-map : (F : Container ℓ (Maybe Ix)) {G G′ : Container ℓ Ix}
   → (φ : G ⊸ G′)

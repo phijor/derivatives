@@ -61,6 +61,13 @@ inr≢inl p = Sum.⊎Path.encode _ _ p .lower
 ⊎-map-right f (inl a) = inl a
 ⊎-map-right f (inr b) = inr (f b)
 
+⊎-map-right-cong : ∀ {C : Type ℓ}
+  → {f g : B → C}
+  → (f ≡ g)
+  → ⊎-map-right {A = A} f ≡ ⊎-map-right g
+⊎-map-right-cong p i (inl a) = inl a
+⊎-map-right-cong p i (inr b) = inr (p i b)
+
 ⊎-right-Iso : ∀ {C : Type ℓ} → Iso B C → Iso (A ⊎ B) (A ⊎ C)
 ⊎-right-Iso iso .Iso.fun = ⊎-map-right (iso .Iso.fun)
 ⊎-right-Iso iso .Iso.inv = ⊎-map-right (iso .Iso.inv)
