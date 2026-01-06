@@ -571,8 +571,14 @@ import Derivative.Indexed.Container as IndexedContainer
 <!--
 ```agda
 open IndexedContainer
-  using (₀ ; ₁ ; ₀° ; ₁° ; tt° ; 𝟚 ; _⊸_ ; isContainerEquiv)
-  renaming (_⊗_ to _⊗ᴵ_ ; _⊕_ to _⊕ᴵ_ ; isContainerEmbedding to isContainerEmbeddingᴵ)
+  using (₀ ; ₁ ; ₀° ; ₁° ; tt° ; 𝟚 ; _⊸_ ; isContainerEquiv ; _⧟_)
+  renaming
+    ( _⊗_ to _⊗ᴵ_
+    ; _⊕_ to _⊕ᴵ_
+    ; _⋆_ to _⋆ᴵ_
+    ; isContainerEmbedding to isContainerEmbeddingᴵ
+    ; [-]-map to [_]-map
+    )
 open IndexedContainer.Container
 ```
 -->
@@ -657,7 +663,54 @@ _ = DiscreteContainer→isEquivBinaryChainRule
 ### Fixed Points of Containers
 
 ```agda
-import Derivative.Indexed.Mu
+open import Derivative.Indexed.Mu
+```
+
+**Problem 5.9**:
+Substitution `F[_]` is an endofunctor.
+```agda
+```
+
+**Problem 5.10**:
+`F[_]`-algebras form a wild category.
+```agda
+```
+
+**Definition 5.12**:
+For any `I+1`-indexed container `F` there is an `I`-indexed fixed point container `μ F`.
+```agda
+_ : (F : IndexedContainer (Maybe Ix)) → IndexedContainer Ix
+_ = μ
+```
+
+**Problem 5.13**:
+Define an equivalence of containers `F [ μ F ] ⧟ μ F`.
+```agda
+_ : (F : IndexedContainer (Maybe Ix)) → (F [ μ F ]ᴵ) ⧟ (μ F)
+_ = μ-in-equiv
+```
+
+**Problem 5.14**:
+Derive a recursion principle for fixed-point containers.
+```agda
+module _
+  (F : IndexedContainer (Maybe Ix))
+  (G : IndexedContainer Ix)
+  (α : F [ G ]ᴵ ⊸ G)
+  where
+  _ : μ F ⊸ G
+  _ = μ-rec F G α
+
+  _ : μ-in F ⋆ᴵ μ-rec F G α ≡ [ F ]-map (μ-rec F G α) ⋆ᴵ α
+  _ = μ-rec-β F G α
+```
+
+**Theorem 5.15**:
+Every signature container admits a smallest fixed point in the wild category of containers.
+For any `F[_]`-algebra `(G, α)`, there is a unique algebra map `α* : μ F ⊸ G`:
+```agda
+  _ : ∃![ α* ∈ μ F ⊸ G ] μ-in F ⋆ᴵ α* ≡ [ F ]-map α* ⋆ᴵ α
+  _ = μ-rec-unique F G α
 ```
 
 ### The Fixed Point Rule
