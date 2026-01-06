@@ -15,6 +15,7 @@ open import Derivative.Basics.Equiv
 open import Derivative.Basics.Maybe
 open import Derivative.Basics.Sum
 open import Derivative.Basics.Unit
+open import Derivative.Basics.W
 
 open import Cubical.Data.Nat.Base
 open import Cubical.Functions.Surjection
@@ -564,21 +565,6 @@ _ = isEquivChainMapSets≃AllSetsDiscrete
 import Derivative.Indexed.Container as IndexedContainer
 ```
 
-<!--
-```agda
-open IndexedContainer
-  using (₀ ; ₁ ; 𝟚 ; _⊸_ ; isContainerEquiv ; _⧟_)
-  renaming
-    ( _⊗_ to _⊗ᴵ_
-    ; _⊕_ to _⊕ᴵ_
-    ; _⋆_ to _⋆ᴵ_
-    ; isContainerEmbedding to isContainerEmbeddingᴵ
-    ; [-]-map to [_]-map
-    )
-open IndexedContainer.Container
-```
--->
-
 **Definition 5.1**:
 Indexed containers have positions indexed by some `Ix : Type`.
 ```agda
@@ -590,8 +576,21 @@ _ = IndexedContainer.Container-Σ-equiv
 ```
 
 ??? note "Overloading notation"
-    Unfortunately, Agda does not allow to overload the names of definitions for indexed and non-indexed containers.
+    Unfortunately, Agda does not allow overloading the names of definitions for indexed and non-indexed containers.
     The indexed versions are suffixed with `ᴵ`, if necessary.
+
+```agda
+open IndexedContainer
+  using (₀ ; ₁ ; 𝟚 ; _⊸_ ; isContainerEquiv ; _⧟_ ; ↑ ; π₁)
+  renaming
+    ( _⊗_ to _⊗ᴵ_
+    ; _⊕_ to _⊕ᴵ_
+    ; _⋆_ to _⋆ᴵ_
+    ; isContainerEmbedding to isContainerEmbeddingᴵ
+    ; [-]-map to [_]-map
+    )
+open IndexedContainer.Container
+```
 
 **Definition 5.3**:
 Substitution for indexed containers.
@@ -711,5 +710,93 @@ For any `F[_]`-algebra `(G, α)`, there is a unique algebra map `α* : μ F ⊸ 
 ### The Fixed Point Rule
 
 ```agda
-import Derivative.Indexed.MuRule
+open import Derivative.Indexed.MuRule
+```
+
+**Problem 5.16**:
+The lax μ-rule.
+```agda
+_ : (F : IndexedContainer 𝟚)
+  → μ (↑ (∂₀ F [ μ F ]ᴵ) ⊕ᴵ (↑ (∂₁ F [ μ F ]ᴵ) ⊗ᴵ π₁)) ⊸ ∂• (μ F)
+_ = μ-rule
+```
+
+**Lemma 5.17**:
+The μ-recursor reflects equivalences:
+```agda
+_ : (F : IndexedContainer (Maybe Ix)) (G : IndexedContainer Ix)
+  → (φ : (F [ G ]ᴵ) ⊸ G)
+  → isContainerEquiv (μ-rec F G φ)
+  → isContainerEquiv φ
+_ = isEquivFrom-μ-rec
+```
+
+**Proposition 5.18**:
+If the μ-rule is an equivalence, then so is the corresponding chain rule.
+```agda
+_ : (F : IndexedContainer 𝟚)
+  → isContainerEquiv (μ-rule F)
+  → isContainerEquiv (binary-chain-rule F (μ F))
+_ = isEquiv-μ-rule.isEquiv-chain-rule
+```
+
+**Lemma 5.19**:
+The μ-recursor preserves embeddings.
+```agda
+_ : (F : IndexedContainer (Maybe Ix)) (G : IndexedContainer Ix)
+  → (φ : (F [ G ]ᴵ) ⊸ G)
+  → isContainerEmbeddingᴵ φ
+  → isContainerEmbeddingᴵ (μ-rec F G φ)
+_ = isEmbedding-μ-rec
+```
+
+**Lemma 5.20**:
+The recursor for `W`-types preserves embeddings.
+```agda
+_ : {S : Type} {P : S → Type} {A : Type}
+  → (sup* : (Σ[ s ∈ S ] (P s → A)) → A)
+  → isEmbedding sup*
+  → isEmbedding (W-rec sup*)
+_ = isEmbedding-W-rec
+```
+
+**Lemma 5.21**:
+The lax μ-rule is an embedding of containers.
+```agda
+_ : (F : IndexedContainer 𝟚) → isContainerEmbeddingᴵ (μ-rule F)
+_ = isContainerEmbedding-μ-rule
+```
+
+**Proposition 5.22**:
+If the chain rule is an equivalence, so is the μ-rule.
+```agda
+_ : (F : IndexedContainer 𝟚)
+  → isContainerEquiv (binary-chain-rule F (μ F))
+  → isContainerEquiv (μ-rule F)
+_ = isEquiv-μ-rule
+```
+
+**Theorem 5.23**:
+The μ-rule is an equivalence if and only if the corresponding chain rule is.
+```agda
+_ : (F : IndexedContainer 𝟚)
+  → isContainerEquiv (μ-rule F) ≃ isContainerEquiv (binary-chain-rule F (μ F))
+_ = isContainerEquiv-μ-rule≃isContainerEquiv-binary-chain-rule
+```
+
+**Lemma 5.25**:
+The family `Wᴰ` preserves discreteness:
+```agda
+_ : (S : Type) (P Q : S → Type)
+  → (∀ s → Discrete (P s))
+  → (∀ s → Discrete (Q s))
+  → (w : W S P) → Discrete (Wᴰ S P Q w)
+_ = discrete-Wᴰ
+```
+
+**Proposition 5.26**:
+For discrete containers the μ-rule is an equivalence.
+```agda
+_ : (F : IndexedContainer 𝟚) → (∀ ix s → Discrete (F .Pos ix s)) → isContainerEquiv (binary-chain-rule F (μ F))
+_ = Discrete→isEquiv-μ-chain-rule
 ```

@@ -115,9 +115,41 @@ open Container
 Discrete→isEquiv-μ-chain-rule : (F : Container ℓ 𝟚) → (∀ ix s → Discrete (Pos F ix s)) → isContainerEquiv (binary-chain-rule F (μ F))
 Discrete→isEquiv-μ-chain-rule F discrete-P = DiscreteContainer→isEquivBinaryChainRule F (μ F) (discrete-P ₁) (μ-discrete F discrete-P)
 
+module isContainerEmbedding-μ-rule (F : Container ℓ 𝟚) where
+  open Container F renaming (Shape to S ; Pos to P)
+  open μ-rule F
+  private
+    module α = _⊸_ α
+
+  μ-rule-shape : Shape (μ G) → Shape ((∂• (μ F)))
+  μ-rule-shape = μ-rule F ._⊸_.shape
+
+  isEmbedding-α : isContainerEmbedding α
+  isEmbedding-α = isEmbedding-∘ is-emb-η₁ is-emb-η₀⋆chain-rule where
+    is-emb-η₁ : isEmbedding (equivFun (η₁ .Equiv.shape))
+    is-emb-η₁ = isEquiv→isEmbedding $ equivIsEquiv $ η₁ .Equiv.shape
+
+    is-emb-η₀ : isEmbedding (equivFun (η₀ .Equiv.shape))
+    is-emb-η₀ = isEquiv→isEmbedding $ equivIsEquiv $ η₀ .Equiv.shape
+
+    is-emb-chain-rule : isEmbedding (binary-chain-rule F (μ F) ._⊸_.shape)
+    is-emb-chain-rule = isContainerEmbeddingChainRule F (μ F)
+
+    is-emb-η₀⋆chain-rule : isEmbedding (equivFun (η₀ .Equiv.shape) ⨟ binary-chain-rule F (μ F) ._⊸_.shape)
+    is-emb-η₀⋆chain-rule = isEmbedding-∘ is-emb-chain-rule is-emb-η₀
+
+  isEmbedding-μ-rule-shape : isContainerEmbedding (μ-rule F)
+  isEmbedding-μ-rule-shape = isEmbedding-μ-rec G (∂• (μ F)) α isEmbedding-α
+
+  μ-rule-is-prop-fib : ∀ y → isProp (fiber μ-rule-shape y)
+  μ-rule-is-prop-fib = isEmbedding→hasPropFibers isEmbedding-μ-rule-shape
+
+open isContainerEmbedding-μ-rule using () renaming (isEmbedding-μ-rule-shape to isContainerEmbedding-μ-rule) public
+
 module _ (F : Container ℓ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binary-chain-rule F (μ F))) where
   open Container F renaming (Shape to S ; Pos to P)
   open μ-rule F
+  open isContainerEmbedding-μ-rule F
   private
     module α = _⊸_ α
 
@@ -129,9 +161,6 @@ module _ (F : Container ℓ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binar
       → isIsolated (p₁ , wᴰ)
       → isIsolated p₁ × isIsolated wᴰ
     is-isolated-pair s f = isEquiv-Σ-isolate→isIsolatedPair (is-equiv-Σ-isolate s f)
-
-  μ-rule-shape : Shape (μ G) → Shape ((∂• (μ F)))
-  μ-rule-shape = μ-rule F ._⊸_.shape
 
   μ-rule-fib : (y : Shape ((∂• (μ F)))) → fiber μ-rule-shape y
   μ-rule-fib = uncurry $ W-elim μ-rule-fib-rec where
@@ -231,25 +260,6 @@ module _ (F : Container ℓ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binar
   μ-rule-shape⁻¹ : Shape ((∂• (μ F))) → Shape (μ G)
   μ-rule-shape⁻¹ = fst ∘ μ-rule-fib
 
-  isEquiv-α : isContainerEquiv α
-  isEquiv-α = goal where
-    open Equiv using (shape)
-
-    step : isContainerEquiv (Equiv.as-⊸ η₀ ⋆ binary-chain-rule F (μ F))
-    step = isContainerEquivComp (Equiv.as-⊸ η₀) (binary-chain-rule F (μ F)) (equivIsContainerEquiv η₀) is-equiv-chain-rule
-
-    goal : isContainerEquiv (Equiv.as-⊸ η₀ ⋆ binary-chain-rule F (μ F) ⋆ (Equiv.as-⊸ η₁))
-    goal = isContainerEquivComp (Equiv.as-⊸ η₀ ⋆ binary-chain-rule F (μ F)) (Equiv.as-⊸ η₁) step (equivIsContainerEquiv η₁)
-
-  isEmbedding-α : isContainerEmbedding α
-  isEmbedding-α = isContainerEquiv→isContainerEmbedding {e = α} isEquiv-α
-
-  isEmbedding-μ-rule-shape : isContainerEmbedding (μ-rule F)
-  isEmbedding-μ-rule-shape = isEmbedding-μ-rec G (∂• (μ F)) α isEmbedding-α
-
-  μ-rule-is-prop-fib : ∀ y → isProp (fiber μ-rule-shape y)
-  μ-rule-is-prop-fib = isEmbedding→hasPropFibers isEmbedding-μ-rule-shape
-
   isEquiv-μ-rule : isContainerEquiv (μ-rule F)
   isEquiv-μ-rule .equiv-proof y = inhProp→isContr (μ-rule-fib y) (μ-rule-is-prop-fib y)
 
@@ -288,3 +298,13 @@ module isEquiv-μ-rule (F : Container ℓ 𝟚) (is-equiv-μ-rule : isContainerE
       ≃⟨ ⊎-right-≃ $ invEquiv $ Σ-isolate-equiv s f ⟩
     (Pos F ₀ s °) ⊎ (Σ[ (p , _) ∈ Pos F ₁ s ° ] (μP (f p) °))
       ≃∎
+
+isContainerEquiv-μ-rule≃isContainerEquiv-binary-chain-rule
+  : (F : Container ℓ 𝟚)
+  → isContainerEquiv (μ-rule F) ≃ isContainerEquiv (binary-chain-rule F (μ F))
+isContainerEquiv-μ-rule≃isContainerEquiv-binary-chain-rule F
+  = propBiimpl→Equiv
+    isPropIsContainerEquiv
+    isPropIsContainerEquiv
+    (isEquiv-μ-rule.isEquiv-chain-rule F)
+    (isEquiv-μ-rule F)
