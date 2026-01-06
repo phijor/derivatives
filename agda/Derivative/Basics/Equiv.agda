@@ -6,7 +6,9 @@ open import Derivative.Basics.Sigma
 
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Equiv.Properties
-open import Cubical.Foundations.Univalence using (EquivJ)
+open import Cubical.Foundations.Equiv.Dependent
+open import Cubical.Foundations.Transport
+open import Cubical.Foundations.Univalence
 open import Cubical.Functions.FunExtEquiv
 open import Cubical.Data.Sigma
 
@@ -91,3 +93,29 @@ secEquiv {B} e = lineEquiv (λ φ b → secEq e b φ) (equivIsEquiv (invEquiv e 
 
 retEquiv : (e : A ≃ B) → ∀ (φ : I) → A ≃ A
 retEquiv {A} e = lineEquiv (λ φ a → retEq e a φ) (equivIsEquiv (e ∙ₑ invEquiv e)) (idIsEquiv A)
+
+module _ {ℓ'} {A B : Type ℓ} where
+  univalenceᴰ-Iso : (e : A ≃ B)
+    → {P : A → Type ℓ'} {Q : B → Type ℓ'}
+    → Iso (PathP (λ i → ua e i → Type ℓ') P Q) (Σ[ F ∈ mapOver (e .fst) P Q ] isEquivOver {P = P} {Q = Q} F)
+  univalenceᴰ-Iso = EquivJ
+    (λ A e → {P : A → Type ℓ'} {Q : B → Type ℓ'} → Iso (PathP (λ i → ua e i → Type ℓ') P Q) (Σ[ F ∈ mapOver (e .fst) P Q ] isEquivOver {P = P} {Q = Q} F))
+    d
+    where
+      d : ∀ {P Q : B → Type ℓ'} → Iso (PathP (λ i → ua (idEquiv B) i → Type ℓ') P Q) (Σ[ F ∈ mapOver (idfun B) P Q ] isEquivOver {P = P} {Q = Q} F)
+      d {P} {Q} =
+        (PathP (λ i → ua (idEquiv B) i → Type ℓ') P Q)
+          Iso⟨ substIso (λ p → PathP (λ i → p i → Type ℓ') P Q) uaIdEquiv ⟩
+        (P ≡ Q)
+          Iso⟨ invIso funExtIso ⟩
+        ((b : B) → P b ≡ Q b)
+          Iso⟨ codomainIsoDep (λ b → univalenceIso) ⟩
+        ((b : B) → P b ≃ Q b)
+          Iso⟨ Σ-Π-Iso ⟩
+        Σ[ f ∈ ((b : B) → P b → Q b) ] ((b : B) → isEquiv (f b))
+          ∎Iso
+
+  univalenceᴰ : (e : A ≃ B)
+    → {P : A → Type ℓ'} {Q : B → Type ℓ'}
+    → (PathP (λ i → ua e i → Type ℓ') P Q) ≃ (Σ[ F ∈ mapOver (e .fst) P Q ] isEquivOver {P = P} {Q = Q} F)
+  univalenceᴰ e = isoToEquiv $ univalenceᴰ-Iso e
