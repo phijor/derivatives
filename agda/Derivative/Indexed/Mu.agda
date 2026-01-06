@@ -4,6 +4,7 @@ module Derivative.Indexed.Mu where
 
 open import Derivative.Indexed.Container
 open import Derivative.Indexed.Derivative
+open import Derivative.Indexed.Univalence
 open import Derivative.Indexed.ChainRule
 
 open import Derivative.Prelude
@@ -18,6 +19,7 @@ open import Derivative.Isolated
 open import Derivative.Remove
 
 open import Cubical.Foundations.Path
+open import Cubical.Foundations.Equiv.Properties using (congEquiv)
 open import Cubical.Foundations.Transport using (substEquiv)
 import      Cubical.Data.Empty as Empty
 open import Cubical.Data.Sigma
@@ -68,6 +70,17 @@ module _ (F : Container ℓ (Maybe Ix)) where
 
   μ-out : μ F ⊸ F [ μ F ]
   μ-out = Equiv.as-⊸ μ-out-equiv
+
+  μ-in-out : μ-in ⋆ μ-out ≡ id (F [ μ F ])
+  μ-in-out = ⊸≡-ext shape-path λ ix (s , f) → funExt (pos-path ix s f) where
+    shape-path : W-in ⨟ W-out ≡ idfun _
+    shape-path = refl
+
+    pos-path : ∀ ix s
+      → (f : P nothing s → W S (P _))
+      → (p : (F [ μ F ]) .Pos ix _) → Wᴰ-out S _ _ s f (Wᴰ-in S _ _ s f p) ≡ p
+    pos-path ix s f (inl _) = refl
+    pos-path ix s f (inr _) = refl
 
   μ-rec-Π : (G : Container ℓ Ix)
     → (F [ G ]) Π⊸ G
@@ -272,20 +285,26 @@ module _ (F : Container ℓ (Maybe Ix)) where
       → (α : (F [ G ]) ⊸ G)
       → isContr (Σ[ α* ∈ μ F ⊸ G ] μ-in ⋆ α* ≡ [-]-map F α* ⋆ α )
     μ-rec-unique G α = isOfHLevelRespectEquiv 0 (Σ-cong-equiv-snd comm-square-equiv) $ μ-rec-unique' G α
-      where
-        μ-out-inv-coh : Equiv.as-⊸ (Equiv.inv μ-out-equiv) ≡ μ-in
-        μ-out-inv-coh = ⊸≡-ext
-          (refl′ (uncurry sup))
-          λ ix (s , f) → funExt λ wᴰ → transportRefl _ ∙ transportRefl (Wᴰ-out S (P ₁) (P (just ix)) s f wᴰ)
+      where module _ (α* : μ F ⊸ G) where
+        cancel : μ-in ⋆ (μ-out ⋆ ([-]-map F α* ⋆ α)) ≡ [-]-map F α* ⋆ α
+        cancel =
+          μ-in ⋆ (μ-out ⋆ ([-]-map F α* ⋆ α))
+            ≡⟨ sym (⋆-assoc μ-in μ-out ([-]-map F α* ⋆ α)) ⟩
+          (μ-in ⋆ μ-out) ⋆ ([-]-map F α* ⋆ α)
+            ≡⟨ cong (_⋆ ([-]-map F α* ⋆ α)) μ-in-out ⟩
+          id (F [ μ F ]) ⋆ ([-]-map F α* ⋆ α)
+            ≡⟨ ⋆-id-left _ ⟩
+          [-]-map F α* ⋆ α
+            ∎
 
-        comm-square-equiv : (α* : μ F ⊸ G) → (α* ≡ μ-out ⋆ [-]-map F α* ⋆ α) ≃ (μ-in ⋆ α* ≡ [-]-map F α* ⋆ α)
-        comm-square-equiv α* =
+        comm-square-equiv : (α* ≡ μ-out ⋆ [-]-map F α* ⋆ α) ≃ (μ-in ⋆ α* ≡ [-]-map F α* ⋆ α)
+        comm-square-equiv =
           (α* ≡ (μ-out ⋆ [-]-map F α*) ⋆ α)
             ≃⟨ compPathrEquiv (⋆-assoc μ-out ([-]-map F α*) α) ⟩
           (α* ≡ μ-out ⋆ ([-]-map F α* ⋆ α))
-            ≃⟨ containerAdjointEquiv μ-out-equiv α* ([-]-map F α* ⋆ α) ⟩
-          (Equiv.as-⊸ (Equiv.inv μ-out-equiv) ⋆ α* ≡ [-]-map F α* ⋆ α)
-            ≃⟨ substEquiv (λ - → - ⋆ α* ≡ [-]-map F α* ⋆ α) μ-out-inv-coh ⟩
+            ≃⟨ congEquiv (containerEquivPreCompEquiv μ-in-equiv G) ⟩
+          (μ-in ⋆ α* ≡ μ-in ⋆ (μ-out ⋆ ([-]-map F α* ⋆ α)))
+            ≃⟨ compPathrEquiv cancel ⟩
           (μ-in ⋆ α* ≡ [-]-map F α* ⋆ α)
             ≃∎
 
