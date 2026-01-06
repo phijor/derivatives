@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --safe #-}
 module Derivative.Indexed.ChainRule where
 
 open import Derivative.Prelude

@@ -1,4 +1,4 @@
-{-# OPTIONS -WnoUnsupportedIndexedMatch --lossy-unification --allow-unsolved-metas #-}
+{-# OPTIONS -WnoUnsupportedIndexedMatch --lossy-unification --safe #-}
 module Derivative.Indexed.MuRule where
 
 open import Derivative.Prelude

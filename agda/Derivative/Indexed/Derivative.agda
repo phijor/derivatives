@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --safe #-}
 module Derivative.Indexed.Derivative where
 
 open import Derivative.Prelude

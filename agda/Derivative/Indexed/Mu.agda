@@ -1,5 +1,5 @@
 -- TODO: Clean up imports
-{-# OPTIONS -WnoUnsupportedIndexedMatch --allow-unsolved-metas #-}
+{-# OPTIONS -WnoUnsupportedIndexedMatch --safe #-}
 module Derivative.Indexed.Mu where
 
 open import Derivative.Indexed.Container
@@ -150,58 +150,6 @@ module _ (F : Container ℓ (Maybe Ix)) where
   μ-rec-β' G α = ⊸≡-ext (μ-rec.shape-β G α) λ where
     ix (sup s f) → refl
 
-  -- TODO: Prove directly that μ-rec is unique by reshaping the type of algebra-morphisms
-  isProp-rec-unique' : (G : Container ℓ Ix) (α : (F [ G ]) ⊸ G) → isProp (Σ[ α* ∈ μ F ⊸ G ] α* ≡ μ-out ⋆ [-]-map F α* ⋆ α)
-  isProp-rec-unique' G α@([ f ⊸ u ]) = isOfHLevelRespectEquiv 1 (invEquiv equiv) {! !} where
-    rec-pos :
-      ∀ (u* : ∀ (ix : Ix) (w : W S (P ₁)) → Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w)
-      → ∀ (ix : Ix) (w : W S (P ₁)) → Pos G ix ((W-out ⨟ Σ-map-snd (λ z → _∘_ (W-rec f)) ⨟ f) w) ≃ Wᴰ S (P ₁) (P (just ix)) w
-    rec-pos u* = (μ-out ⋆ [-]-map F (the (μ F ⊸ G) ([ W-rec f ⊸ u* ])) ⋆ α) ._⊸_.pos
-
-    RHS : (μ F ⊸ G) → (μ F ⊸ G)
-    RHS α*@([ f* ⊸ u* ]) = μ-out ⋆ [-]-map F α* ⋆ α where
-      _ = {! equivFun $ (μ-out ⋆ [-]-map F α* ⋆ α) ._⊸_.pos _ _ !}
-    RHS-pos : ∀ ix (w : W S (P ₁))
-      → (f* : W _ _ → Shape G)
-      → (u* : Pos G ix (f* w) → Wᴰ _ _ (P (just ix)) w)
-      → Pos G ix (f* w) → Wᴰ _ _ (P (just ix)) w
-    -- RHS-pos ix (sup s x) f* u* = Wᴰ-in _ _ _ s x ∘ {! ⊎-map-right !} ∘ u*
-    RHS-pos ix (sup s x) f* u* = Wᴰ-in _ _ _ s x ∘ {!  !} ∘ u*
-
-    equiv : (Σ[ α* ∈ μ F ⊸ G ] α* ≡ μ-out ⋆ [-]-map F α* ⋆ α ) ≃ {! !}
-    equiv =
-      (Σ[ α* ∈ μ F ⊸ G ] α* ≡ μ-out ⋆ [-]-map F α* ⋆ α)
-        ≃⟨ Σ-cong-equiv-fst ⊸-Σ-equiv ⟩
-      (Σ[ (f* , u*) ∈ Σ[ f* ∈ (W _ _ → Shape G) ] (∀ ix w → Pos G ix (f* w) ≃ Wᴰ _ _ (Pos F (just ix)) w) ] [ f* ⊸ u* ] ≡ RHS ([ f* ⊸ u* ]))
-        ≃⟨ strictEquiv (λ { ((f* , u*) , p) → (f* , cong _⊸_.shape p) , (u* , cong _⊸_.pos p) }) (λ { ((f* , pˢ) , (u* , pᵖ)) → ((f* , u*) , λ i → [ pˢ i ⊸ pᵖ i ]) }) ⟩
-      Σ[ (f* , h) ∈ Σ[ f* ∈ (W S _ → Shape G) ] f* ≡ W-out ⨟ Σ-map-snd (λ _ → f* ∘_) ⨟ f ] Σ[ u* ∈ (∀ ix w → Pos G ix (f* w) ≃ Wᴰ _ _ (Pos F (just ix)) w) ] PathP (λ i → ∀ ix w → Pos G ix (h i w) ≃ Wᴰ _ _ (P (just ix)) w) u* (RHS ([ f* ⊸ u* ]) ._⊸_.pos)
-        ≃⟨ Σ-contractFst (W-out-unique f) ⟩
-      Σ[ u* ∈ (∀ ix w → Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w) ] PathP (λ i → ∀ ix w → Pos G ix (W-rec-β f i w) ≃ Wᴰ _ _ (P (just ix)) w) u* (RHS [ W-rec f ⊸ u* ] ._⊸_.pos)
-        ≃⟨ invEquiv $ Σ-cong-equiv-snd (λ u* → funExt₂Equiv) ⟩
-      Σ[ u* ∈ (∀ ix w → Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w) ]
-        (∀ ix (w : W S _) → PathP (λ i → Pos G ix (W-rec-β f i w) ≃ Wᴰ _ _ (P (just ix)) w) (u* ix w) (RHS [ W-rec f ⊸ u* ] ._⊸_.pos ix w))
-        ≃⟨ Σ-cong-equiv-snd (λ u* → equivΠCod λ ix → equivΠCod λ w → invEquiv equivPathPEquiv) ⟩
-      Σ[ u* ∈ (∀ ix w → Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w) ]
-        (∀ ix (w : W S _) → PathP (λ i → Pos G ix (W-rec-β f i w) → Wᴰ _ _ (P (just ix)) w) (equivFun $ u* ix w) (equivFun $ RHS [ W-rec f ⊸ u* ] ._⊸_.pos ix w))
-        ≃⟨ Σ-cong-equiv-snd (λ u* → equivΠCod λ ix → equivΠ' W-out-equiv λ p → {! !}) ⟩
-      Σ[ u* ∈ (∀ ix w → Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w) ]
-        (∀ ix ((s , x) : Σ _ _)
-          → PathP (λ i → Pos G ix (f (s , (λ p → W-rec f (x p)))) → Wᴰ _ _ (P (just ix)) (sup s x))
-            (equivFun $ u* ix (sup s x))
-            {! !}
-        )
-        -- ≃⟨ invEquiv (Σ-Π₂-≃ {A = Ix} {B = λ _ → W S _} {C = λ ix w → Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w} {D = λ ix w u* → {! !}}) ⟩
-      -- (∀ ix (w : W S _) → Σ[ u* ∈ Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w ] PathP (λ i → Pos G ix (W-rec-β f i w) → Wᴰ _ _ (P (just ix)) w) (equivFun u*) _)
-        -- ≃⟨ equivΠCod (λ ix → equivΠCod λ w → Σ-cong-equiv-snd λ u* → invEquiv equivPathPEquiv) ⟩
-      -- (∀ ix (w : W S _) → Σ[ u* ∈ Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w ] PathP (λ i → Pos G ix (W-rec-β f i w) → Wᴰ _ _ (P (just ix)) w) (equivFun u*) _)
-        -- ≃⟨ {! Σ-Π-≃ !} ⟩
-        ≃⟨ {! !} ⟩
-      {! !}
-        ≃∎
-
-    contr : ∀ ix → (w : W S (P nothing)) → ∃![ u* ∈ Pos G ix (W-rec f w) ≃ Wᴰ _ _ (Pos F (just ix)) w ] PathP (λ i → Pos G ix (W-rec-β f i w) → Wᴰ _ _ (P (just ix)) w) (equivFun u*) _
-    contr ix (sup s f) = {! !}
-
   μ-rec-unique' : (G : Container ℓ Ix)
     → (α : (F [ G ]) ⊸ G)
     → isContr (Σ[ α* ∈ μ F ⊸ G ] α* ≡ μ-out ⋆ [-]-map F α* ⋆ α )
@@ -340,11 +288,3 @@ module _ (F : Container ℓ (Maybe Ix)) where
 
     goal : isEmbedding α.shape → isEmbedding (W-rec α.shape)
     goal = isEmbedding-W-rec α.shape
-
-  isSurjection-μ-rec : (G : Container ℓ Ix)
-    → (α : (F [ G ]) ⊸ G)
-    → isSurjection (α ._⊸_.shape)
-    → isSurjection (μ-rec G α ._⊸_.shape)
-  isSurjection-μ-rec G α = {! !} where
-    step₁ : isSurjection (([-]-map F (μ-rec G α) ⋆ α) ._⊸_.shape)
-    step₁ = {! !}

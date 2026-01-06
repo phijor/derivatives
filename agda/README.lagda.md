@@ -1,6 +1,11 @@
+# Overview
+
+```agda
+{-# OPTIONS --safe #-}
+```
+
 <!--
 ```agda
-{-# OPTIONS --allow-unsolved-metas #-}
 module README where
 
 open import Derivative.Prelude hiding (∂ᴵ)
@@ -33,8 +38,6 @@ private
   𝟘 = ⊥*
 ```
 -->
-
-# Overview
 
 ## Removing Isolated Points in Univalent Foundations
 
