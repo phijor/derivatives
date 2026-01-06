@@ -562,17 +562,17 @@ _ = isEquivChainMapSets≃AllSetsDiscrete
 ### Indexed Containers
 
 ```agda
-import Derivative.Indexed.Container as IndexedContainer
+import Derivative.Indexed.Container as Containerᴵ
 ```
 
 **Definition 5.1**:
 Indexed containers have positions indexed by some `Ix : Type`.
 ```agda
-IndexedContainer : (Ix : Type) → Type _
-IndexedContainer = IndexedContainer.Container ℓ-zero
+Containerᴵ : (Ix : Type) → Type _
+Containerᴵ = Containerᴵ.Container ℓ-zero
 
-_ : IndexedContainer Ix ≃ (Σ[ S ∈ Type ] (Ix → S → Type))
-_ = IndexedContainer.Container-Σ-equiv
+_ : Containerᴵ Ix ≃ (Σ[ S ∈ Type ] (Ix → S → Type))
+_ = Containerᴵ.Container-Σ-equiv
 ```
 
 ??? note "Overloading notation"
@@ -580,7 +580,7 @@ _ = IndexedContainer.Container-Σ-equiv
     The indexed versions are suffixed with `ᴵ`, if necessary.
 
 ```agda
-open IndexedContainer
+open Containerᴵ
   using (₀ ; ₁ ; 𝟚 ; _⊸_ ; isContainerEquiv ; _⧟_ ; ↑ ; π₁)
   renaming
     ( _⊗_ to _⊗ᴵ_
@@ -589,14 +589,14 @@ open IndexedContainer
     ; isContainerEmbedding to isContainerEmbeddingᴵ
     ; [-]-map to [_]-map
     )
-open IndexedContainer.Container
+open Containerᴵ.Container
 ```
 
 **Definition 5.3**:
 Substitution for indexed containers.
 ```agda
-_[_]ᴵ : (F : IndexedContainer (Maybe Ix)) (G : IndexedContainer Ix) → IndexedContainer Ix
-_[_]ᴵ = IndexedContainer._[_]
+_[_]ᴵ : (F : Containerᴵ (Maybe Ix)) (G : Containerᴵ Ix) → Containerᴵ Ix
+_[_]ᴵ = Containerᴵ._[_]
 ```
 
 **Definition 5.4**:
@@ -604,7 +604,7 @@ The derivative of an indexed container is defined for each _isolated_ index `i :
 ```agda
 import Derivative.Indexed.Derivative as IndexedDerivative
 
-∂ᴵ : (i : Ix °) → (F : IndexedContainer Ix) → IndexedContainer Ix
+∂ᴵ : (i : Ix °) → (F : Containerᴵ Ix) → Containerᴵ Ix
 ∂ᴵ = IndexedDerivative.∂
 ```
 
@@ -620,8 +620,8 @@ The chain rule for binary containers.
 open import Derivative.Indexed.ChainRule as IndexedChainRule
 
 _ :
-  ∀ (F : IndexedContainer 𝟚)
-  → (G : IndexedContainer _)
+  ∀ (F : Containerᴵ 𝟚)
+  → (G : Containerᴵ _)
   → ((∂₀ F [ G ]ᴵ) ⊕ᴵ ((∂₁ F [ G ]ᴵ) ⊗ᴵ ∂• G)) ⊸ ∂• (F [ G ]ᴵ)
 _ = binary-chain-rule
 ```
@@ -629,7 +629,7 @@ _ = binary-chain-rule
 **Proposition 5.6**:
 The binary chain rule is an embedding.
 ```agda
-_ : (F : IndexedContainer 𝟚) (G : IndexedContainer 𝟙)
+_ : (F : Containerᴵ 𝟚) (G : Containerᴵ 𝟙)
   → isContainerEmbeddingᴵ (binary-chain-rule F G)
 _ = isContainerEmbeddingChainRule
 ```
@@ -637,7 +637,7 @@ _ = isContainerEmbeddingChainRule
 **Proposition 5.7**:
 Like for unary containers, the binary chain rule is an equivalence iff `Σ-isolate` is.
 ```agda
-_ : (F : IndexedContainer 𝟚) (G : IndexedContainer 𝟙) →
+_ : (F : Containerᴵ 𝟚) (G : Containerᴵ 𝟙) →
   isContainerEquiv (binary-chain-rule F G)
     ≃
   (∀ s f → isEquiv (Σ-isolate (F .Pos ₁ s) (G .Pos _ ∘ f)))
@@ -647,7 +647,7 @@ _ = isEquivBinaryChainRule≃isEquiv-Σ-isolate
 **Proposition 5.8**:
 For discrete containers, the binary chain rule is an equivalence.
 ```agda
-_ : (F : IndexedContainer 𝟚) (G : IndexedContainer 𝟙)
+_ : (F : Containerᴵ 𝟚) (G : Containerᴵ 𝟙)
   → (∀ s → Discrete (Pos F ₁ s))
   → (∀ t → Discrete (Pos G • t))
   → isContainerEquiv (binary-chain-rule F G)
@@ -673,14 +673,14 @@ Substitution `F[_]` is an endofunctor.
 **Definition 5.12**:
 For any `I+1`-indexed container `F` there is an `I`-indexed fixed point container `μ F`.
 ```agda
-_ : (F : IndexedContainer (Maybe Ix)) → IndexedContainer Ix
+_ : (F : Containerᴵ (Maybe Ix)) → Containerᴵ Ix
 _ = μ
 ```
 
 **Problem 5.13**:
 Define an equivalence of containers `F [ μ F ] ⧟ μ F`.
 ```agda
-_ : (F : IndexedContainer (Maybe Ix)) → (F [ μ F ]ᴵ) ⧟ (μ F)
+_ : (F : Containerᴵ (Maybe Ix)) → (F [ μ F ]ᴵ) ⧟ (μ F)
 _ = μ-in-equiv
 ```
 
@@ -688,8 +688,8 @@ _ = μ-in-equiv
 Derive a recursion principle for fixed-point containers.
 ```agda
 module _
-  (F : IndexedContainer (Maybe Ix))
-  (G : IndexedContainer Ix)
+  (F : Containerᴵ (Maybe Ix))
+  (G : Containerᴵ Ix)
   (α : F [ G ]ᴵ ⊸ G)
   where
   _ : μ F ⊸ G
@@ -716,7 +716,7 @@ open import Derivative.Indexed.MuRule
 **Problem 5.16**:
 The lax μ-rule.
 ```agda
-_ : (F : IndexedContainer 𝟚)
+_ : (F : Containerᴵ 𝟚)
   → μ (↑ (∂₀ F [ μ F ]ᴵ) ⊕ᴵ (↑ (∂₁ F [ μ F ]ᴵ) ⊗ᴵ π₁)) ⊸ ∂• (μ F)
 _ = μ-rule
 ```
@@ -724,7 +724,7 @@ _ = μ-rule
 **Lemma 5.17**:
 The μ-recursor reflects equivalences:
 ```agda
-_ : (F : IndexedContainer (Maybe Ix)) (G : IndexedContainer Ix)
+_ : (F : Containerᴵ (Maybe Ix)) (G : Containerᴵ Ix)
   → (φ : (F [ G ]ᴵ) ⊸ G)
   → isContainerEquiv (μ-rec F G φ)
   → isContainerEquiv φ
@@ -734,7 +734,7 @@ _ = isEquivFrom-μ-rec
 **Proposition 5.18**:
 If the μ-rule is an equivalence, then so is the corresponding chain rule.
 ```agda
-_ : (F : IndexedContainer 𝟚)
+_ : (F : Containerᴵ 𝟚)
   → isContainerEquiv (μ-rule F)
   → isContainerEquiv (binary-chain-rule F (μ F))
 _ = isEquiv-μ-rule.isEquiv-chain-rule
@@ -743,7 +743,7 @@ _ = isEquiv-μ-rule.isEquiv-chain-rule
 **Lemma 5.19**:
 The μ-recursor preserves embeddings.
 ```agda
-_ : (F : IndexedContainer (Maybe Ix)) (G : IndexedContainer Ix)
+_ : (F : Containerᴵ (Maybe Ix)) (G : Containerᴵ Ix)
   → (φ : (F [ G ]ᴵ) ⊸ G)
   → isContainerEmbeddingᴵ φ
   → isContainerEmbeddingᴵ (μ-rec F G φ)
@@ -763,14 +763,14 @@ _ = isEmbedding-W-rec
 **Lemma 5.21**:
 The lax μ-rule is an embedding of containers.
 ```agda
-_ : (F : IndexedContainer 𝟚) → isContainerEmbeddingᴵ (μ-rule F)
+_ : (F : Containerᴵ 𝟚) → isContainerEmbeddingᴵ (μ-rule F)
 _ = isContainerEmbedding-μ-rule
 ```
 
 **Proposition 5.22**:
 If the chain rule is an equivalence, so is the μ-rule.
 ```agda
-_ : (F : IndexedContainer 𝟚)
+_ : (F : Containerᴵ 𝟚)
   → isContainerEquiv (binary-chain-rule F (μ F))
   → isContainerEquiv (μ-rule F)
 _ = isEquiv-μ-rule
@@ -779,7 +779,7 @@ _ = isEquiv-μ-rule
 **Theorem 5.23**:
 The μ-rule is an equivalence if and only if the corresponding chain rule is.
 ```agda
-_ : (F : IndexedContainer 𝟚)
+_ : (F : Containerᴵ 𝟚)
   → isContainerEquiv (μ-rule F) ≃ isContainerEquiv (binary-chain-rule F (μ F))
 _ = isContainerEquiv-μ-rule≃isContainerEquiv-binary-chain-rule
 ```
@@ -797,6 +797,6 @@ _ = discrete-Wᴰ
 **Proposition 5.26**:
 For discrete containers the μ-rule is an equivalence.
 ```agda
-_ : (F : IndexedContainer 𝟚) → (∀ ix s → Discrete (F .Pos ix s)) → isContainerEquiv (binary-chain-rule F (μ F))
+_ : (F : Containerᴵ 𝟚) → (∀ ix s → Discrete (F .Pos ix s)) → isContainerEquiv (binary-chain-rule F (μ F))
 _ = Discrete→isEquiv-μ-chain-rule
 ```
