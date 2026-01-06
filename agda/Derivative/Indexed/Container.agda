@@ -26,7 +26,7 @@ open import Cubical.Foundations.Transport using (substEquiv ; subst2Equiv)
 open import Cubical.Functions.FunExtEquiv using (funExt₂)
 open import Cubical.Functions.Embedding using (isEmbedding ; isEquiv→isEmbedding)
 
-record Container (ℓ : Level) (Ix : Type ℓ) : Type (ℓ-suc ℓ) where
+record Container (ℓ : Level) (Ix : Type) : Type (ℓ-suc ℓ) where
   constructor _◁_
   field
     Shape : Type ℓ
@@ -37,12 +37,12 @@ open Container
 private
   variable
     ℓS ℓP ℓ : Level
-    Ix : Type ℓ
+    Ix : Type
 
 -- Idices
-tt° : 𝟙 °
-tt° .fst = •
-tt° .snd _ = yes refl
+•° : 𝟙 °
+•° .fst = •
+•° .snd _ = yes refl
 
 𝟚 : Type
 𝟚 = Maybe 𝟙
@@ -374,20 +374,20 @@ _⊕_ F G = shape ◁ pos module ⊕ where
 ↑ F .Pos nothing _ = 𝟘*
 
 -- Projection onto the 0ᵗʰ and 1ˢᵗ variable
-π₀ : Container _ 𝟚
-π₀ .Shape = 𝟙
-π₀ .Pos ₀ _ = 𝟙
-π₀ .Pos ₁ _ = 𝟘
+π₀ : Container ℓ 𝟚
+π₀ .Shape = 𝟙*
+π₀ .Pos ₀ _ = 𝟙*
+π₀ .Pos ₁ _ = 𝟘*
 
-π₁ : Container _ 𝟚
-π₁ .Shape = 𝟙
-π₁ .Pos ₀ _ = 𝟘
-π₁ .Pos ₁ _ = 𝟙
+π₁ : Container ℓ 𝟚
+π₁ .Shape = 𝟙*
+π₁ .Pos ₀ _ = 𝟘*
+π₁ .Pos ₁ _ = 𝟙*
 
 -- This is well-behaved for isolated (i : Ix):
 π : (i : Ix) → Container ℓ Ix
 π i .Shape = Lift 𝟙
-π i .Pos j _ = i ≡ j
+π i .Pos j _ = Lift (i ≡ j)
 
 π° : {Ix : Type} → (i : Ix °) → Container ℓ-zero Ix
 π° (i , i≟_) .Shape = 𝟙

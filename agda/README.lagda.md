@@ -567,7 +567,7 @@ import Derivative.Indexed.Container as IndexedContainer
 <!--
 ```agda
 open IndexedContainer
-  using (₀ ; ₁ ; ₀° ; ₁° ; tt° ; 𝟚 ; _⊸_ ; isContainerEquiv ; _⧟_)
+  using (₀ ; ₁ ; 𝟚 ; _⊸_ ; isContainerEquiv ; _⧟_)
   renaming
     ( _⊗_ to _⊗ᴵ_
     ; _⊕_ to _⊕ᴵ_
@@ -603,18 +603,16 @@ _[_]ᴵ = IndexedContainer._[_]
 **Definition 5.4**:
 The derivative of an indexed container is defined for each _isolated_ index `i : Ix °`.
 ```agda
-import Derivative.Indexed.Derivative
+import Derivative.Indexed.Derivative as IndexedDerivative
 
 ∂ᴵ : (i : Ix °) → (F : IndexedContainer Ix) → IndexedContainer Ix
-∂ᴵ = Derivative.Indexed.Derivative.∂
+∂ᴵ = IndexedDerivative.∂
 ```
 
 Shorthands for the derivative of unary containers (`∂ᴵ tt°`),
 and the two derivatives of binary containers.
 ```agda
-∂• = ∂ᴵ tt°
-∂₀ = ∂ᴵ ₀°
-∂₁ = ∂ᴵ ₁°
+open IndexedDerivative using (∂• ; ∂₀ ; ∂₁)
 ```
 
 **Problem 5.5**:
@@ -632,14 +630,15 @@ _ = binary-chain-rule
 **Proposition 5.6**:
 The binary chain rule is an embedding.
 ```agda
-_ : ∀ F G → isContainerEmbeddingᴵ (binary-chain-rule F G)
+_ : (F : IndexedContainer 𝟚) (G : IndexedContainer 𝟙)
+  → isContainerEmbeddingᴵ (binary-chain-rule F G)
 _ = isContainerEmbeddingChainRule
 ```
 
 **Proposition 5.7**:
 Like for unary containers, the binary chain rule is an equivalence iff `Σ-isolate` is.
 ```agda
-_ : ∀ F G →
+_ : (F : IndexedContainer 𝟚) (G : IndexedContainer 𝟙) →
   isContainerEquiv (binary-chain-rule F G)
     ≃
   (∀ s f → isEquiv (Σ-isolate (F .Pos ₁ s) (G .Pos _ ∘ f)))
@@ -649,9 +648,9 @@ _ = isEquivBinaryChainRule≃isEquiv-Σ-isolate
 **Proposition 5.8**:
 For discrete containers, the binary chain rule is an equivalence.
 ```agda
-_ : ∀ F G
+_ : (F : IndexedContainer 𝟚) (G : IndexedContainer 𝟙)
   → (∀ s → Discrete (Pos F ₁ s))
-  → (∀ t → Discrete (Pos G _ t))
+  → (∀ t → Discrete (Pos G • t))
   → isContainerEquiv (binary-chain-rule F G)
 _ = DiscreteContainer→isEquivBinaryChainRule
 ```

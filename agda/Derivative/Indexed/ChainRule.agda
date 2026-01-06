@@ -19,14 +19,14 @@ open import Cubical.Data.Sigma
 private
   variable
     ℓ : Level
-    Ix : Type ℓ
+    Ix : Type
 
 open Container
 
 binary-chain-rule :
-  ∀ (F : Container _ 𝟚)
-  → (G : Container _ 𝟙)
-  → ((∂ ₀° F [ G ]) ⊕ ((∂ ₁° F [ G ]) ⊗ ∂ tt° G)) ⊸ ∂ tt° (F [ G ])
+  ∀ (F : Container ℓ 𝟚)
+  → (G : Container ℓ 𝟙)
+  → ((∂ ₀° F [ G ]) ⊕ ((∂ ₁° F [ G ]) ⊗ ∂ •° G)) ⊸ ∂ •° (F [ G ])
 binary-chain-rule F G =
     L   ⧟⟨ e₁ ⟩
     H₁  ⊸⟨ η ⟩
@@ -39,10 +39,10 @@ binary-chain-rule F G =
   Q = Qᵢ •
 
   L : Container _ _
-  L = (∂ ₀° F [ G ]) ⊕ ((∂ ₁° F [ G ]) ⊗ ∂ tt° G)
+  L = (∂ ₀° F [ G ]) ⊕ ((∂ ₁° F [ G ]) ⊗ ∂ •° G)
 
   R : Container _ _
-  R = ∂ tt° (F [ G ])
+  R = ∂ •° (F [ G ])
 
   U₁ : Type _
   U₁ = (Σ[ s ∈ S ] Σ[ f ∈ (P ₁ s → T) ] ((P ₀ s °) ⊎ (Σ[ (p , _) ∈ P ₁ s ° ] (Q (f p) °))))
@@ -70,7 +70,7 @@ binary-chain-rule F G =
           (λ (((s , p°) , f) , (t , q)) → (s , p° , (f , t) , q))
           (λ (s , p° , (f , t) , q) → (((s , p°) , f) , (t , q)))
 
-  R₁ : 𝟙 → U₁ → Type
+  R₁ : 𝟙 → U₁ → Type _
   R₁ i u₁ = L .Pos i (invEq f₁ u₁)
 
   H₁ : Container _ _
@@ -83,7 +83,7 @@ binary-chain-rule F G =
   f₂ : U₂ ≃ (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P ₁ s → T) ] (P ₀ s ⊎ (Σ[ p₁ ∈ P ₁ s ] Q (f p₁))) °)
   f₂ = invEquiv Σ-assoc-≃ ∙ₑ Σ-cong-equiv-snd (λ { (s , f) → invEquiv IsolatedSumEquiv })
 
-  R₂ : 𝟙 → U₂ → Type
+  R₂ : 𝟙 → U₂ → Type _
   R₂ i u₂ = R .Pos i (equivFun f₂ u₂)
 
   H₂ : Container _ _
@@ -128,7 +128,7 @@ binary-chain-rule F G =
   e₂ .Equiv.shape = f₂
   e₂ .Equiv.pos i u₂ = idEquiv (Pos H₂ i u₂)
 
-module _ (F : Container _ 𝟚) (G : Container _ 𝟙) where
+module _ (F : Container ℓ 𝟚) (G : Container ℓ 𝟙) where
   open binary-chain-rule F G
 
   isContainerEmbeddingChainRule : isContainerEmbedding (binary-chain-rule F G)

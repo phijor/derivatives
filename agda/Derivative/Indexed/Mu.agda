@@ -29,7 +29,7 @@ open import Cubical.Functions.Surjection
 private
   variable
     ℓ : Level
-    Ix : Type ℓ
+    Ix : Type
 
 open Container
 

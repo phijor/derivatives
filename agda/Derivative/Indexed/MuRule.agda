@@ -25,21 +25,21 @@ open import Cubical.Functions.Embedding
 private
   variable
     ℓ : Level
-    Ix : Type ℓ
+    Ix : Type
 
 open Container
-μ-rule : ∀ (F : Container _ 𝟚) →
-  μ ((↑ (∂ ₀° F [ μ F ])) ⊕ ((↑ (∂ ₁° F [ μ F ])) ⊗ π₁))
+μ-rule : ∀ (F : Container ℓ 𝟚) →
+  μ ((↑ (∂₀ F [ μ F ])) ⊕ ((↑ (∂₁ F [ μ F ])) ⊗ π₁))
     ⊸
-  ∂ tt° (μ F)
-μ-rule F = μ-rec G (∂ tt° (μ F)) α module μ-rule where
+  ∂• (μ F)
+μ-rule {ℓ} F = μ-rec G (∂• (μ F)) α module μ-rule where
   open Container F renaming (Shape to S ; Pos to P)
 
-  G : Container _ 𝟚
-  G = (↑ (∂ ₀° F [ μ F ])) ⊕ ((↑ (∂ ₁° F [ μ F ])) ⊗ π₁)
+  G : Container ℓ 𝟚
+  G = (↑ (∂₀ F [ μ F ])) ⊕ ((↑ (∂₁ F [ μ F ])) ⊗ π₁)
 
-  G[_] : Container _ 𝟙 → Container _ 𝟙
-  G[ Y ] = (∂ ₀° F [ μ F ]) ⊕ ((∂ ₁° F [ μ F ]) ⊗ Y)
+  G[_] : Container ℓ 𝟙 → Container ℓ 𝟙
+  G[ Y ] = (∂₀ F [ μ F ]) ⊕ ((∂₁ F [ μ F ]) ⊗ Y)
 
   G-subst : ∀ Y → Equiv (G [ Y ]) (G[ Y ])
   G-subst Y = [ shape ◁≃ pos ] where
@@ -55,7 +55,7 @@ open Container
 
     shape = isoToEquiv shape-Iso
 
-    μP : W S (P ₁) → Type
+    μP : W S (P ₁) → Type _
     μP = Wᴰ S (P ₁) (P ₀)
 
     pos₀ : (s : S) (p° : P ₀ s °) (f₁ : P ₁ s → W S (P ₁)) (f₀ : 𝟘* → Shape Y)
@@ -65,57 +65,57 @@ open Container
         ((P ₀ s ∖° p°) ⊎ (Σ[ p ∈ P ₁ s ] μP (f₁ p))) ⊎ (Σ[ x ∈ 𝟘* ] Pos Y _ (f₀ x))
     pos₀ _ _ _ _ = ⊎-empty-right (λ ())
 
-    pos₁ : (s : S) (p° : P ₁ s °) (f₁ : (P ₁ s ∖° p°) → W S (P ₁)) (f₀ : 𝟘* ⊎ 𝟙 → Shape Y)
+    pos₁ : (s : S) (p° : P ₁ s °) (f₁ : (P ₁ s ∖° p°) → W S (P ₁)) (f₀ : 𝟘* ⊎ 𝟙* → Shape Y)
       → (P ₀ s ⊎ (Σ[ p ∈ (P ₁ s) ∖° p° ] μP (f₁ p))) ⊎ (Pos Y _ (f₀ (inr •)))
           ≃
-        ((P ₀ s ⊎ (Σ[ p ∈ (P ₁ s) ∖° p° ] μP (f₁ p))) ⊎ 𝟘) ⊎ (Σ[ i ∈ 𝟘* ⊎ 𝟙 ] Pos Y _ (f₀ i))
+        ((P ₀ s ⊎ (Σ[ p ∈ (P ₁ s) ∖° p° ] μP (f₁ p))) ⊎ 𝟘*) ⊎ (Σ[ i ∈ 𝟘* ⊎ 𝟙* ] Pos Y _ (f₀ _))
     pos₁ s p° f₁ f₀ =
       let X = P ₀ s
           W = (Σ[ p ∈ (P ₁ s) ∖° p° ] μP (f₁ p))
-          Z : 𝟘* ⊎ 𝟙 → Type _
+          Z : 𝟘* ⊎ 𝟙* → Type _
           Z i = Pos Y _ (f₀ i)
       in
       (X ⊎ W) ⊎ (Z (inr •))
         ≃⟨ ⊎-left-≃ (⊎-empty-right λ ()) ⟩
-      ((X ⊎ W) ⊎ 𝟘) ⊎ (Z (inr •))
+      ((X ⊎ W) ⊎ 𝟘*) ⊎ (Z (inr •))
         ≃⟨ ⊎-right-≃ $ invEquiv (Σ-contractFst (isOfHLevelRespectEquiv 0 (⊎-empty-left λ ()) isContr-𝟙*)) ⟩
-      ((X ⊎ W) ⊎ 𝟘) ⊎ (Σ[ i ∈ 𝟘* ⊎ 𝟙* ] Z i)
+      ((X ⊎ W) ⊎ 𝟘*) ⊎ (Σ[ i ∈ 𝟘* ⊎ 𝟙* ] Z i)
         ≃∎
 
     pos : (i : 𝟙) → (s : Shape $ G [ Y ]) → Pos G[ Y ] i (equivFun shape s) ≃ Pos (G [ Y ]) i s
     pos • (inl ((s , p°) , f₁) , f₀) = pos₀ s p° f₁ f₀
     pos • (inr (((s , p°) , f₁) , •) , f₀) = pos₁ s p° f₁ f₀
 
-  η₀ : (G [ ∂ tt° (μ F) ]) ⧟ ((∂ ₀° F [ μ F ]) ⊕ ((∂ ₁° F [ μ F ]) ⊗ ∂ tt° (μ F)))
-  η₀ = G-subst (∂ tt° (μ F))
+  η₀ : (G [ ∂• (μ F) ]) ⧟ ((∂₀ F [ μ F ]) ⊕ ((∂₁ F [ μ F ]) ⊗ ∂• (μ F)))
+  η₀ = G-subst (∂• (μ F))
 
-  η₁ : ∂ tt° (F [ μ F ]) ⧟ ∂ tt° (μ F)
-  η₁ = ∂-map-equiv tt° (μ-in-equiv F)
+  η₁ : ∂• (F [ μ F ]) ⧟ ∂• (μ F)
+  η₁ = ∂-map-equiv •° (μ-in-equiv F)
 
-  _ : (G [ ∂ tt° (μ F) ]) ⊸ ∂ tt° (μ F)
+  _ : (G [ ∂• (μ F) ]) ⊸ ∂• (μ F)
   _ =
-    (G [ ∂ tt° (μ F) ])
+    (G [ ∂• (μ F) ])
       ⧟⟨ η₀ ⟩
-    ((∂ ₀° F [ μ F ]) ⊕ ((∂ ₁° F [ μ F ]) ⊗ ∂ tt° (μ F)))
+    ((∂₀ F [ μ F ]) ⊕ ((∂₁ F [ μ F ]) ⊗ ∂• (μ F)))
       ⊸⟨ binary-chain-rule F (μ F) ⟩
-    ∂ tt° (F [ μ F ])
+    ∂• (F [ μ F ])
       ⧟⟨ η₁ ⟩
-    ∂ tt° (μ F)
+    ∂• (μ F)
       ⊸∎
 
-  α : (G [ ∂ tt° (μ F) ]) ⊸ ∂ tt° (μ F)
+  α : (G [ ∂• (μ F) ]) ⊸ ∂• (μ F)
   α = (Equiv.as-⊸ η₀) ⋆ binary-chain-rule F (μ F) ⋆ (Equiv.as-⊸ η₁)
 
-μ-discrete : (F : Container _ 𝟚)
+μ-discrete : (F : Container ℓ 𝟚)
   → (∀ ix s → Discrete (Pos F ix s))
   → (∀ w → Discrete (Pos (μ F) • w))
 μ-discrete F discrete-P = discrete-Wᴰ S (P ₁) (P ₀) (discrete-P ₁) (discrete-P ₀) where
   open Container F renaming (Shape to S ; Pos to P)
 
-Discrete→isEquiv-μ-chain-rule : (F : Container _ 𝟚) → (∀ ix s → Discrete (Pos F ix s)) → isContainerEquiv (binary-chain-rule F (μ F))
+Discrete→isEquiv-μ-chain-rule : (F : Container ℓ 𝟚) → (∀ ix s → Discrete (Pos F ix s)) → isContainerEquiv (binary-chain-rule F (μ F))
 Discrete→isEquiv-μ-chain-rule F discrete-P = DiscreteContainer→isEquivBinaryChainRule F (μ F) (discrete-P ₁) (μ-discrete F discrete-P)
 
-module _ (F : Container _ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binary-chain-rule F (μ F))) where
+module _ (F : Container ℓ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binary-chain-rule F (μ F))) where
   open Container F renaming (Shape to S ; Pos to P)
   open μ-rule F
   private
@@ -130,10 +130,10 @@ module _ (F : Container _ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binary-
       → isIsolated p₁ × isIsolated wᴰ
     is-isolated-pair s f = isEquiv-Σ-isolate→isIsolatedPair (is-equiv-Σ-isolate s f)
 
-  μ-rule-shape : Shape (μ G) → Shape ((∂ tt° (μ F)))
+  μ-rule-shape : Shape (μ G) → Shape ((∂• (μ F)))
   μ-rule-shape = μ-rule F ._⊸_.shape
 
-  μ-rule-fib : (y : Shape ((∂ tt° (μ F)))) → fiber μ-rule-shape y
+  μ-rule-fib : (y : Shape ((∂• (μ F)))) → fiber μ-rule-shape y
   μ-rule-fib = uncurry $ W-elim μ-rule-fib-rec where
     module _ (s : S) (f : P ₁ s → W S (P ₁))
       (rec : ∀ p y → fiber μ-rule-shape (f p , y))
@@ -228,7 +228,7 @@ module _ (F : Container _ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binary-
                 (below p₁ wᴰ)
               lemma₂ = Wᴰ-Path→≡ S (P ₁) (P ₀) (refl′ p₁ , lemma₃)
 
-  μ-rule-shape⁻¹ : Shape ((∂ tt° (μ F))) → Shape (μ G)
+  μ-rule-shape⁻¹ : Shape ((∂• (μ F))) → Shape (μ G)
   μ-rule-shape⁻¹ = fst ∘ μ-rule-fib
 
   isEquiv-α : isContainerEquiv α
@@ -245,7 +245,7 @@ module _ (F : Container _ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binary-
   isEmbedding-α = isContainerEquiv→isContainerEmbedding {e = α} isEquiv-α
 
   isEmbedding-μ-rule-shape : isContainerEmbedding (μ-rule F)
-  isEmbedding-μ-rule-shape = isEmbedding-μ-rec G (∂ tt° (μ F)) α isEmbedding-α
+  isEmbedding-μ-rule-shape = isEmbedding-μ-rec G (∂• (μ F)) α isEmbedding-α
 
   μ-rule-is-prop-fib : ∀ y → isProp (fiber μ-rule-shape y)
   μ-rule-is-prop-fib = isEmbedding→hasPropFibers isEmbedding-μ-rule-shape
@@ -253,7 +253,7 @@ module _ (F : Container _ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binary-
   isEquiv-μ-rule : isContainerEquiv (μ-rule F)
   isEquiv-μ-rule .equiv-proof y = inhProp→isContr (μ-rule-fib y) (μ-rule-is-prop-fib y)
 
-module isEquiv-μ-rule (F : Container _ 𝟚) (is-equiv-μ-rule : isContainerEquiv (μ-rule F)) where
+module isEquiv-μ-rule (F : Container ℓ 𝟚) (is-equiv-μ-rule : isContainerEquiv (μ-rule F)) where
   open Container F renaming (Shape to S ; Pos to P)
   open μ-rule F using (α ; G ; η₀ ; η₁)
 
@@ -262,7 +262,7 @@ module isEquiv-μ-rule (F : Container _ 𝟚) (is-equiv-μ-rule : isContainerEqu
 
 
     is-equiv-α : isContainerEquiv α
-    is-equiv-α = isEquivFrom-μ-rec G (∂ tt° (μ F)) α is-equiv-μ-rule
+    is-equiv-α = isEquivFrom-μ-rec G (∂• (μ F)) α is-equiv-μ-rule
 
   isEquiv-chain-rule : isContainerEquiv (binary-chain-rule F (μ F))
   isEquiv-chain-rule = isContainerEquivCompLeftRight η₀ η₁ (binary-chain-rule F (μ F)) is-equiv-α

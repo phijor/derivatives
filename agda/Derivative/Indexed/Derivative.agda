@@ -13,10 +13,10 @@ open import Derivative.Indexed.Container
 private
   variable
     ℓ : Level
-    Ix : Type ℓ
+    Ix : Type
 
 ∂ : (i : Ix °) → (F : Container ℓ Ix) → Container ℓ Ix
-∂ {ℓ} {Ix} (i , i≟_) F = shape ◁ pos module ∂ where
+∂ {Ix} {ℓ} (i , i≟_) F = shape ◁ pos module ∂ where
   open Container F renaming (Shape to S ; Pos to P)
   shape : Type ℓ
   shape = Σ[ s ∈ S ] ((P i s) °)
@@ -27,6 +27,15 @@ private
 
   pos : Ix → shape → Type _
   pos j = pos-dec j (i≟ j)
+
+∂• : Container ℓ 𝟙 → Container ℓ 𝟙
+∂• = ∂ •°
+
+∂₀ : Container ℓ 𝟚 → Container ℓ 𝟚
+∂₀ = ∂ ₀°
+
+∂₁ : Container ℓ 𝟚 → Container ℓ 𝟚
+∂₁ = ∂ ₁°
 
 ∂-map : (i : Ix °) → {F G : Container ℓ Ix} → (F ⊸ G) → (∂ i F ⊸ ∂ i G)
 ∂-map (i , i≟_) {F} {G} φ = [ shape ⊸ pos ] module ∂-map where
