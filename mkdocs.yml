@@ -66,3 +66,6 @@ markdown_extensions:
 plugins:
 - search
 - awesome-nav
+- gen-files:
+    scripts:
+      - "./scripts/gen_agda_pages.py"

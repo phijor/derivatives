@@ -45,6 +45,16 @@
     {
       packages.derivative = derivative;
       packages.default = config.packages.derivative;
+      packages.mkdocs-env = (
+        pkgs.python314.withPackages (p: [
+          p.mkdocs
+          p.mkdocs-awesome-nav
+          p.mkdocs-gen-files
+          p.mkdocs-material
+
+          p.black
+        ])
+      );
 
       packages.site = pkgs.stdenvNoCC.mkDerivation {
         pname = "site";
@@ -60,39 +70,16 @@
               ./docs/stylesheets
               ./docs/.nav.yml
               ./mkdocs.yml
+              ./scripts/gen_agda_pages.py
             ];
           };
 
         nativeBuildInputs = [
-          (pkgs.python3.withPackages (p: [
-            p.mkdocs
-            p.mkdocs-awesome-nav
-            p.mkdocs-material
-          ]))
-          pkgs.sd
+          config.packages.mkdocs-env
         ];
 
-        # configurePhase = ''
-        #   cp -vrT ${config.packages.derivative.html} docs
-        # '';
-
         buildPhase = ''
-          mkdir -p docs
-
-          echo "Copying hightlighted Markdown files..."
-          cp -v ${config.packages.derivative.html}/*.md docs/
-
-          echo "Wrapping raw HTML files as Markdown..."
-          for raw in ${config.packages.derivative.html}/*.html; do
-            base="''${raw##*/}"
-            md="docs/''${base%.html}.md"
-            echo "Preparing $raw → $md..."
-            cp -v $raw $md
-            sd '\A' '<pre class="Agda">' $md
-            sd '\z' '</pre>' $md
-          done
-
-          mkdocs -v build
+          AGDA_HTML_DIR="${config.packages.derivative.html}" mkdocs -v build
         '';
 
         installPhase = ''
@@ -106,13 +93,7 @@
         packages = [
           inputs'.cornelis.packages.cornelis
 
-          pkgs.gnumake
-          pkgs.sd
-          (pkgs.python3.withPackages (p: [
-            p.mkdocs
-            p.mkdocs-awesome-nav
-            p.mkdocs-material
-          ]))
+          config.packages.mkdocs-env
         ];
       };
     };
