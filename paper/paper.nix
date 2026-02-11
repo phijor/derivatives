@@ -24,6 +24,7 @@
       packages.texlive = texlive.combine {
         inherit (texlive)
           scheme-medium
+          biber
           latex-bin
           latexmk
 
