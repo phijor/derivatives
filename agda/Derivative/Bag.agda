@@ -97,7 +97,7 @@ isIsolatedFin {X} = Discrete→isIsolated (isFinSet→Discrete (str X))
 module Universe (P : Type → Type)
   (is-prop-P : ∀ A → isProp (P A))
   (is-P-+1 : ∀ {A : Type} → P A → P (A ⊎ 𝟙))
-  (is-P-∖ : ∀ {A : Type} → P A → ∀ a → P (A ∖ a))
+  (is-P-∖ : ∀ {A : Type} → P A → (a : A °) → P (A ∖° a))
   where
   U : Type₁
   U = Σ[ X ∈ Type ] P X
@@ -106,8 +106,8 @@ module Universe (P : Type → Type)
   uBag .Container.Shape = U
   uBag .Container.Pos = ⟨_⟩
 
-  _-ᵁ_ : (X : U) → (x : ⟨ X ⟩) → U
-  (X -ᵁ x) .fst = ⟨ X ⟩ ∖ x
+  _-ᵁ_ : (X : U) → (x : ⟨ X ⟩ °) → U
+  (X -ᵁ x) .fst = ⟨ X ⟩ ∖° x
   (X -ᵁ x) .snd = is-P-∖ (str X) x
 
   _+1 : U → U
@@ -115,7 +115,7 @@ module Universe (P : Type → Type)
   (X +1) .snd = is-P-+1 (str X)
 
   ∂-uBag-shape-Iso : Iso (Σ[ X ∈ U ] (⟨ X ⟩ °)) U
-  ∂-uBag-shape-Iso .Iso.fun (X , x , _) = X -ᵁ x
+  ∂-uBag-shape-Iso .Iso.fun (X , x) = X -ᵁ x
   ∂-uBag-shape-Iso .Iso.inv X .fst = X +1
   ∂-uBag-shape-Iso .Iso.inv X .snd = nothing°
   ∂-uBag-shape-Iso .Iso.rightInv X = Σ≡Prop is-prop-P $ ua $ removeNothingEquiv
@@ -123,7 +123,7 @@ module Universe (P : Type → Type)
     U-equiv : (⟨ X ⟩ ∖ x₀) ⊎ 𝟙 ≃ ⟨ X ⟩
     U-equiv = replace-isolated-equiv x₀ isolated-x₀
 
-    U-path : (X -ᵁ x₀) +1 ≡ X
+    U-path : (X -ᵁ x°) +1 ≡ X
     U-path = Σ≡Prop is-prop-P $ ua U-equiv
 
     pt-path : PathP (λ i → ⟨ U-path i ⟩ °) nothing° x°
@@ -134,7 +134,7 @@ module Universe (P : Type → Type)
 
   ∂-uBag : Equiv (∂ uBag) uBag
   ∂-uBag .Equiv.shape = ∂-uBag-shape
-  ∂-uBag .Equiv.pos (X , x , _) = idEquiv ⟨ X -ᵁ x ⟩
+  ∂-uBag .Equiv.pos (X , x) = idEquiv ⟨ X -ᵁ x ⟩
 
 module SubNat where
   open import Cubical.Data.Nat
@@ -164,8 +164,8 @@ module SubNat where
       cancel {x = nothing} {y = just y} = ex-falso ∘ znots
       cancel {x = nothing} {y = nothing} _ = refl′ nothing
 
-  isSub-∖ : ∀ {X} → isSub X → ∀ x → isSub (X ∖ x)
-  isSub-∖ {X} = PT.rec (isPropΠ λ x → isPropIsSub (X ∖ x)) λ ι x → PT.∣ compEmbedding ι (remove-embedding x) ∣₁
+  isSub-∖ : ∀ {X} → isSub X → ∀ x → isSub (X ∖° x)
+  isSub-∖ {X} = PT.rec (isPropΠ λ x → isPropIsSub (X ∖° x)) λ ι (x , _) → PT.∣ compEmbedding ι (remove-embedding x) ∣₁
 
   open Universe isSub isPropIsSub isSub-+1 isSub-∖
     renaming (uBag to ℕBag)

@@ -480,7 +480,7 @@ module _
   (P : Type → Type)
   (is-prop-P : ∀ A → isProp (P A))
   (is-P-+1 : ∀ {A : Type} → P A → P (A ⊎ 𝟙))
-  (is-P-∖ : ∀ {A : Type} → P A → ∀ a → P (A ∖ a))
+  (is-P-∖ : ∀ {A : Type} → P A → (a : A °) → P (A ∖° a))
   where
 
   open Derivative.Bag.Universe P is-prop-P is-P-+1 is-P-∖
