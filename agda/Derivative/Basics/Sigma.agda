@@ -10,6 +10,8 @@ open import Cubical.Foundations.HLevels using (isSet→SquareP)
 open import Cubical.Data.Nat
 open import Cubical.Data.Sigma
 
+open import Cubical.Data.Sigma using (Σ-cong-equiv-fst ; Σ-cong-equiv-snd) public
+
 private
   variable
     ℓ ℓ' : Level

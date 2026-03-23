@@ -66,6 +66,10 @@ module _ {ℓB ℓB′} {A : Type ℓ} {B : A → Type ℓB} {B′ : A → Type 
   isEmbedding-Σ-map-snd {f} emb-f = hasPropFibers→isEmbedding λ where
     y → isOfHLevelRetractFromIso 1 Σ-map-snd-fiber-iso $ isEmbedding→hasPropFibers (emb-f (y .fst)) (y .snd)
 
+  Σ-map-snd-embedding : (∀ a → B a ↪ B′ a) → Σ A B ↪ Σ A B′
+  Σ-map-snd-embedding f .fst = Σ-map-snd (fst ∘ f)
+  Σ-map-snd-embedding f .snd = isEmbedding-Σ-map-snd (snd ∘ f)
+
 isEmbedding-Σ-map : ∀ {ℓB ℓB′} {A′ : Type ℓ} {B : A → Type ℓB} {B′ : A′ → Type ℓB′}
   → {f : A → A′}
   → {g : ∀ a → B a → B′ (f a)}

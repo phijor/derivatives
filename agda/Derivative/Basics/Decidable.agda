@@ -47,6 +47,16 @@ decNot (no ¬p) = yes ¬p
 decEquiv : (e : A ≃ B) → Dec A → Dec B
 decEquiv e = map (equivFun e) (_∘ invEq e)
 
+decSubstEquiv : A ≃ B → Dec A ≃ Dec B
+decSubstEquiv e = isoToEquiv iso module decSubstEquiv where
+  iso : Iso _ _
+  iso .Iso.fun = decEquiv e
+  iso .Iso.inv = decEquiv (invEquiv e)
+  iso .Iso.rightInv (yes b) = cong yes (secEq e b)
+  iso .Iso.rightInv (no ¬b) = cong no $ funExt λ b → cong ¬b (secEq e b)
+  iso .Iso.leftInv (yes a) = cong yes (retEq e a)
+  iso .Iso.leftInv (no ¬a) = cong no $ funExt λ a → cong ¬a (retEq e a)
+
 Dec→Type : Dec A → Type
 Dec→Type (yes _) = 𝟙
 Dec→Type (no  _) = 𝟘

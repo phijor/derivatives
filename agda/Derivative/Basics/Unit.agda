@@ -34,3 +34,11 @@ isContr→≃𝟙* contr-A = (const •) , is-equiv-const where
 
 isContr→≡𝟙* : isContr A → A ≡ 𝟙*
 isContr→≡𝟙* contr-A = ua $ isContr→≃𝟙* contr-A
+
+Π𝟙*-equiv : ∀ {ℓA} (A : 𝟙* {ℓ} → Type ℓA) → (∀ t → A t) ≃ (A •)
+Π𝟙*-equiv A = strictIsoToEquiv iso module Π𝟙*-equiv where
+  iso : Iso _ _
+  iso .Iso.fun = _$ •
+  iso .Iso.inv = const
+  iso .Iso.rightInv _ = refl
+  iso .Iso.leftInv _ = refl
