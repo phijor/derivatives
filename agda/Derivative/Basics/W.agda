@@ -234,7 +234,9 @@ isEmbedding-W-rec {S} {P} {A} sup* is-emb-sup* = hasPropFibersOfImage→isEmbedd
   fiber-equiv = isEmbedding→W-rec-fiber-equiv sup* is-emb-sup*
 
   prop-fibers : ∀ w → isProp (fiber (W-rec sup*) (W-rec sup* w))
-  prop-fibers (sup s f) = isOfHLevelRespectEquiv 1 (invEquiv $ fiber-equiv s f) is-prop-fibers'
-    where
-      is-prop-fibers' : isProp (∀ p → fiber (W-rec sup*) (W-rec sup* (f p)))
-      is-prop-fibers' = isPropΠ λ p → prop-fibers (f p)
+  prop-fibers = W-elim goal where module _ (s : S) (f : P s → W S P) (ind : ∀ p → isProp (fiber (W-rec sup*) (W-rec sup* (f p)))) where
+    is-prop-fibers' : isProp (∀ p → fiber (W-rec sup*) (W-rec sup* (f p)))
+    is-prop-fibers' = isPropΠ ind
+
+    goal : isProp (fiber (W-rec sup*) (sup* (s , W-rec sup* ∘ f)))
+    goal = isOfHLevelRespectEquiv 1 (invEquiv $ fiber-equiv s f) is-prop-fibers'
