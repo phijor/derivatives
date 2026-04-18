@@ -3,6 +3,7 @@ module Derivative.Basics.Sum where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Embedding
+open import Derivative.Basics.Decidable as Dec
 
 open import Cubical.Data.Sigma
 open import Cubical.Data.Sum public
@@ -29,6 +30,17 @@ inrInj = isEmbedding→Inj Sum.isEmbedding-inr _ _
 
 inr≢inl : ∀ {x : A} {y : B} → inr x ≢ inl y
 inr≢inl p = Sum.⊎Path.encode _ _ p .lower
+
+inl≢inr : ∀ {x : A} {y : B} → inl y ≢ inr x
+inl≢inr = inr≢inl ∘ sym
+
+decFiberInl : (y : A ⊎ B) → Dec (fiber inl y)
+decFiberInl (inl a) = yes (a , refl)
+decFiberInl (inr b) = no λ (a , inl≡inr) → inl≢inr inl≡inr
+
+decFiberInr : (y : A ⊎ B) → Dec (fiber inr y)
+decFiberInr (inl a) = no λ (b , inr≡inl) → inr≢inl inr≡inl
+decFiberInr (inr b) = yes (b , refl)
 
 Σ-⊎-fst-≃ : {E : A ⊎ B → Type ℓ} → (Σ (A ⊎ B) E) ≃ (Σ A (E ∘ inl) ⊎ Σ B (E ∘ inr))
 Σ-⊎-fst-≃ = Sum.Σ⊎≃
