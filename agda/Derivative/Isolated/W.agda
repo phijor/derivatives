@@ -17,7 +17,7 @@ private
 
 opaque
   isIsolatedTop : ∀ {q : Q s} → isIsolated q → isIsolated {A = Wᴰ S P Q (sup s f)} (top q)
-  isIsolatedTop {s} {f} {q} = isIsolatedPreserveEquiv' (Wᴰ-out-equiv _ _ _ s f) (top q) ∘ isIsolatedInl
+  isIsolatedTop {s} {f} {q} = isIsolatedReflectEquiv (Wᴰ-out-equiv _ _ _ s f) (top q) ∘ isIsolatedInl
 
 top° : Q s ° → Wᴰ S P Q (sup s f) °
 top° = Σ-map top λ q → isIsolatedTop
@@ -31,7 +31,7 @@ opaque
   isIsolatedBelow : ∀ {p : P s} {wᴰ : Wᴰ S P Q (f p)}
     → isIsolated {A = Σ[ p ∈ P s ] Wᴰ S P Q (f p)} (p , wᴰ)
     → isIsolated {A = Wᴰ S P Q (sup s f)} (below p wᴰ)
-  isIsolatedBelow {s} {f} {p} {wᴰ} = isIsolatedPreserveEquiv' (Wᴰ-out-equiv _ _ _ s f) (below p wᴰ) ∘ isIsolatedInr
+  isIsolatedBelow {s} {f} {p} {wᴰ} = isIsolatedReflectEquiv (Wᴰ-out-equiv _ _ _ s f) (below p wᴰ) ∘ isIsolatedInr
 
 below° : (Σ[ p ∈ P s ] Wᴰ S P Q (f p)) ° → Wᴰ S P Q (sup s f) °
 below° = Σ-map (uncurry below) λ _ → isIsolatedBelow

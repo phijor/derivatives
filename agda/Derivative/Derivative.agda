@@ -29,7 +29,7 @@ open Cart
   ∂-shape : (Σ[ s ∈ F .Shape ] F .Pos s °) → (Σ[ t ∈ G .Shape ] G .Pos t °)
   ∂-shape (s , _) .fst = f s
   ∂-shape (s , (p , isolated-p)) .snd .fst = invEq (u s) p
-  ∂-shape (s , (p , isolated-p)) .snd .snd = isIsolatedRespectEquiv (u s) p isolated-p
+  ∂-shape (s , (p , isolated-p)) .snd .snd = isIsolatedPreserveEquivInv (u s) p isolated-p
 
   ∂-pos : (s : F .Shape) (p : F .Pos s °) → (G .Pos (f s) ∖ invEq (u s) (p .fst)) ≃ (F .Pos s ∖ (p .fst))
   ∂-pos s p = RemoveRespectEquiv (p .fst) (u s)

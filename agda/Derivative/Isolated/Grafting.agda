@@ -11,6 +11,29 @@ private
     ℓ : Level
     A B : Type ℓ
 
+-- This lets us define an elimination principle for a type `A` with some isolated point `a₀ : A`:
+-- To give a section `(a : A) → B a`, it suffices to give `B a`, once for all `a` such that `a₀ ≡ a`,
+-- and another time for all `a` such that `a₀ ≢ a`.
+-- This principle is not valid for arbitrary pointed types!
+-- ```agda
+module _ {ℓB : Level} {B : A → Type ℓB}
+  ((a₀ , a₀≟_) : A °)
+  (eq* : ∀ a → a₀ ≡ a → B a)
+  (neq* : (a : A ∖ a₀) → B (a .fst))
+  where
+  elimIsolated : ∀ a → B a
+  elimIsolated a = Dec.elim (eq* a) (λ neq → neq* (a , neq)) (a₀≟ a)
+
+  elimIsolated-β-yes : ∀ a → (p : a₀ ≡ a) → elimIsolated a ≡ eq* a p
+  elimIsolated-β-yes a p i = Dec.elim (eq* a) (λ neq → neq* (a , neq)) (isIsolated→isPropDecPath a₀ a₀≟_ a (a₀≟ a) (yes p) i)
+
+  elimIsolated-β-refl : elimIsolated a₀ ≡ eq* a₀ refl
+  elimIsolated-β-refl = elimIsolated-β-yes a₀ refl
+
+  elimIsolated-β-no : ∀ a → (¬p : a₀ ≢ a) → elimIsolated a ≡ neq* (a , ¬p)
+  elimIsolated-β-no a ¬p i = Dec.elim (eq* a) (λ neq → neq* (a , neq)) (isIsolated→isPropDecPath a₀ a₀≟_ a (a₀≟ a) (no ¬p) i)
+-- ```
+
 graft : (a° : A °) → (((A ∖ a° .fst) → B) × B) → (A → B)
 graft a° (f , b₀) = elimIsolated a° (λ _ _ → b₀) f
 
@@ -40,11 +63,14 @@ graft-eval-yes-filler a° f b₀ p using (a₀ , a₀≟_) ← a° = λ i j → 
       filler : Square p (eval-dec a₀ (yes a₀≡a₀)) _ (cong f a₀≡a₀)
       filler = doubleCompPath-filler (elimIsolated-β-yes a° (λ _ _ → b₀) (f ∘ fst) a₀ a₀≡a₀) p (cong f a₀≡a₀)
 
+      trivial-loop : a₀≡a₀ ≡ refl
+      trivial-loop = isIsolated→K a₀ a₀≟_ a₀≡a₀
+
       adjust₁ : cong f a₀≡a₀ ≡ refl
-      adjust₁ i j = f (isIsolated→K a° a₀≡a₀ i j)
+      adjust₁ i j = f (trivial-loop i j)
 
       adjust₂ : elimIsolated-β-yes a° (λ _ _ → b₀) (f ∘ fst) a₀ a₀≡a₀ ≡ graft-β-yes a° (f ∘ fst) {b₀}
-      adjust₂ = cong (elimIsolated-β-yes a° _ (f ∘ fst) a₀) (isIsolated→K a° a₀≡a₀)
+      adjust₂ = cong (elimIsolated-β-yes a° _ (f ∘ fst) a₀) trivial-loop
 
       goal : Square p (eval-dec a₀ (yes a₀≡a₀)) (sym $ graft-β-yes a° (f ∘ fst)) (refl′ (f a₀))
       goal = subst2 (λ r s → Square p (eval-dec a₀ (yes a₀≡a₀)) (sym r) s) adjust₂ adjust₁ filler

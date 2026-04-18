@@ -54,7 +54,7 @@ is-natural-counit : (F G : Container ℓ ℓ) (f : Cart F G) → [ ∂[ f ] ]⊗
 is-natural-counit F G f = Cart≡ refl $ funExt λ { ((s , p°) , _) → equivExt (goal s p°) }
   where
     opaque
-      unfolding isIsolatedRespectEquiv
+      unfolding isIsolatedPreserveEquivInv
 
       goal : (s : F .Shape) (p°@(p₀ , p₀≟_) : F .Pos s °)
         → (let (q₀ , q₀≟_) = ∂[ f ] .shape (s , p°) .snd)
@@ -77,13 +77,10 @@ zig F =
 
 zig≡ : (F : Container ℓ ℓ) → [ unit F ]⊗Id ⋆ counit (F ⊗Id) ≡ id (F ⊗Id)
 zig≡ F = Cart≡ refl (funExt pos-path) module zig≡ where
-  opaque
-    unfolding isIsolatedRespectEquiv
-
-    pos-path : ∀ s → (counit-pos (F ⊗Id) s nothing isIsolatedNothing) ∙ₑ maybe-equiv (unit-pos F (s .fst)) ≡ idEquiv _
-    pos-path s = equivExt λ where
-      (just p) → refl′ (just p)
-      nothing → refl′ nothing
+  pos-path : ∀ s → (counit-pos (F ⊗Id) s nothing isIsolatedNothing) ∙ₑ maybe-equiv (unit-pos F (s .fst)) ≡ idEquiv _
+  pos-path s = equivExt λ where
+    (just p) → refl′ (just p)
+    nothing → refl′ nothing
 
 zag : (G : Container ℓ ℓ) → Cart (∂ G) (∂ G)
 zag G =

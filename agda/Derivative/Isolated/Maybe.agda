@@ -72,7 +72,7 @@ isEquiv-replace→isIsolated {A} a₀ is-equiv = is-isolated-a₀ where
   equiv = invEquiv (replace a₀ , is-equiv)
 
   is-isolated-a₀ : isIsolated a₀
-  is-isolated-a₀ = isIsolatedRespectEquiv equiv nothing isIsolatedNothing
+  is-isolated-a₀ = isIsolatedPreserveEquivInv equiv nothing isIsolatedNothing
 
 isIsolated≃isEquiv-replace : (a₀ : A)
   → isIsolated a₀ ≃ isEquiv (replace a₀)
