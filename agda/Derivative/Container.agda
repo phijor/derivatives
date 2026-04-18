@@ -51,9 +51,12 @@ _⊗_ : (F G : Container ℓS ℓP) → Container _ _
 (F ⊗ G) .Pos x = F .Pos (x .fst) ⊎ G .Pos (x .snd)
 infix 11 _⊗_
 
+𝕪 : (P : Type ℓP) → Container ℓS ℓP
+𝕪 P .Shape = 𝟙*
+𝕪 P .Pos = const P
+
 Id : Container ℓS ℓP
-Id .Shape = 𝟙*
-Id .Pos = const 𝟙*
+Id = 𝕪 𝟙*
 
 _⊗Id : Container ℓS ℓP → Container ℓS ℓP
 F ⊗Id = F ⊗ Id
@@ -143,9 +146,16 @@ module CartReasoning where
 
 open CartReasoning public
 
+[_]⊗_ :
+  ∀ {F G : Container ℓS ℓP}
+  → Cart F G
+  → (H : Container ℓS ℓP)
+  → Cart (F ⊗ H) (G ⊗ H)
+[_]⊗_ {F} {G} f H .shape s = f .shape (s .fst) , _
+[_]⊗_ {F} {G} f H .pos s = Sum.⊎-left-≃ (f .pos (s .fst))
+
 [_]⊗Id : {F G : Container ℓS ℓP} → Cart F G → Cart (F ⊗Id) (G ⊗Id)
-[_]⊗Id {F} {G} f .shape s = f .shape (s .fst) , _
-[_]⊗Id {F} {G} f .pos s = Sum.⊎-left-≃ (f .pos (s .fst))
+[_]⊗Id {ℓS} {ℓP} = [_]⊗ Id
 
 record Equiv (F G : Container ℓS ℓP) : Type (ℓ-max ℓS ℓP) where
   constructor [_◁≃_]
