@@ -1,3 +1,5 @@
+<!--
+```agda
 {-# OPTIONS --safe #-}
 module Derivative.Isolated.Sigma where
 
@@ -17,7 +19,13 @@ private
     ℓ : Level
     A : Type ℓ
     B : A → Type ℓ
+```
+-->
 
+# Isolated points of _Σ_-types
+
+If `a : A` and `b : B a` are isolated, then `(a , b)` is isolated in `Σ A B`.
+```agda
 isIsolatedΣ : ∀ {a : A} {b : B a}
   → isIsolated a
   → isIsolated b
@@ -33,7 +41,10 @@ isIsolatedΣ {B} {a} {b} isolated-a isolated-b (a′ , b′) = discrete (isolate
     discrete-b (no ¬q) = no λ { (p , q) → ¬q (equivFun adj $ cong (λ p → subst B p b) (isIsolated→isPropPath a isolated-a a′ _ _) ∙ q) }
     
   discrete (no ¬p) = no λ r → ¬p (cong fst r)
+```
 
+This defines a map from pairs of isolated points to isolated pairs:
+```agda
 Σ-isolate : ∀ {ℓA ℓB} (A : Type ℓA) (B : A → Type ℓB)
   → (Σ[ a° ∈ A ° ] (B (a° .fst)) °) → (Σ[ a ∈ A ] B a) °
 Σ-isolate A B ((a , isolated-a) , b , isolated-b) .fst .fst = a
@@ -42,89 +53,13 @@ isIsolatedΣ {B} {a} {b} isolated-a isolated-b (a′ , b′) = discrete (isolate
 
 _,°_ : (a : A °) → (b : B (a .fst) °) → (Σ[ a ∈ A ] B a) °
 a ,° b = Σ-isolate _ _ (a , b)
+```
 
-isIsolatedΣSndProp : ∀ {ℓP} {P : A → Type ℓP}
-  → {a : A} {p : P a}
-  → isIsolated a
-  → isProp (P a)
-  → isIsolated {A = Σ A P} (a , p)
-isIsolatedΣSndProp {P} {a} {p} isolated-a is-prop-P = isIsolatedΣ isolated-a (isProp→isIsolated is-prop-P p)
+## Characterizing `Σ-isolate`
 
-isIsolatedΣSnd→Discrete : {ℓ : Level}
-  → (A : Type ℓ)
-  → ((B : A → Type ℓ) → (a₀ : A) → (b₀ : B a₀) → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀)
-  → Discrete A
-isIsolatedΣSnd→Discrete {ℓ} A Σ-isolated-fst a₀ a₁ = goal where
-  B' : A → Type ℓ
-  B' a = a₀ ≡ a
-
-  b₀ : B' a₀
-  b₀ = refl
-
-  is-isolated-pair : isIsolated {A = Σ A B'} (a₀ , b₀)
-  is-isolated-pair = isContr→isIsolatedCenter (isContrSingl a₀) (a₀ , b₀)
-
-  goal : Dec (a₀ ≡ a₁)
-  goal = Σ-isolated-fst B' a₀ b₀ is-isolated-pair a₁
-
-module _ (is-equiv-Σ-isolate : isEquiv (Σ-isolate A B)) where
-  private
-    unisolate-equiv : (Σ[ a ∈ A ] B a) ° ≃ (Σ[ a° ∈ A ° ] (B (a° .fst)) °)
-    unisolate-equiv = invEquiv (_ , is-equiv-Σ-isolate)
-
-    unisolate : (Σ[ a ∈ A ] B a) ° → (Σ[ a° ∈ A ° ] (B (a° .fst)) °)
-    unisolate = equivFun unisolate-equiv
-
-  isEquiv-Σ-isolate→isIsolatedPair : {a₀ : A} {b₀ : B a₀} → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀ × isIsolated b₀
-  isEquiv-Σ-isolate→isIsolatedPair {a₀} {b₀} isolated-ab
-    using ab°@((a , isolated-a) , (b , isolated-b)) ← unisolate ((a₀ , b₀) , isolated-ab)
-    = isolated-a₀ , isolated-b₀ where
-      help : Σ-isolate A B ab° ≡ Σ-isolate A B (unisolate ((a₀ , b₀) , isolated-ab))
-      help = Isolated≡ $ refl′ (a , b)
-
-      fib₀ : fiber unisolate ab°
-      fib₀ .fst = Σ-isolate A B ab°
-      fib₀ .snd = sym (invEq (equivAdjointEquiv (_ , is-equiv-Σ-isolate)) help)
-
-      fib₁ : fiber unisolate ab°
-      fib₁ .fst = (a₀ , b₀) , isolated-ab
-      fib₁ .snd = refl
-
-      contr-fib = equivIsEquiv unisolate-equiv .equiv-proof ab°
-
-      fib₀≡fib₁ : fib₀ ≡ fib₁
-      fib₀≡fib₁ = isContr→isProp contr-fib _ _
-
-      a≡a₀ : a ≡ a₀
-      a≡a₀ = cong (fst ∘ fst ∘ fst) fib₀≡fib₁
-
-      isolated-a₀ : isIsolated a₀
-      isolated-a₀ = subst isIsolated a≡a₀ isolated-a
-
-      b≡b₀ : PathP (λ i → B (a≡a₀ i)) b b₀
-      b≡b₀ = cong (snd ∘ fst ∘ fst) fib₀≡fib₁
-
-      isolated-b₀ : isIsolated b₀
-      isolated-b₀ = transport (λ i → (b : B (a≡a₀ i)) → Dec (b≡b₀ i ≡ b)) isolated-b
-
-  isEquiv-Σ-isolate→isIsolatedFst : {a₀ : A} {b₀ : B a₀} → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀
-  isEquiv-Σ-isolate→isIsolatedFst = fst ∘ isEquiv-Σ-isolate→isIsolatedPair
-
-isIsolatedPair→isEquiv-Σ-isolated :
-  (∀ {a₀ : A} {b₀ : B a₀} → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀ × isIsolated b₀)
-  → isEquiv (Σ-isolate A B)
-isIsolatedPair→isEquiv-Σ-isolated {A} {B} is-isolated-pair = isoToIsEquiv Σ-isolate-Iso where
-  Σ-isolate⁻¹ : (Σ[ a ∈ A ] B a) ° → (Σ[ a° ∈ A ° ] (B (a° .fst)) °)
-  Σ-isolate⁻¹ ((a , b) , isolated-ab)
-    using (isolated-a , isolated-b) ← is-isolated-pair isolated-ab
-    = (a , isolated-a) , (b , isolated-b)
-
-  Σ-isolate-Iso : Iso (Σ[ a° ∈ A ° ] (B (a° .fst)) °) ((Σ[ a ∈ A ] B a) °)
-  Σ-isolate-Iso .Iso.fun = Σ-isolate A B
-  Σ-isolate-Iso .Iso.inv = Σ-isolate⁻¹
-  Σ-isolate-Iso .Iso.rightInv _ = Isolated≡ refl
-  Σ-isolate-Iso .Iso.leftInv _ = ΣPathP (Isolated≡ refl , Isolated≡ refl)
-
+A prori, it is not clear whether `Σ-isolate` is an equivalence or not.
+We can however reshape its fibers into a proposition:
+```agda
 Σ-isolate-fiber-equiv : ∀ (A : Type ℓ) (B : A → Type ℓ)
   → (a : A) (b : B a) (isolated-ab : isIsolated {A = Σ A B} (a , b))
   → fiber (Σ-isolate A B) ((a , b) , isolated-ab) ≃ (isIsolated a × isIsolated b)
@@ -150,6 +85,10 @@ isProp-fiber-Σ-isolate : ∀ (A : Type ℓ) (B : A → Type ℓ)
 isProp-fiber-Σ-isolate A B y = isOfHLevelRespectEquiv 1 (invEquiv $ Σ-isolate-fiber-equiv A B _ _ _)
   $ isProp× (isPropIsIsolated _) (isPropIsIsolated _)
 
+```
+
+This shows that `Σ-isolate` is an embedding:
+```agda
 isEmbedding-Σ-isolate : ∀ (A : Type ℓ) (B : A → Type ℓ) → isEmbedding (Σ-isolate A B)
 isEmbedding-Σ-isolate A B = hasPropFibers→isEmbedding $ isProp-fiber-Σ-isolate A B
 
@@ -157,7 +96,25 @@ isEmbedding-Σ-isolate A B = hasPropFibers→isEmbedding $ isProp-fiber-Σ-isola
   → (Σ[ a° ∈ A ° ] (B (a° .fst)) °) ↪ ((Σ[ a ∈ A ] B a) °)
 Σ-isolate-embedding A B .fst = Σ-isolate A B
 Σ-isolate-embedding A B .snd = isEmbedding-Σ-isolate A B
+```
 
+If `Σ-isolate` is an equivalence, then we get a converse to `isIsolatedΣ`:
+```agda
+module _
+  {A : Type ℓ} {B : A → Type ℓ}
+  (is-equiv-Σ-isolate : isEquiv (Σ-isolate A B))
+  where
+  isEquiv-Σ-isolate→isIsolatedPair : {a₀ : A} {b₀ : B a₀} → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀ × isIsolated b₀
+  isEquiv-Σ-isolate→isIsolatedPair {a₀} {b₀} isolated-ab = equivFun (Σ-isolate-fiber-equiv A B a₀ b₀ isolated-ab) fib where
+    fib : fiber (Σ-isolate A B) ((a₀ , b₀) , isolated-ab)
+    fib = is-equiv-Σ-isolate .equiv-proof ((a₀ , b₀) , isolated-ab) .fst
+
+  isEquiv-Σ-isolate→isIsolatedFst : {a₀ : A} {b₀ : B a₀} → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀
+  isEquiv-Σ-isolate→isIsolatedFst = fst ∘ isEquiv-Σ-isolate→isIsolatedPair
+```
+
+Since `Σ-isolate` is always an embedding, it being an equivalence is the same as it being surjective.
+```agda
 isEquiv-Σ-isolate≃isSurjection-Σ-isolate : (A : Type ℓ) (B : A → Type ℓ) → isEquiv (Σ-isolate A B) ≃ isSurjection (Σ-isolate A B)
 isEquiv-Σ-isolate≃isSurjection-Σ-isolate A B =
   isEquiv _
@@ -168,7 +125,10 @@ isEquiv-Σ-isolate≃isSurjection-Σ-isolate A B =
     ≃⟨ equivΠCod (λ y → Σ-contractSnd λ _ → inhProp→isContr (isProp-fiber-Σ-isolate _ _ y) isPropIsProp) ⟩
   (∀ y → ∥ fiber _ y ∥₁)
     ≃∎
+```
 
+Thus we can strengthen `isEquiv-Σ-isolate→isIsolatedPair` to the following equivalence:
+```agda
 isSurjection-Σ-isolate≃isIsolatedPair : (A : Type ℓ) (B : A → Type ℓ)
   → isSurjection (Σ-isolate A B) ≃ (∀ a → (b : B a) → isIsolated {A = Σ A B} (a , b) → isIsolated a × isIsolated b)
 isSurjection-Σ-isolate≃isIsolatedPair A B =
@@ -182,36 +142,21 @@ isSurjection-Σ-isolate≃isIsolatedPair A B =
     ≃⟨ equivΠCod (λ a → equivΠCod λ b → equivΠCod λ h → Σ-isolate-fiber-equiv A B a b h) ⟩
   ((a : A) (b : B a) → isIsolated (a , b) → isIsolated a × isIsolated b)
     ≃∎
+```
 
+By composing both equivalences, we see `Σ-isolate` is an equivalence if and only of isolatedness distributes over `Σ`.
+```agda
 isEquiv-Σ-isolate≃isIsolatedPair : (A : Type ℓ) (B : A → Type ℓ)
  → isEquiv (Σ-isolate A B) ≃ (∀ (a₀ : A) (b₀ : B a₀) → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀ × isIsolated b₀)
 isEquiv-Σ-isolate≃isIsolatedPair A B = isEquiv-Σ-isolate≃isSurjection-Σ-isolate A B ∙ₑ isSurjection-Σ-isolate≃isIsolatedPair A B
+```
 
-isIsolated→isEmbeddingInjSnd : (a₀ : A) → isIsolated a₀ → isEmbedding {A = B a₀} {B = Σ A B} (a₀ ,_)
-isIsolated→isEmbeddingInjSnd {A} {B} a₀ is-isolated-a₀ = λ b₀ b₁ → equivIsEquiv $ isoToEquiv (path-iso b₀ b₁) where
-  path-iso : (b₀ b₁ : B a₀) → Iso (b₀ ≡ b₁) ((a₀ , b₀) ≡ (a₀ , b₁))
-  path-iso b₀ b₁ =
-    (b₀ ≡ b₁)
-      Iso⟨ invIso (Σ-contractFstIso (isIsolated→isContrLoop a₀ is-isolated-a₀)) ⟩
-    Σ[ p ∈ a₀ ≡ a₀ ] PathP (λ i → B (p i)) b₀ b₁
-      Iso⟨ ΣPathPIsoPathPΣ {B = λ i → B} ⟩
-    ((a₀ , b₀) ≡ (a₀ , b₁))
-      ∎Iso
+## Discreteness and _Σ_-types
 
-isIsolatedFst→isIsolatedSnd≃isIsolatedPair : {a₀ : A} → isIsolated a₀ → (b₀ : B a₀) → isIsolated b₀ ≃ isIsolated {A = Σ A B} (a₀ , b₀)
-isIsolatedFst→isIsolatedSnd≃isIsolatedPair {A} {B} {a₀} isolated-a₀ b₀ = propBiimpl→Equiv
-  (isPropIsIsolated b₀)
-  (isPropIsIsolated (a₀ , b₀))
-  (isIsolatedΣ isolated-a₀)
-  (EmbeddingReflectIsolated (a₀ ,_) $ isIsolated→isEmbeddingInjSnd a₀ isolated-a₀)
-
-isEquiv-Σ-isolate→DiscreteFst : (A : Type ℓ)
-  → ((B : A → Type ℓ) → isEquiv (Σ-isolate A B))
-  → Discrete A
-isEquiv-Σ-isolate→DiscreteFst {ℓ} A is-equiv-Σ-isolate = isIsolatedΣSnd→Discrete A goal where
-  goal : ∀ (B : A → Type ℓ) a₀ (b₀ : B a₀) → isIsolated (a₀ , b₀) → isIsolated a₀
-  goal B a₀ b₀ isolated-ab = isEquiv-Σ-isolate→isIsolatedFst (is-equiv-Σ-isolate B) isolated-ab
-
+If `A : Type` is discrete, and `B : A → Type` is family of discrete types, then
+`Σ-isolate` is an equivalence.
+This follows from the closure of discrete types under `Σ`:
+```agda
 Discrete→isEquiv-Σ-isolate : Discrete A → (∀ a → Discrete (B a)) → isEquiv (Σ-isolate A B)
 Discrete→isEquiv-Σ-isolate {A} {B} disc-A disc-B = subst isEquiv compute (equivIsEquiv e) where
   e : (Σ[ a° ∈ A ° ] (B (a° .fst)) °) ≃ ((Σ[ a ∈ A ] B a) °)
@@ -225,12 +170,91 @@ Discrete→isEquiv-Σ-isolate {A} {B} disc-A disc-B = subst isEquiv compute (equ
 
   compute : equivFun e ≡ Σ-isolate A B
   compute = funExt λ _ → Isolated≡ refl
+```
 
-Discrete→isEquiv-Σ-isolate-singl : Discrete A → (a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_))
-Discrete→isEquiv-Σ-isolate-singl {A} disc-A a₀ = Discrete→isEquiv-Σ-isolate disc-A disc-a₀≡a where
-  disc-a₀≡a : (a : A) → Discrete (a₀ ≡ a)
-  disc-a₀≡a = Dec.Discrete→DiscretePath disc-A a₀
+If `a₀ : A` is an isolated point, then `(λ b → a₀ , b) : B a₀ → Σ A B` is an embedding.
+This is not true for arbitrary points of `A`.
+```agda
+isIsolated→isEmbeddingInjSnd : (a₀ : A) → isIsolated a₀ → isEmbedding {A = B a₀} {B = Σ A B} (a₀ ,_)
+isIsolated→isEmbeddingInjSnd {A} {B} a₀ is-isolated-a₀ = λ b₀ b₁ → equivIsEquiv $ isoToEquiv (path-iso b₀ b₁) where
+  path-iso : (b₀ b₁ : B a₀) → Iso (b₀ ≡ b₁) ((a₀ , b₀) ≡ (a₀ , b₁))
+  path-iso b₀ b₁ =
+    (b₀ ≡ b₁)
+      Iso⟨ invIso (Σ-contractFstIso (isIsolated→isContrLoop a₀ is-isolated-a₀)) ⟩
+    Σ[ p ∈ a₀ ≡ a₀ ] PathP (λ i → B (p i)) b₀ b₁
+      Iso⟨ ΣPathPIsoPathPΣ {B = λ i → B} ⟩
+    ((a₀ , b₀) ≡ (a₀ , b₁))
+      ∎Iso
+```
 
+Thus, over an isolated point `a₀ : A`, a point `b : B a₀` is isolated if the pair `(a₀ , b)` is isolated.
+```agda
+isIsolatedFst→isIsolatedSnd≃isIsolatedPair : {a₀ : A} → isIsolated a₀ → (b₀ : B a₀) → isIsolated b₀ ≃ isIsolated {A = Σ A B} (a₀ , b₀)
+isIsolatedFst→isIsolatedSnd≃isIsolatedPair {A} {B} {a₀} isolated-a₀ b₀ = propBiimpl→Equiv
+  (isPropIsIsolated b₀)
+  (isPropIsIsolated (a₀ , b₀))
+  (isIsolatedΣ isolated-a₀)
+  (EmbeddingReflectIsolated (a₀ ,_) $ isIsolated→isEmbeddingInjSnd a₀ isolated-a₀)
+```
+
+We can also characterize discreteness of some type `A : Type` by how `Σ-isolate` behaves with respect to any family `B : A → Type`.
+First, we can show that a type is discrete if `a₀ ,_ : B a₀ → Σ A B` reflects isolated points for any `a₀ : A` (not just isolated points):
+```agda
+isIsolatedΣSnd→Discrete : {ℓ : Level}
+  → (A : Type ℓ)
+  → ((B : A → Type ℓ) → (a₀ : A) → (b₀ : B a₀) → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀)
+  → Discrete A
+isIsolatedΣSnd→Discrete {ℓ} A Σ-isolated-fst a₀ a₁ = goal where
+  B' : A → Type ℓ
+  B' a = a₀ ≡ a
+
+  b₀ : B' a₀
+  b₀ = refl
+
+  is-isolated-pair : isIsolated {A = Σ A B'} (a₀ , b₀)
+  is-isolated-pair = isContr→isIsolatedCenter (isContrSingl a₀) (a₀ , b₀)
+
+  goal : Dec (a₀ ≡ a₁)
+  goal = Σ-isolated-fst B' a₀ b₀ is-isolated-pair a₁
+```
+
+From this we can deduce that for all `A : Type`,
+if `Σ-isolate` is an equivalence for _all_ families over `A`,
+then `A` must be discrete.
+```agda
+isEquiv-Σ-isolate→DiscreteFst : (A : Type ℓ)
+  → ((B : A → Type ℓ) → isEquiv (Σ-isolate A B))
+  → Discrete A
+isEquiv-Σ-isolate→DiscreteFst {ℓ} A is-equiv-Σ-isolate = isIsolatedΣSnd→Discrete A goal where
+  goal : ∀ (B : A → Type ℓ) a₀ (b₀ : B a₀) → isIsolated (a₀ , b₀) → isIsolated a₀
+  goal B a₀ b₀ isolated-ab = isEquiv-Σ-isolate→isIsolatedFst (is-equiv-Σ-isolate B) isolated-ab
+```
+
+The converse holds as well, since `a₀ ,_` is an embedding.
+```agda
+DiscreteFst→isEquiv-Σ-isolated : (A : Type ℓ)
+  → Discrete A
+  → ((B : A → Type ℓ) → isEquiv (Σ-isolate A B))
+DiscreteFst→isEquiv-Σ-isolated A disc-A B = invEq (isEquiv-Σ-isolate≃isIsolatedPair _ _) proof where
+  proof : ∀ a₀ → (b₀ : B a₀) → isIsolated (a₀ , b₀) → isIsolated a₀ × isIsolated b₀
+  proof a₀ b₀ isolated-ab .fst = disc-A a₀
+  proof a₀ b₀ isolated-ab .snd = EmbeddingReflectIsolated
+    (a₀ ,_)
+    (isIsolated→isEmbeddingInjSnd a₀ (disc-A a₀))
+    isolated-ab
+```
+
+All together, a type `A` is discrete if and only if `Σ-isolate` is an equivalence for any family over `A`.
+```agda
+isEquiv-Σ-isolate≃DiscreteFst : (A : Type ℓ) → ((B : A → Type ℓ) → isEquiv (Σ-isolate A B)) ≃ Discrete A
+isEquiv-Σ-isolate≃DiscreteFst A = propBiimpl→Equiv (isPropΠ λ B → isPropIsEquiv _) isPropDiscrete
+  (isEquiv-Σ-isolate→DiscreteFst A)
+  (DiscreteFst→isEquiv-Σ-isolated A)
+```
+
+We can restrict the above to a specific family: `A` is discrete if and only if `Σ-isolate` is an equivalence
+for `A` and the family `a₀ ≡_ : A → Type`:
+```agda
 isEquiv-Σ-isolate-singl→Discrete : (∀ a₀ → isEquiv (Σ-isolate A (a₀ ≡_))) → Discrete A
 isEquiv-Σ-isolate-singl→Discrete is-equiv-Σ-isolate a₀ = isolated-a₀ where
   is-isolated-center : isIsolated {A = singl a₀} (a₀ , refl)
@@ -239,10 +263,15 @@ isEquiv-Σ-isolate-singl→Discrete is-equiv-Σ-isolate a₀ = isolated-a₀ whe
   isolated-a₀ : isIsolated a₀
   isolated-a₀ = isEquiv-Σ-isolate→isIsolatedFst (is-equiv-Σ-isolate a₀) is-isolated-center
 
+Discrete→isEquiv-Σ-isolate-singl : Discrete A → (a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_))
+Discrete→isEquiv-Σ-isolate-singl {A} disc-A a₀ = Discrete→isEquiv-Σ-isolate disc-A disc-a₀≡a where
+  disc-a₀≡a : (a : A) → Discrete (a₀ ≡ a)
+  disc-a₀≡a = Dec.Discrete→DiscretePath disc-A a₀
+
 Discrete≃isEquiv-Σ-isolate-singl : Discrete A ≃ ((a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_)))
 Discrete≃isEquiv-Σ-isolate-singl = propBiimpl→Equiv
   isPropDiscrete
   (isPropΠ λ a₀ → isPropIsEquiv _)
   Discrete→isEquiv-Σ-isolate-singl
   isEquiv-Σ-isolate-singl→Discrete
-
+```
