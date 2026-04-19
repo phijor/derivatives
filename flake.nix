@@ -18,6 +18,7 @@
         inputs.treefmt-nix.flakeModule
         ./derivative.nix
         ./paper/paper.nix
+        ./scripts/default.nix
       ];
       systems = [
         "aarch64-darwin"
