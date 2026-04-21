@@ -204,11 +204,11 @@ isEmbedding→W-rec-fiber-equiv : ∀ {ℓ} {S : Type ℓS} {P : S → Type ℓP
   → fiber (W-rec sup*) (W-rec sup* (sup s f)) ≃ ((p : P s) → fiber (W-rec sup*) (W-rec sup* (f p)))
 isEmbedding→W-rec-fiber-equiv {S} {P} {A} sup* is-emb-sup* s f =
   Σ[ x ∈ W S P ] W-rec sup* x ≡ sup* (s , W-rec sup* ∘ f)
-    ≃⟨ Σ-cong-equiv-snd (λ x → compPathlEquiv (sym $ W-rec-β sup* ≡$ x)) ⟩
-  Σ[ x ∈ W S P ] sup* (W-out x .fst , _) ≡ sup* (s , W-rec sup* ∘ f)
+    ≃⟨ invEquiv $ Σ-cong-equiv-fst W-in-equiv ⟩
+  Σ[ (s′ , f′) ∈ (Σ[ s ∈ S ] (P s → W S P)) ] W-rec sup* (sup s′ f′) ≡ sup* (s , W-rec sup* ∘ f)
+    ≃⟨⟩
+  Σ[ (s′ , f′) ∈ (Σ[ s ∈ S ] (P s → W S P)) ] sup* (s′ , W-rec sup* ∘ f′) ≡ sup* (s , W-rec sup* ∘ f)
     ≃⟨ Σ-cong-equiv-snd (λ x → invEquiv $ cong sup* , is-emb-sup* _ _) ⟩
-  Σ[ w ∈ W S P ] (W-out w .fst , W-rec sup* ∘ W-out w .snd) ≡ (s , W-rec sup* ∘ f)
-    ≃⟨ invEquiv $ Σ-cong-equiv-fst $ W-in-equiv ⟩
   Σ[ (s′ , f′) ∈ (Σ[ s ∈ S ] (P s → W S P)) ] (s′ , W-rec sup* ∘ f′) ≡ (s , W-rec sup* ∘ f)
     ≃⟨ Σ-cong-equiv-snd (λ _ → invEquiv ΣPathP≃PathPΣ) ⟩
   Σ[ (s′ , f′) ∈ (Σ[ s ∈ S ] (P s → W S P)) ] Σ _ _
