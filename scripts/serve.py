@@ -20,5 +20,5 @@ if __name__ == "__main__":
 
     PORT = 8001
     with socketserver.TCPServer(("", PORT), NoCacheHandler) as httpd:
-        print(f"Serving at port '{PORT}'")
+        print(f"Serving site at 'http://127.0.0.1:{PORT}'")
         httpd.serve_forever()
