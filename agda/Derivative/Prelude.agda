@@ -161,6 +161,13 @@ infixr 0 _→⟨_⟩_
 infixr 0 _→≃⟨_⟩_
 infix 1 _→∎
 
+-- Unfortunately, the Cubical library indexes truncation levels starting from (0 = contractible),
+-- whereas they are (-2)-indexed in HoTT-book parlance.  To avoid confusion, we can give names to
+-- the lowest levels.
+pattern h-prop = 1
+pattern h-set = 2
+pattern h-groupoid = 3
+
 isPropFromPointed→isProp : (A → isProp A) → isProp A
 isPropFromPointed→isProp h a b = h a a b
 
