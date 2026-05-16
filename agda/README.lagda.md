@@ -425,19 +425,6 @@ In the 1-category of set-truncated containers, `_⊗ Id ⊣ ∂ₛ`.
 _ : -⊗Id ⊣ ∂ₛ
 _ = -⊗Id⊣∂
 ```
-natural in `F` and `G`, respectively,
-```agda
-_ = is-natural-unit
-_ = is-natural-counit
-```
-and zig-zag fillers
-```agda
-_ : [ unit F ]⊗Id ⋆ counit (F ⊗Id) ≡ id (F ⊗Id)
-_ = zig≡ _
-
-_ : unit (∂ G) ⋆ ∂[ counit G ] ≡ id (∂ G)
-_ = zag≡ _
-```
 
 ### Basic Laws of Derivatives
 
