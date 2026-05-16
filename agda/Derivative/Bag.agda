@@ -165,7 +165,7 @@ module SubNat where
       cancel {x = nothing} {y = nothing} _ = refl′ nothing
 
   isSub-∖ : ∀ {X} → isSub X → ∀ x → isSub (X ∖° x)
-  isSub-∖ {X} = PT.rec (isPropΠ λ x → isPropIsSub (X ∖° x)) λ ι (x , _) → PT.∣ compEmbedding ι (remove-embedding x) ∣₁
+  isSub-∖ {X} = PT.rec (isPropΠ λ x → isPropIsSub (X ∖° x)) λ ι (x , _) → PT.∣ compEmbedding ι (forget-remove-embedding x) ∣₁
 
   open Universe isSub isPropIsSub isSub-+1 isSub-∖
     renaming (uBag to ℕBag)

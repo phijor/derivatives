@@ -10,7 +10,7 @@ open import Derivative.Isolated.Base
 open import Cubical.Foundations.Equiv.Properties using (preCompEquiv ; equivAdjointEquiv ; congEquiv)
 open import Cubical.Foundations.Path using (toPathP⁻ ; flipSquare)
 open import Cubical.Foundations.Transport using (subst⁻ ; subst⁻-filler)
-open import Cubical.Functions.Embedding using (_↪_ ; EmbeddingΣProp)
+open import Cubical.Functions.Embedding using (_↪_ ; EmbeddingΣProp ; isEmbedding)
 open import Cubical.Data.Nat.Base
 open import Cubical.Data.Sigma
 import      Cubical.Data.Empty as Empty
@@ -27,9 +27,14 @@ Remove A a = Σ[ b ∈ A ] (a ≢ b)
 _∖_ : (A : Type ℓ) (a : A) → Type ℓ
 _∖_ = Remove
 
+forget-remove : (a : A) → A ∖ a → A
+forget-remove a = fst
 
-remove-embedding : (a : A) → (A ∖ a) ↪ A
-remove-embedding a = EmbeddingΣProp λ a → isProp≢
+forget-remove-embedding : (a : A) → (A ∖ a) ↪ A
+forget-remove-embedding a = EmbeddingΣProp λ a → isProp≢
+
+isEmbedding-forget-remove : (a : A) → isEmbedding (forget-remove a)
+isEmbedding-forget-remove a = forget-remove-embedding a .snd
 
 Remove≡ : {a : A} {x y : A ∖ a} → x .fst ≡ y .fst → x ≡ y
 Remove≡ {a} = Σ≡Prop λ a′ → isProp¬ (a ≡ a′)
