@@ -2,6 +2,7 @@
 module Derivative.Container where
 
 open import Derivative.Prelude
+import      Derivative.Basics.Decidable as Dec
 import      Derivative.Basics.Maybe as Maybe
 open import Derivative.Basics.Sum as Sum using (_⊎_)
 
@@ -38,6 +39,12 @@ TruncatedContainer n k ℓS ℓP = Σ (Container ℓS ℓP) (isTruncatedContaine
 
 SetContainer : (ℓS ℓP : Level) → Type (ℓ-suc (ℓ-max ℓS ℓP))
 SetContainer = TruncatedContainer 2 2
+
+isDiscreteContainer : Container ℓS ℓP → Type _
+isDiscreteContainer F = ∀ s → Dec.Discrete (F .Pos s)
+
+DiscreteContainer : (ℓS ℓP : Level) → Type _
+DiscreteContainer ℓS ℓP = Σ[ F ∈ Container ℓS ℓP ] isDiscreteContainer F
 
 _⊗_ : (F G : Container ℓS ℓP) → Container _ _
 (F ⊗ G) .Shape = F .Shape × G .Shape

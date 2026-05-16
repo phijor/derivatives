@@ -31,44 +31,50 @@ module _ (F G : Container ℓ ℓ) where
   open Container F renaming (Shape to S ; Pos to P)
   open Container G renaming (Shape to T ; Pos to Q)
 
-  chain-shape-equiv-left :
-    ((Σ[ (s , p) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖° p → T)) × (Σ[ t ∈ T ] Q t °))
-      ≃
-    (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p° ∈ (P s) ° ] Q (f (p° .fst)) °))
-  chain-shape-equiv-left =
-    ((Σ[ (s , p°) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖° p° → T)) × (Σ[ t ∈ T ] Q t °))
-      ≃⟨ strictEquiv (λ (((s , p°) , f) , t , q°) → ((s , p°) , (f , t) , q°)) (λ ((s , p°) , (f , t) , q°) → (((s , p°) , f) , t , q°)) ⟩
-    ((Σ[ (s , p°) ∈ (Σ[ s ∈ S ] (P s °)) ] (Σ[ (_ , t) ∈ (P s ∖° p° → T) × T ] Q t °)))
-      ≃⟨ Σ-cong-equiv-snd (λ (s , p°) → invEquiv $ Σ-cong-equiv-fst $ ungraftEquiv p°) ⟩
-    ((Σ[ (s , p°) ∈ (Σ[ s ∈ S ] (P s °)) ] (Σ[ f ∈ (P s → T) ] Q (f (p° .fst)) °)))
-      ≃⟨ strictEquiv (λ ((s , p°) , (f , q)) → ((s , f) , p° , q)) (λ ((s , f) , p° , q) → ((s , p°) , (f , q))) ⟩
-    (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p° ∈ P s ° ] Q (f (p° .fst)) °))
-      ≃∎
-
   chain-rule : Cart (((∂ F) [ G ]) ⊗ ∂ G) (∂ (F [ G ]))
   chain-rule =
-    (((∂ F) [ G ]) ⊗ ∂ G)
+    ∂ F [ G ] ⊗ ∂ G
       ⊸⟨ Equiv→Cart η₀ ⟩
     H
       ⊸⟨ η₁ ⟩
-    (∂ (F [ G ]))
+    ∂ (F [ G ])
       ⊸∎
     module chain-rule where
+      equiv-left :
+        (Σ[ (s , p) ∈ Σ[ s ∈ S ] (P s °) ] (P s ∖° p → T)) × (Σ[ t ∈ T ] Q t °)
+          ≃
+        (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] Σ[ p° ∈ (P s) ° ] Q (f (p° .fst)) °)
+      equiv-left =
+        (Σ[ (s , p°) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖° p° → T)) × (Σ[ t ∈ T ] Q t °)
+          ≃⟨ step-I ⟩
+        Σ[ (s , p°) ∈ Σ[ s ∈ S ] (P s °) ] Σ[ (_ , t) ∈ (P s ∖° p° → T) × T ] Q t °
+          ≃⟨ Σ-cong-equiv-snd (λ (s , p°) → invEquiv $ Σ-cong-equiv-fst $ ungraftEquiv p°) ⟩
+        Σ[ (s , p°) ∈ Σ[ s ∈ S ] (P s °) ] Σ[ f ∈ (P s → T) ] Q (f (p° .fst)) °
+          ≃⟨ step-II ⟩
+        Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] Σ[ p° ∈ P s ° ] Q (f (p° .fst)) °
+          ≃∎ where
+          step-I = strictEquiv
+            (λ (((s , p°) , f) , t , q°) → ((s , p°) , (f , t) , q°))
+            (λ ((s , p°) , (f , t) , q°) → (((s , p°) , f) , t , q°))
+          step-II = strictEquiv
+            (λ ((s , p°) , (f , q)) → ((s , f) , p° , q))
+            (λ ((s , f) , p° , q) → ((s , p°) , (f , q)))
+
       H : Container _ _
-      H .Shape = Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p° ∈ (P s) ° ] Q (f (p° .fst)) °)
+      H .Shape = Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] Σ[ p° ∈ (P s) ° ] Q (f (p° .fst)) °
       H .Pos ((s , f) , (p° , q°)) = (Σ[ (p , _) ∈ P s ∖° p° ] Q (f p)) ⊎ (Q (f (p° .fst)) ∖° q°)
 
-      η₀ : Equiv (((∂ F) [ G ]) ⊗ ∂ G) H
-      η₀ = Equiv-inv $ Equiv-fst $ invEquiv chain-shape-equiv-left
+      η₀ : Equiv (∂ F [ G ] ⊗ ∂ G) H
+      η₀ = Equiv-inv $ Equiv-fst $ invEquiv equiv-left
 
       η₁ : Cart H (∂ (F [ G ]))
       η₁ .shape = Σ-map-snd λ (s , f) → Σ-isolate (P s) (Q ∘ f)
       η₁ .pos ((s , f) , (p° , q°)) = invEquiv (isIsolatedFst→Σ-remove-equiv (p° .snd))
 
   chain-shape-map :
-    (Σ[ (s , p) ∈ (Σ[ s ∈ S ] (P s °)) ] (P s ∖ (p .fst) → T)) × (Σ[ t ∈ T ] Q t °)
+    (Σ[ (s , p) ∈ Σ[ s ∈ S ] (P s °) ] (P s ∖ (p .fst) → T)) × (Σ[ t ∈ T ] Q t °)
       →
-    (Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p ∈ (P s) ] Q (f p)) °)
+    Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p ∈ (P s) ] Q (f p)) °
   chain-shape-map = chain-rule .shape
 
   isEmbedding-chain-shape-map : isEmbedding chain-shape-map
@@ -84,7 +90,7 @@ module _ (F G : Container ℓ ℓ) where
     is-equiv-Σ-Σ-isolate : isEquiv (Σ-map-snd {A = Σ[ s ∈ S ] (P s → T)} (λ (s , f) → Σ-isolate (P s) (Q ∘ f)))
     is-equiv-Σ-Σ-isolate = isEquiv[f∘equivFunA≃B]→isEquiv[f]
       (Σ-map-snd _)
-      chain-shape-equiv-left
+      chain-rule.equiv-left
       is-equiv-chain-shape-map
 
     is-equiv-Σ-isolate : ∀ s f → isEquiv (Σ-isolate (P s) (Q ∘ f))
@@ -107,25 +113,25 @@ module _ (F G : Container ℓ ℓ) where
     isEquivChainRule→isEquiv-Σ-isolated
     isEquiv-Σ-isolated→isEquivChainRule
 
-DiscreteContainer : (ℓS ℓP : Level) → Type _
-DiscreteContainer ℓS ℓP = Σ[ F ∈ Container ℓS ℓP ] ∀ s → Discrete (F .Pos s)
+isStrong : (F G : Container ℓ ℓ) → Type _
+isStrong F G = isEquiv (chain-shape-map F G)
 
-hasChainEquiv : (ℓ : Level) → Type (ℓ-suc ℓ)
-hasChainEquiv ℓ = (F G : Container ℓ ℓ) → isEquiv (chain-shape-map F G)
+isGloballyStrong : (ℓ : Level) → Type (ℓ-suc ℓ)
+isGloballyStrong ℓ = (F G : Container ℓ ℓ) → isStrong F G
 
-isPropHasChainEquiv : isProp (hasChainEquiv ℓ)
-isPropHasChainEquiv = isPropΠ2 λ F G → isPropIsEquiv _
+isPropIsGloballyStrong : isProp (isGloballyStrong ℓ)
+isPropIsGloballyStrong = isPropΠ2 λ F G → isPropIsEquiv _
 
-DiscreteContainer→isEquivChainMap : (F G : DiscreteContainer ℓ ℓ) → isEquiv (chain-shape-map (F .fst) (G .fst))
-DiscreteContainer→isEquivChainMap (F , disc-F) (G , disc-G) = isEquiv-Σ-isolated→isEquivChainRule F G is-equiv-Σ-isolate where
+DiscreteContainer→isStrong : (F G : DiscreteContainer ℓ ℓ) → isEquiv (chain-shape-map (F .fst) (G .fst))
+DiscreteContainer→isStrong (F , disc-F) (G , disc-G) = isEquiv-Σ-isolated→isEquivChainRule F G is-equiv-Σ-isolate where
   open Container F renaming (Shape to S ; Pos to P)
   open Container G renaming (Shape to T ; Pos to Q)
 
   is-equiv-Σ-isolate : ∀ s f → isEquiv (Σ-isolate (P s) (Q ∘ f))
   is-equiv-Σ-isolate s f = Discrete→isEquiv-Σ-isolate (disc-F s) (disc-G ∘ f)
 
-isEquivChainMap→AllTypesDiscrete : hasChainEquiv ℓ → (A : Type ℓ) → Discrete A
-isEquivChainMap→AllTypesDiscrete {ℓ} is-equiv-chain-shape-map A = discrete-A where
+isGloballyStrong→AllTypesDiscrete : isGloballyStrong ℓ → (A : Type ℓ) → Discrete A
+isGloballyStrong→AllTypesDiscrete {ℓ} is-equiv-chain-shape-map A = discrete-A where
   F : Container ℓ ℓ
   F .Shape = 𝟙*
   F .Pos _ = A
@@ -143,26 +149,26 @@ isEquivChainMap→AllTypesDiscrete {ℓ} is-equiv-chain-shape-map A = discrete-A
   discrete-A : Discrete A
   discrete-A = isEquiv-Σ-isolate-singl→Discrete is-equiv-Σ-isolate-singl
 
-AllTypesDiscrete→isEquivChainMap : ((A : Type ℓ) → Discrete A) → hasChainEquiv ℓ
-AllTypesDiscrete→isEquivChainMap discrete F G = DiscreteContainer→isEquivChainMap (F , discrete ∘ Pos F) (G , discrete ∘ Pos G)
+AllTypesDiscrete→isGloballyStrong : ((A : Type ℓ) → Discrete A) → isGloballyStrong ℓ
+AllTypesDiscrete→isGloballyStrong discrete F G = DiscreteContainer→isStrong (F , discrete ∘ Pos F) (G , discrete ∘ Pos G)
 
-isEquivChainMap≃AllTypesDiscrete : hasChainEquiv ℓ ≃ ((A : Type ℓ) → Discrete A)
-isEquivChainMap≃AllTypesDiscrete = propBiimpl→Equiv isPropHasChainEquiv (isPropΠ λ A → isPropDiscrete)
-  isEquivChainMap→AllTypesDiscrete
-  AllTypesDiscrete→isEquivChainMap
+isGloballyStrong≃AllTypesDiscrete : isGloballyStrong ℓ ≃ ((A : Type ℓ) → Discrete A)
+isGloballyStrong≃AllTypesDiscrete = propBiimpl→Equiv isPropIsGloballyStrong (isPropΠ λ A → isPropDiscrete)
+  isGloballyStrong→AllTypesDiscrete
+  AllTypesDiscrete→isGloballyStrong
 
-¬hasChainEquiv : ¬ hasChainEquiv ℓ-zero
-¬hasChainEquiv is-equiv-chain-shape-map = S1.¬isIsolated-base $ Discrete→isIsolated discrete-S¹ base where
+¬isGloballyStrong : ¬ isGloballyStrong ℓ-zero
+¬isGloballyStrong is-equiv-chain-shape-map = S1.¬isIsolated-base $ Discrete→isIsolated discrete-S¹ base where
   open import Cubical.HITs.S1.Base
   
   discrete-S¹ : Discrete S¹
-  discrete-S¹ = isEquivChainMap→AllTypesDiscrete is-equiv-chain-shape-map S¹
+  discrete-S¹ = isGloballyStrong→AllTypesDiscrete is-equiv-chain-shape-map S¹
 
-isEquivChainMapSets→AllSetsDiscrete :
+isStrongSets→AllSetsDiscrete :
   ((F G : SetContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape))
     →
   ((A : hSet ℓ) → Discrete ⟨ A ⟩)
-isEquivChainMapSets→AllSetsDiscrete {ℓ} is-equiv-chain-shape-map (A , is-set-A) = discrete-A where
+isStrongSets→AllSetsDiscrete {ℓ} is-equiv-chain-shape-map (A , is-set-A) = discrete-A where
   F : SetContainer ℓ ℓ
   F .fst .Shape = 𝟙*
   F .fst .Pos _ = A
@@ -184,11 +190,11 @@ isEquivChainMapSets→AllSetsDiscrete {ℓ} is-equiv-chain-shape-map (A , is-set
   discrete-A : Discrete A
   discrete-A = isEquiv-Σ-isolate-singl→Discrete is-equiv-Σ-isolate-singl
 
-AllSetsDiscrete→isEquivChainMapSets :
+AllSetsDiscrete→isStrongSets :
   ((A : hSet ℓ) → Discrete ⟨ A ⟩)
     →
   ((F G : SetContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape))
-AllSetsDiscrete→isEquivChainMapSets discrete (F , is-set-F) (G , is-set-G) = DiscreteContainer→isEquivChainMap
+AllSetsDiscrete→isStrongSets discrete (F , is-set-F) (G , is-set-G) = DiscreteContainer→isStrong
   (F , disc-F)
   (G , disc-G)
   where
@@ -198,26 +204,26 @@ AllSetsDiscrete→isEquivChainMapSets discrete (F , is-set-F) (G , is-set-G) = D
     disc-G : ∀ t → Discrete (G .Pos t)
     disc-G t = discrete (G .Pos t , is-set-G .snd t)
 
-isEquivChainMapSets≃AllSetsDiscrete :
+isStrongSets≃AllSetsDiscrete :
   ((F G : SetContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape))
     ≃
   ((A : hSet ℓ) → Discrete ⟨ A ⟩)
-isEquivChainMapSets≃AllSetsDiscrete = propBiimpl→Equiv
+isStrongSets≃AllSetsDiscrete = propBiimpl→Equiv
   (isPropΠ2 λ F G → isPropIsEquiv _)
   (isPropΠ λ A → isPropDiscrete)
-  isEquivChainMapSets→AllSetsDiscrete
-  AllSetsDiscrete→isEquivChainMapSets
+  isStrongSets→AllSetsDiscrete
+  AllSetsDiscrete→isStrongSets
 
-impredicativeProp→hasChainEquiv→LEM : (ℓ : Level)
+impredicativeProp→isGloballyStrong→LEM : (ℓ : Level)
   → (Ω : Type ℓ)
   → (resize : Ω ≃ hProp ℓ)
-  → hasChainEquiv ℓ
+  → isGloballyStrong ℓ
   → (P : hProp ℓ) → Dec ⟨ P ⟩
-impredicativeProp→hasChainEquiv→LEM ℓ Ω resize has-chain-equiv = dec-prop where
+impredicativeProp→isGloballyStrong→LEM ℓ Ω resize has-chain-equiv = dec-prop where
   open import Cubical.Relation.Nullary.Properties using (EquivPresDiscrete)
 
   all-types-discrete : (A : Type ℓ) → Discrete A
-  all-types-discrete = isEquivChainMap→AllTypesDiscrete has-chain-equiv
+  all-types-discrete = isGloballyStrong→AllTypesDiscrete has-chain-equiv
 
   Ω-discrete : Discrete Ω
   Ω-discrete = all-types-discrete Ω
