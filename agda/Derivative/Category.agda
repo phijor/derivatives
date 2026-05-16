@@ -84,3 +84,16 @@ open TriangleIdentities using (Δ₁ ; Δ₂)
 -⊗Id⊣∂ ._⊣_.ε = ε
 -⊗Id⊣∂ ._⊣_.triangleIdentities .Δ₁ (F , _) = zig≡ F
 -⊗Id⊣∂ ._⊣_.triangleIdentities .Δ₂ (G , _) = zag≡ G
+
+private
+  nat-hom-adj : NaturalBijection._⊣_ -⊗Id ∂ₛ
+  nat-hom-adj = adj→adj' -⊗Id ∂ₛ -⊗Id⊣∂
+
+  _⊸ₛ_ = SetCart
+
+cart-Iso : (F G : SetContainer ℓ ℓ) → Iso ((F ⊗Id₀) ⊸ₛ G) (F ⊸ₛ (∂ₛ-ob G))
+cart-Iso F G = nat-hom-adj .NaturalBijection._⊣_.adjIso {c = F} {d = G}
+
+cart-equiv : (F G : SetContainer ℓ ℓ) → (F ⊸ₛ (∂ₛ-ob G)) ≃ ((F ⊗Id₀) ⊸ₛ G)
+cart-equiv F G .fst f = [ f ]⊗Id ⋆ counit (G .fst)
+cart-equiv F G .snd = isoToIsEquiv (invIso (cart-Iso F G))
