@@ -53,21 +53,18 @@ is-natural-unit F G f = Cart≡ (funExt λ s → ΣPathP (refl′ (f .shape s , 
 is-natural-counit : (F G : Container ℓ ℓ) (f : Cart F G) → [ ∂[ f ] ]⊗Id ⋆ counit G ≡ counit F ⋆ f
 is-natural-counit F G f = Cart≡ refl $ funExt λ { ((s , p°) , _) → equivExt (goal s p°) }
   where
-    opaque
-      unfolding isIsolatedPreserveEquivInv
-
-      goal : (s : F .Shape) (p°@(p₀ , p₀≟_) : F .Pos s °)
-        → (let (q₀ , q₀≟_) = ∂[ f ] .shape (s , p°) .snd)
-        → (q : G .Pos (f .shape s))
-        →
-          equivFun (maybe-equiv (∂[ f ] .pos (s , p°))) (unreplace q₀ q₀≟_ q)
-            ≡
-          unreplace p₀ p₀≟_ (equivFun (f .pos s) q)
-      goal s p°@(p₀ , p₀≟_) q
-        using p ← equivFun (f .pos s) q
-        with (p₀≟ p)
-      ... | (yes p₀≡p) = refl
-      ... | (no ¬p₀≡p) = cong {B = λ _ → Maybe (F .Pos s ∖ _)} just (Remove≡ $ refl′ p)
+    goal : (s : F .Shape) (p°@(p₀ , p₀≟_) : F .Pos s °)
+      → (let (q₀ , q₀≟_) = ∂[ f ] .shape (s , p°) .snd)
+      → (q : G .Pos (f .shape s))
+      →
+        equivFun (maybe-equiv (∂[ f ] .pos (s , p°))) (unreplace q₀ q₀≟_ q)
+          ≡
+        unreplace p₀ p₀≟_ (equivFun (f .pos s) q)
+    goal s p°@(p₀ , p₀≟_) q
+      using p ← equivFun (f .pos s) q
+      with (p₀≟ p)
+    ... | (yes p₀≡p) = refl
+    ... | (no ¬p₀≡p) = cong {B = λ _ → Maybe (F .Pos s ∖ _)} just (Remove≡ $ refl′ p)
 
 zig : (F : Container ℓ ℓ) → Cart (F ⊗Id) (F ⊗Id)
 zig F =
