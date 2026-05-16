@@ -520,7 +520,7 @@ For discrete containers, the chain rule is an equivalence.
 Therefore it is an isomorphism in the 1-category of set-truncated containers, `ℂont`.
 ```agda
 _ : (F G : DiscreteContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape)
-_ = DiscreteContainer→isEquivChainMap
+_ = DiscreteContainer→isStrong
 ```
 
 **Theorem 4.6**:
@@ -528,10 +528,10 @@ If the chain rule is invertible for arbitrary containers if and only if arbitrar
 This is impossible in the presence of types of higher truncation level.
 ```agda
 _ : ((F G : Container ℓ ℓ) → isEquiv (chain-rule F G .shape)) ≃ ((A : Type ℓ) → Discrete A)
-_ = isEquivChainMap≃AllTypesDiscrete
+_ = isGloballyStrong≃AllTypesDiscrete
 
-_ : ¬ hasChainEquiv ℓ-zero
-_ = ¬hasChainEquiv
+_ : ¬ isGloballyStrong ℓ-zero
+_ = ¬isGloballyStrong
 ```
 
 **Corollary 4.7**:
@@ -541,7 +541,7 @@ _ :
   ((F G : SetContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape))
     ≃
   ((A : hSet ℓ) → Discrete ⟨ A ⟩)
-_ = isEquivChainMapSets≃AllSetsDiscrete
+_ = isStrongSets≃AllSetsDiscrete
 ```
 
 ## Derivatives of Fixed Points
