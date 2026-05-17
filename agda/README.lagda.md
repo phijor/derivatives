@@ -4,11 +4,16 @@
 {-# OPTIONS --safe #-}
 ```
 
+## Basic notation and definitions
+
+```agda
+open import Derivative.Prelude
+```
+
 <!--
 ```agda
 module README where
 
-open import Derivative.Prelude
 open import Derivative.Basics.Decidable
 open import Derivative.Basics.Embedding
 open import Derivative.Basics.Equiv
