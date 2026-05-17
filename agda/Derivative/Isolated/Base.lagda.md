@@ -13,12 +13,13 @@ open import Derivative.Basics.Decidable
     ; isProp¬
     )
 open import Derivative.Basics.Embedding
+open import Derivative.Basics.Equiv
 
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.Properties using (equivAdjointEquiv ; congEquiv)
 open import Cubical.Relation.Nullary.Properties using (EquivPresDec ; EquivPresDiscrete)
 open import Cubical.Relation.Nullary.HLevels using (isPropDiscrete)
-open import Cubical.HITs.PropositionalTruncation as PT using (∥_∥₁)
+import      Cubical.HITs.PropositionalTruncation as PT
 
 private
   variable

@@ -2,7 +2,7 @@
 module Derivative.Indexed.Univalence where
 
 open import Derivative.Prelude
-open import Derivative.Basics.Equiv using (univalenceᴰ)
+open import Derivative.Basics.Equiv using (univalenceᴰ ; symEquiv)
 open import Derivative.Indexed.Container
 
 open import Cubical.Data.Sigma
@@ -10,7 +10,6 @@ open import Cubical.Foundations.Equiv.Properties
 open import Cubical.Foundations.Equiv.Dependent
 open import Cubical.Foundations.Transport
 open import Cubical.Foundations.Univalence
-open import Cubical.Functions.FunExtEquiv
 
 
 private

@@ -6,13 +6,14 @@ module Derivative.Isolated.Sigma where
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable as Dec
 open import Derivative.Basics.Embedding
+open import Derivative.Basics.Equiv using (substAdjointEquiv)
 
 open import Derivative.Isolated.Base
 
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.Properties using (equivAdjointEquiv)
 open import Cubical.Functions.Surjection
-open import Cubical.HITs.PropositionalTruncation as PT using (∥_∥₁)
+import      Cubical.HITs.PropositionalTruncation as PT
 
 private
   variable

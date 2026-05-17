@@ -13,7 +13,6 @@ open import Cubical.Foundations.Path
 open import Cubical.Data.Sigma.Properties
 open import Cubical.Relation.Nullary.Properties using (EquivPresDiscrete)
 open import Cubical.Functions.Embedding
-open import Cubical.Functions.FunExtEquiv
 
 private
   variable

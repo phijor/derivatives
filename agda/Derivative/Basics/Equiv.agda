@@ -2,6 +2,7 @@
 module Derivative.Basics.Equiv where
 
 open import Derivative.Prelude
+open import Derivative.Basics.Function
 open import Derivative.Basics.Sigma
 
 open import Cubical.Foundations.Equiv
@@ -9,7 +10,6 @@ open import Cubical.Foundations.Equiv.Properties
 open import Cubical.Foundations.Equiv.Dependent
 open import Cubical.Foundations.Transport
 open import Cubical.Foundations.Univalence
-open import Cubical.Functions.FunExtEquiv
 open import Cubical.Data.Sigma
 
 private
@@ -79,6 +79,14 @@ equivAdjointEquivExtDomain {B} {C} =
   EquivJ
     (λ A e → (f : B → C) (g : A → C) → (g ∘ invEq e ≡ f) ≃ (g ≡ f ∘ equivFun e))
     (λ f g → idEquiv (g ≡ f))
+
+symEquiv : ∀ {a b : A} → (a ≡ b) ≃ (b ≡ a)
+symEquiv = strictEquiv sym sym
+
+substAdjointEquiv : (B : A → Type ℓ) {x y : A} (p : x ≡ y)
+  → {x′ : B x} {y′ : B y}
+  → (subst B p x′ ≡ y′) ≃ (x′ ≡ subst B (sym p) y′)
+substAdjointEquiv B {x} {y} p {x′} {y′} = invEquiv (equivAdjointEquiv (substEquiv' B p) {x′} {y′})
 
 lineEquiv : ∀ {A B : I → Type ℓ} (f : (i : I) → A i → B i)
   → (is-equiv₀ : isEquiv (f i0))

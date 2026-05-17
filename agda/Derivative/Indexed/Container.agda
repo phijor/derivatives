@@ -23,7 +23,6 @@ open import Cubical.Foundations.Equiv.Properties
     )
 open import Cubical.Foundations.Univalence using (ua)
 open import Cubical.Foundations.Transport using (substEquiv ; subst2Equiv)
-open import Cubical.Functions.FunExtEquiv using (funExt₂)
 open import Cubical.Functions.Embedding using (isEmbedding ; isEquiv→isEmbedding)
 
 record Container (ℓ : Level) (Ix : Type) : Type (ℓ-suc ℓ) where

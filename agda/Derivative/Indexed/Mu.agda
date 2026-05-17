@@ -10,6 +10,7 @@ open import Derivative.Indexed.ChainRule
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
 open import Derivative.Basics.Equiv
+open import Derivative.Basics.Function
 open import Derivative.Basics.Maybe
 open import Derivative.Basics.Sigma
 open import Derivative.Basics.Sum
@@ -22,7 +23,6 @@ open import Cubical.Foundations.Path
 open import Cubical.Foundations.Equiv.Properties using (congEquiv)
 open import Cubical.Foundations.Transport using (substEquiv)
 open import Cubical.Data.Sigma
-open import Cubical.Functions.FunExtEquiv
 open import Cubical.Functions.Embedding
 open import Cubical.Functions.Surjection
 

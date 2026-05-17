@@ -5,6 +5,7 @@ open import Derivative.Prelude
 open import Derivative.Basics.Decidable
 open import Derivative.Basics.Embedding
 open import Derivative.Basics.Maybe
+open import Derivative.Basics.Path
 open import Derivative.Basics.Sum
 open import Derivative.Basics.Unit
 open import Derivative.Basics.W
@@ -19,7 +20,6 @@ open import Derivative.Indexed.ChainRule
 
 open import Cubical.Foundations.Path
 open import Cubical.Data.Sigma
-open import Cubical.Functions.FunExtEquiv
 open import Cubical.Functions.Embedding
 
 private

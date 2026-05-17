@@ -2,6 +2,7 @@
 module Derivative.Basics.Sigma where
 
 open import Derivative.Prelude
+open import Derivative.Basics.Function
 
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Path

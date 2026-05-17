@@ -3,6 +3,7 @@ module Derivative.Basics.Sum where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Embedding
+open import Derivative.Basics.Equiv
 open import Derivative.Basics.Decidable as Dec
 
 open import Cubical.Data.Sigma
