@@ -251,3 +251,30 @@ module SubNat where
   ∂-ℕBag : Equiv (∂ ℕBag) ℕBag
   ∂-ℕBag = ∂-uBag
 ```
+
+### The universe is a (large) terminal container
+
+The identity family `Type → Type` defines a container with large shapes:
+```agda
+𝓤 : Container (ℓ-suc ℓ-zero) ℓ-zero
+𝓤 .Container.Shape = Type
+𝓤 .Container.Pos = idfun Type
+```
+
+The extent of `𝓤` is `λ X → Σ[ S ∈ Type ] (S → X)`,
+so we can think of `𝓤` as representing `Type`-indexed collections.
+In particular, there is a unique cartesian map into `𝓤`:
+```agda
+! : (F : Container (ℓ-suc ℓ-zero) ℓ-zero) → Cart F 𝓤
+! F .Cart.shape = F .Container.Pos
+! F .Cart.pos s = idEquiv (F .Container.Pos s)
+
+!-unique : (F : Container (ℓ-suc ℓ-zero) ℓ-zero) → isContr (Cart F 𝓤)
+!-unique F@(S ◁ P) .fst = ! F
+!-unique F@(S ◁ P) .snd ([ Q ◁ Q≃P ]) = sym $ Cart≡ shape-path (funExt pos-path) where
+  shape-path : Q ≡ P
+  shape-path = funExt λ s → ua $ Q≃P s
+
+  pos-path : ∀ s → PathP (λ i → shape-path i s ≃ P s) (Q≃P s) (idEquiv (P s))
+  pos-path s = equivPathP $ ua-ungluePathExt $ Q≃P s
+```
