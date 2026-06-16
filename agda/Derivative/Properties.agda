@@ -14,6 +14,8 @@ open import Derivative.Container
 open import Derivative.Derivative
 
 open import Cubical.Foundations.Equiv.Properties
+import      Cubical.Foundations.Univalence as Univalence
+import      Cubical.Foundations.Transport as Transport
 open import Cubical.Data.Sigma
 open import Cubical.Data.Empty using (uninhabEquiv)
 
@@ -136,3 +138,110 @@ module _ {Ix : Type ℓ} (F : Ix → Container ℓ ℓ) where
   sum'-rule : Equiv (∂ (∑ F)) (∑ (∂ ∘ F))
   sum'-rule .Equiv.shape = Σ-assoc-≃
   sum'-rule .Equiv.pos ((ix , s) , p , _) = idEquiv $ F ix .Pos s ∖ p
+
+russel : ¬ (Σ[ U ∈ Type ℓ ] Σ[ El ∈ (U → Type ℓ) ] hasSection El)
+russel {ℓ} (U , El , code , code-sec) = paradox where
+  cast : ∀ {X} → El (code X) → X
+  cast {X} = transport (code-sec X)
+
+  data V : Type ℓ where
+    sup* : (u : U) → (El u → V) → V
+
+  sup : (X : Type ℓ) → (X → V) → V
+  sup X el = sup* (code X) (el ∘ cast)
+
+  _∈_ : V → V → Type _
+  x ∈ sup* _ A = fiber A x
+
+  _∉_ : V → V → Type _
+  x ∉ X = ¬ x ∈ X
+
+  ∈-sup-equiv-inh-fiber : (A : Type ℓ) (el : A → V)
+    → (x : V)
+    → (x ∈ sup A el) ≃ fiber el x
+  ∈-sup-equiv-inh-fiber A _ _ = Σ-cong-equiv-fst equiv-fst where
+    equiv-fst : El (code A) ≃ A
+    equiv-fst = Univalence.pathToEquiv (code-sec A)
+
+  not-in-self : Type _
+  not-in-self = Σ[ x ∈ V ] x ∉ x
+
+  R : V
+  R = sup not-in-self fst
+
+  in-R-iff-not-in-self : (X : V) → (X ∈ R) ≃ (X ∉ X)
+  in-R-iff-not-in-self X =
+    (Σ[ h ∈ El (code not-in-self) ] fst (cast h) ≡ X)
+      ≃⟨ ∈-sup-equiv-inh-fiber not-in-self fst X ⟩
+    (Σ[ u ∈ not-in-self ] fst u ≡ X)
+      ≃⟨ strictEquiv (λ ((u , h) , p) → (u , sym p) , h) (λ ((u , p) , h) → (u , h) , sym p) ⟩
+    (Σ[ (u , _) ∈ singl X ] u ∉ u)
+      ≃⟨ (Σ-contractFst (isContrSingl X)) ⟩
+    (X ∉ X)
+      ≃∎
+    
+  R∈R≃R∉R : (R ∈ R) ≃ (R ∉ R)
+  R∈R≃R∉R = in-R-iff-not-in-self R
+
+  R∉R : R ∉ R
+  R∉R R∈R = equivFun R∈R≃R∉R R∈R R∈R
+
+  R∈R : R ∈ R
+  R∈R = invEq R∈R≃R∉R R∉R
+
+  paradox : ⊥
+  paradox = R∉R R∈R
+
+no-terminal : ¬ (Σ[ Y ∈ Container ℓ ℓ ] ∀ (X : Container ℓ ℓ) → isContr (Cart X Y))
+no-terminal {ℓ} (Y@(T ◁ Q) , contr-cart) = russel (T , Q , code , code-sec) where
+  is-equiv-Q : isEquiv Q
+  is-equiv-Q .equiv-proof P = isOfHLevelRespectEquiv 0 equiv contr-cart-const-P where
+    contr-cart-const-P : isContr (Cart (𝕪 P) (T ◁ Q))
+    contr-cart-const-P = contr-cart (𝕪 P)
+
+    equiv : (Cart {ℓS = ℓ} (𝕪 P) (T ◁ Q)) ≃ fiber Q P
+    equiv =
+      Cart (𝕪 P) (T ◁ Q)
+        ≃⟨ Cart-Σ-equiv ⟩
+      Σ[ t ∈ (𝟙* → T) ] ((x : 𝟙*) → Q (t x) ≃ P)
+        ≃⟨ invEquiv Σ-Π-≃ ⟩
+      (𝟙* → Σ[ t ∈ T ] Q t ≃ P)
+        ≃⟨ Π𝟙*-equiv _ ⟩
+      Σ[ t ∈ T ] Q t ≃ P
+        ≃⟨ Σ-cong-equiv-snd (λ t → invEquiv Univalence.univalence) ⟩
+      Σ[ t ∈ T ] Q t ≡ P
+        ≃∎
+
+  code : Type ℓ → T
+  code = invIsEq is-equiv-Q
+
+  code-sec : ∀ X → Q (code X) ≡ X
+  code-sec X = secIsEq is-equiv-Q X
+
+private
+  isEmpty→isContrΠ : ∀ {ℓ ℓ'} {A : Type ℓ} {B : A → Type ℓ'}
+    → (¬ A) → isContr (∀ a → B a)
+  isEmpty→isContrΠ ¬A .fst = ex-falso ∘ ¬A
+  isEmpty→isContrΠ ¬A .snd f = funExt $ ex-falso ∘ ¬A
+
+no-internal-hom : ¬ (Σ[ _⇒_ ∈ ((F G : Container ℓ ℓ) → Container ℓ ℓ) ] ∀ F G H → Cart (F ⊗ G) H ≃ Cart F (G ⇒ H))
+no-internal-hom {ℓ} (_⇒_ , adj) = no-terminal (_ , is-terminal-∅⇒∅) where
+  ∅ : Container ℓ ℓ
+  ∅ .Shape = 𝟘*
+  ∅ .Pos ()
+
+  is-contr-into-∅ : (X : Container ℓ ℓ) → isContr (Cart (X ⊗ ∅) ∅)
+  is-contr-into-∅ X@(S ◁ P) = isOfHLevelRespectEquiv 0 (invEquiv equiv) isContr-𝟙* where
+    equiv : (Cart (X ⊗ ∅) ∅) ≃ 𝟙
+    equiv =
+      Cart (X ⊗ ∅) ∅
+        ≃⟨ Cart-Σ-equiv ⟩
+      Σ[ f ∈ ((S × 𝟘*) → 𝟘*) ] ((s : S × Shape ∅) → Pos ∅ (f s) ≃ (P (s .fst) ⊎ Pos ∅ (s .snd)))
+        ≃⟨ Σ-contractSnd (λ f → isEmpty→isContrΠ λ ()) ⟩
+      ((S × 𝟘*) → 𝟘*)
+        ≃⟨ isContr→≃𝟙* (isEmpty→isContrΠ λ ()) ⟩
+      𝟙
+        ≃∎
+
+  is-terminal-∅⇒∅ : (X : Container ℓ ℓ) → isContr (Cart X (∅ ⇒ ∅))
+  is-terminal-∅⇒∅ X = isOfHLevelRespectEquiv 0 (adj X ∅ ∅) $ is-contr-into-∅ X
