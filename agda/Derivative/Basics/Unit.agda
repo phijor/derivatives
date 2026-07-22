@@ -26,8 +26,11 @@ isSet-𝟙* = isOfHLevel-𝟙* 2
 𝟙*-unit-×-left-equiv : (𝟙* {ℓ} × A) ≃ A
 𝟙*-unit-×-left-equiv = strictEquiv (λ { (• , a) → a }) (λ a → (• , a))
 
-isContr→≡𝟙* : isContr A → A ≡ 𝟙*
-isContr→≡𝟙* contr-A = ua $ (const •) , is-equiv-const where
+isContr→≃𝟙* : isContr A → A ≃ 𝟙* {ℓ}
+isContr→≃𝟙* contr-A = (const •) , is-equiv-const where
   is-equiv-const : isEquiv (λ _ → •)
   is-equiv-const .equiv-proof • .fst = contr-A .fst , refl
   is-equiv-const .equiv-proof • .snd (a , p) = ΣPathP (contr-A .snd a , λ i j → •)
+
+isContr→≡𝟙* : isContr A → A ≡ 𝟙*
+isContr→≡𝟙* contr-A = ua $ isContr→≃𝟙* contr-A
