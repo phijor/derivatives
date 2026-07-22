@@ -2,6 +2,7 @@
 module Derivative.Basics.S1 where
 
 open import Derivative.Prelude
+import Derivative.Basics.Connected as Connected
 
 open import Cubical.HITs.S1.Base public
 import Cubical.HITs.S1.Properties as S1
@@ -19,5 +20,5 @@ elimProp {P = P} is-prop-P base* (loop i) = isProp→PathP (λ i → is-prop-P (
 refl≢loop : refl ≢ loop
 refl≢loop refl≡loop = 0≢1-ℤ (cong winding refl≡loop)
 
-isConnected : (x y : S¹) → PT.∥ x ≡ y ∥₁
+isConnected : Connected.isConnected S¹
 isConnected = elimProp (λ x → isPropΠ λ y → PT.isPropPropTrunc) S1.isConnectedS¹
