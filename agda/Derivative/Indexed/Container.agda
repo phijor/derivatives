@@ -321,6 +321,15 @@ private
       F .Pos (just i) s ⊎ (Σ[ p ∈ F .Pos nothing s ] G .Pos i (f p))
   pos i (s , f) = ⊎-right-≃ $ Σ-cong-equiv-snd' λ p → φ.pos i (f p)
 
+[-]-map-⋆ : (F : Container ℓ (Maybe Ix)) {G G′ G″ : Container ℓ Ix}
+  → (g₀ : G ⊸ G′)
+  → (g₁ : G′ ⊸ G″)
+  → [-]-map F (g₀ ⋆ g₁) ≡ [-]-map F g₀ ⋆ [-]-map F g₁
+[-]-map-⋆ _ g₀ g₁ = ⊸≡-ext⁻ refl λ where
+  ix (s , f) → funExt λ where
+    (inl p₀) → refl
+    (inr (p , q)) → refl
+
 isEquiv-[-]-map : (F : Container ℓ (Maybe Ix)) {G G′ : Container ℓ Ix}
   → (φ : G ⊸ G′)
   → isContainerEquiv φ
