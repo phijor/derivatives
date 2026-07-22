@@ -275,4 +275,15 @@ Discrete≃isEquiv-Σ-isolate-singl = propBiimpl→Equiv
   (isPropΠ λ a₀ → isPropIsEquiv _)
   Discrete→isEquiv-Σ-isolate-singl
   isEquiv-Σ-isolate-singl→Discrete
+
+module _ {ℓA ℓB} {A : Type ℓA} {B : Type ℓB} where
+  isIsolatedFst : ∀ {x : A × B} → isIsolated x → isIsolated (x .fst)
+  isIsolatedFst {x = a , b} is-isolated-a,b a′ = Dec.map (cong fst) (λ h a≡a′ → h (cong₂ _,_ a≡a′ (refl′ b))) (is-isolated-a,b (a′ , b))
+
+  isIsolatedSnd : ∀ {x : A × B} → isIsolated x → isIsolated (x .snd)
+  isIsolatedSnd {x = a , b} is-isolated-a,b b′ = Dec.map (cong snd) (λ h b≡b′ → h (cong₂ _,_ (refl′ a) b≡b′)) (is-isolated-a,b (a , b′))
+
+  isIsolatedPair : ∀ {x : A × B} → isIsolated x → isIsolated (x .fst) × isIsolated (x .snd)
+  isIsolatedPair is-isolated .fst = isIsolatedFst is-isolated
+  isIsolatedPair is-isolated .snd = isIsolatedSnd is-isolated
 ```
