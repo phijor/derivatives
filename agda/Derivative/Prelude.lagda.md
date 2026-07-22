@@ -55,6 +55,13 @@ In the base universe `Type`, we use the non-starred aliases `𝟘` and `𝟙`.
 {-# DISPLAY 𝟙* {ℓ = ℓ-zero} = 𝟙 #-}
 ```
 
+<!--
+```agda
+𝟘-rec : 𝟘* {ℓ} → A
+𝟘-rec ()
+```
+-->
+
 ## Conveniences
 
 Get the universe level of a type.
@@ -87,7 +94,8 @@ refl′ a i = a
 Negation `¬_` is defined in terms of the non-polymorphic empty type `⊥`.
 Use `ex-falso` to eliminate it.
 ```agda
-ex-falso : Empty.⊥ → A
+open Empty using (⊥) public
+ex-falso : ⊥ → A
 ex-falso ()
 ```
 
