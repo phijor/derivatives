@@ -203,3 +203,15 @@ isEmbedding-⊎-map-right {A} f is-embedding-f = hasPropFibers→isEmbedding pro
       $ isContr→isProp $ isContrSingl a
     prop-fibers (inr c) = isOfHLevelRespectEquiv 1 (invEquiv $ ⊎-map-right-fiber-inr-equiv f c)
       $ isEmbedding→hasPropFibers is-embedding-f c
+
+isPropSumEquiv : (isProp A × isProp B × (A → B → ⊥)) ≃ isProp (A ⊎ B)
+isPropSumEquiv {A} {B} = propBiimpl→Equiv
+  (isProp× isPropIsProp $ isProp× isPropIsProp (isProp→ (isProp¬ _)))
+  isPropIsProp
+  (uncurry $ uncurry ∘ Sum.isProp⊎)
+  lemma
+  where
+    lemma : isProp (A ⊎ B) → isProp A × isProp B × (A → B → ⊥)
+    lemma is-prop-sum .fst a₀ a₁ = inlInj (is-prop-sum (inl a₀) (inl a₁))
+    lemma is-prop-sum .snd .fst b₀ b₁ = inrInj (is-prop-sum (inr b₀) (inr b₁))
+    lemma is-prop-sum .snd .snd a b = inl≢inr $ is-prop-sum (inl a) (inr b)
