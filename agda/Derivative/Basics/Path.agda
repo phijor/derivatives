@@ -40,7 +40,7 @@ Jᴰ : ∀ {ℓ ℓ'} {A : I → Type ℓ}
   → {y : A i1} (p : PathP A x y) → P y p
 Jᴰ _ P d p = transport (λ i → P (p i) λ j → p (i ∧ j)) d
 
-doubleCompPathP : (B : A → Type ℓ)
+compSquare→PathP : (B : A → Type ℓ)
   → {x y z w : A}
   → {p : x ≡ y} {q : y ≡ z} {r : z ≡ w} {s : x ≡ w}
   → (filler : Square (sym p) r q s)
@@ -49,14 +49,37 @@ doubleCompPathP : (B : A → Type ℓ)
   → (qᴰ : PathP (λ i → B (q i)) yᴰ zᴰ)
   → (rᴰ : PathP (λ i → B (r i)) zᴰ wᴰ)
   → PathP (λ i → B (s i)) xᴰ wᴰ
-doubleCompPathP B filler pᴰ qᴰ rᴰ i =
+compSquare→PathP B filler pᴰ qᴰ rᴰ i =
   compᴵ (λ j → B (filler i j)) (∂ᴵ i)
   λ where
     j (i = i0) → pᴰ (~ j)
     j (i = i1) → rᴰ j
     j (j = i0) → qᴰ i
 
+doubleCompPathP : (B : A → Type ℓ)
+  → {x y z w : A}
+  → {p : x ≡ y} {q : y ≡ z} {r : z ≡ w}
+  → {xᴰ : B x} {yᴰ : B y} {zᴰ : B z} {wᴰ : B w}
+  → (pᴰ : PathP (λ i → B (p i)) xᴰ yᴰ)
+  → (qᴰ : PathP (λ i → B (q i)) yᴰ zᴰ)
+  → (rᴰ : PathP (λ i → B (r i)) zᴰ wᴰ)
+  → PathP (λ i → B ((p ∙∙ q ∙∙ r) i)) xᴰ wᴰ
+doubleCompPathP B {p} {q} {r} = compSquare→PathP B λ i j → doubleCompPath-filler p q r j i
+
 neqCongEquiv : {a b : A} {x y : B}
   → (a ≡ b) ≃ (x ≡ y)
   → (a ≢ b) ≃ (x ≢ y)
 neqCongEquiv e = preCompEquiv (invEquiv e)
+
+cong-compPath : {x y z : A}
+  → (f : A → B)
+  → (p : x ≡ y) (q : y ≡ z)
+  → cong f (p ∙ q) ≡ (cong f p) ∙ (cong f q)
+cong-compPath {x} {y} {z} f p q = cong fst $ compPath-unique refl (cong f p) (cong f q) filler-left filler-right where
+  filler-left : Σ[ r ∈ f x ≡ f z ] PathP (λ i → f x ≡ f (q i)) (cong f p) r
+  filler-left .fst = cong f (p ∙ q)
+  filler-left .snd i j = f (compPath-filler p q i j)
+
+  filler-right : Σ[ r ∈ f x ≡ f z ] PathP (λ i → f x ≡ f (q i)) (cong f p) r
+  filler-right .fst = (cong f p) ∙ (cong f q)
+  filler-right .snd = compPath-filler (cong f p) (cong f q)

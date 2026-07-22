@@ -250,7 +250,7 @@ module _ (F : Container ℓ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binar
                 k (j = i1) → lemma₁ i p₁
 
               lemma₃ : PathP (λ i → Wᴰ S (P ₁) (P ₀) (lemma₁ i p₁)) (subst (Pos (μ F) •) μˢ-adjust μᵖ) wᴰ
-              lemma₃ = doubleCompPathP (Wᴰ S (P ₁) (P ₀)) sq (symP μˢ-adjust-filler) (refl′ μᵖ) μᵖ-path
+              lemma₃ = compSquare→PathP (Wᴰ S (P ₁) (P ₀)) sq (symP μˢ-adjust-filler) (refl′ μᵖ) μᵖ-path
 
               lemma₂ : PathP (λ i → Wᴰ S (P ₁) (P ₀) (sup s (lemma₁ i)))
                 (below p₁ ((subst (Pos (μ F) •) μˢ-adjust μᵖ)))
