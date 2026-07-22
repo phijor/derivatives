@@ -113,6 +113,27 @@ module _ {F G : Container ℓ Ix} {φ γ : F ⊸ G} where
     → φ ≡ γ
   ⊸≡-ext p q = ⊸≡ p (funExt λ ix → funExt λ s → equivPathP (q ix s))
 
+  ⊸≡-ext-Iso : Iso (φ ≡ γ) (Σ[ p ∈ φ.shape ≡ γ.shape ] ∀ ix s → PathP (λ i → G .Pos ix (p i s) ≃ F .Pos ix s) (φ.pos ix s) (γ.pos ix s))
+  ⊸≡-ext-Iso .Iso.fun p .fst i s = p i ._⊸_.shape s
+  ⊸≡-ext-Iso .Iso.fun p .snd ix s i = p i ._⊸_.pos ix s
+  ⊸≡-ext-Iso .Iso.inv = uncurry λ p q → ⊸≡ p (funExt₂ q)
+  ⊸≡-ext-Iso .Iso.rightInv _ = refl
+  ⊸≡-ext-Iso .Iso.leftInv _ = refl
+
+  ⊸≡-ext-equiv : (φ ≡ γ) ≃ (Σ[ p ∈ φ.shape ≡ γ.shape ] ∀ ix s → PathP (λ i → G .Pos ix (p i s) ≃ F .Pos ix s) (φ.pos ix s) (γ.pos ix s))
+  ⊸≡-ext-equiv = strictIsoToEquiv ⊸≡-ext-Iso
+
+  ⊸≡-ext-Iso' : Iso (φ ≡ γ) ((s : F .Shape) → Σ[ p ∈ φ.shape s ≡ γ.shape s ] ∀ ix → PathP (λ i → G .Pos ix (p i) ≃ F .Pos ix s) (φ.pos ix s) (γ.pos ix s))
+  ⊸≡-ext-Iso' .Iso.fun p s .fst i = p i ._⊸_.shape s
+  ⊸≡-ext-Iso' .Iso.fun p s .snd ix i = p i ._⊸_.pos ix s
+  ⊸≡-ext-Iso' .Iso.inv p i ._⊸_.shape s = p s .fst i
+  ⊸≡-ext-Iso' .Iso.inv p i ._⊸_.pos ix s = p s .snd ix i
+  ⊸≡-ext-Iso' .Iso.rightInv _ = refl
+  ⊸≡-ext-Iso' .Iso.leftInv _ = refl
+
+  ⊸≡-ext-equiv' : (φ ≡ γ) ≃ ((s : F .Shape) → Σ[ p ∈ φ.shape s ≡ γ.shape s ] ∀ ix → PathP (λ i → G .Pos ix (p i) ≃ F .Pos ix s) (φ.pos ix s) (γ.pos ix s))
+  ⊸≡-ext-equiv' = strictIsoToEquiv ⊸≡-ext-Iso'
+
   ⊸≡-ext⁻ : (p : φ.shape ≡ γ.shape)
     → (q : (ix : Ix) (s : F .Shape) → PathP (λ i → F .Pos ix s → G .Pos ix (p i s)) (invEq $ φ.pos ix s) (invEq $ γ.pos ix s))
     → φ ≡ γ
