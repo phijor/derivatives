@@ -29,6 +29,14 @@ inlInj = isEmbedding→Inj Sum.isEmbedding-inl _ _
 inrInj : ∀ {x y : B} → inr {A = A} x ≡ inr y → x ≡ y
 inrInj = isEmbedding→Inj Sum.isEmbedding-inr _ _
 
+inlPathEquiv : ∀ {x y : A} → (x ≡ y) ≃ (inl {B = B} x ≡ inl y)
+inlPathEquiv .fst = cong inl
+inlPathEquiv .snd = Sum.isEmbedding-inl _ _
+
+inrPathEquiv : ∀ {x y : B} → (x ≡ y) ≃ (inr {A = A} x ≡ inr y)
+inrPathEquiv .fst = cong inr
+inrPathEquiv .snd = Sum.isEmbedding-inr _ _
+
 inr≢inl : ∀ {x : A} {y : B} → inr x ≢ inl y
 inr≢inl p = Sum.⊎Path.encode _ _ p .lower
 
