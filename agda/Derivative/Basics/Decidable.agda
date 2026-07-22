@@ -145,3 +145,13 @@ module DecPath where
 
 isEmbeddingYes : isEmbedding {A = A} yes
 isEmbeddingYes w z = equivIsEquiv (DecPath.Cover≃Path (yes w) (yes z))
+
+decΣProp : {B : A → Type ℓ}
+  → (prop-A : isProp A)
+  → (dec-A : Dec A)
+  → (dec-B : ∀ a → Dec (B a))
+  → Dec (Σ A B)
+decΣProp {A} {B} prop-A (yes a) dec-B = mapDec (a ,_) (_∘ proj) (dec-B a) where
+  proj : Σ A B → B a
+  proj (a′ , b) = subst B (prop-A _ a) b
+decΣProp prop-A (no ¬a) _ = no $ ¬a ∘ fst
