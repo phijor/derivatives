@@ -14,6 +14,7 @@ open import Derivative.Basics.Decidable
     )
 open import Derivative.Basics.Embedding
 open import Derivative.Basics.Equiv
+open import Derivative.Basics.Sum
 
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.Properties using (equivAdjointEquiv ; congEquiv)
@@ -74,18 +75,6 @@ A ° = Isolated A
 
 forget-isolated : A ° → A
 forget-isolated = fst
-```
-
-By `isIsolated→isPropPath`, loops around an isolated point must be trivial.
-In other words, isolated points satisfy a K-like rule.
-```agda
-module _ (a : A) (is-isolated-a : isIsolated a) where
-  isIsolated→K : (p : a ≡ a) → p ≡ refl
-  isIsolated→K p = isIsolated→isPropPath a is-isolated-a a p refl
-  
-  isIsolated→isContrLoop : isContr (a ≡ a)
-  isIsolated→isContrLoop .fst = refl
-  isIsolated→isContrLoop .snd = sym ∘ isIsolated→K
 ```
 
 Since being isolated is a proposition, equality in `A °` is just that of `A`:
@@ -161,6 +150,27 @@ isEquiv-forget-isolated≃Discrete : isEquiv {A = A °} forget-isolated ≃ Disc
 isEquiv-forget-isolated≃Discrete = propBiimpl→Equiv (isPropIsEquiv _) isPropDiscrete
   isEquiv-forget-isolated→Discrete
   Discrete→isEquiv-forget-isolated
+```
+
+By `isIsolated→isPropPath`, loops around an isolated point must be trivial.
+In other words, isolated points satisfy a K-like rule.
+```agda
+module _ (a : A) (is-isolated-a : isIsolated a) where
+  isIsolated→K : (p : a ≡ a) → p ≡ refl
+  isIsolated→K p = isIsolated→isPropPath a is-isolated-a a p refl
+
+  isIsolated→isContrLoop : isContr (a ≡ a)
+  isIsolated→isContrLoop .fst = refl
+  isIsolated→isContrLoop .snd = sym ∘ isIsolated→K
+```
+
+Furthermore, we can deduce that the law of the excluded middle holds for path from an isolated point:
+```agda
+isIsolated→isContrDecPath : {a : A} → isIsolated a → ∀ b → isContr (Dec (a ≡ b))
+isIsolated→isContrDecPath {a} isolated-a b = inhProp→isContr (isolated-a b) (isIsolated→isPropDecPath a isolated-a b)
+
+isIsolated→isContrPathLEM : {a : A} → isIsolated a → ∀ b → isContr ((a ≡ b) ⊎ (a ≢ b))
+isIsolated→isContrPathLEM isolated-a b = isOfHLevelRespectEquiv 0 Dec.dec-⊎-equiv $ isIsolated→isContrDecPath isolated-a b
 ```
 
 A type is _perfect_ if it does not have any isolated points at all:
