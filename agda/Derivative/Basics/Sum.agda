@@ -63,6 +63,36 @@ decFiberInr (inr b) = yes (b , refl)
 Σ-⊎-snd-≃ : (Σ[ a ∈ A ] C a ⊎ D a) ≃ (Σ A C ⊎ Σ A D)
 Σ-⊎-snd-≃ = isoToEquiv Σ-⊎-snd-Iso
 
+rec-fiber-equiv : ∀ {C : Type ℓ} {f : A → C} {g : B → C} → ∀ c → fiber (Sum.rec f g) c ≃ (fiber f c ⊎ fiber g c)
+rec-fiber-equiv c = Σ-⊎-fst-≃
+
+rec-equiv : ∀ {C : Type ℓ} → ((A → C) × (B → C)) ≃ ((A ⊎ B) → C)
+rec-equiv .fst = uncurry Sum.rec
+rec-equiv {A} {B} {C} .snd .equiv-proof f = ((f₀ , f₁) , f-β) , unique where
+  f₀ : A → C
+  f₀ = f ∘ inl
+
+  f₁ : B → C
+  f₁ = f ∘ inr
+
+  f-β : Sum.rec f₀ f₁ ≡ f
+  f-β = funExt λ where
+    (inl a) → refl
+    (inr b) → refl
+
+  unique : (y : fiber (uncurry Sum.rec) f) → ((f₀ , f₁) , f-β) ≡ y
+  unique ((g₀ , g₁) , g-β) = ΣPathP (≡-× f₀≡g₀ f₁≡g₁ , coh) where
+    f₀≡g₀ : f₀ ≡ g₀
+    f₀≡g₀ = funExt λ a → sym $ g-β ≡$ (inl a)
+
+    f₁≡g₁ : f₁ ≡ g₁
+    f₁≡g₁ = funExt λ b → sym $ g-β ≡$ (inr b)
+
+    coh : PathP (λ i → Sum.rec (f₀≡g₀ i) (f₁≡g₁ i) ≡ f) f-β g-β
+    coh = funExtSquare λ where
+      (inl a) i j → g-β (~ i ∨ j) (inl a)
+      (inr b) i j → g-β (~ i ∨ j) (inr b)
+
 ⊎-map-left : ∀ {C : Type ℓ} → (f : A → B) → (A ⊎ C) → (B ⊎ C)
 ⊎-map-left f (inl a) = inl (f a)
 ⊎-map-left f (inr b) = inr b
