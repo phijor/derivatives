@@ -10,6 +10,7 @@ open import Derivative.Basics.Sum
 open import Cubical.Foundations.Equiv.HalfAdjoint
 open import Cubical.Foundations.Equiv.Dependent
 open import Cubical.Foundations.Path
+open import Cubical.Data.Nat.Base
 open import Cubical.Data.Sigma.Properties
 open import Cubical.Relation.Nullary.Properties using (EquivPresDiscrete)
 open import Cubical.Functions.Embedding
@@ -128,6 +129,43 @@ module _ {S : Type ℓS} {P : S → Type ℓP} where
 
   WPath-≃ : (x y : W S P) → (x ≡ y) ≃ (WPath x y)
   WPath-≃ x y = isoToEquiv $ WPathIso x y
+
+  -- h-levels ≥ 1 are closed under W-types.
+  -- https://homotopytypetheory.org/2012/09/21/positive-h-levels-are-closed-under-w/
+  isOfHLevelSucW :
+    ∀ (n : HLevel)
+    → isOfHLevel (1 + n) S
+    → isOfHLevel (1 + n) (W S P)
+  isOfHLevelSucW zero trunc-S = W-elim2 λ s₀ s₁ f₀ f₁ hyp → cong₂ sup (trunc-S s₀ s₁) (funExtNonDep λ {p₀} {p₁} _ → hyp p₀ p₁)
+  isOfHLevelSucW n@(suc _) trunc-S = W-elim2 goal where
+    goal : (s₀ s₁ : S) (f₀ : P s₀ → W S P) (f₁ : P s₁ → W S P)
+      → (∀ p₀ p₁ → isOfHLevel n (f₀ p₀ ≡ f₁ p₁))
+      → isOfHLevel n (sup s₀ f₀ ≡ sup s₁ f₁)
+    goal s₀ s₁ f₀ f₁ hyp = isOfHLevelRespectEquiv n (invEquiv $ WPath-≃ _ _)
+      $ isOfHLevelΣ n (trunc-S s₀ s₁) λ s₀≡s₁ → lemma s₀ s₁ s₀≡s₁ f₀ f₁ hyp
+      where
+        Motive : (s₀ s₁ : S) → s₀ ≡ s₁ → Type _
+        Motive s₀ s₁ s₀≡s₁ =
+          ∀ (f₀ : P s₀ → W S P)
+          → (f₁ : P s₁ → W S P)
+          → (∀ p₀ p₁ → isOfHLevel n (f₀ p₀ ≡ f₁ p₁))
+          → isOfHLevel n (PathP (λ i → P (s₀≡s₁ i) → W S P) f₀ f₁)
+
+        motive-refl : ∀ s₀
+          → (f₀ f₁ : P s₀ → W S P)
+          → ((p₀ p₁ : P s₀) → isOfHLevel n (f₀ p₀ ≡ f₁ p₁))
+          → isOfHLevel n (f₀ ≡ f₁)
+        motive-refl s₀ f₀ f₁ hyp = isOfHLevelRespectEquiv n funExtEquiv $ isOfHLevelΠ n
+          λ (p : P s₀) → hyp p p
+
+        lemma : ∀ (s₀ s₁ : S) → (s₀≡s₁ : s₀ ≡ s₁) → Motive s₀ s₁ s₀≡s₁
+        lemma s₀ s₁ = J (Motive s₀) (motive-refl s₀)
+
+  isPropW : isProp S → isProp (W S P)
+  isPropW = isOfHLevelSucW 0
+
+  isSetW : isSet S → isSet (W S P)
+  isSetW = isOfHLevelSucW 1
 
 module _ (S : Type ℓS) (P : S → Type ℓP) (Q : S → Type ℓQ) where
   open impl S P
