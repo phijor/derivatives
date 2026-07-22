@@ -55,6 +55,9 @@ Dec→Type* : Dec A → Type ℓ
 Dec→Type* (yes _) = 𝟙*
 Dec→Type* (no  _) = 𝟘*
 
+isContr→Dec : isContr A → Dec A
+isContr→Dec contr = yes (contr .fst)
+
 opaque
   Dec→Collapsible : Dec A → Collapsible A
   Dec→Collapsible = SplitSupport→Collapsible ∘ PStable→SplitSupport ∘ Stable→PStable ∘ Dec→Stable
