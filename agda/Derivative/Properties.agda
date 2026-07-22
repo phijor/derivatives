@@ -6,6 +6,7 @@ open import Derivative.Basics.Decidable as Dec
 open import Derivative.Basics.Maybe
 open import Derivative.Basics.Sum as Sum using (_⊎_ ; inl ; inr)
 open import Derivative.Basics.Unit
+open import Derivative.Basics.W as W using (W)
 
 open import Derivative.Isolated
 open import Derivative.Remove
@@ -18,6 +19,7 @@ import      Cubical.Foundations.Univalence as Univalence
 import      Cubical.Foundations.Transport as Transport
 open import Cubical.Data.Sigma
 open import Cubical.Data.Empty using (uninhabEquiv)
+open import  Cubical.HITs.SetTruncation as ST using (∥_∥₂)
 
 private
   variable
@@ -140,7 +142,7 @@ module _ {Ix : Type ℓ} (F : Ix → Container ℓ ℓ) where
   sum'-rule .Equiv.pos ((ix , s) , p , _) = idEquiv $ F ix .Pos s ∖ p
 
 russel : ¬ (Σ[ U ∈ Type ℓ ] Σ[ El ∈ (U → Type ℓ) ] hasSection El)
-russel {ℓ} (U , El , code , code-sec) = paradox where
+russel {ℓ} (U , El , code , code-sec) = paradox module russel where
   cast : ∀ {X} → El (code X) → X
   cast {X} = transport (code-sec X)
 
@@ -218,6 +220,30 @@ no-terminal {ℓ} (Y@(T ◁ Q) , contr-cart) = russel (T , Q , code , code-sec) 
   code-sec : ∀ X → Q (code X) ≡ X
   code-sec X = secIsEq is-equiv-Q X
 
+no-weak-terminal : ¬ (Σ[ Y ∈ Container ℓ ℓ ] ∀ (X : Container ℓ ℓ) → Cart X Y)
+no-weak-terminal {ℓ} (Y@(T ◁ Q) , inh-cart) = russel (T , Q , code , code-sec) where
+  Q-fiber-equiv : (P : Type ℓ) → Cart (𝕪 P) (T ◁ Q) ≃ fiber Q P
+  Q-fiber-equiv P =
+    Cart (𝕪 P) (T ◁ Q)
+      ≃⟨ Cart-Σ-equiv ⟩
+    Σ[ t ∈ (𝟙* → T) ] ((x : 𝟙*) → Q (t x) ≃ P)
+      ≃⟨ invEquiv Σ-Π-≃ ⟩
+    (𝟙* → Σ[ t ∈ T ] Q t ≃ P)
+      ≃⟨ Π𝟙*-equiv _ ⟩
+    Σ[ t ∈ T ] Q t ≃ P
+      ≃⟨ Σ-cong-equiv-snd (λ t → invEquiv Univalence.univalence) ⟩
+    Σ[ t ∈ T ] Q t ≡ P
+      ≃∎
+
+  Q-inh-fiber : ∀ P → fiber Q P
+  Q-inh-fiber P = equivFun (Q-fiber-equiv P) (inh-cart (𝕪 P))
+
+  code : Type ℓ → T
+  code = fst ∘ Q-inh-fiber
+
+  code-sec : ∀ X → Q (code X) ≡ X
+  code-sec = snd ∘ Q-inh-fiber
+
 private
   isEmpty→isContrΠ : ∀ {ℓ ℓ'} {A : Type ℓ} {B : A → Type ℓ'}
     → (¬ A) → isContr (∀ a → B a)
@@ -245,3 +271,121 @@ no-internal-hom {ℓ} (_⇒_ , adj) = no-terminal (_ , is-terminal-∅⇒∅) wh
 
   is-terminal-∅⇒∅ : (X : Container ℓ ℓ) → isContr (Cart X (∅ ⇒ ∅))
   is-terminal-∅⇒∅ X = isOfHLevelRespectEquiv 0 (adj X ∅ ∅) $ is-contr-into-∅ X
+
+russel-set : ¬ (Σ[ U ∈ hSet ℓ ] Σ[ El ∈ (⟨ U ⟩ → hSet ℓ) ] hasSection El)
+russel-set {ℓ} ((U , is-set-U) , El* , code* , code-sec*) = paradox where
+  El : U → Type ℓ
+  El = fst ∘ El*
+
+  code-sec : (X : hSet ℓ) → El (code* X) ≡ ⟨ X ⟩
+  code-sec X = cong ⟨_⟩ $ code-sec* X
+
+  cast : (X : hSet ℓ) → El (code* X) → ⟨ X ⟩
+  cast X = transport (code-sec X)
+
+  V : Type ℓ
+  V = W U El
+
+  sup : (X : hSet ℓ) → (⟨ X ⟩ → V) → V
+  sup X el = W.sup (code* X) (el ∘ cast X)
+
+  is-set-V : isSet V
+  is-set-V = {! !}
+
+  _∈_ : V → V → Type _
+  x ∈ W.sup _ A = fiber A x
+
+  _∉_ : V → V → Type _
+  x ∉ X = ¬ x ∈ X
+
+  ∈-sup-equiv-inh-fiber : (A : hSet ℓ) (el : ⟨ A ⟩ → V)
+    → (x : V)
+    → (x ∈ sup A el) ≃ fiber el x
+  ∈-sup-equiv-inh-fiber A _ _ = Σ-cong-equiv-fst equiv-fst where
+    equiv-fst : El (code* A) ≃ ⟨ A ⟩
+    equiv-fst = Univalence.pathToEquiv $ code-sec A
+
+  not-in-self : hSet ℓ
+  not-in-self = (Σ[ x ∈ V ] x ∉ x) , (isSetΣSndProp is-set-V λ _ → isProp¬ _)
+
+  R : V
+  R = sup not-in-self fst
+
+  in-R-iff-not-in-self : (X : V) → (X ∈ R) ≃ (X ∉ X)
+  in-R-iff-not-in-self X =
+    X ∈ sup not-in-self fst
+      ≃⟨ ∈-sup-equiv-inh-fiber not-in-self fst X ⟩
+    Σ[ (x , _) ∈ Σ[ x ∈ V ] x ∉ x ] x ≡ X
+      ≃⟨ strictEquiv (λ ((u , h) , p) → (u , sym p) , h) (λ ((u , p) , h) → (u , h) , sym p) ⟩
+    (Σ[ (u , _) ∈ singl X ] u ∉ u)
+      ≃⟨ (Σ-contractFst (isContrSingl X)) ⟩
+    (X ∉ X)
+      ≃∎
+
+  R∈R≃R∉R : (R ∈ R) ≃ (R ∉ R)
+  R∈R≃R∉R = in-R-iff-not-in-self R
+
+  R∉R : R ∉ R
+  R∉R R∈R = equivFun R∈R≃R∉R R∈R R∈R
+
+  R∈R : R ∈ R
+  R∈R = invEq R∈R≃R∉R R∉R
+
+  paradox : ⊥
+  paradox = R∉R R∈R
+
+no-weak-terminal-set : ¬ (Σ[ Y ∈ SetContainer ℓ ℓ ] ∀ (X : SetContainer ℓ ℓ) → SetCart X Y)
+no-weak-terminal-set {ℓ} ((Y@(T ◁ Q) , is-set-T , is-set-Q) , inh-set-cart) = russel-set (T* , Q* , code , code-sec) where
+  T* : hSet ℓ
+  T* = T , is-set-T
+
+  Q* : T → hSet ℓ
+  Q* t = Q t , is-set-Q t
+
+  𝕪-set : hSet ℓ → SetContainer ℓ ℓ
+  𝕪-set P .fst = 𝕪 ⟨ P ⟩
+  𝕪-set P .snd .fst = isSet-𝟙*
+  𝕪-set P .snd .snd _ = str P
+
+  Q*-fiber-equiv : (P : hSet ℓ) → Cart (𝕪 ⟨ P ⟩) (T ◁ Q) ≃ fiber Q* P
+  Q*-fiber-equiv P*@(P , _) =
+    Cart (𝕪 P) (T ◁ Q)
+      ≃⟨ Cart-Σ-equiv ⟩
+    Σ[ t ∈ (𝟙* → T) ] ((x : 𝟙*) → Q (t x) ≃ P)
+      ≃⟨ invEquiv Σ-Π-≃ ⟩
+    (𝟙* → Σ[ t ∈ T ] Q t ≃ P)
+      ≃⟨ Π𝟙*-equiv _ ⟩
+    Σ[ t ∈ T ] Q t ≃ P
+      ≃⟨ Σ-cong-equiv-snd (λ t → invEquiv Univalence.univalence) ⟩
+    Σ[ t ∈ T ] Q t ≡ P
+      ≃⟨ Σ-cong-equiv-snd (λ t → Σ≡PropEquiv λ _ → isPropIsSet) ⟩
+    Σ[ t ∈ T ] Q* t ≡ P*
+      ≃∎
+
+  Q*-inh-fiber : ∀ P → fiber Q* P
+  Q*-inh-fiber P = equivFun (Q*-fiber-equiv P) (inh-set-cart (𝕪-set P))
+
+  code : hSet ℓ → T
+  code = fst ∘ Q*-inh-fiber
+
+  code-sec : ∀ X → Q* (code X) ≡ X
+  code-sec = snd ∘ Q*-inh-fiber
+
+private
+  _⊗ₛ_ : SetContainer ℓ ℓ → SetContainer ℓ ℓ → SetContainer ℓ ℓ
+  ((F , is-set-F) ⊗ₛ (G , is-set-G)) .fst = F ⊗ G
+  ((F , is-set-F) ⊗ₛ (G , is-set-G)) .snd .fst = isSet× (is-set-F .fst) (is-set-G .fst)
+  ((F , is-set-F) ⊗ₛ (G , is-set-G)) .snd .snd (s , t) = Sum.isSet⊎ (is-set-F .snd s) (is-set-G .snd t)
+
+no-internal-hom-set : ¬ (Σ[ _⇒_ ∈ ((F G : SetContainer ℓ ℓ) → SetContainer ℓ ℓ) ] ∀ F G H → SetCart (F ⊗ₛ G) H → SetCart F (G ⇒ H))
+no-internal-hom-set {ℓ} (_⇒_ , curry) = no-weak-terminal-set (∅ ⇒ ∅ , is-weak-terminal-∅⇒∅) where
+  ∅ : SetContainer ℓ ℓ
+  ∅ .fst .Shape = 𝟘*
+  ∅ .fst .Pos ()
+  ∅ .snd .fst ()
+  ∅ .snd .snd ()
+
+  is-weak-terminal-∅⇒∅ : (X : SetContainer ℓ ℓ) → SetCart X (∅ ⇒ ∅)
+  is-weak-terminal-∅⇒∅ X = curry X ∅ ∅ λ where
+    .Cart.shape ()
+    .Cart.pos ()
