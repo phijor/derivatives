@@ -127,3 +127,8 @@ module _ {ℓ'} {A B : Type ℓ} where
     → {P : A → Type ℓ'} {Q : B → Type ℓ'}
     → (PathP (λ i → ua e i → Type ℓ') P Q) ≃ (Σ[ F ∈ mapOver (e .fst) P Q ] isEquivOver {P = P} {Q = Q} F)
   univalenceᴰ e = isoToEquiv $ univalenceᴰ-Iso e
+
+flipEquiv : ∀ {ℓA ℓB ℓC}
+  {A : Type ℓA} {B : Type ℓB} {C : A → B → Type ℓC}
+  → (∀ a b → C a b) ≃ (∀ b a → C a b)
+flipEquiv = strictEquiv (λ f b a → f a b) (λ f a b → f b a)
