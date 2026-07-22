@@ -290,7 +290,7 @@ russel-set {ℓ} ((U , is-set-U) , El* , code* , code-sec*) = paradox where
   sup X el = W.sup (code* X) (el ∘ cast X)
 
   is-set-V : isSet V
-  is-set-V = {! !}
+  is-set-V = W.isSetW is-set-U
 
   _∈_ : V → V → Type _
   x ∈ W.sup _ A = fiber A x
