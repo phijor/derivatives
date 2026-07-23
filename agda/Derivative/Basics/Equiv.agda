@@ -66,6 +66,17 @@ preCompEquivFiberEquiv {A} {B} {C} e f c =
   Σ[ b ∈ B ] f b ≡ c
     ≃∎
 
+postCompEquivFiberEquiv : (f : A → B) → (e : B ≃ C)
+  → ∀ c → fiber (f ⨟ equivFun e) c ≃ fiber f (invEq e c)
+postCompEquivFiberEquiv {A} f e c =
+  Σ[ a ∈ A ] (equivFun e (f a)) ≡ c
+    ≃⟨ ⨟-fiber-equiv f (equivFun e) c ⟩
+  Σ[ (b , _) ∈ fiber (equivFun e) c ] fiber f b
+    ≃⟨ Σ-contractFst (equivIsEquiv e .equiv-proof c) ⟩
+  fiber f (invEq e c)
+    ≃∎
+
+
 equivAdjointEquivExtCodomain : (e : A ≃ B) (f : C → A) (g : C → B)
   → (f ≡ invEq e ∘ g) ≃ (equivFun e ∘ f ≡ g)
 equivAdjointEquivExtCodomain {C} e f g = invEquiv funExtEquiv ∙ₑ equivΠCod lemma ∙ₑ funExtEquiv where
