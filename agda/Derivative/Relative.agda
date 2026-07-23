@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas --lossy-unification #-}
+{-# OPTIONS --allow-unsolved-metas #-}
 module Derivative.Relative where
 
 open import Derivative.Prelude
@@ -22,7 +22,7 @@ private
 
 module _ (R : Type ℓ) where
   ∂ : Container ℓ ℓ → Container ℓ ℓ
-  ∂ F = S′ ◁ P′ where
+  ∂ F = ∂F where
     open module F = Container F renaming (Shape to S ; Pos to P)
 
     S′ : Type _
@@ -30,6 +30,11 @@ module _ (R : Type ℓ) where
 
     P′ : S′ → Type _
     P′ (s , f , _) = P s - f
+
+    ∂F : Container _ _
+    ∂F .Container.Shape = S′
+    ∂F .Container.Pos = P′
+    {-# INLINE ∂F #-}
 
   ∂[_] : {F G : Container ℓ ℓ} → Cart F G → Cart (∂ F) (∂ G)
   ∂[_] {F} {G} φ = ∂f module ∂[-] where
@@ -54,7 +59,8 @@ module _ (R : Type ℓ) where
       open module F = Container F renaming (Shape to S ; Pos to P)
 
     unit-shape : S → Σ[ (s , _) ∈ S × 𝟙* {ℓ} ] (R ↪° (P s ⊎ R))
-    unit-shape s .fst = s , •
+    unit-shape s .fst .fst = s
+    unit-shape s .fst .snd = •
     unit-shape s .snd = inr-dec-emb
 
     unit-pos : (s : S) → ((P s ⊎ R) - inr) ≃ P s
@@ -101,13 +107,12 @@ module _ (R : Type ℓ) where
   zag≡ : (G : Container ℓ ℓ) → unit (∂ G) ⋆ ∂[ counit G ] ≡ id (∂ G)
   zag≡ G = Cart≡ (funExt shape-path) (funExt pos-path) module zag≡ where
     open module G = Container G renaming (Shape to T ; Pos to Q)
+    open Cart using (shape ; pos)
 
-    shape-path : (∂s : Σ[ t ∈ T ] R ↪° Q t) → ∂[ counit G ] .Cart.shape (unit-shape (∂ G) ∂s) ≡ ∂s
-    shape-path (t , f , _) = ΣPathP λ where
-      .fst → refl′ t
-      .snd → ↪°-≡ $ refl′ f
+    shape-path : (∂s : Σ[ t ∈ T ] R ↪° Q t) → ∂[ counit G ] .shape (unit (∂ G) .shape ∂s) ≡ ∂s
+    shape-path (t , f , _) = ΣPathP (refl′ t , ↪°-≡ (refl′ f))
 
-    pos-path : ∀ ∂s → ∂[ counit G ] .Cart.pos _ ∙ₑ (unit-pos (∂ G) ∂s) ≡ idEquiv (Q (∂s .fst) - ∂s .snd .fst)
+    pos-path : ∀ ∂s → ∂[ counit G ] .pos (unit (∂ G) .shape ∂s) ∙ₑ (unit (∂ G) .pos ∂s) ≡ idEquiv (Q (∂s .fst) - ∂s .snd .fst)
     pos-path ∂s = invEquivPathP $ funExt λ where
       (t , ¬fib) → Complement≡ $ refl′ t
 
