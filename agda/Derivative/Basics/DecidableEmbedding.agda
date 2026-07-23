@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --safe #-}
 module Derivative.Basics.DecidableEmbedding where
 
 open import Derivative.Prelude
@@ -130,55 +130,6 @@ isContrDecEmbedding-𝟘 = inhProp→isContr
   ((λ ()) , isDecEmbedding-𝟘 _)
   (isPropΣ (λ f g → funExt λ ()) isPropIsDecEmbedding)
 
--- isDecEmbedding→K : (f : X → A) → isDecEmbedding f → (p : f ≡ f) → p ≡ refl
--- isDecEmbedding→K f dec-emb p = {!  !}
-
--- DecEmbedding↪Embedding : (X ↪° A) ↪ (X ↪ A)
--- DecEmbedding↪Embedding = Σ-map-snd-embedding λ f → {! EmbeddingΣProp !}
-
--- discreteDecEmbedding : Discrete (X ↪° A)
--- discreteDecEmbedding (f , dec-emb-f) (g , dec-emb-g) = decEquiv (funExtEquiv ∙ₑ ↪°-≡-equiv)
---   {! !}
---   where
---     goal : Dec (∀ x → f x ≡ g x)
---     goal = {! isDecEmbedding→fiberLEM !}
-
--- isSetDecEmbedding : isSet (X ↪° A)
--- isSetDecEmbedding (f , dec-emb-f) (g , dec-emb-g) = isOfHLevelRespectEquiv 1 ↪°-≡-equiv goal where
---   foo : (f ≡ g) ≃ {! !}
---   foo =
---     (f ≡ g)
---       ≃⟨ {! !} ⟩
---     (∀ x → f x ≡ g x)
---       ≃⟨ equivΠCod (λ x → {! !}) ⟩
---     (∀ x → {! !})
---       ≃⟨ {! !} ⟩
---     {! !}
---       ≃∎
-
---   goal : isProp (f ≡ g)
---   goal = {! !}
-
--- isSetDecEmbedding (f , dec-emb-f) (g , dec-emb-g) = isOfHLevelRespectEquiv 1 ΣPathP≃PathPΣ $ isPropΣ
---   {! !}
---   λ p → isOfHLevelPathP 1 (isPropIsDecEmbedding g) _ _
-
--- preimage : (f : X ↪° A) → A → X ⊎ 𝟙
--- preimage (f , dec-emb-f) a = Dec.elim (inl ∘ fst) (inr ∘ const _) (dec-emb-f a .fst)
-
--- _≊_ : (f g : X ↪° A) → Type _
--- f ≊ g = ∀ a → (preimage f a) ≡ (preimage g a)
-
--- private
---   split : (f : X → A ⊎ B) → isDecEmbedding f → (X → A) ⊎ (X → B)
---   split f dec-emb = {! !}
-
--- DecEmbeddingSumIso : Iso (X ↪° (A ⊎ B)) ((X ↪° A) ⊎ (X ↪° B))
--- DecEmbeddingSumIso .Iso.fun (fst₁ , snd₁) = {! !}
--- DecEmbeddingSumIso .Iso.inv = {! !}
--- DecEmbeddingSumIso .Iso.rightInv = {! !}
--- DecEmbeddingSumIso .Iso.leftInv = {! !}
-
 is-dec-emb-inl : isDecEmbedding (inl {A = A} {B = B})
 is-dec-emb-inl y = dec-fiber y , hasPropFibersInl y where
   dec-fiber : ∀ y → Dec (fiber inl y)
@@ -210,20 +161,6 @@ embed-sum {A} {B} {C} ι = α , β , not-fiber where
 
   not-fiber : ∀ c → ¬ fiber (α .fst) c × fiber (β .fst) c
   not-fiber c ((a , ιinla≡c) , (b , ιinrb≡c)) = inl≢inr (ι.cancel (ιinla≡c ∙ sym ιinrb≡c))
-
-embed-sum-inv : (Σ[ α ∈ A ↪° C ] Σ[ β ∈ B ↪° C ] ∀ c → ¬ fiber (α .fst) c × fiber (β .fst) c) → (A ⊎ B) ↪° C
-embed-sum-inv {A} {C} {B} y@(α , β , h) = ι , {! !} where
-  module α = Notation α
-  module β = Notation β
-
-  ι : A ⊎ B → C
-  ι = Sum.rec α.fun β.fun
-
-embed-sum-fiber-equiv : ∀ y → fiber (embed-sum {A = A} {B = B} {C = C}) y ≃ {! !}
-embed-sum-fiber-equiv y@(α , β , h) = {! !}
-
-embed-sum-equiv : ((A ⊎ B) ↪° C) ≃ (Σ[ α ∈ A ↪° C ] Σ[ β ∈ B ↪° C ] ∀ c → ¬ fiber (Sum.rec (α .fst) (β .fst)) c)
-embed-sum-equiv = {! !}
 
 Complement : (B : Type ℓ) → (f : A → B) → Type _
 Complement B f = Σ[ b ∈ B ] ¬ fiber f b
@@ -361,28 +298,8 @@ dec-emb-postcomp-equiv (f , dec-emb-f) e .snd b = goal where
   goal .fst = decEquiv fiber-equiv $ dec-emb-f (invEq e b) .fst
   goal .snd = isOfHLevelRespectEquiv 1 fiber-equiv $ dec-emb-f (invEq e b) .snd
 
-remove-self-empty : (f : A → A) → isDecEmbedding f → ¬ (A - f)
-remove-self-empty f dec-emb-f (a , ¬fib) = Dec.rec
-  ¬fib
-  {! !}
-  (dec-emb-f a .fst)
-
-module _ where
-  open import Cubical.HITs.PropositionalTruncation as PT
-
-  isConnected : (X : Type ℓ) → Type _
-  isConnected X = (x y : X) → PT.∥ x ≡ y ∥₁
-
-  null : (A : Type ℓ) → isConnected X → isEquiv (the (A → X → A) const)
-  null {X} A conn-X = {! !}
-
-  dec-emb-connected-sum : ((x y : X) → PT.∥ x ≡ y ∥₁) → (X ↪° (A ⊎ B)) → (X ↪° A) ⊎ (X ↪° B)
-  dec-emb-connected-sum conn (f , dec-emb-f) = {! !}
-
 module Examples where
   open import Cubical.Data.Nat
-
-  open import Derivative.Basics.S1 as S¹ using (S¹)
 
   private
     empty-fib : (f : X → A) → ∀ a → ¬ fiber f a → Dec (fiber f a) × isProp (fiber f a)
@@ -395,36 +312,3 @@ module Examples where
   suc-emb .snd zero = empty-fib suc zero $ uncurry λ _ → snotz
   suc-emb .snd (suc n) .fst = yes (n , refl)
   suc-emb .snd (suc n) .snd (k , suc-k≡n) (l , suc-l≡n) = Σ≡Prop (λ _ → isSetℕ _ _) $ injSuc $ suc-k≡n ∙ sym suc-l≡n
-
-  --- Dedekind finiteness of the circle, in the strong sense:
-  S¹-dedekind : (f : S¹ → S¹) → isDecEmbedding f → ∀ x → fiber f x
-  S¹-dedekind f dec-emb x = ext x (dec-emb x .fst) (dec-emb x .snd) where
-    import Cubical.HITs.PropositionalTruncation as PT
-    import Derivative.Basics.S1 as S¹
-
-    ext-no : (x : S¹) → isProp (fiber f x) → ¬ ¬ fiber f x
-    ext-no x prop-fiber = PT.rec (isProp¬ _) contra (S¹.isConnected (f x) x) where
-      contra : f x ≡ x → ¬ (¬ fiber f x)
-      contra p ¬fib = ¬fib (x , p)
-
-    ext : (x : S¹) → Dec (fiber f x) → isProp (fiber f x) → fiber f x
-    ext x (yes fib) _ = fib
-    ext x (no ¬fib) prop = ex-falso $ ext-no x prop ¬fib
-
-  connected-dedekind : isConnected X → (f : X → X) → isDecEmbedding f → isEquiv f
-  connected-dedekind {X} conn-X f dec-emb .equiv-proof = contr-fib where module _ (x : X) where
-    import Cubical.HITs.PropositionalTruncation as PT
-    ext-no : isProp (fiber f x) → ¬ ¬ fiber f x
-    ext-no prop-fiber = PT.rec (isProp¬ _) contra (conn-X (f x) x) where
-      contra : f x ≡ x → ¬ (¬ fiber f x)
-      contra p ¬fib = ¬fib (x , p)
-
-    ext : Dec (fiber f x) → isProp (fiber f x) → fiber f x
-    ext (yes fib) _ = fib
-    ext (no ¬fib) prop = ex-falso $ ext-no prop ¬fib
-
-    inh-fib : fiber f x
-    inh-fib = ext (dec-emb x .fst) (dec-emb x .snd)
-
-    contr-fib : isContr (fiber f x)
-    contr-fib = inhProp→isContr (inh-fib) (dec-emb x .snd)
