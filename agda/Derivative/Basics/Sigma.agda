@@ -57,6 +57,10 @@ module _ {B′ : A′ → Type ℓ} where
     (Σ-map-fst-fiber-iso f)
     (is-equiv-f .equiv-proof a′)
 
+  Σ-map-fst-equiv : (e : A ≃ A′) → (Σ A (B′ ∘ equivFun e)) ≃ (Σ A′ B′)
+  Σ-map-fst-equiv e .fst = Σ-map-fst (equivFun e)
+  Σ-map-fst-equiv e .snd = isEquiv-Σ-map-fst (equivIsEquiv e)
+
 module _ {ℓB ℓB′} {A : Type ℓ} {B : A → Type ℓB} {B′ : A → Type ℓB′} where
   Σ-map-snd : (f : ∀ a → B a → B′ a) → (Σ A B) → (Σ A B′)
   Σ-map-snd f (a , b) = (a , f a b)
@@ -87,6 +91,9 @@ module _ {ℓB ℓB′} {A : Type ℓ} {B : A → Type ℓB} {B′ : A → Type 
   Σ-cong-equiv-snd' f .fst = Σ-map-snd (equivFun ∘ f)
   Σ-cong-equiv-snd' f .snd = isEquiv-Σ-map-snd (equivIsEquiv ∘ f)
 
+  Σ-map-snd-equiv : (f : ∀ a → B a ≃ B′ a) → (Σ A B) ≃ (Σ A B′)
+  Σ-map-snd-equiv = Σ-cong-equiv-snd'
+
   opaque
     isEquiv-Σ-map-snd→isEquiv : {f : ∀ a → B a → B′ a} → isEquiv (Σ-map-snd f) → ∀ a → isEquiv (f a)
     isEquiv-Σ-map-snd→isEquiv {f} is-equiv-Σ-map-snd a′ .equiv-proof b′ = isOfHLevelRetractFromIso 0
@@ -98,6 +105,12 @@ module _ {ℓB ℓB′} {A : Type ℓ} {B : A → Type ℓB} {B′ : A → Type 
   → (f : ∀ a → B a → B′ (e a))
   → Σ A B → Σ A′ B′
 Σ-map e f = Σ-map-snd f ⨟ Σ-map-fst e
+
+Σ-map-equiv : ∀ {ℓB ℓB′} {B : A → Type ℓB} {B′ : A′ → Type ℓB′}
+  → (e : A ≃ A′)
+  → (f : ∀ a → B a ≃ B′ (equivFun e a))
+  → Σ A B ≃ Σ A′ B′
+Σ-map-equiv e f = Σ-map-snd-equiv f ∙ₑ Σ-map-fst-equiv e
 
 isEquiv-Σ-map : ∀ {ℓB ℓB′} {B : A → Type ℓB} {B′ : A′ → Type ℓB′}
   → {e : A → A′}
