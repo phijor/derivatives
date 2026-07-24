@@ -12,6 +12,7 @@ open import Cubical.Foundations.Structure public
 open import Cubical.Foundations.Isomorphism hiding (iso) public
 open import Cubical.Foundations.Equiv renaming (_■ to _≃∎) public
 open import Cubical.Reflection.StrictEquiv public
+open import Cubical.Data.Nat.Base using (ℕ ; zero ; suc) public
 open import Cubical.Data.Sigma using (_×_ ; ΣPathP ; Σ≡Prop ; ∃-syntax ; ∃!-syntax) public
 open import Cubical.Relation.Nullary.Base using (¬_) public
 open import Cubical.HITs.PropositionalTruncation using (∥_∥₁) public
