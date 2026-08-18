@@ -11,8 +11,8 @@ To do so, they recognize that each \( \mu F \) essentially behaves like repeated
 and infer a fixed-point rule from the chain rule.
 
 Our goal is to derive a similar fixed-point rule for our generalized derivative,
-ideally by deriving it from the chain-rule as well.
-This begs the question: if in general the chain-rule rule is lax,
+ideally by deriving it from the chain rule as well.
+This raises the question: if in general the chain rule is lax,
 is it ever possible to have a strong fixed-point rule?
 It appears that the answer to this question is \enquote{it depends}:
 we are able to show (cf.~\autoref{strong-mu-rule-iff-strong-chain-rule})
@@ -341,7 +341,7 @@ Hence we say:
 \begin{definition}
   A smallest fixed point of a signature container \( F : \Cont_{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
 \end{definition}
-Spelled out, a smallest \( F \)-fixed point it consists of a \emph{carrier} \( M : \Cont_I \)
+Spelled out, a smallest \( F \)-fixed point consists of a \emph{carrier} \( M : \Cont_I \)
 and a structure map \( m : \Cart{\Subst{F}{M}}{M} \)
 such that for any other algebra \( (G, g) \), the type of morphisms \( \Alg{\Subst{F}{\Blank}}((M, m), (G, g)) \) is contractible.
 The latter means exactly that there is a unique map \( r : \Cart{M}{G} \) that commutes with the structure maps \( m \) and \( g \).
@@ -442,7 +442,7 @@ which yields a morphism into \emph{any} other algebra:
     \Rec_{\Sh} &: \W(S, P) \to T \\
     \Rec_{\Sh} &\DefEq \lambda(\Sup(s, f)).\, \alpha_{\Sh} (s, \Rec_{\Sh} \circ f)
   \end{align*}
-  On positions, we define map
+  On positions, we define a map
   \( {u : Q_i(\Rec_{\Sh}(w)) \to \bar{\W}_{S,P,\vec{P}}(w)} \) by induction on \( w : \W(S, P) \).
   For \( w \JudgeEq \Sup(s, f) \), it is the composite
   \[
@@ -731,7 +731,7 @@ This tells us that \( \MuRule_F \) embeds \( \mu F' \) as a subcontainer inside 
   \begin{proof}
     By the indexed analogue of \autoref{is-embedding-chain-rule},
     the shape map of the chain rule is an embedding.
-    This lifts to \( \alpha \), and from there to \( \MuRule_F \JudgeEq \Rec_F(\alpha) \) by \autoref{is-equiv-from-mu-rec}.
+    This lifts to \( \alpha \), and from there to \( \MuRule_F \JudgeEq \Rec_F(\alpha) \) by \autoref{is-embedding-mu-rec}.
   \end{proof}
 \end{lemma}
 
@@ -752,7 +752,7 @@ From this, we can conclude that a strong chain rule alone is enough to prove a s
   \end{proof}
 \end{proposition}
 
-Thus, whether the \( \mu \)-rule is strong depends only on the chain-rule:
+Thus, whether the \( \mu \)-rule is strong depends only on the chain rule:
 \begin{theorem}\label{strong-mu-rule-iff-strong-chain-rule}
   For any container \( F : \Cont_{I + 1} \), the following are equivalent:
   \begin{enumerate}
@@ -784,6 +784,6 @@ Hence, we obtain a strong \( \mu \)-rule for discrete containers:
   If \( F : \Cont_{I + 1} \) is discrete, then \( \MuRule_F \) is an equivalence.
   \begin{proof}
     By \autoref{strong-mu-rule-iff-strong-chain-rule}, it suffices to show that \( \Chain_{F,\mu F} \) is an equivalence.
-    But \( \mu F \) is discrete (\autoref{mu-discrete}), and the chain-rule between discrete containers is strong (\autoref{discrete-strong-binary-chain-rule}).
+    But \( \mu F \) is discrete (\autoref{mu-discrete}), and the chain rule between discrete containers is strong (\autoref{discrete-strong-binary-chain-rule}).
   \end{proof}
 \end{proposition}

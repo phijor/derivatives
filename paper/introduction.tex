@@ -9,7 +9,7 @@ including sums \( F \CPlus G \), products \( F \CTimes G \) and substitution \( 
 Another important operation on containers is that of a derivative.
 It traces back to \citeauthor{Huet1997Zipper}'s \citetitle{Huet1997Zipper}~\cite{Huet1997Zipper},
 a procedure for computing a type of contexts around a subtree in a tree-shaped data type.
-In~\cite{McBride2001DerivativeRegularType}, \citeauthor{McBride2001DerivativeRegularType}
+\Citeauthor{McBride2001DerivativeRegularType}~\cite{McBride2001DerivativeRegularType}
 notices that for the class of \enquote{regular types}, one-hole contexts behave like derivatives of functions in calculus:
 they satisfy similar rules for constants, sums and products, and their substitution follows a chain rule.
 \Citeauthor{AbbottEtAl2003DerivativesContainers} extend this to a derivative operation on containers,
@@ -42,11 +42,11 @@ By Hedberg's Theorem, positions of discrete containers must be sets, meaning tha
 
 In this paper, we show how to define derivatives of untruncated containers in spite of this apparent obstacle.
 We tackle the problem in two steps.
-At first, an exercise in reverse mathematics:
-In our definition of a derivative, what are the minimal assumptions on decidability that we can make which do not force positions to be sets?
-Having found a potential generalized derivative, we ask whether it behaves correctly:
+First, we distill a definition of a derivative which depends on decidable equality in a minimal way
+and does not force positions to be sets.
+Then, we ask whether it behaves correctly:
 Does it satisfy a universal property like discrete containers do?
-Do laws of derivatives hold? Is there a chain rule?
+Do the expected laws of derivatives hold? Is there a chain rule?
 
 To this end, in \autoref{isolated-points} we recall the notion of \emph{isolatedness} of a point in a type.
 This is a local notion of discreteness, considered in type theory, for example, by \citeauthor{KrausEtAl2013GeneralizationsHedberg’sTheorem}~\cite{KrausEtAl2013GeneralizationsHedberg’sTheorem}.
