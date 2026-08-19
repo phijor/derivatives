@@ -48,12 +48,13 @@ A shape \( s : S \) of a container \( F \JudgeEq (\MkCont{S}{P}) \) is intuitive
 as the name of a constructor of the inductive type encoded by \( F \),
 and each position \( p : P(s) \) indexes an argument to this constructor.
 To model (polymorphic) functions between inductive types,
-one should describe how constructors of the input map to constructors in the output,
-and associate to each position in the output --- encoding the argument to a constructor --- its occurrence in the input.
+one should describe how constructors of the input map to constructors in the output.
+Furthermore, to each position in the output, one must point to its occurrence in the input.
 Hence, a morphism \( (\MkCont{S}{P}) \to (\MkCont{T}{Q}) \) consists of a map of shapes \( f : S \to T \),
 and a family of maps of positions \( u : \prod_{s : S} Q_{fs} \to P_s \).
+By mapping positions from output to input it becomes possible to describe functions in which data is dropped or duplicated.
 For our purposes, we have to go one step further and describe a kind of \enquote{linear} function;
-one in which positions are mapped 1-to-1 between input and output:
+one in which the mapping of positions is 1-to-1 between input and output:
 \begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
   The type of \emph{cartesian morphisms} between \( F \) and \( G \) is
@@ -167,15 +168,15 @@ We can not only take the derivative of a container, but also act functorially on
 \begin{problem}
   Define a wild endofunctor \( \Der : \ContCart \to \ContCart \).
   That is,
-  for all \( f : \Cart{F}{G} \), a morphisms \( \Der{f} : \Cart{\Der{F}}{\Der{G}} \),
+  for all \( f : \Cart{F}{G} \), a morphism \( \Der{f} : \Cart{\Der{F}}{\Der{G}} \),
   such that \( \Der(\id_F) = \id_{\Der{F}} \) and \(\Der(fg) = (\Der{f})(\Der{g}) \).
   \begin{construction}
     For any \( (f, u) : \Cart{(\MkCont{S}{P})}{(\MkCont{T}{Q})} \),
     there is a canonical morphism \( \Der{(f, u)} \DefEq (f' , u') : \Cart{\Der{(\MkCont{S}{P})}}{\Der{(\MkCont{T}{Q})}} \)
     obtained as follows:
     On shapes, the map \( f' : \sum_{s : S} \Isolated{P_s} \to \sum_{t : T} \Isolated{Q_t} \)
-    applies \( f \) to the first component and \( \Isolated{(u_s^\Inv)} : \Isolated{P_s} \simeq \Isolated{Q_{fs}} \) to the second.
-    On positions, \( u'_{s,p} : G_{fs} \setminus u_s^\Inv(p) \simeq F_s \setminus p \) is obtained from \( u_s \), which respects the removed point \( p \).
+    applies \( f \) to the first component and \( \Isolated{(u_s^\Inv)} : \Isolated{P_s} \simeq \Isolated{Q_{f(s)}} \) to the second.
+    On positions, \( u'_{s,p} : Q_{f(s)} \setminus u_s^\Inv(p) \simeq P_s \setminus p \) is obtained from \( u_s \), which respects the removed point \( p \).
     (cf.\@ \autoref{is-isolated-respect-equiv}).
   \end{construction}
 \end{problem}
@@ -185,7 +186,7 @@ as long as shapes are at least sets, and positions are at least propositions:
 \begin{proposition}
   For \( n \geq 0 \) and \( k \geq -1 \), the derivative of an \( (n, k) \)-truncated container is \( (n, k) \)-truncated.
   \begin{proof}
-    Let \( (\MkCont{S}{P}) \) an \( (n, k) \)-truncated container.
+    Let \( (\MkCont{S}{P}) \) be an \( (n, k) \)-truncated container.
     By \autoref{is-set-isolated} \( \Isolated{P_s} \) is a 0-truncated type and \( S \) is \( n \)-truncated,
     thus \( \Der{(\MkCont{S}{P})}_{\Sh} \JudgeEq \sum_{s : S} \Isolated{P_s} \) is \( n \)-truncated.
     Positions are \( k \)-types since \( P_s \setminus p \) embeds into \( P_s \).
@@ -442,8 +443,8 @@ as shown by Labelle in~\cite{Labelle1986combinatorialdifferentialequations}.
 Modulo size issues, the proof of \autoref{bag-fixed-point} goes through for any subuniverse
 of types closed under addition and removal of single points:
 \begin{proposition}
-  Let \( P : \Type \to \Prop \) a predicate
-  for which for all \( A : \Type \), \( P(A) \) implies both \( P(A + 1) \)
+  Let \( P : \Type \to \Prop \) be a predicate
+  such that for all \( A : \Type \), \( P(A) \) implies both \( P(A + 1) \)
   and \( \prod_{a : A} P(A \setminus a) \).
   This defines a container
   \( \Bag_P \DefEq (\MkCont{\sum_{\Type} P}{\Fst}) \)

@@ -36,13 +36,14 @@ an \emph{untruncated} container \( (\MkCont{S}{P}) \) consists of a \emph{type} 
 Untruncated containers subsume many notions of containers that express symmetries of constructors by encoding them in the (higher) path types of shapes.
 Much of the theory of set-truncated containers transfers directly, since it never assumed that types were sets in the first place.
 Does the same apply to derivatives of containers?
-At a glance this seems unlikely because, unlike other constructions on containers, traditional derivatives are special:
-They are only well-behaved for \emph{discrete} containers, i.e. those whose positions are discrete.
-By Hedberg's Theorem, positions of discrete containers must be sets, meaning that a generalization to a type of untruncated positions seems impossible.
+At a glance this seems unlikely because, unlike other constructions on containers,
+traditional derivatives are only well-behaved for containers whose positions have decidable equality.
+By Hedberg's Theorem, positions of such \emph{discrete} containers must be sets.
+As such it is not immediately clear what a derivative of containers that are genuinely not set-truncated might look like.
 
-In this paper, we show how to define derivatives of untruncated containers in spite of this apparent obstacle.
+In this paper, we show how to define a derivative of untruncated containers in spite of this apparent obstacle.
 We tackle the problem in two steps.
-First, we distill a definition of a derivative which depends on decidable equality in a minimal way
+First, we distill a definition of derivative which depends on decidable equality in a minimal way
 and does not force positions to be sets.
 Then, we ask whether it behaves correctly:
 Does it satisfy a universal property like discrete containers do?

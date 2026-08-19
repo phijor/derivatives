@@ -359,7 +359,7 @@ the type \( \W(A, B) \) has the single constructor
   }
 \end{equation*}
 Each \( w : \W(A, B) \) is a well-founded tree with \( A \)-labeled nodes, and \( B(a) \)-branching subtrees.
-A path to some node inside \( w \), labelled by \( C : A \to \Type \),
+A finite path to some node inside \( w \), labelled by a family \( C : A \to \Type \),
 can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \) with two constructors, namely
 \begin{center}
   \hspace*{\fill}
@@ -390,7 +390,7 @@ the constructors define equivalences
 \end{align*}
 for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
 
-We use \( \W \) and \( \bar{\W} \) to define the shapes and position, respectively, of the smallest fixed-point container:
+We use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively, of the smallest fixed-point container:
 \begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \Cont_{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \Cont_I \):
   \begin{align*}
