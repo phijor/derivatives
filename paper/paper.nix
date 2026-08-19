@@ -60,7 +60,7 @@
         installPhase = ''
           runHook preInstall
           mkdir -p $out
-          cp _target/main.pdf $out/
+          cp main.pdf $out/
           runHook postInstall
         '';
       };

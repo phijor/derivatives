@@ -1,5 +1,6 @@
 # vim: ft=perl:
 
 $pdf_mode = 1;
-$out_dir = '_target';
+$aux_dir = '_target';
+$out_dir = '.';
 @default_files = ('main.tex');
