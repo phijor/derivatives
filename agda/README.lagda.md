@@ -783,14 +783,24 @@ _ : (F : Containerᴵ 𝟚)
 _ = isContainerEquiv-μ-rule≃isContainerEquiv-binary-chain-rule
 ```
 
-**Lemma 5.25**:
-The family `Wᴰ` preserves discreteness:
+**Lemma 5.24**:
+Given a tree `x : W S P`, the type `Wᴰ x` of finite paths into `x` is discrete
+if both branching `P : S → Type` and labeling of nodes `Q : S → Type` is discrete.
 ```agda
 _ : (S : Type) (P Q : S → Type)
   → (∀ s → Discrete (P s))
   → (∀ s → Discrete (Q s))
   → (w : W S P) → Discrete (Wᴰ S P Q w)
 _ = discrete-Wᴰ
+```
+
+**Lemma 5.25**:
+If `F` is a discrete container, then so is `μ F`:
+```agda
+_ : (F : Containerᴵ 𝟚)
+  → (∀ ix s → Discrete (F .Pos ix s))
+  → (∀ w → Discrete (μ F .Pos • w))
+_ = μ-discrete
 ```
 
 **Proposition 5.26**:
