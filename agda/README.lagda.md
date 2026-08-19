@@ -653,8 +653,15 @@ open import Derivative.Indexed.Mu
 ```
 
 **Problem 5.9**:
-Substitution `F[_]` is an endofunctor.
+Substitution `F[_]` is a (wild) endofunctor.
 ```agda
+_ : (F : Containerᴵ (Maybe Ix)) {G G′ : Containerᴵ Ix}
+  → G ⊸ G′
+  → (F [ G ]ᴵ) ⊸ (F [ G′ ]ᴵ)
+_ = [_]-map
+
+_ = Containerᴵ.[-]-map-id
+_ = Containerᴵ.[-]-map-⋆
 ```
 
 **Problem 5.10**:

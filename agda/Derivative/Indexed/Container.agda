@@ -342,6 +342,13 @@ private
       F .Pos (just i) s ⊎ (Σ[ p ∈ F .Pos nothing s ] G .Pos i (f p))
   pos i (s , f) = ⊎-right-≃ $ Σ-cong-equiv-snd' λ p → φ.pos i (f p)
 
+[-]-map-id : (F : Container ℓ (Maybe Ix)) (G : Container ℓ Ix)
+  → [-]-map F (id G) ≡ id (F [ G ])
+[-]-map-id F G = ⊸≡-ext refl λ where
+  ix (s , f) → funExt λ where
+    (inl p₀) → refl
+    (inr (p , q)) → refl
+
 [-]-map-⋆ : (F : Container ℓ (Maybe Ix)) {G G′ G″ : Container ℓ Ix}
   → (g₀ : G ⊸ G′)
   → (g₁ : G′ ⊸ G″)
