@@ -126,6 +126,7 @@ Function application is written \( f(a, b) \).
 We move arguments into subscripts, \( f_a(b) \), or even drop them, \( f(b) \), if they can be inferred from context without ambiguity.
 The unit type is inhabited by \( \bullet : 1 \),
 the coproduct has constructors \( \Inl : A \to A + B \) and \( \Inr : B \to A + B \).
+In the special case of \( A + 1 \), we call the constructors \( \Just \DefEq \Inl : A \to A + 1 \) and \( \Nothing \DefEq \Inr(\bullet) : A + 1 \).
 Projections out of \( \times \) and \( \Sigma \) are denoted by \( \Op{fst} \) and \( \Op{snd} \).
 We write \( \Sigma(f, g) : \Sigma_A B \to \Sigma_{A'} B' \) for the map that applies
 \( f : A \to A' \) and \( g : \prod_{a : A} B(a) \to B'(f(a)) \) to the components of a \( \Sigma \)-type.

@@ -134,13 +134,13 @@ We see that isolated points distribute over sums:
   \end{construction}
 \end{problem}
 
-From this we immediately see that \( \Nothing \DefEq \Inr{(\bullet)} : A + 1 \) is an isolated point, since \( \bullet : 1 \)
-is trivially isolated:
+The point \( \bullet : 1 \) is trivially isolated, hence \( \Isolated{1} \simeq 1 \).
+Consequently, \( A + 1 \) always has an isolated point, independently of the choice of \( A \):
 \begin{corollary}\label{is-isolated-nothing}
   The point \( \Nothing : A + 1 \) is isolated for any type \( A \),
   and there is an equivalence \( \Isolated{(A + 1)} \simeq \Isolated{A} + 1 \).
 \end{corollary}
-This yields the decision procedure for \( \prod_{x : A + 1} \Op{Dec}(x = \Nothing) \) that we alluded to earlier.
+This implements the decision procedure \( \prod_{x : A + 1} \Op{Dec}(x = \Nothing) \) that we alluded to earlier.
 
 While it may seem obvious that the isolated points of a disjoint sum are a sum of isolated points,
 describing the isolated points of \( \Sigma \)-types is a more subtle affair.
