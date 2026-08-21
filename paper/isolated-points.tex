@@ -386,8 +386,8 @@ on the paths of the indexing type \( A \):
     \]
     and show \( h^\prime_b : (a_0 , b_0) \neq (a_0 , b) \) as follows:
     Assume that there is some path \( p_b : (a_0 , b_0) = (a_0 , b) \).
-    From this we obtain (dependent) paths \( p'_b : a_0 = a_0 \) and \( p''_b : b_0 =_{p'_b} b \).
-    Since \( a_0 = a_0 \) is a proposition, we know that \( p'_b = \Op{refl} \),
+    From this we obtain (dependent) paths \( r : a_0 = a_0 \) and \( s : b_0 =_r b \).
+    Since \( a_0 = a_0 \) is a proposition, we know that \( r = \Op{refl} \),
     hence \( b_0 = b \).
     This is contradictory since we are given \( h_b : b_0 \neq b \).
   \end{construction}
@@ -412,9 +412,8 @@ This map is an equivalence whenever we can decide if we are removing from a chos
     as follows:
     Introduce \( a : A \), \( b : B(a) \) and \( h : (a_0 , b_0) \neq (a , b) \),
     then decide whether \( a_0 = a \) or not.
-    If \( p : a_0 = a \), we map to \( \Inr{(p_*(b), h^\prime)} \),
-    where \( h^\prime : b_0 \neq p_*(b) \),
-    which we conclude from \( h \) and \( p \).
+    If \( p : a_0 = a \), let \( b^\prime \DefEq p^{\Inv}_*(b) : B(a_0) \) and map to \( \Inr{(b^\prime, h^\prime)} \),
+    where we conclude \( h^\prime : b_0 \neq b^\prime \) from \( h \) and \( p \).
     In case that \( h : a_0 \neq a \) we map to \( \Inl{((a, h), b)} \) directly.
     It is straightforward to verify that these maps are inverses of each other.
   \end{proof}
