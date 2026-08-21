@@ -81,10 +81,11 @@ Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
 
   To construct the equivalence on positions,
   let \( s : S \), \( p_0 : \Isolated{P_s} \), \( f : P_s \setminus p_0 \to T \), \( t : T \) and \( q_0 : \Isolated{Q_t} \).
+  Extend \( f \) to a map \( \bar{f} \DefEq \Graft_{p_0}(f, t) : P_s \to T \).
   Our goal becomes to construct an equivalence
   \[
       \big(
-        \sum_{p : P_s} Q_{\GraftSyntaxX{f}{t}{p_0}(p)}
+        \sum_{p : P_s} Q_{\bar{f}(p)}
       \big) \setminus (p_0 , q_0)
     \simeq
       \big(
@@ -94,7 +95,7 @@ Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
       (Q_t \setminus q_0),
   \]
   which we obtain from \autoref{is-equiv-sigma-remove},
-  and by applying the computation rules of grafting to \( \GraftSyntaxX{f}{t}{p_0} : P_s \to T \).
+  and by applying the computation rules of grafting to \( \bar{f} : P_s \to T \).
 \end{construction}
 
 Note that the above proof essentially factors \( \Chain_{F,G} \) into
