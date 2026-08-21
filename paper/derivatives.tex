@@ -1,69 +1,44 @@
 \section{Derivatives of Containers}\label{derivatives}
 
-Let us recall the notion of a container in type theory:
+Containers were introduced to give categorical semantics to datatypes,
+in particular the inductively defined class of \emph{strictly-positive types}~\cite{Abbott2003CategoriesContainers}.
 \begin{definition}
   A \emph{container} \( (\MkCont{S}{P}) \) consists of \emph{shapes} \( S : \Type \) and
   a family \( P : S \to \Type \) of \emph{positions}.
   We access shapes and positions via postfix projections
   \( (\MkCont{S}{P})_{\Sh} \DefEq S \) and \( (\MkCont{S}{P})_{\Ps} \DefEq P \).
 \end{definition}
+A container \( (\MkCont{S}{P}) \) can be thought of a normal form for the datatype it represents;
+each shape \( s : S \) is the name of a data constructor
+and each \( p : P(s) \) indexes an argument to this constructor.
+If \( P(s) \) is finite, then one may think of its cardinality as the \enquote{arity} of the constructor.
 
-Containers were introduced to model inductive data types,
-hence they are closed under products \( \times \), sums \( + \) and substitution \( \Subst{\Blank}{\Blank} \);
-see \autoref{container-operations} for their definitions.
-The constant container at a type \( S \) is \( \CConst{S} \DefEq (\MkCont{S}{0}) \);
-products and sums form a monoidal structure with units \( \CConst{1} \) and \( \CConst{0} \).
-The identity container \( \Id \DefEq (\MkCont{1}{1}) \)
-is a unit for substitution, which is a non-symmetric monoidal product.
-
-\begin{figure}
-  \begin{align*}
-    % Products
-    (F \CTimes G)_{\Sh} &\DefEq S \times T
-      &
-    (F \CTimes G)_{\Ps} &\DefEq \lambda (s, t).\, P_s + Q_t
-      \\
-    % Sums
-    (F \CPlus G)_{\Sh} &\DefEq S + T
-      &
-    (F \CPlus G)_{\Ps} &\DefEq
-      \lambda
-      \begin{cases}
-        \Inl(s).\, P_s \\
-        \Inr(t).\, Q_t
-      \end{cases}
-      \\
-    % Substitution
-    (\Subst{F}{G})_{\Sh} &\DefEq \sum_{s : S} (P_s \to T)
-      &
-    (\Subst{F}{G})_{\Ps} &\DefEq \lambda (s, f).\, \sum_{p : P_s} Q_{fp}
-  \end{align*}
-  \caption{%
-    Operations on containers \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
-  }%
-  \label{container-operations}
-\end{figure}
-
-A shape \( s : S \) of a container \( F \JudgeEq (\MkCont{S}{P}) \) is intuitively understood
-as the name of a constructor of the inductive type encoded by \( F \),
-and each position \( p : P(s) \) indexes an argument to this constructor.
 To model (polymorphic) functions between inductive types,
 one should describe how constructors of the input map to constructors in the output.
 Furthermore, to each position in the output, one must point to its occurrence in the input.
-Hence, a morphism \( (\MkCont{S}{P}) \to (\MkCont{T}{Q}) \) consists of a map of shapes \( f : S \to T \),
-and a family of maps of positions \( u : \prod_{s : S} Q_{fs} \to P_s \).
+\begin{definition}\label{container-morphism}
+  Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
+  The type of \emph{container morphisms} between \( F \) and \( G \) is
+  \[
+    (F \to G) \DefEq \sum_{f : S \to T} \prod_{s : S} Q_{fs} \to P_s
+  \]
+  We denote the shape- and position components of a morphism \( {f : F \to G} \)
+  by \( {f_{\Sh} : F_{\Sh} \to G_{\Sh}} \) and \( f_{\Ps} : \prod_{s : F_{\Sh}} G_{\Ps}(f_{\Sh}(s)) \to F_{\Ps}(s) \), respectively.
+\end{definition}
+
 By mapping positions from output to input it becomes possible to describe functions in which data is dropped or duplicated.
 For our purposes, we have to go one step further and describe a kind of \enquote{linear} function;
 one in which the mapping of positions is 1-to-1 between input and output:
 \begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
-  The type of \emph{cartesian morphisms} between \( F \) and \( G \) is
-  \[
-    \Cart{F}{G} \DefEq \sum_{f : S \to T} \prod_{s : S} Q_{fs} \simeq P_s
-  \]
-  We denote the shape- and position components of a morphism \( {f : \Cart{F}{G}} \)
-  by \( {f_{\Sh} : F_{\Sh} \to G_{\Sh}} \) and \( f_{\Ps} : \prod_{s : F_{\Sh}} G_{\Ps}(f_{\Sh}(s)) \simeq F_{\Ps}(s) \), respectively.
+  A container morphism \(f : F \to G \) is \emph{cartesian}
+  if \( f_{\Ps}(s) : Q(f_{\Sh}(s)) \to P(s) \)
+  is an equivalence of types for each \( s : S \).
+  We denote the subtype of cartesian morphisms by \( \Cart{F}{G} \).
 \end{definition}
+Cartesian morphisms capture the intuition of a \enquote{linear} map of datatypes:
+the extension of \(f : \Cart{F}{G} \) as a natural transformation \( \Ext{f} : \Ext{F} \Rightarrow \Ext{G} \) can only permute data,
+not drop or duplicate it.
 
 In the remainder of this paper we will only consider cartesian morphisms.
 We are going to drop \enquote{cartesian} in writing, but retain the notation \( \Cart{F}{G} \).
@@ -99,6 +74,63 @@ Traditional set-based containers are \( (0,0) \)-truncated.
 In particular, \( \ContCart_{0,0} \) forms a univalent 1-category in which a morphism being an isomorphism is a proposition equivalent to it being an equivalence of containers.
 An example of containers of higher truncation level are \citeauthor{Gylterud2011}'s \emph{symmetric containers}~\cite{Gylterud2011}:
 these have groupoids for shapes, and sets for positions, hence are exactly the \( (1,0) \)-truncated containers.
+
+Any container defines a \enquote{polynomial} in types,
+that is a family \( \Type \to \Type \), called its \emph{extension}, \emph{extent} or \emph{interpretation}:
+\begin{definition}\label{wild-extension}
+  The \emph{extension} of a container \( F \JudgeEq (\MkCont{S}{P}) \) is \( \Ext{F} : \Type \to \Type \)
+  given by \( \Ext{F}(X) \DefEq \sum_{s : S} (P_s \to X) \).
+\end{definition}
+The extension of set-truncated containers defines an endofunctor of \( h \)-sets.
+Set-truncated containers and container morphisms form a 1-category,
+and \citeauthor{AbbottEtAl2005ContainersConstructingstrictly} prove that
+\( \Ext{\Blank} \) is a fully-faithful functor into the category of endofunctors.
+In essence, morphisms of set-truncated containers represent exactly polymorphic functions,
+that is natural transformations of polynomial endofunctors of sets~\cite[{Theorem~3.4}]{AbbottEtAl2005ContainersConstructingstrictly}.
+Polynomial functors are closed under products, sums, composition and more.
+These correspond to operations on containers:
+\begin{definition}\label{container-operations}
+  Given \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \), define the following:
+  \begin{itemize}
+    \item Product \( F \CTimes G \):
+      \begin{align*}
+        (F \CTimes G)_{\Sh} &\DefEq S \times T
+          &
+        (F \CTimes G)_{\Ps} &\DefEq \lambda (s, t).\, P_s + Q_t
+      \end{align*}
+    \item Sum \( F \CPlus G \):
+      \begin{align*}
+        (F \CPlus G)_{\Sh} &\DefEq S + T
+          &
+        (F \CPlus G)_{\Ps} &\DefEq
+          \lambda
+          \begin{cases}
+            \Inl(s).\, P_s \\
+            \Inr(t).\, Q_t
+          \end{cases}
+      \end{align*}
+    \item Substitution \( \Subst{F}{G} \):
+      \begin{align*}
+        (\Subst{F}{G})_{\Sh} &\DefEq \sum_{s : S} (P_s \to T)
+          &
+        (\Subst{F}{G})_{\Ps} &\DefEq \lambda (s, f).\, \sum_{p : P_s} Q_{fp}
+      \end{align*}
+  \end{itemize}
+  Furthermore, for any \( A : \Type \), we define
+  the \emph{constant-} \( \CConst(A) \DefEq (\MkCont{A}{0}) \)
+  and \emph{tuple} containers \( \CYo(A) \DefEq (\MkCont{1}{A}) \).
+  The \emph{identity container} is \( \Id \DefEq (\MkCont{1}{1}) \).
+\end{definition}
+For set-truncated containers,
+products and sums form a symmetric monoidal structure with units \( \CConst(1) \) and \( \CConst(0) \).
+The identity container \( \Id \DefEq (\MkCont{1}{1}) \)
+is a unit for substitution, which is a non-symmetric monoidal product.
+The extension functor \( \Ext{\Blank} \) is monoidal with respect to products, sums and substitution.
+We have \( \Ext{\CConst(A)}(X) \simeq A \) and \( \Ext{\CYo(A)}(X) \simeq (A \to X) \).%
+\footnote{
+  On \( h \)-sets, the composite \( \Ext{\Blank} \circ \CYo \) is essentially the Yoneda-embedding, whence the name \( \CYo \).
+}
+Furthermore, \( \Ext{\Id}(X) \simeq X \).
 
 When constructing a morphism \( f : \Cart{F}{G} \), we will oftentimes factor it
 through (equivalent) auxiliary containers
