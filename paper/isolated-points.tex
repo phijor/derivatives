@@ -33,7 +33,7 @@ Consider for example the sum \( A + 1 \) for an arbitrary type \( A \).
 Even if equality in this type is not decidable without further assumptions on \( A \),
 it should at least be possible to decide \( x = \Inr(\bullet) \), no matter which \( x : A + 1 \) we are given.
 After all, the constructors \( \Inl \) and \( \Inr \) are injective,
-so case-analysis should yield a decision procedure, even without looking at points of \( A \).
+so case analysis should yield a decision procedure, even without looking at points of \( A \).
 We call such points \emph{isolated}:
 \begin{definition}
   A point \( a : A \) is \emph{isolated} if \( a = b \) is decidable for all \( b : A \).
@@ -177,7 +177,7 @@ hence \( \SigmaIsolate \) must be an embedding:
   For all \( A : \Type \), \( B : A \to \Type \), and \( y \JudgeEq ((a, b), \Blank) : \Isolated{(\Sigma_{A} B)} \),
   there is an equivalence \( \Op{fiber}_{\SigmaIsolate}(y) \simeq \IsIsolated(a) \times \IsIsolated(b) \).
   \begin{proof}
-    By extensionality of paths in \( \Sigma \)-types, we re-phrase the type of fibers over \( y \) in terms of singletons
+    By extensionality of paths in \( \Sigma \)-types, we rephrase the type of fibers over \( y \) in terms of singletons
     over \( a \) and \( b \), namely
     \[
         \textstyle
@@ -236,7 +236,7 @@ to arbitrary sums:
   Let \( A : \Type \), \( B : A \to \Type \), and \( a : \Isolated{A} \).
   Then any \( b : B(a) \) is isolated if and only if \( (a, b) : \Sigma_{A} B \) is isolated.
   \begin{proof}
-    Only the backward direction is non-trivial,
+    Only the backward direction is nontrivial,
     and follows from \autoref{embedding-reflect-isolated}:
     since \( a \) is isolated,
     \( \lambda b.\, (a, b) \) is an embedding
@@ -288,7 +288,7 @@ is the same as removing it from either side, and then taking the sum:
   \end{align*}
   for all points \( a_0 : A \) and \( b_0 : B \), respectively.
   \begin{construction}
-    Define the obvious maps in either direction by case-analysis.
+    Define the obvious maps in either direction by case analysis.
     These preserve inequalities since \( \Inl \) and \( \Inr \) are embeddings,
     and are inverses of each other as inequalities are always propositions.
   \end{construction}
@@ -401,7 +401,7 @@ This map is an equivalence whenever we can decide if we are removing from a chos
   is an equivalence.
   \begin{proof}
     First note that \( a_0 = a_0 \) is a proposition by \autoref{is-prop-isolated-path},
-    thus the map is well-defined.
+    thus \( \SigmaRemove \) is a well-defined map.
     We construct an inverse
     \[
       \SigmaRemove^{\Inv}

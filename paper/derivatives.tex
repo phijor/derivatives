@@ -69,7 +69,7 @@ In the remainder of this paper we will only consider cartesian morphisms.
 We are going to drop \enquote{cartesian} in writing, but retain the notation \( \Cart{F}{G} \).
 Morphisms of containers compose as expected, and together with an identity morphism \( \id_F : \Cart{F}{F} \)
 they form a wild category \( \ContCart \):
-composition is associative and unital, but we make no assumption on the truncation level of the hom-types \( \Cart{F}{G} \).
+composition is associative and unital, but we make no assumption on the truncation level of the type of morphisms \( \Cart{F}{G} \).
 Note that this wild category is \emph{not} univalent in the na{\"i}ve sense:
 The canonical map taking paths of containers \( F = G \) to categorical isomorphisms,\footnote{%
   that is, pairs \( f : \Cart{F}{G}, g : \Cart{G}{F} \) with chosen paths \( fg = \id_F \) and \( gf = \id_G \)
@@ -136,7 +136,7 @@ The derivative of a container \( G \) represents a type of
 For traditional containers, this can be implemented as an operation \( G \mapsto \Der{G} \) by removing a chosen position over each shape:
 Given \( G \JudgeEq (\MkCont{T}{Q}) \), \citeauthor{AbbottEtAl2005DataDifferentiating} define \( \Der{G} \)
 to have as shapes pairs \( (t , q) : \sum_{T} Q \), over which the positions are \( Q_t \setminus q \).
-To ensure that \( \Der \) is well-behaved, it is characterized by a universal property:
+To ensure that \( \Der \) is well behaved, it is characterized by a universal property:
 on the subcategory of discrete containers, \( \Der \) extends to an endofunctor,
 and induces an adjunction \( \Maybe{\Blank} \dashv \Der \).
 This describes \( \Der{G} \) as \enquote{\( G \) with a hole} by a mapping-in property:
@@ -300,7 +300,7 @@ and discuss how this relates to the original construction of \citeauthor{AbbottE
   \end{construction}
 \end{problem}
 
-In their original construction, \citeauthor{AbbottEtAl2005DataDifferentiating} only establish isomorphisms between hom-sets
+In their original construction, \citeauthor{AbbottEtAl2005DataDifferentiating} only establish isomorphisms between the sets
 \( \Cart{\Maybe{F}}{G} \) and \( \Cart{F}{\Der{G}} \), natural in \( F \).
 This falls short of defining a proper adjunction since \( \Der{G} \) is left undefined for non-discrete containers \( G \).
 We can however complete the search for a suitable subcategory of differentiable containers \cite[14]{AbbottEtAl2005DataDifferentiating}:
@@ -309,8 +309,8 @@ and restricting the above wild adjunction to set-truncated containers yields the
 \begin{theorem}\label{derivative-adjunction-sets}
   In the 1-category of set-truncated containers \( \ContCart_{0,0} \), \( \Der \) is right-adjoint to tensoring \( \Blank \CTimes \Id \). \qed
 \end{theorem}
-From this, we can extract the familiar natural isomorphism of hom-sets in \( \ContCart_{0,0} \).
-In fact, the same argument lets us obtain a natural equivalence of hom-types for arbitrary containers,
+From this, we can extract the familiar natural isomorphism of morphism-sets in \( \ContCart_{0,0} \).
+In fact, the same argument lets us obtain a natural equivalence of morphism-types for arbitrary containers,
 which otherwise would be somewhat tedious to establish:
 there is an equivalence \( (\Cart{F}{\Der{G}}) \simeq (\Cart{\Maybe{F}}{G}) \) natural in \( F, G : \ContCart \),
 with underlying map
@@ -318,7 +318,7 @@ with underlying map
   {\Blank}^\sharp &: (\Cart{F}{\Der{G}}) \to (\Cart{\Maybe{F}}{G}) \\
   f^{\sharp} &\DefEq \varepsilon_G \circ (\Maybe{f})
 \end{align*}
-Interestingly, the proof of \cite[{Theorem 5.1}]{AbbottEtAl2005DataDifferentiating} already uses \( {\Blank}^{\sharp} \) to show naturality of the hom-set isomorphism in \( F \).
+Interestingly, the proof of \cite[{Theorem 5.1}]{AbbottEtAl2005DataDifferentiating} already uses \( {\Blank}^{\sharp} \) to show that the above family of isomorphisms is natural in \( F \).
 
 Furthermore, we can iterate the adjunction and easily obtain a notion of \( n \)-fold derivatives.
 Denote by \( \CYo(A) \DefEq (\MkCont{1}{A}) \) the container of \enquote{\( A \)-tuples}.
@@ -407,7 +407,7 @@ There are however equivalent small replacements of this type,
 such as the one given by \citeauthor{FinsterEtAl2021CartesianBicategoryPolynomial} in \cite[Theorem~25]{FinsterEtAl2021CartesianBicategoryPolynomial}.
 
 \begin{proposition}\label{bag-fixed-point}
-  The bag-container is a fixed-point of derivation:
+  The container \( \Bag \) is a fixed-point of derivation:
   there is an equivalence \( \CartIso{\Der{\Bag}}{\Bag} \).
   \begin{proof}
     First, note that finite sets are closed under addition and removal of points:

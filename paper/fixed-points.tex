@@ -262,12 +262,12 @@ This, however, is hampered by the fact that we cannot (yet) internally prove tha
 that is \( (\infty,1) \)-categories in an appropriate sense.
 If they were, one could attempt to show that \( \llbracket \Blank \rrbracket \) is a structure-preserving embedding:
 a particularly elegant way to show that \( \llbracket \Blank \rrbracket \) is fully faithful for sets
-is given by \citeauthor{Damato2023RevisitingContainersCubical} in \cite{Damato2023RevisitingContainersCubical} and relies almost exclusively on the Yoneda-lemma,
+is given by \citeauthor{Damato2023RevisitingContainersCubical} in \cite{Damato2023RevisitingContainersCubical} and relies almost exclusively on the Yoneda lemma,
 which should make the proof amenable to generalization.
 
 In light of this, we are going to define a notion of fixed point entirely internal to the wild category of containers,
 which does not reference the interpretation functor \( \Ext{\Blank} \) at all.
-Barring the above-mentioned issues, this should correspond to the more traditional definition of container fixed points in terms of \( \Ext{\Blank} \).
+Barring the issues mentioned above, this should correspond to the more traditional definition of container fixed points in terms of \( \Ext{\Blank} \).
 First, note that substitution into a fixed container behaves functorially:
 \begin{problem}
   Given \( F : \Cont_{I+1} \), extend \( \Subst{F}{\Blank} \) to a wild endofunctor on \( \ContCart_I \).
@@ -608,7 +608,7 @@ There is however hope to recover at least a morphism out of \( \mu F' \) into \(
     Lastly, let \( \MuRule_F \DefEq \Rec_{F'}(\alpha) : \Cart{ \mu F' }{ \Der{(\mu F)} } \).
   \end{construction}
 
-One advantage of defining the \( \mu \)-rule by recursion is that it highlights the dependency on the chain-rule.
+One advantage of defining the \( \mu \)-rule by recursion is that it highlights the dependency on the chain rule.
 First, observe that recursion reflects equivalence, in the following sense:
 \begin{lemma}\label{is-equiv-from-mu-rec}
   Let \( \alpha : \Cart{\Subst{F}{G}}{G} \).
