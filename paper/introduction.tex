@@ -150,6 +150,7 @@ To avoid confusion, we name the truncation level for low \( n \):
 If \( P : A \to \Type \) is a family of propositions, \( \Sigma_A P \) defines a subtype of \( A \).
 We implicitly coerce terms \( a : \Sigma_A P \) to type \( A \) and write, for example,
 \( f(a) : B \) instead of \( f(\Op{fst}(a)) \) when applying a function \( f : A \to B \).
+For all \( a : A \) the \emph{singleton} type \( \Singl(a) \DefEq \sum_{b : A} a = b \) is contractible.
 
 \paragraph{Equivalences.}
 A function \( f : A \to B \) is an equivalence if for all \( y : B \) the type of fibers \( \Fiber_f(y) \DefEq \sum_{x : A} f(x) = y \) is contractible.
