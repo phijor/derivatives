@@ -481,7 +481,13 @@ of types closed under addition and removal of single points:
   This defines a container
   \( \Bag_P \DefEq (\MkCont{\sum_{\Type} P}{\Fst}) \)
   such that \( \CartIso{\Der{\Bag_P}}{\Bag_P} \). \qedhere
+  \begin{proof}
+    The proof mirrors that of \autoref{bag-fixed-point};
+    for the details we refer the reader to the formalization.
+  \end{proof}
 \end{proposition}
-For the details of the proof we refer the reader to the formalization;
-there one can find an example of this applied to countable multisets
-defined by the predicate \( P(A) \DefEq \lVert A \hookrightarrow \mathbb{N} \rVert \).
+\( \Bag \) is an instance of the above for the predicate \( P(A) \DefEq \sum_{n : \mathbb{N}} \PropTrunc{X \simeq \Fin{n}} \).
+In the formalization, we provide another example:
+for \( P(A) \DefEq \lVert A \hookrightarrow \mathbb{N} \rVert \),
+\( \Bag_P \) is a container representing countable multisets,
+and again a \( \Der{} \)-fixpoint.
