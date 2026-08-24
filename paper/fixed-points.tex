@@ -135,14 +135,24 @@ its construction factors into smaller steps that make it obvious why, in general
         H_2
       \end{tikzcd}
     \]
-    Following the argument in \autoref{lax-chain-rule} and some type yoga,
-    we see that the type of shapes of \( \L \) is equivalent to
+    Following the argument in \autoref{lax-chain-rule}, we apply \autoref{graft-equiv} to graft a function typed \( P_1(s) \to T \) in \eqref{binary-chain-rule-shape-equiv},
+    and see that the shapes of \( \L \) are equivalent to
     \begin{align}
-      U_1 \DefEq
-        \sum_{s : S} \sum_{f : P_1(s) \to T} \Isolated{P_0(s)} + \smashoperator{\sum_{p : \Isolated{P_1(s)}}} \Isolated{Q(fp)}
-          \label{binary-chain-rule-shape-equiv}
+      \L_{\Sh}
+        &\simeq
+          \sum_{s : S} \left(\Isolated{P_0(s)} \times (P_1(s) \to T)\right) + \smashoperator[l]{\sum_{p : \Isolated{P_1(s)}}} \sum_{(f, t) : \Highlight{(P_1(s) \setminus p \to T) \times T}} {\Isolated{Q(t)}}
+          \notag
+          \\
+        &\simeq
+          \sum_{s : S} \left(\Isolated{P_0(s)} \times (P_1(s) \to T)\right) + \smashoperator[l]{\sum_{p : \Isolated{P_1(s)}}} \sum_{f : \Highlight{P_1(s) \to T}} {\Isolated{Q(f(p))}}
+          \label{binary-chain-rule-shape-equiv}%
+          \\
+        &\simeq
+          \sum_{s : S} \smashoperator[r]{\sum_{f : P_1(s) \to T}} \Big(\Isolated{P_0(s)} + \smashoperator{\sum_{p : \Isolated{P_1(s)}}} \Isolated{Q(fp)}\Big)
+          \eqcolon U_1
+          \notag
     \end{align}
-    Denote this equivalence by \( f_1 : {\L}_{\Sh} \simeq U_1 \), and define \( H_1 \DefEq (\MkCont{U_1}{{\L}_{\Ps} \circ f_1^{\Inv}}) \).
+    Denote this equivalence by \( f_1 : {\L}_{\Sh} \simeq U_1 \), and let \( H_1 \DefEq (\MkCont{U_1}{{\L}_{\Ps} \circ f_1^{\Inv}}) \).
     This defines the equivalence \( \CartIso{\L}{H_1} \) to the left.
 
     On the other side we obtain an equivalence \( f_2 : U_2 \simeq {\R}_{\Sh} \)
