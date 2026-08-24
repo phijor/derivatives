@@ -75,7 +75,7 @@ Substitution generalizes to an operation that places a container inside the posi
     \begin{align*}
       \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Sh} &\DefEq \sum_{s : S} P(s) \to T
         \\
-      \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Ps} &\DefEq \lambda (s, f).\, \vec{P}_i(s) + \smashoperator{\sum_{p : P(s)}} Q_i(fp)
+      \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Ps} &\DefEq \lambda i\, (s, f).\, \vec{P}_i(s) + \smashoperator{\sum_{p : P(s)}} Q_i(fp)
         \qedhere
     \end{align*}
 \end{definition}
