@@ -174,14 +174,14 @@ and induces an adjunction \( \Maybe{\Blank} \dashv \Der \).
 This describes \( \Der{G} \) as \enquote{\( G \) with a hole} by a mapping-in property:
 morphisms \( \Cart{F}{\Der{G}} \) are in 1-to-1 correspondence with morphisms of shape \( (f, u) : \Cart{\Maybe{F}}{G} \),
 hence the position maps are equivalences \( u_s : G_{\Ps}(fs) \simeq F_{\Ps}(s) + 1 \).
-In particular, there is a position \( u_s^{\Inv}(\Inr(\bullet)) : G_{\Ps}(fs) \) in the output
+In particular, there is a position \( u_s^{\Inv}(\Inr(\bullet)) : G_{\Ps}(f(s)) \) in the output
 which does not correspond to a position in the input, \( F_{\Ps}(s) \), indicating the hole.
 
 As we have seen in the previous section, removing points from a type is a subtle process in a univalent setting:
 a position \( q : G_{\Ps}(t) \) is not simply a discrete point, but comes with a potentially complicated type of paths around it.
 If we wanted to encode morphisms into \( \Der{G} \) by the same universal property,
 we would have to avoid the entire connected component around \( q \),
-that is, find some type of \enquote{hole} \( H(q) \) such that \( G_{\Ps}(fs) \simeq F_{\Ps}(s) + H(q) \).
+that is, find some type of \enquote{hole} \( H(q) \) such that \( G_{\Ps}(f(s)) \simeq F_{\Ps}(s) + H(q) \).
 But this type now depends on \( q \) and its higher path structure,
 and can no longer be expressed uniformly as a simple product with the fixed container \( \Id \).
 
