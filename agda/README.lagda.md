@@ -217,7 +217,7 @@ _ :  ∀ {b : B} → (A ⊎ (B ∖ b)) ≃ ((A ⊎ B) ∖ (inr b))
 _ = remove-right-equiv
 ```
 
-The other way around there is a map that takes \( (A ∖ a_0) ⊎ 1 \) and replaces \( \mathsf{nothing} \) with \( a_0 \):
+The other way around there is a map that takes \( \mathsf{Maybe}(A ∖ a_0) \) and replaces \( \mathsf{nothing} \) with \( a_0 \):
 ```agda
 _ : (a₀ : A) → Maybe (A ∖ a₀) → A
 _ = replace
@@ -237,7 +237,7 @@ module _ (A : Type) (B : A → Type) where
 -->
 
 **Problem 2.20**:
-If \( a_0 \) is *h-isolated* (i.e. \( \mathsf{isProp}(a_0 = a₀) \)), then there is a map that
+If \( a_0 \) is *h-isolated* (i.e. \( \mathsf{isProp}(a_0 = a_0) \)), then there is a map that
 looks like it characterizes removal of points from \( Σ \)-types.
 ```agda
   _ : ∀ (a₀ : A) (b₀ : B a₀)
@@ -299,6 +299,14 @@ _ = λ ℓ → Container ℓ ℓ
 _ : (S : Type) → (P : S → Type) → Container _ _
 _ = λ S P → (S ◁ P)
 ```
+
+We sometimes use the notation \( (s : S \lhd P(s)) \) when defining containers.
+```agda
+_ : (S : Type) (P : S → Type) → Container _ _
+_ = λ S P → (s ∈ S ◁ P s)
+```
+We use `∈` instead of `:`, as the latter is part of Agda's syntax.
+This mirrors the notation `Σ[ a ∈ A ] B a` for `Σ A B`.
 
 ??? note "Universe polymorphism"
     Containers are defined for shapes and positions in any universe.
@@ -371,7 +379,7 @@ The derivative of an untruncated container.
 Its shapes contain an _isolated_ position.
 ```agda
 _ : (S : Type) (P : S → Type)
-  → ∂ (S ◁ P) ≡ ((Σ[ s ∈ S ] P s °) ◁ λ (s , p) → (P s ∖° p))
+  → ∂ (S ◁ P) ≡ ((s , p) ∈ (Σ[ s ∈ S ] P s °) ◁ (P s ∖° p))
 _ = λ S P → refl
 ```
 

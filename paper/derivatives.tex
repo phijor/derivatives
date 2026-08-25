@@ -12,6 +12,8 @@ A container \( (\MkCont{S}{P}) \) can be thought of a normal form for the dataty
 each shape \( s : S \) is the name of a data constructor
 and each \( p : P(s) \) indexes an argument to this constructor.
 If \( P(s) \) is finite, then one may think of its cardinality as the \enquote{arity} of the constructor.
+We will sometimes use binders and write \( (\MkCont{s : S}{P(s)}) \) to define containers,
+just like we do for \( \Sigma \) and \( \Pi \)-types.
 
 To model (polymorphic) functions between inductive types,
 one should describe how constructors of the input map to constructors in the output.

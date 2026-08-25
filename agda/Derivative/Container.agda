@@ -24,7 +24,7 @@ private
 Container-syntax : (S : Type ℓS) → (P : S → Type ℓP) → Container ℓS ℓP
 Container-syntax = _◁_
 
-syntax Container-syntax S (λ s → P) = [ s ∈ S ]◁ P
+syntax Container-syntax S (λ s → P) = s ∈ S ◁ P
 
 open Container
 

@@ -37,11 +37,11 @@ open Cart
 ∂-prop-trunc S {P} is-prop-P =
   ∂ (S ◁ P)
     ⊸≃⟨⟩
-  [ (s , p , _) ∈ Σ[ s ∈ S ] (P s) ° ]◁ (P s ∖ p)
+  ((s , p , _) ∈ (Σ[ s ∈ S ] (P s) °) ◁ (P s ∖ p))
     ⊸≃⟨ Equiv-fst $ Σ-cong-equiv-snd (λ s → isProp→IsolatedEquiv (is-prop-P s)) ⟩
-  [ (s , p) ∈ Σ S P ]◁ (P s ∖ p)
+  ((s , p) ∈ Σ S P ◁ (P s ∖ p))
     ⊸≃⟨ Equiv-snd (λ (s , p) → uninhabEquiv (λ ()) (isProp→isEmptyRemove (is-prop-P s) p)) ⟩
-  [ (s , p) ∈ Σ S P ]◁ 𝟘*
+  ((s , p) ∈ Σ S P ◁ 𝟘*)
     ⊸≃∎
 
 ∂-prop : (P : Type ℓ) → isProp P → Equiv (∂ (𝟙* {ℓ} ◁ const P)) (P ◁ const 𝟘*)
@@ -64,13 +64,13 @@ open Cart
 𝕪[ A ] .Shape = 𝟙*
 𝕪[ A ] .Pos = const A
 
-∂-𝕪° : (A : Type ℓ) → (a° : A °) → Equiv (∂ 𝕪[ A ]) ([ a ∈ A ° ]◁ (A ∖° a))
+∂-𝕪° : (A : Type ℓ) → (a° : A °) → Equiv (∂ 𝕪[ A ]) (a ∈ A ° ◁ (A ∖° a))
 ∂-𝕪° {ℓ} A a°@(a₀ , a₀≟_) =
   ∂ (𝟙* ◁ const A)
     ⊸≃⟨⟩
-  ([ (_ , a) ∈ 𝟙* × (A °) ]◁ (A ∖° a))
+  (_ , a) ∈ 𝟙* × (A °) ◁ (A ∖° a)
     ⊸≃⟨ Equiv-fst 𝟙*-unit-×-left-equiv ⟩
-  ([ a ∈ A ° ]◁ (A ∖° a))
+  (a ∈ A ° ◁ (A ∖° a))
     ⊸≃∎
 
 ∂-𝕪 : (A : Type ℓ) → Discrete A → Equiv (∂ 𝕪[ A ⊎ 𝟙* ]) (𝕂 (A ⊎ 𝟙*) ⊗ 𝕪[ A ])
