@@ -353,14 +353,23 @@ with underlying map
 Interestingly, the proof of \cite[{Theorem 5.1}]{AbbottEtAl2005DataDifferentiating} already uses \( {\Blank}^{\sharp} \) to show that the above family of isomorphisms is natural in \( F \).
 
 Furthermore, we can iterate the adjunction and easily obtain a notion of \( n \)-fold derivatives.
-Denote by \( \CYo(A) \DefEq (\MkCont{1}{A}) \) the container of \enquote{\( A \)-tuples}.
-We see that \( \Der^n(G) \) encodes a type of \( G \)-terms with \( n \) holes:
-\begin{corollary}
+\begin{corollary}\label{nth-derivative-sets}
   For all \( n : \mathbb{N} \), there is an adjunction \( \Blank \CTimes \CYo{[n]} \dashv \Der^n \)
   in the 1-category \( \ContCart_{0,0} \).
 \end{corollary}
-We believe that this extends to the entire wild category \( \ContCart \),
-but one has to carefully check that the data of the wild adjunction in \autoref{derivative-adjunction} composes coherently.
+Intuitively, \( \Der^n(\MkCont{S}{P}) \) encodes a type with \( n \) distinct holes:
+its type of shapes is equivalent to a type of tuples \( (s, p_1, \ldots, p_n) \)
+in which \( s : S \) and \( p_{i+1} : \Isolated{P_s} \setminus p_1 \setminus \ldots \setminus p_i \).
+A valid position is then some \( p : \Isolated{P_s} \) that is not one of \( p_1, \ldots, p_n \).
+
+\begin{todo-block}
+  Write a last section for derivatives relative to some \( {R : \Type} \).
+  Show that there is some \( \Der_R \) such that \( \Blank \CTimes \CYo{R} \dashv \Der_R \).
+  Prove that, in general, there is no internal hom \( [\Blank, F] \dashv \Der_F \):
+  if there was, \( [0, 0] \) would be a (wild) terminal object, but that would allow us to prove \( \Type \)-in-\( \Type \).
+\end{todo-block}
+% We believe that \autoref{nth-derivative-sets} extends to an adjunction on the entire wild category \( \ContCart \),
+% but one has to carefully check that the data of the wild adjunction in \autoref{derivative-adjunction} composes coherently.
 
 \subsection{Basic Laws of Derivatives}
 
