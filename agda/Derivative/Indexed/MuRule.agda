@@ -112,9 +112,6 @@ open Container
 μ-discrete F discrete-P = discrete-Wᴰ S (P ₁) (P ₀) (discrete-P ₁) (discrete-P ₀) where
   open Container F renaming (Shape to S ; Pos to P)
 
-Discrete→isEquiv-μ-chain-rule : (F : Container ℓ 𝟚) → (∀ ix s → Discrete (Pos F ix s)) → isContainerEquiv (binary-chain-rule F (μ F))
-Discrete→isEquiv-μ-chain-rule F discrete-P = DiscreteContainer→isEquivBinaryChainRule F (μ F) (discrete-P ₁) (μ-discrete F discrete-P)
-
 module isContainerEmbedding-μ-rule (F : Container ℓ 𝟚) where
   open Container F renaming (Shape to S ; Pos to P)
   open μ-rule F
@@ -146,7 +143,7 @@ module isContainerEmbedding-μ-rule (F : Container ℓ 𝟚) where
 
 open isContainerEmbedding-μ-rule using () renaming (isEmbedding-μ-rule-shape to isContainerEmbedding-μ-rule) public
 
-module _ (F : Container ℓ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binary-chain-rule F (μ F))) where
+module StrongChainRule (F : Container ℓ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binary-chain-rule F (μ F))) where
   open Container F renaming (Shape to S ; Pos to P)
   open μ-rule F
   open isContainerEmbedding-μ-rule F
@@ -263,7 +260,7 @@ module _ (F : Container ℓ 𝟚) (is-equiv-chain-rule : isContainerEquiv (binar
   isEquiv-μ-rule : isContainerEquiv (μ-rule F)
   isEquiv-μ-rule .equiv-proof y = inhProp→isContr (μ-rule-fib y) (μ-rule-is-prop-fib y)
 
-module isEquiv-μ-rule (F : Container ℓ 𝟚) (is-equiv-μ-rule : isContainerEquiv (μ-rule F)) where
+module StrongFixRule (F : Container ℓ 𝟚) (is-equiv-μ-rule : isContainerEquiv (μ-rule F)) where
   open Container F renaming (Shape to S ; Pos to P)
   open μ-rule F using (α ; G ; η₀ ; η₁)
 
@@ -306,5 +303,12 @@ isContainerEquiv-μ-rule≃isContainerEquiv-binary-chain-rule F
   = propBiimpl→Equiv
     isPropIsContainerEquiv
     isPropIsContainerEquiv
-    (isEquiv-μ-rule.isEquiv-chain-rule F)
-    (isEquiv-μ-rule F)
+    (StrongFixRule.isEquiv-chain-rule F)
+    (StrongChainRule.isEquiv-μ-rule F)
+
+module Discrete (F : Container ℓ 𝟚) (discrete-F : ∀ ix s → Discrete (Pos F ix s)) where
+  isEquiv-μ-chain-rule : isContainerEquiv (binary-chain-rule F (μ F))
+  isEquiv-μ-chain-rule = DiscreteContainer→isEquivBinaryChainRule F (μ F) (discrete-F ₁) (μ-discrete F discrete-F)
+
+  isEquiv-μ-rule : isContainerEquiv (μ-rule F)
+  isEquiv-μ-rule = StrongChainRule.isEquiv-μ-rule F isEquiv-μ-chain-rule

@@ -94,7 +94,7 @@ _ = EmbeddingReflectIsolated
 ```
 
 **Proposition 2.7**:
-The constructors `inl : A → A ⊎ B` and `inr : B → A ⊎ B` preserve and reflect isolated points.
+The constructors \( \mathsf{inl} : A → A ⊎ B \) and \( \mathsf{inr} : B → A ⊎ B \) preserve and reflect isolated points.
 ```agda
 _ : ∀ {a : A} → isIsolated a ≃ isIsolated (inl {B = B} a)
 _ = isIsolated≃isIsolatedInl
@@ -110,13 +110,13 @@ _ : (A ⊎ B) ° ≃ (A °) ⊎ (B °)
 _ = IsolatedSumEquiv
 ```
 
-The type `A ⊎ 𝟙` is used so often that we abbreviate it as `Maybe A`:
+The type \( A ⊎ 𝟙 \) is used so often that we abbreviate it as \( \mathsf{Maybe}(A) \):
 ```agda
 _ : (A : Type) → Maybe A ≡ (A ⊎ 𝟙)
 _ = λ A → refl
 ```
 
-The point `nothing : Maybe A` is always isolated:
+The point \( \mathsf{nothing} : \mathsf{Maybe}(A) \) is always isolated:
 ```agda
 _ : isIsolated {A = Maybe A} nothing
 _ = isIsolatedNothing
@@ -125,8 +125,8 @@ _ : (Maybe A) °
 _ = nothing°
 ```
 
-**Problem 2.8**:
-The isolated points of `Maybe A` are those of `A` or `nothing`:
+**Corollary 2.9**:
+The isolated points of \( \mathsf{Maybe}(A) \) are the isolated points of \( A \) and \( \mathsf{nothing} \):
 ```agda
 _ : (A : Type) → (Maybe A) ° ≃ Maybe (A °)
 _ = λ A →
@@ -145,7 +145,7 @@ module _ (A : Type) (B : A → Type) where
 There is a map taking (dependent) pairs of isolated points to an
 isolated point in the corresponding type of pairs:
 ```agda
-  _ : (Σ[ a° ∈ A ° ] (B (a° .fst)) °) → (Σ[ a ∈ A ] B a) °
+  _ : (Σ[ (a , _) ∈ A ° ] (B a) °) → (Σ[ a ∈ A ] B a) °
   _ = Σ-isolate A B
 ```
 
@@ -175,14 +175,14 @@ Over discrete types, `Σ-isolate` is an equivalence.
 ```
 
 **Proposition 2.15**:
-Over a fixed *isolated* point `a : A`, pairing `λ b → (a , b)` preserves and reflects isolated points.
+Over a fixed *isolated* point \( a_0 : A \), pairing \( λ b.\, (a_0 , b) \) preserves and reflects isolated points.
 ```agda
   _ : {a₀ : A} → isIsolated a₀ → (b₀ : B a₀) → isIsolated b₀ ≃ isIsolated {A = Σ A B} (a₀ , b₀)
   _ = isIsolatedFst→isIsolatedSnd≃isIsolatedPair
 ```
 
 **Proposition 2.16**:
-Discreteness of a type can be characterized by `Σ-isolate` at the family `B(a) ≔ (a₀ ≡ a)`.
+Discreteness of a type can be characterized by `Σ-isolate` at the family \( B(a) ≔ (a_0 = a) \).
 ```agda
 _ : Discrete A ≃ ((a₀ : A) → isEquiv (Σ-isolate A (a₀ ≡_)))
 _ = Discrete≃isEquiv-Σ-isolate-singl
@@ -193,14 +193,14 @@ _ = Discrete≃isEquiv-Σ-isolate-singl
 open import Derivative.Remove
 ```
 
-The type `A ∖ a₀` is the subtype of "`A` with `a₀` removed".
+The type \( A ∖ a_0 \) is the subtype of \( A \) with \( a_0 \) removed.
 ```agda
 _ : (A : Type) → (a₀ : A) → (A ∖ a₀) ≡ (Σ[ a ∈ A ] a₀ ≢ a)
 _ = λ A a → refl
 ```
 
 **Problem 2.17**:
-Show that first adding a point to `A`, then removing it gives a type equivalent to `A`.
+Show that first adding a point to \( A \), then removing it gives a type equivalent to \( A \).
 ```agda
 _ : Maybe A ∖ nothing ≃ A
 _ = removeNothingEquiv
@@ -217,14 +217,14 @@ _ :  ∀ {b : B} → (A ⊎ (B ∖ b)) ≃ ((A ⊎ B) ∖ (inr b))
 _ = remove-right-equiv
 ```
 
-The other way around there is a map that takes `(A ∖ a₀) ⊎ 𝟙` and replaces `nothing` with `a₀`:
+The other way around there is a map that takes \( (A ∖ a_0) ⊎ 1 \) and replaces \( \mathsf{nothing} \) with \( a_0 \):
 ```agda
 _ : (a₀ : A) → Maybe (A ∖ a₀) → A
 _ = replace
 ```
 
 **Proposition 2.19**:
-The map `replace a₀` is an equivalence if and only if `a₀` is isolated.
+The map \( \mathsf{replace}(a_0) \) is an equivalence if and only if \( a_0 \) is isolated.
 ```agda
 _ : (a₀ : A) → isIsolated a₀ ≃ isEquiv (replace a₀)
 _ = isIsolated≃isEquiv-replace
@@ -237,8 +237,8 @@ module _ (A : Type) (B : A → Type) where
 -->
 
 **Problem 2.20**:
-If `a₀` is *h-isolated* (i.e. `isProp (a₀ ≡ a₀)`), then there is a map that
-looks like it characterizes removal of points from `Σ`-types.
+If \( a_0 \) is *h-isolated* (i.e. \( \mathsf{isProp}(a_0 = a₀) \)), then there is a map that
+looks like it characterizes removal of points from \( Σ \)-types.
 ```agda
   _ : ∀ (a₀ : A) (b₀ : B a₀)
     → (isProp (a₀ ≡ a₀))
@@ -256,14 +256,14 @@ If `a₀` is isolated, then it is *h-isolated*, and `Σ-remove a₀ b₀` is an 
 ### Grafting
 
 **Problem 2.22**:
-For all `a : A °`, *grafting* extends the domain a function `f : A ∖ a₀ → B` to all of `A`, given some `b₀ : B`.
+For all \( a : A^\circ \), *grafting* extends the domain of a function \( f : A \setminus a_0 \to B \) to all of \( A \), given some \( b_0 : B \).
 ```agda
-_ : (a° : A °) → (((A ∖° a°) → B) × B) → (A → B)
+_ : (a : A °) → (((A ∖° a) → B) × B) → (A → B)
 _ = graft
 ```
 
-**Problem 2.23**:
-This defines an *induction-like* principle for maps out of types `A` pointed by an isolated `a₀ : A °`.
+**Proposition 2.23**:
+This defines an *induction-like* principle for maps out of types \( A \) pointed by an isolated \( a_0 : A^\circ \).
 In particular, it has computation rules,
 ```agda
 _ : (a° : A °) (f : (A ∖° a°) → B) {b₀ : B} → graft a° (f , b₀) (a° .fst) ≡ b₀
@@ -281,7 +281,7 @@ import Derivative.Isolated.DependentGrafting
 ??? note
     We do not use this more general definition as it contains an extra `transport`,
     which, for non-dependent functions, is a transport over `refl`.
-    Since `transport refl` does not definitionially reduce to the identity function,
+    Since `transport refl` does not definitionally reduce to the identity function,
     we would have to manually get rid of it everywhere.
 
 ## Derivatives of Containers
@@ -291,7 +291,7 @@ open import Derivative.Container
 ```
 
 **Definition 3.1**:
-A container `(S ◁ P)` consists of shapes `S : Type` and over this a family of positions `P : S → Type`.
+A container \( (S ◁ P) \) consists of shapes \( S : \mathsf{Type} \) and over this a family of positions \( P : S → \mathsf{Type} \).
 ```agda
 _ : (ℓ : Level) → Type (ℓ-suc ℓ)
 _ = λ ℓ → Container ℓ ℓ
@@ -346,7 +346,7 @@ _ = ℂont
 ```
 
 **Definition 3.4**:
-An `(n, k)`-truncated container has `n`-truncated shapes, and `k`-truncated positions.
+An \( (n, k) \)-truncated container has \( n \)-truncated shapes, and \( k \)-truncated positions.
 ```agda
 _ : (n k : HLevel) → (F : Container _ _) → Type _
 _ = isTruncatedContainer {ℓS = ℓ-zero} {ℓP = ℓ-zero}
@@ -376,7 +376,7 @@ _ = λ S P → refl
 ```
 
 **Problem 3.7**:
-Extend the derivative to a wild functor on `ℂont∞`.
+Extend the derivative to a functor on the wild category of containers and cartesian morphisms, `ℂont∞`.
 ```agda
 _ : WildFunctor ℂont∞ ℂont∞
 _ = ∂∞
@@ -392,14 +392,14 @@ _ = isTruncatedDerivative
 ```
 
 **Corollary 3.9**:
-`∂` restricts to an endofunctor of the 1-category of set-truncated containers.
+\( \partial \) restricts to an endofunctor of the 1-category of set-truncated containers.
 ```agda
 _ : Functor ℂont ℂont
 _ = ∂ₛ
 ```
 
 **Problem 3.10**:
-Define a wild adjunction `_⊗ Id ⊣ ∂`.
+Define a wild adjunction \( \_ \otimes \mathsf{Id} \dashv \partial \).
 This consists of two families of morphisms `unit` and `counit`,
 ```agda
 open import Derivative.Adjunction
@@ -410,7 +410,7 @@ _ = unit _
 _ : Cart (∂ G ⊗Id) G
 _ = counit _
 ```
-natural in `F` and `G`, respectively,
+natural in \( F \) and \( G \), respectively,
 ```agda
 _ = is-natural-unit
 _ = is-natural-counit
@@ -425,7 +425,7 @@ _ = zag≡ _
 ```
 
 **Theorem 3.11**:
-In the 1-category of set-truncated containers, `_⊗ Id ⊣ ∂ₛ`.
+The above restricts to an adjunction in the 1-category of set-truncated containers.
 ```agda
 _ : -⊗Id ⊣ ∂ₛ
 _ = -⊗Id⊣∂
@@ -457,7 +457,7 @@ _ = prod-rule _ _
 ```
 
 **Proposition 3.15**:
-The `Bag` container is a fixed point of `∂`.
+The `Bag` container is a fixed point of \( \partial \).
 ```agda
 open import Derivative.Bag
 
@@ -466,7 +466,7 @@ _ = ∂-Bag-equiv
 ```
 
 **Proposition 3.16**:
-Any predicate closed under addition and removal of single points induces a fixed point of `∂`.
+Any predicate closed under addition and removal of single points induces a fixed point of \( \partial \).
 ```agda
 module _
   (P : Type → Type)
@@ -558,7 +558,7 @@ import Derivative.Indexed.Container as Containerᴵ
 ```
 
 **Definition 5.1**:
-Indexed containers have positions indexed by some `Ix : Type`.
+Indexed containers have positions indexed by some \( \mathsf{Ix} : \Type \).
 ```agda
 Containerᴵ : (Ix : Type) → Type _
 Containerᴵ = Containerᴵ.Container ℓ-zero
@@ -592,7 +592,7 @@ _[_]ᴵ = Containerᴵ._[_]
 ```
 
 **Definition 5.4**:
-The derivative of an indexed container is defined for each _isolated_ index `i : Ix °`.
+The derivative of an indexed container is defined for each _isolated_ index \( i : \mathsf{Ix}^\circ \).
 ```agda
 import Derivative.Indexed.Derivative as IndexedDerivative
 
@@ -653,7 +653,7 @@ open import Derivative.Indexed.Mu
 ```
 
 **Problem 5.9**:
-Substitution `F[_]` is a (wild) endofunctor.
+Substitution \( F[\_] \) is a (wild) endofunctor.
 ```agda
 _ : (F : Containerᴵ (Maybe Ix)) {G G′ : Containerᴵ Ix}
   → G ⊸ G′
@@ -665,19 +665,19 @@ _ = Containerᴵ.[-]-map-⋆
 ```
 
 **Problem 5.10**:
-`F[_]`-algebras form a wild category.
+\( F[\_] \)-algebras form a wild category.
 ```agda
 ```
 
 **Definition 5.12**:
-For any `I+1`-indexed container `F` there is an `I`-indexed fixed point container `μ F`.
+For any \( I+1 \)-indexed container \( F \) there is an \( I \)-indexed fixed point container \( μ F \).
 ```agda
 _ : (F : Containerᴵ (Maybe Ix)) → Containerᴵ Ix
 _ = μ
 ```
 
 **Problem 5.13**:
-Define an equivalence of containers `F [ μ F ] ⧟ μ F`.
+Define an equivalence of containers \( F [ {μ F} ] ⧟ μ F \).
 ```agda
 _ : (F : Containerᴵ (Maybe Ix)) → (F [ μ F ]ᴵ) ⧟ (μ F)
 _ = μ-in-equiv
@@ -700,7 +700,7 @@ module _
 
 **Theorem 5.15**:
 Every signature container admits a smallest fixed point in the wild category of containers.
-For any `F[_]`-algebra `(G, α)`, there is a unique algebra map `α* : μ F ⊸ G`:
+For any \( F[\_]\)-algebra \( α : F[G] ⊸ G \), there is a unique algebra map \( α^* : μ F ⊸ G \):
 ```agda
   _ : ∃![ α* ∈ μ F ⊸ G ] μ-in F ⋆ᴵ α* ≡ [ F ]-map α* ⋆ᴵ α
   _ = μ-rec-unique F G α
@@ -713,7 +713,7 @@ open import Derivative.Indexed.MuRule
 ```
 
 **Problem 5.16**:
-The lax μ-rule.
+The lax \( μ \)-rule.
 ```agda
 _ : (F : Containerᴵ 𝟚)
   → μ (↑ (∂₀ F [ μ F ]ᴵ) ⊕ᴵ (↑ (∂₁ F [ μ F ]ᴵ) ⊗ᴵ π₁)) ⊸ ∂• (μ F)
@@ -731,16 +731,16 @@ _ = isEquivFrom-μ-rec
 ```
 
 **Proposition 5.18**:
-If the μ-rule is an equivalence, then so is the corresponding chain rule.
+If the \( μ \)-rule is an equivalence, then so is the corresponding chain rule.
 ```agda
 _ : (F : Containerᴵ 𝟚)
   → isContainerEquiv (μ-rule F)
   → isContainerEquiv (binary-chain-rule F (μ F))
-_ = isEquiv-μ-rule.isEquiv-chain-rule
+_ = StrongFixRule.isEquiv-chain-rule
 ```
 
 **Lemma 5.19**:
-The μ-recursor preserves embeddings.
+The \( μ \)-recursor preserves embeddings.
 ```agda
 _ : (F : Containerᴵ (Maybe Ix)) (G : Containerᴵ Ix)
   → (φ : (F [ G ]ᴵ) ⊸ G)
@@ -750,7 +750,7 @@ _ = isEmbedding-μ-rec
 ```
 
 **Lemma 5.20**:
-The recursor for `W`-types preserves embeddings.
+The recursor for \( \mathsf{W} \)-types preserves embeddings.
 ```agda
 _ : {S : Type} {P : S → Type} {A : Type}
   → (sup* : (Σ[ s ∈ S ] (P s → A)) → A)
@@ -760,7 +760,7 @@ _ = isEmbedding-W-rec
 ```
 
 **Lemma 5.21**:
-The lax μ-rule is an embedding of containers.
+The lax \( μ \)-rule is an embedding of containers.
 ```agda
 _ : (F : Containerᴵ 𝟚) → isContainerEmbeddingᴵ (μ-rule F)
 _ = isContainerEmbedding-μ-rule
@@ -772,30 +772,38 @@ If the chain rule is an equivalence, so is the μ-rule.
 _ : (F : Containerᴵ 𝟚)
   → isContainerEquiv (binary-chain-rule F (μ F))
   → isContainerEquiv (μ-rule F)
-_ = isEquiv-μ-rule
+_ = StrongChainRule.isEquiv-μ-rule
 ```
 
 **Theorem 5.23**:
-The μ-rule is an equivalence if and only if the corresponding chain rule is.
+The \( μ \)-rule is an equivalence if and only if the corresponding chain rule is.
 ```agda
 _ : (F : Containerᴵ 𝟚)
   → isContainerEquiv (μ-rule F) ≃ isContainerEquiv (binary-chain-rule F (μ F))
 _ = isContainerEquiv-μ-rule≃isContainerEquiv-binary-chain-rule
 ```
 
+Given a tree \( x : \mathsf{W}(S, P) \), the type of \( Q \)-labelled finite paths into \( x \)
+is \( \bar{\mathsf{W}}_{S,P,Q}(x) \), written here as
+```agda
+_ : (S : Type) (P Q : S → Type)
+  → W S P → Type
+_ = Wᴰ
+```
+
 **Lemma 5.24**:
-Given a tree `x : W S P`, the type `Wᴰ x` of finite paths into `x` is discrete
-if both branching `P : S → Type` and labeling of nodes `Q : S → Type` is discrete.
+If both branching \( P : S → \mathsf{Type} \) and labeling of nodes \( Q : S → \mathsf{Type} \) are discrete,
+then paths into any \( x : \mathsf{W}(S, P) \) are discrete:
 ```agda
 _ : (S : Type) (P Q : S → Type)
   → (∀ s → Discrete (P s))
   → (∀ s → Discrete (Q s))
-  → (w : W S P) → Discrete (Wᴰ S P Q w)
+  → (x : W S P) → Discrete (Wᴰ S P Q x)
 _ = discrete-Wᴰ
 ```
 
 **Lemma 5.25**:
-If `F` is a discrete container, then so is `μ F`:
+If \( F \) is a discrete container, then so is \( μ F \):
 ```agda
 _ : (F : Containerᴵ 𝟚)
   → (∀ ix s → Discrete (F .Pos ix s))
@@ -804,8 +812,8 @@ _ = μ-discrete
 ```
 
 **Proposition 5.26**:
-For discrete containers the μ-rule is an equivalence.
+For discrete containers the \( μ \)-rule is an equivalence.
 ```agda
-_ : (F : Containerᴵ 𝟚) → (∀ ix s → Discrete (F .Pos ix s)) → isContainerEquiv (binary-chain-rule F (μ F))
-_ = Discrete→isEquiv-μ-chain-rule
+_ : (F : Containerᴵ 𝟚) → (∀ ix s → Discrete (F .Pos ix s)) → isContainerEquiv (μ-rule F)
+_ = Discrete.isEquiv-μ-rule
 ```

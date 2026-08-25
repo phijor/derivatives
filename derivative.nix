@@ -74,6 +74,7 @@
           toSource {
             root = ./.;
             fileset = unions [
+              ./docs/javascript
               ./docs/stylesheets
               ./docs/.nav.yml
               ./mkdocs.yml
