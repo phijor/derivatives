@@ -82,7 +82,7 @@ and then distributing isolated points over Σ-types by means of [`Σ-isolate`](D
       H .Pos ((s , f) , (p° , q°)) = (Σ[ (p , _) ∈ P s ∖° p° ] Q (f p)) ⊎ (Q (f (p° .fst)) ∖° q°)
 
       η₀ : Equiv (∂ F [ G ] ⊗ ∂ G) H
-      η₀ = Equiv-inv $ Equiv-fst $ invEquiv equiv-left
+      η₀ = Equiv-inv $ Equiv-shape $ invEquiv equiv-left
 
       η₁ : Cart H (∂ (F [ G ]))
       η₁ .shape = Σ-map-snd λ (s , f) → Σ-isolate (P s) (Q ∘ f)

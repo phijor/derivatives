@@ -1,3 +1,7 @@
+## Containers
+
+<!--
+```agda
 {-# OPTIONS --safe #-}
 module Derivative.Container where
 
@@ -10,70 +14,116 @@ open import Cubical.Foundations.Transport using (substEquiv)
 open import Cubical.Reflection.RecordEquiv
 open import Cubical.Data.Sigma.Base
 
+private
+  variable
+    ℓS ℓP ℓ : Level
+```
+-->
+
+A container consists of a type `S` of _shapes_ and a family `P : S → Type` of _positions_.
+```agda
 record Container (ℓS ℓP : Level) : Type (ℓ-suc (ℓ-max ℓS ℓP)) where
-  -- no-eta-equality
   constructor _◁_
   field
     Shape : Type ℓS
     Pos : Shape → Type ℓP
+```
 
-private
-  variable
-    ℓS ℓP ℓ : Level
-
+<!--
+```agda
 Container-syntax : (S : Type ℓS) → (P : S → Type ℓP) → Container ℓS ℓP
 Container-syntax = _◁_
 
-syntax Container-syntax S (λ s → P) = s ∈ S ◁ P
-
 open Container
+```
+-->
 
+We denote a container either by \( (S \lhd P) \) or \( (s : S \lhd P(s)) \).
+```agda
+syntax Container-syntax S (λ s → P) = s ∈ S ◁ P
+```
+
+### Truncated and discrete containers
+
+We say that a container is \( (n, k) \)-_truncated_ if we know that its shapes and positions are
+\( n \)- and \( k \)-truncated types, respectively.
+```agda
 isTruncatedContainer : (n k : HLevel) → Container ℓS ℓP → Type _
 isTruncatedContainer n k (S ◁ P) = isOfHLevel n S × ∀ s → isOfHLevel k (P s)
 
-isSetContainer : Container ℓS ℓP → Type _
-isSetContainer = isTruncatedContainer 2 2
-
 TruncatedContainer : (n k : HLevel) (ℓS ℓP : Level) → Type (ℓ-suc (ℓ-max ℓS ℓP))
 TruncatedContainer n k ℓS ℓP = Σ (Container ℓS ℓP) (isTruncatedContainer n k)
+```
+
+A container is _set-truncated_ or a _set-container_ if its shapes and positions are \( h \)-sets.
+```agda
+isSetContainer : Container ℓS ℓP → Type _
+isSetContainer = isTruncatedContainer h-set h-set
 
 SetContainer : (ℓS ℓP : Level) → Type (ℓ-suc (ℓ-max ℓS ℓP))
-SetContainer = TruncatedContainer 2 2
+SetContainer = TruncatedContainer h-set h-set
+```
 
+A container is _discrete_ if its positions are discrete, i.e. have decidable equality.
+```agda
 isDiscreteContainer : Container ℓS ℓP → Type _
 isDiscreteContainer F = ∀ s → Dec.Discrete (F .Pos s)
 
 DiscreteContainer : (ℓS ℓP : Level) → Type _
 DiscreteContainer ℓS ℓP = Σ[ F ∈ Container ℓS ℓP ] isDiscreteContainer F
+```
 
+### Operations
+
+We denote by `_⊗_` and `_⊕_` the product and sum of containers.
+```agda
 _⊗_ : (F G : Container ℓS ℓP) → Container _ _
 (F ⊗ G) .Shape = F .Shape × G .Shape
 (F ⊗ G) .Pos x = F .Pos (x .fst) ⊎ G .Pos (x .snd)
 infix 11 _⊗_
-
-𝕪 : (P : Type ℓP) → Container ℓS ℓP
-𝕪 P .Shape = 𝟙*
-𝕪 P .Pos = const P
-
-Id : Container ℓS ℓP
-Id = 𝕪 𝟙*
-
-_⊗Id : Container ℓS ℓP → Container ℓS ℓP
-F ⊗Id = F ⊗ Id
 
 _⊕_ : (F G : Container ℓS ℓP) → Container _ _
 (F ⊕ G) .Shape = F .Shape ⊎ G .Shape
 (F ⊕ G) .Pos (Sum.inl s) = F .Pos s
 (F ⊕ G) .Pos (Sum.inr t) = G .Pos t
 infix 10 _⊕_
+```
 
+For any \( A : \mathsf{Type} \), we define the _tuple_ container \( \mathsf{y}(A) ≔ (1 \lhd A) \):
+```agda
+𝕪 : (A : Type ℓP) → Container ℓS ℓP
+𝕪 A .Shape = 𝟙*
+𝕪 A .Pos = const A
+```
+Its extent \( 〚 \mathsf{y}(A) 〛 \) is the representable functor \( X ↦ X^A \).
+
+The _identity container_ is \( \mathsf{Id} ≔ \mathsf{y}(1) \); its extent is the identity functor.
+```agda
+Id : Container ℓS ℓP
+Id = 𝕪 𝟙*
+```
+
+Similarly, we there is a _constant_ container \( (S \lhd 0) \) for any \( S : \mathsf{Type} \).
+```agda
 Const : (S : Type ℓ) → Container ℓ ℓ
 Const S .Shape = S
 Const S .Pos _ = 𝟘*
 
 One : (ℓ : Level) → Container ℓ ℓ
 One ℓ = Const 𝟙*
+```
 
+The substitution \( F[G] \) represents the composite data type obtained from substituting \( G \) into the positions of \( F \):
+```agda
+_[_] : (F G : Container ℓ ℓ) → Container ℓ ℓ
+(F [ G ]) .Shape = Σ[ s ∈ F .Shape ] (F .Pos s → G .Shape)
+(F [ G ]) .Pos (s , f) = Σ[ p ∈ F .Pos s ] G .Pos (f p)
+```
+
+### Cartesian morphisms
+
+A _cartesian morphism_ of containers consists of a map of shapes, and a family of equivalences of positions:
+```agda
 record Cart {ℓS ℓT ℓP ℓQ} (F : Container ℓS ℓP) (G : Container ℓT ℓQ) : Type (ℓ-max (ℓ-max ℓS ℓP) (ℓ-max ℓT ℓQ)) where
   constructor [_◁_]
   field
@@ -81,13 +131,19 @@ record Cart {ℓS ℓT ℓP ℓQ} (F : Container ℓS ℓP) (G : Container ℓT 
     pos : ∀ s → G .Pos (shape s) ≃ F .Pos s
 
 open Cart
+```
 
+We define morphisms as a `record`-type, but sometimes it is useful to view them as a \( Σ \)-type:
+```agda
 unquoteDecl Cart-Σ-Iso = declareRecordIsoΣ Cart-Σ-Iso (quote Cart)
 
 Cart-Σ-equiv : ∀ {ℓS ℓT ℓP ℓQ} {F : Container ℓS ℓP} {G : Container ℓT ℓQ}
   → Cart F G ≃ (Σ[ fₛₕ ∈ (F .Shape → G .Shape) ] ∀ s → G .Pos (fₛₕ s) ≃ F .Pos s)
 Cart-Σ-equiv = isoToEquiv Cart-Σ-Iso
+```
 
+Container morphisms are (extensionally) equal if their maps on shapes and positions agree:
+```agda
 Cart≡ : {F G : Container ℓS ℓP}
   → {f g : Cart F G}
   → (p : f .shape ≡ g .shape)
@@ -106,29 +162,26 @@ Cart≡Equiv f g = strictIsoToEquiv iso module Cart≡Equiv where
   iso .Iso.inv p .snd = cong pos p
   iso .Iso.rightInv _ = refl
   iso .Iso.leftInv _ = refl
+```
 
+### Composition
+
+Cartesian morphisms compose, and there is an identity-morphism for each container.
+```agda
 _⋆_ : ∀ {F G H : Container ℓS ℓP} → Cart F G → Cart G H → Cart F H
 (f ⋆ g) .shape = g .shape ∘ f .shape
 (f ⋆ g) .pos s = g .pos (f .shape s) ∙ₑ f .pos s
--- {-# INJECTIVE_FOR_INFERENCE _⋆_ #-}
 
 id : (F : Container ℓS ℓP) → Cart F F
 id F .shape s = s
 id F .pos s = idEquiv _
+```
 
-TruncatedCart : {n k : HLevel} → (F G : TruncatedContainer n k ℓS ℓP) → Type _
-TruncatedCart F G = Cart (F .fst) (G .fst)
-{-# INJECTIVE_FOR_INFERENCE TruncatedCart #-}
+This defines the structure of a (wild) category,
+which we assemble in [`Derivative.Category`](Derivative.Category.html).
 
-SetCart : (F G : TruncatedContainer 2 2 ℓS ℓP) → Type _
-SetCart = TruncatedCart {n = 2} {k = 2}
-
-isOfHLevelCart : (n : HLevel) → {F G : TruncatedContainer n n ℓS ℓP} → isOfHLevel n (TruncatedCart F G)
-isOfHLevelCart n {F = _ , _ , trunc-pos-F} {G = _ , trunc-shape-G , trunc-pos-G} = isOfHLevelRetractFromIso n Cart-Σ-Iso
-  $ isOfHLevelΣ n
-    (isOfHLevelΠ n λ _ → trunc-shape-G)
-    λ f → isOfHLevelΠ n λ s → isOfHLevel≃ n (trunc-pos-G (f s)) (trunc-pos-F s)
-
+We define some notation that lets us compose chains of morphisms:
+```agda
 module CartReasoning where
   private
     variable
@@ -145,18 +198,28 @@ module CartReasoning where
   infix 1 _⊸∎
 
 open CartReasoning public
+```
 
-[_]⊗_ :
-  ∀ {F G : Container ℓS ℓP}
-  → Cart F G
-  → (H : Container ℓS ℓP)
-  → Cart (F ⊗ H) (G ⊗ H)
-[_]⊗_ {F} {G} f H .shape s = f .shape (s .fst) , _
-[_]⊗_ {F} {G} f H .pos s = Sum.⊎-left-≃ (f .pos (s .fst))
+```agda
+TruncatedCart : {n k : HLevel} → (F G : TruncatedContainer n k ℓS ℓP) → Type _
+TruncatedCart F G = Cart (F .fst) (G .fst)
+{-# INJECTIVE_FOR_INFERENCE TruncatedCart #-}
 
-[_]⊗Id : {F G : Container ℓS ℓP} → Cart F G → Cart (F ⊗Id) (G ⊗Id)
-[_]⊗Id {ℓS} {ℓP} = [_]⊗ Id
+SetCart : (F G : TruncatedContainer 2 2 ℓS ℓP) → Type _
+SetCart = TruncatedCart {n = 2} {k = 2}
 
+isOfHLevelCart : (n : HLevel) → {F G : TruncatedContainer n n ℓS ℓP} → isOfHLevel n (TruncatedCart F G)
+isOfHLevelCart n {F = _ , _ , trunc-pos-F} {G = _ , trunc-shape-G , trunc-pos-G} = isOfHLevelRetractFromIso n Cart-Σ-Iso
+  $ isOfHLevelΣ n
+    (isOfHLevelΠ n λ _ → trunc-shape-G)
+    λ f → isOfHLevelΠ n λ s → isOfHLevel≃ n (trunc-pos-G (f s)) (trunc-pos-F s)
+```
+
+### Equivalences
+
+A cartesian morphism is an _equivalence_ if its shape map is an equivalence of types.
+We wrap this in a new `record`, and use [`Equiv→Cart`](#Equiv→Cart) to project out the underlying morphism.
+```agda
 record Equiv (F G : Container ℓS ℓP) : Type (ℓ-max ℓS ℓP) where
   constructor [_◁≃_]
   field
@@ -166,7 +229,10 @@ record Equiv (F G : Container ℓS ℓP) : Type (ℓ-max ℓS ℓP) where
 Equiv→Cart : {F G : Container ℓS ℓP} → Equiv F G → Cart F G
 Equiv→Cart [ shape ◁≃ pos ] .shape = equivFun shape
 Equiv→Cart [ shape ◁≃ pos ] .pos = pos
+```
 
+Equivalences compose and there is an identity equivalence:
+```agda
 _⋆ₑ_ : ∀ {F G H : Container ℓS ℓP} → Equiv F G → Equiv G H → Equiv F H
 (f ⋆ₑ g) .Equiv.shape = f .Equiv.shape ∙ₑ g .Equiv.shape
 (f ⋆ₑ g) .Equiv.pos s = g .Equiv.pos (equivFun (f .Equiv.shape) s) ∙ₑ f .Equiv.pos s
@@ -174,24 +240,17 @@ _⋆ₑ_ : ∀ {F G H : Container ℓS ℓP} → Equiv F G → Equiv G H → Equ
 idₑ : (F : Container ℓS ℓP) → Equiv F F
 idₑ F .Equiv.shape = idEquiv _
 idₑ F .Equiv.pos _ = idEquiv _
+```
 
--- TODO: Rename to Equiv-shape and Equiv-pos
-Equiv-fst : ∀ {S S′ : Type ℓS} {P : S′ → Type ℓP}
-  → (e : S ≃ S′)
-  → Equiv (S ◁ (P ∘ equivFun e)) (S′ ◁ P)
-Equiv-fst {S} {P} e .Equiv.shape = e
-Equiv-fst {S} {P} e .Equiv.pos s = idEquiv (P (equivFun e s))
-
-Equiv-snd : ∀ {S : Type ℓS} {P P′ : S → Type ℓP}
-  → (e : ∀ s → P′ s ≃ P s)
-  → Equiv (S ◁ P) (S ◁ P′)
-Equiv-snd {S} e .Equiv.shape = idEquiv S
-Equiv-snd {S} e .Equiv.pos = e
-
+Additionally, we can invert equivalences of containers:
+```agda
 Equiv-inv : {F G : Container ℓS ℓ} → Equiv F G → Equiv G F
 Equiv-inv {F} {G} [ shape ◁≃ pos ] .Equiv.shape = invEquiv shape
 Equiv-inv {F} {G} [ shape ◁≃ pos ] .Equiv.pos t = invEquiv $ substEquiv (G .Pos) (sym (secEq shape t)) ∙ₑ pos (invEq shape t)
+```
 
+Again, we define some nice syntax for composing equivalences.
+```agda
 module EquivReasoning where
   private
     variable
@@ -212,7 +271,41 @@ module EquivReasoning where
   infix 1 _⊸≃∎
 
 open EquivReasoning public
+```
 
-_[_] : (F G : Container ℓ ℓ) → Container ℓ ℓ
-(F [ G ]) .Shape = Σ[ s ∈ F .Shape ] (F .Pos s → G .Shape)
-(F [ G ]) .Pos (s , f) = Σ[ p ∈ F .Pos s ] G .Pos (f p)
+We can lift equivalences on types of shapes/positions to equivalences of containers:
+```agda
+Equiv-shape : ∀ {S S′ : Type ℓS} {P : S′ → Type ℓP}
+  → (e : S ≃ S′)
+  → Equiv (S ◁ (P ∘ equivFun e)) (S′ ◁ P)
+Equiv-shape {P} e .Equiv.shape = e
+Equiv-shape {P} e .Equiv.pos s = idEquiv (P (equivFun e s))
+
+Equiv-pos : ∀ {S : Type ℓS} {P P′ : S → Type ℓP}
+  → (e : ∀ s → P′ s ≃ P s)
+  → Equiv (S ◁ P) (S ◁ P′)
+Equiv-pos {S} e .Equiv.shape = idEquiv S
+Equiv-pos {S} e .Equiv.pos = e
+```
+
+### More operations
+
+We use a shorthand for \( \_ ⊗ \mathsf{Id} \).
+```agda
+_⊗Id : Container ℓS ℓP → Container ℓS ℓP
+F ⊗Id = F ⊗ Id
+```
+
+This induces an action on cartesian morphisms.
+```agda
+[_]⊗_ :
+  ∀ {F G : Container ℓS ℓP}
+  → Cart F G
+  → (H : Container ℓS ℓP)
+  → Cart (F ⊗ H) (G ⊗ H)
+[_]⊗_ {F} {G} f H .shape s = f .shape (s .fst) , _
+[_]⊗_ {F} {G} f H .pos s = Sum.⊎-left-≃ (f .pos (s .fst))
+
+[_]⊗Id : {F G : Container ℓS ℓP} → Cart F G → Cart (F ⊗Id) (G ⊗Id)
+[_]⊗Id {ℓS} {ℓP} = [_]⊗ Id
+```

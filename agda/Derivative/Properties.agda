@@ -38,9 +38,9 @@ open Cart
   ∂ (S ◁ P)
     ⊸≃⟨⟩
   ((s , p , _) ∈ (Σ[ s ∈ S ] (P s) °) ◁ (P s ∖ p))
-    ⊸≃⟨ Equiv-fst $ Σ-cong-equiv-snd (λ s → isProp→IsolatedEquiv (is-prop-P s)) ⟩
+    ⊸≃⟨ Equiv-shape $ Σ-cong-equiv-snd (λ s → isProp→IsolatedEquiv (is-prop-P s)) ⟩
   ((s , p) ∈ Σ S P ◁ (P s ∖ p))
-    ⊸≃⟨ Equiv-snd (λ (s , p) → uninhabEquiv (λ ()) (isProp→isEmptyRemove (is-prop-P s) p)) ⟩
+    ⊸≃⟨ Equiv-pos (λ (s , p) → uninhabEquiv (λ ()) (isProp→isEmptyRemove (is-prop-P s) p)) ⟩
   ((s , p) ∈ Σ S P ◁ 𝟘*)
     ⊸≃∎
 
@@ -49,7 +49,7 @@ open Cart
   ∂ (𝟙* {ℓ} ◁ const P)
     ⊸≃⟨ ∂-prop-trunc 𝟙* {P = const P} (const is-prop-P) ⟩
   ((𝟙* × P) ◁ const 𝟘*)
-    ⊸≃⟨ Equiv-fst 𝟙*-unit-×-left-equiv ⟩
+    ⊸≃⟨ Equiv-shape 𝟙*-unit-×-left-equiv ⟩
   (P ◁ const 𝟘*)
     ⊸≃∎
 
@@ -69,7 +69,7 @@ open Cart
   ∂ (𝟙* ◁ const A)
     ⊸≃⟨⟩
   (_ , a) ∈ 𝟙* × (A °) ◁ (A ∖° a)
-    ⊸≃⟨ Equiv-fst 𝟙*-unit-×-left-equiv ⟩
+    ⊸≃⟨ Equiv-shape 𝟙*-unit-×-left-equiv ⟩
   (a ∈ A ° ◁ (A ∖° a))
     ⊸≃∎
 
