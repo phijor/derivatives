@@ -446,14 +446,14 @@ which yields a morphism into \emph{any} other algebra:
 \end{problem}
 \begin{construction}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
-  Abbreviate \( \Rec_{F}(\alpha) \) by \( \Rec \).
+  Abbreviate \( \Rec \DefEq \Rec_{F}(\alpha) \), \( \W \DefEq \W(S, P) \) and \( \bar{\W} \DefEq \bar{\W}(S,P,\vec{P}) \).
   On shapes, \( \Rec \)  is defined by \( \W \)-recursion,
   \begin{align*}
-    \Rec_{\Sh} &: \W(S, P) \to T \\
+    \Rec_{\Sh} &: \W \to T \\
     \Rec_{\Sh} &\DefEq \lambda(\Sup(s, f)).\, \alpha_{\Sh} (s, \Rec_{\Sh} \circ f)
   \end{align*}
   On positions, we define a map
-  \( {u : Q_i(\Rec_{\Sh}(w)) \to \bar{\W}_{S,P,\vec{P}}(w)} \) by induction on \( w : \W(S, P) \).
+  \( {u : Q_i(\Rec_{\Sh}(w)) \to \bar{\W}(w)} \) by induction on \( w : \W \).
   For \( w \JudgeEq \Sup(s, f) \), it is the composite
   \[
     \begin{tikzcd}
@@ -461,12 +461,12 @@ which yields a morphism into \emph{any} other algebra:
         \ar[r, dashed, "u"]
         \ar[d, "{\alpha_{\Ps}(i, \Rec_{\Sh} \circ f)}"{swap}]
         &
-      \bar{\W}_{S,P,\vec{P}}(\Sup(s, f))
+      \bar{\W}(\Sup(s, f))
         \\
       \vec{P}_i(s) + \sum_{p \in P(s)} Q_i(\Rec_{\Sh}(f(p)))
         \ar[r, "u^*"{swap}]
         &
-      \vec{P}_i(s) + \sum_{p \in P(s)} \bar{\W}_{S,P,\vec{P}}(\Sup(s, f))
+      \vec{P}_i(s) + \sum_{p \in P(s)} \bar{\W}(f(p))
         \ar[u, "\WPathIn"{swap}]
     \end{tikzcd}
   \]
