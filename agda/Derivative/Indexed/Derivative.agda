@@ -45,7 +45,7 @@ private
   shape = Σ-map φ.shape λ s → invEq (IsolatedSubstEquiv (φ.pos i s))
 
   pos-dec : ∀ j → (i≟j : Dec (i ≡ j)) → ∀ s → ∂.pos-dec i i≟_ G j i≟j (shape s) ≃ ∂.pos-dec i i≟_ F j i≟j s
-  pos-dec j (yes i≡j) (s , p , _) = RemoveRespectEquiv p (φ.pos i s)
+  pos-dec j (yes i≡j) (s , p , _) = RemoveRespectInvEquiv p (φ.pos i s)
   pos-dec j (no ¬i≡j) (s , _) = φ.pos j s
 
   pos : ∀ j s → _ ≃ _

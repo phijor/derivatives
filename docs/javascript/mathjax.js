@@ -3,17 +3,17 @@ window.MathJax = {
     inlineMath: [["\\(", "\\)"]],
     displayMath: [["\\[", "\\]"]],
     processEscapes: true,
-    processEnvironments: true
+    processEnvironments: true,
     active: {
       '→': '\\to',
       '⊎': '\\uplus',
-      '∖': '\\setminus'
+      '∖': '\\setminus',
     },
   },
   options: {
     ignoreHtmlClass: ".*|",
-    processHtmlClass: "arithmatex"
-  }
+    processHtmlClass: "arithmatex",
+  },
 };
 
 document$.subscribe(() => {

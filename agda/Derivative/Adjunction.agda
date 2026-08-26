@@ -95,7 +95,7 @@ zag≡ G = Cart≡ (funExt shape-path) (funExt λ ∂s → equivExt (pos-path �
   opaque
     pos-path : (∂s : ∂ G .Shape) (∂p : ∂ G .Pos ∂s) → remove-nothing (equivFun (∂[ counit G ] .pos (unit-shape (∂ G) ∂s)) ∂p) ≡ ∂p
     pos-path (s , p°@(p₀ , p₀≟_)) (p , neq) =
-      let p′ = unreplace p₀ p₀≟_ p , RemoveRespectEquiv.neq-equiv nothing (unreplace-isolated-equiv p₀ p₀≟_) p .fst neq
+      let p′ = unreplace p₀ p₀≟_ p , RemoveRespectInvEquiv.neq-equiv nothing (unreplace-isolated-equiv p₀ p₀≟_) p .fst neq
           p″ = just (the (G .Pos s ∖ p₀) (p , neq)) , nothing≢just
       in Remove≡ $
         remove-nothing p′ .fst

@@ -32,7 +32,7 @@ open Cart
   ∂-shape (s , (p , isolated-p)) .snd .snd = isIsolatedPreserveEquivInv (u s) p isolated-p
 
   ∂-pos : (s : F .Shape) (p : F .Pos s °) → (G .Pos (f s) ∖ invEq (u s) (p .fst)) ≃ (F .Pos s ∖ (p .fst))
-  ∂-pos s p = RemoveRespectEquiv (p .fst) (u s)
+  ∂-pos s p = RemoveRespectInvEquiv (p .fst) (u s)
 
   ∂f : Cart (∂ F) (∂ G)
   ∂f .shape = ∂-shape
