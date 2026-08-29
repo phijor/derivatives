@@ -32,7 +32,7 @@ private
 ## The `Bag` container
 
 We define a container `Bag` representing finite multisets.
-Its shapes are the (large) _h_-groupoid of of finite sets,
+Its shapes are the (large) _h_-groupoid of finite sets,
 i.e. types merely equivalent to some standard finite type `Fin n`.
 Over a finite set `X : FinSet`, the type of positions is simply the underlying type `⟨ X ⟩ : Type`.
 ```agda
@@ -111,7 +111,7 @@ IsolatedFinEquiv : (X : FinSet) → ⟨ X ⟩ ° ≃ ⟨ X ⟩
 IsolatedFinEquiv (X , is-finset) = Discrete→IsolatedEquiv $ isFinSet→Discrete {A = X} is-finset
 ```
 
-This is enough to show that together, [`pred`](#pred) and [`succ`](#succ) form an isomorphism between finite- and pointed, finite sets:
+This is enough to show that together, [`pred`](#pred) and [`succ`](#succ) form an isomorphism between finite sets and pointed finite sets:
 ```agda
 pred-iso : Iso FinSet• FinSet
 pred-iso .Iso.fun = pred
@@ -211,8 +211,8 @@ module Universe (P : Type → Type)
 
 ### Sub-countable types
 
-An example of the above are sub-countable types, i.e. those that merely embed into ℕ.
-These define a container representing multisets with cardinality of at most ℵ₀.
+An example of the above is the universe of sub-countable types, i.e. those that merely embed into ℕ.
+These define a container representing multisets with cardinality at most ℵ₀.
 ```agda
 module SubNat where
   open import Cubical.Data.Nat

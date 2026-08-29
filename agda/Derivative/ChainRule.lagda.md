@@ -36,8 +36,8 @@ open Cart
 
 For any pair of containers, we can define a cartesian morphism
 `chain-rule : ∂ F [ G ] ⊗ ∂ G ⊸ ∂ (F [ G ])`, a _lax_ chain rule.
-Under some circumstances, this morphism will be invertible,
-that is a _strong_ chain rule.
+Under some circumstances, this morphism will be invertible.
+In this case we call the chain rule _strong_.
 ```agda
 module _ (F G : Container ℓ ℓ) where
   open Container F renaming (Shape to S ; Pos to P)
@@ -261,7 +261,7 @@ isStrongSets≃AllSetsDiscrete = propBiimpl→Equiv
   AllSetsDiscrete→isStrongSets
 ```
 
-In the presences of a small replacement `Ω` of `hProp`,
+In the presence of a small replacement `Ω` of `hProp`,
 a strong chain rule for _h_-sets would let us decide arbitrary propositions (a form of LEM).
 ```agda
 impredicativeProp→isGloballyStrong→LEM : (ℓ : Level)

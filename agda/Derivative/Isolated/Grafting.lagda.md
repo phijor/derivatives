@@ -65,7 +65,7 @@ ungraft (a₀ , _) f .fst = f ∘ forget-remove a₀
 ungraft (a₀ , _) f .snd = f a₀
 ```
 
-We can show that `graft a°` is an equivalence with inverse `ungraft a°` by application of the the computation rules.
+We can show that `graft a°` is an equivalence with inverse `ungraft a°` by application of the computation rules.
 ```agda
 isEquiv-graft : (a° : A °) → isEquiv (graft {B = B} a°)
 isEquiv-graft {A} {B} a°@(a₀ , a₀≟_) = isoToIsEquiv graft-iso module isEquivgraft where

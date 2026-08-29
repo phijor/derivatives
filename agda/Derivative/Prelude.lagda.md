@@ -36,7 +36,7 @@ private
 We use custom universe-polymorphic types for the empty- and unit type to minimize the amount of conversions
 we have to perform between `Unit` and `Lift Unit` (and similarly for `⊥`).
 
-The single inhabitant of `𝟙*` is `•` (`\bub`). We explicitly make use η-equality for the unit type.
+The single inhabitant of `𝟙*` is `•` (`\bub`). We explicitly make use of η-equality for the unit type.
 ```agda
 data 𝟘* {ℓ : Level} : Type ℓ where
 
@@ -245,7 +245,7 @@ pattern h-set = 2
 pattern h-groupoid = 3
 ```
 
-Also, here's some useful properties of _h_-propositions:
+Also, here are some useful properties of _h_-propositions:
 ```agda
 isPropFromPointed→isProp : (A → isProp A) → isProp A
 isPropFromPointed→isProp h a b = h a a b

@@ -84,7 +84,7 @@ Isolated≡ = Σ≡Prop isPropIsIsolated
 ```
 
 Of course, the same applies to dependent paths,
-except that the type looks a little more unwieldly.
+except that the type looks a little more unwieldy.
 ```agda
 IsolatedPathP : ∀ {B : A → Type ℓ} {a₀ a₁ : A} {p : a₀ ≡ a₁}
   → {b₀ : B a₀ °} {b₁ : B a₁ °}
@@ -101,7 +101,7 @@ Isolated≢ a≢b p = a≢b $ cong fst p
 ```
 
 Together, this shows that `A °` is a discrete type:
-For any pair `a, b : A °`, there is two ways of showing that `a ≡ b`,
+For any pair `a, b : A °`, there are two ways of showing that `a ≡ b`,
 either by using isolatedness of `a`, or of `b`.
 ```agda
 DiscreteIsolated : Discrete (A °)
@@ -114,7 +114,7 @@ _ : isSet (A °)
 _ = Dec.Discrete→isSet DiscreteIsolated
 ```
 
-For our developement, we chose to prove this more directly however.
+For our development, we chose to prove this more directly however.
 ```agda
 opaque
   isSetIsolated : isSet (A °)
@@ -164,7 +164,7 @@ module _ (a : A) (is-isolated-a : isIsolated a) where
   isIsolated→isContrLoop .snd = sym ∘ isIsolated→K
 ```
 
-Furthermore, we can deduce that the law of the excluded middle holds for path from an isolated point:
+Furthermore, we can deduce that the law of the excluded middle holds for paths from an isolated point:
 ```agda
 isIsolated→isContrDecPath : {a : A} → isIsolated a → ∀ b → isContr (Dec (a ≡ b))
 isIsolated→isContrDecPath {a} isolated-a b = inhProp→isContr (isolated-a b) (isIsolated→isPropDecPath a isolated-a b)
@@ -294,7 +294,7 @@ isIsolated→isContrConnectedComponent {A} {a} a≟_ = isOfHLevelRespectEquiv 0 
 
 <!--
 ```agda
--- TODO: In a perfect type, no connecte component is contractible.
+-- TODO: In a perfect type, no connected component is contractible.
 -- isPerfect→¬isContrConnectedComponent : isPerfect A → ∀ a → ¬ isContr (Σ[ b ∈ A ] ∥ a ≡ b ∥₁)
 -- isPerfect→¬isContrConnectedComponent {A} is-perfect a is-contr-conn = is-perfect (a , is-isolated-a) where
 --   is-isolated-a : isIsolated a

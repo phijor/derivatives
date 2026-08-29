@@ -58,7 +58,7 @@ a ,° b = Σ-isolate _ _ (a , b)
 
 ## Characterizing `Σ-isolate`
 
-A prori, it is not clear whether `Σ-isolate` is an equivalence or not.
+A priori, it is not clear whether `Σ-isolate` is an equivalence or not.
 We can however reshape its fibers into a proposition:
 ```agda
 Σ-isolate-fiber-equiv : ∀ (A : Type ℓ) (B : A → Type ℓ)
@@ -145,7 +145,7 @@ isSurjection-Σ-isolate≃isIsolatedPair A B =
     ≃∎
 ```
 
-By composing both equivalences, we see `Σ-isolate` is an equivalence if and only of isolatedness distributes over `Σ`.
+By composing both equivalences, we see `Σ-isolate` is an equivalence if and only if isolatedness distributes over `Σ`.
 ```agda
 isEquiv-Σ-isolate≃isIsolatedPair : (A : Type ℓ) (B : A → Type ℓ)
  → isEquiv (Σ-isolate A B) ≃ (∀ (a₀ : A) (b₀ : B a₀) → isIsolated {A = Σ A B} (a₀ , b₀) → isIsolated a₀ × isIsolated b₀)
@@ -154,7 +154,7 @@ isEquiv-Σ-isolate≃isIsolatedPair A B = isEquiv-Σ-isolate≃isSurjection-Σ-i
 
 ## Discreteness and _Σ_-types
 
-If `A : Type` is discrete, and `B : A → Type` is family of discrete types, then
+If `A : Type` is discrete, and `B : A → Type` is a family of discrete types, then
 `Σ-isolate` is an equivalence.
 This follows from the closure of discrete types under `Σ`:
 ```agda
@@ -245,7 +245,7 @@ DiscreteFst→isEquiv-Σ-isolated A disc-A B = invEq (isEquiv-Σ-isolate≃isIso
     isolated-ab
 ```
 
-All together, a type `A` is discrete if and only if `Σ-isolate` is an equivalence for any family over `A`.
+Altogether, a type `A` is discrete if and only if `Σ-isolate` is an equivalence for any family over `A`.
 ```agda
 isEquiv-Σ-isolate≃DiscreteFst : (A : Type ℓ) → ((B : A → Type ℓ) → isEquiv (Σ-isolate A B)) ≃ Discrete A
 isEquiv-Σ-isolate≃DiscreteFst A = propBiimpl→Equiv (isPropΠ λ B → isPropIsEquiv _) isPropDiscrete

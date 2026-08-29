@@ -103,7 +103,7 @@ Id : Container ℓS ℓP
 Id = 𝕪 𝟙*
 ```
 
-Similarly, we there is a _constant_ container \( (S \lhd 0) \) for any \( S : \mathsf{Type} \).
+Similarly, there is a _constant_ container \( (S \lhd 0) \) for any \( S : \mathsf{Type} \).
 ```agda
 Const : (S : Type ℓ) → Container ℓ ℓ
 Const S .Shape = S
@@ -166,7 +166,7 @@ Cart≡Equiv f g = strictIsoToEquiv iso module Cart≡Equiv where
 
 ### Composition
 
-Cartesian morphisms compose, and there is an identity-morphism for each container.
+Cartesian morphisms compose, and there is an identity morphism for each container.
 ```agda
 _⋆_ : ∀ {F G H : Container ℓS ℓP} → Cart F G → Cart G H → Cart F H
 (f ⋆ g) .shape = g .shape ∘ f .shape

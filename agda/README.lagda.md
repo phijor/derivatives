@@ -161,7 +161,7 @@ The fibers of this map are propositions, hence it is an embedding.
 ```
 
 **Lemma 2.13**:
-`Σ-isolate` is a surjection (hence equivalence) iff pairing `(_,_)` reflects isolated points.
+`Σ-isolate` is a surjection (hence an equivalence) iff pairing `(_,_)` reflects isolated points.
 ```agda
   _ : isSurjection (Σ-isolate A B) ≃ (∀ a → (b : B a) → isIsolated {A = Σ A B} (a , b) → isIsolated a × isIsolated b)
   _ = isSurjection-Σ-isolate≃isIsolatedPair A B
@@ -217,7 +217,7 @@ _ :  ∀ {b : B} → (A ⊎ (B ∖ b)) ≃ ((A ⊎ B) ∖ (inr b))
 _ = remove-right-equiv
 ```
 
-The other way around there is a map that takes \( \mathsf{Maybe}(A ∖ a_0) \) and replaces \( \mathsf{nothing} \) with \( a_0 \):
+The other way around, there is a map that takes \( \mathsf{Maybe}(A ∖ a_0) \) and replaces \( \mathsf{nothing} \) with \( a_0 \):
 ```agda
 _ : (a₀ : A) → Maybe (A ∖ a₀) → A
 _ = replace
@@ -263,7 +263,7 @@ _ = graft
 ```
 
 **Proposition 2.23**:
-This defines an *induction-like* principle for maps out of types \( A \) pointed by an isolated \( a_0 : A^\circ \).
+This defines an *induction-like* principle for maps out of types \( A \) with an isolated point \( a_0 : A^\circ \).
 In particular, it has computation rules,
 ```agda
 _ : (a° : A °) (f : (A ∖° a°) → B) {b₀ : B} → graft a° (f , b₀) (a° .fst) ≡ b₀
@@ -291,7 +291,7 @@ open import Derivative.Container
 ```
 
 **Definition 3.1**:
-A container \( (S ◁ P) \) consists of shapes \( S : \mathsf{Type} \) and over this a family of positions \( P : S → \mathsf{Type} \).
+A container \( (S ◁ P) \) consists of shapes \( S : \mathsf{Type} \) and a family of positions \( P : S → \mathsf{Type} \) over those shapes.
 ```agda
 _ : (ℓ : Level) → Type (ℓ-suc ℓ)
 _ = λ ℓ → Container ℓ ℓ
@@ -341,7 +341,7 @@ _ : (F G : Container _ _) → Type ℓ-zero
 _ = Equiv
 ```
 
-Containers and cartesian morphism assemble into a wild category.
+Containers and cartesian morphisms assemble into a wild category.
 Set-truncated containers form a 1-category.
 ```agda
 open import Derivative.Category ℓ-zero
@@ -511,7 +511,7 @@ isContainerEmbedding = λ f → isEmbedding (Cart.shape f)
 ```
 
 **Proposition 4.3**:
-Then chain rule is an embedding of containers.
+The chain rule is an embedding of containers.
 ```agda
 _ : isContainerEmbedding (chain-rule F G)
 _ = isEmbedding-chain-shape-map _ _
@@ -537,7 +537,7 @@ _ = DiscreteContainer→isStrong
 ```
 
 **Theorem 4.6**:
-If the chain rule is invertible for arbitrary containers if and only if arbitrary types are discrete.
+The chain rule is invertible for arbitrary containers if and only if arbitrary types are discrete.
 This is impossible in the presence of types of higher truncation level.
 ```agda
 _ : ((F G : Container ℓ ℓ) → isEquiv (chain-rule F G .shape)) ≃ ((A : Type ℓ) → Discrete A)
