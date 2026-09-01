@@ -433,8 +433,8 @@ and that derivatives of products follow a Leibniz rule:
 To some extent we can also solve differential equations involving \( \Der \).
 In particular, given a container \( F \), we can ask if it has an anti-derivative,
 i.e. some \( G \) for which \( \CartIso{\Der{G}}{F} \).
-Interestingly, \( \Der \) has fixed-points, that is containers that are their own derivative.
-The prototypical example of such a fixed-point is the container of finite multisets, or \emph{bags}.
+Interestingly, \( \Der \) has fixpoints, that is containers that are their own derivative.
+The prototypical example of such a fixpoint is the container of finite multisets, or \emph{bags}.
 Famously, bags cannot be expressed as set-truncated containers, but can be if one allows shapes of higher truncation level.
 Let us reproduce \citeauthor{Gylterud2011}'s construction~\cite[{example~3.6.1}]{Gylterud2011} of bags as a symmetric container,
 but in the language of HoTT.
@@ -450,7 +450,7 @@ There are however equivalent small replacements of this type,
 such as the one given by \citeauthor{FinsterEtAl2021CartesianBicategoryPolynomial} in \cite[Theorem~25]{FinsterEtAl2021CartesianBicategoryPolynomial}.
 
 \begin{proposition}\label{bag-fixed-point}
-  The container \( \Bag \) is a fixed-point of derivation:
+  The container \( \Bag \) is a fixpoint of derivation:
   there is an equivalence \( \CartIso{\Der{\Bag}}{\Bag} \).
   \begin{proof}
     First, note that finite sets are closed under addition and removal of points:

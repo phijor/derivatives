@@ -1,27 +1,27 @@
-\section{Derivatives of Fixed Points}\label{fixed-points}
+\section{Derivatives of Fixpoints}\label{fixed-points}
 
-Containers let us model inductive data types as fixed points to substitution \( \Subst{\Blank}{\Blank} \):
+Containers let us model inductive data types as fixpoints to substitution \( \Subst{\Blank}{\Blank} \):
 if \( F \) describes the branching of an inductive data type, then there is a corresponding
 container \( \mu F \) such that \( \CartIso{\Subst{F}{\mu F}}{\mu F} \).
 This lets us turn informal recursive specifications such as \( \Op{List}(X) = 1 + X \times \Op{List}(X) \)
 into a precise description of \( \Op{List} \) as a container.
-\Citeauthor{AbbottEtAl2005DataDifferentiating} prove that the derivative of a fixed-point container
-is itself a fixed point: \( \Der{(\mu F)} \) is equivalent to \( \mu F' \) for some \( F' \) obtained from \( F \).
+\Citeauthor{AbbottEtAl2005DataDifferentiating} prove that the derivative of a fixpoint container
+is itself a fixpoint: \( \Der{(\mu F)} \) is equivalent to \( \mu F' \) for some \( F' \) obtained from \( F \).
 To do so, they recognize that each \( \mu F \) essentially behaves like repeated substitution \( \Subst{F}{\Subst{F}{\Subst{F}{\ldots}}} \),
-and infer a fixed-point rule from the chain rule.
+and infer a fixpoint rule from the chain rule.
 
-Our goal is to derive a similar fixed-point rule for our generalized derivative,
+Our goal is to derive a similar fixpoint rule for our generalized derivative,
 ideally by deriving it from the chain rule as well.
 This raises the question: if in general the chain rule is lax,
-is it ever possible to have a strong fixed-point rule?
+is it ever possible to have a strong fixpoint rule?
 It appears that the answer to this question is \enquote{it depends}:
 we are able to show (cf.~\autoref{strong-mu-rule-iff-strong-chain-rule})
-that the fixed-point rule for an \( (I + 1) \)-indexed container \( F \) is strong if and only if the chain rule
+that the fixpoint rule for an \( (I + 1) \)-indexed container \( F \) is strong if and only if the chain rule
 between \( F \) and \( \mu F \) is.
 
 \subsection{Indexed Containers}
 
-To define and reason about an operation \( \mu \) taking a container to a fixed-point,
+To define and reason about an operation \( \mu \) taking a container to a fixpoint,
 we first have to recall the definition of indexed containers.
 These encode data types polymorphic in more than one variable:
 \begin{definition}[note={Indexed containers}]
@@ -32,8 +32,8 @@ These encode data types polymorphic in more than one variable:
 \end{definition}
 Ordinary containers correspond to unary containers, \( \Cont_{1} \).
 Each index \( i : I \) corresponds to a variable in the type that a container describes.
-In particular, \( (I + 1) \)-indexed containers are used to transcribe fixed-point expressions that contain an extra recursion variable.
-We call \( (I + 1) \)-indexed containers \emph{signature containers}; their fixed points describe inductive types.
+In particular, \( (I + 1) \)-indexed containers are used to transcribe fixpoint expressions that contain an extra recursion variable.
+We call \( (I + 1) \)-indexed containers \emph{signature containers}; their fixpoints describe inductive types.
 \begin{example}
   \newcommand*{\Nil}{\Op{nil}}
   \newcommand*{\Cons}{\Op{cons}}
@@ -239,11 +239,11 @@ Like in \autoref{discrete-strong-chain-rule}, this is the case for discrete cont
   If \( F : \Cont_2 \) and \( G : \Cont_1 \) are discrete, then \( \Chain_{F,G} \) is an equivalence. \qed
 \end{proposition}
 
-\subsection{Fixed Points of Containers}\label{fixed-point-containers}
+\subsection{Fixpoints of Containers}\label{fixed-point-containers}
 
-To show how derivatives of untruncated containers interact with fixed points,
-we first have to give a suitable specification of what we mean by such a \enquote{fixed point}.
-Traditionally, the (smallest) fixed point associated to a signature container is constructed as follows:
+To show how derivatives of untruncated containers interact with fixpoints,
+we first have to give a suitable specification of what we mean by such a \enquote{fixpoint}.
+Traditionally, the (smallest) fixpoint associated to a signature container is constructed as follows:
 Given an \( I \)-indexed and set-truncated container \( (\MkCont{S}{P}) \),
 it is interpreted as a functor \( \llbracket \MkCont{S}{P} \rrbracket : [\Set^I, \Set] \),
 which takes families \( \vec{X} : I \to \Set \) to
@@ -256,7 +256,7 @@ allowing concise proofs for a number of properties.
 In particular, given a signature container \( F : \Cont_{I+1} \), its interpretation \( \llbracket F \rrbracket(\vec{X}, \Blank) : [ \Set, \Set ] \)
 admits an initial algebra for any \( \vec{X} \).
 This initial algebra can be shown to lie in the image of the interpretation functor, hence it defines a necessarily unique \( I \)-indexed container \( \mu F \),
-which is regarded as the smallest fixed point of \( F \).
+which is regarded as the smallest fixpoint of \( F \).
 
 Recently,
 \citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} have expanded upon this idea in~\cite{DamatoEtAl2025FormalisingInductiveCoinductive},
@@ -275,9 +275,9 @@ a particularly elegant way to show that \( \llbracket \Blank \rrbracket \) is fu
 is given by \citeauthor{Damato2023RevisitingContainersCubical} in \cite{Damato2023RevisitingContainersCubical} and relies almost exclusively on the Yoneda lemma,
 which should make the proof amenable to generalization.
 
-In light of this, we are going to define a notion of fixed point entirely internal to the wild category of containers,
+In light of this, we are going to define a notion of fixpoint entirely internal to the wild category of containers,
 which does not reference the interpretation functor \( \Ext{\Blank} \) at all.
-Barring the issues mentioned above, this should correspond to the more traditional definition of container fixed points in terms of \( \Ext{\Blank} \).
+Barring the issues mentioned above, this should correspond to the more traditional definition of container fixpoints in terms of \( \Ext{\Blank} \).
 First, note that substitution into a fixed container behaves functorially:
 \begin{problem}
   Given \( F : \Cont_{I+1} \), extend \( \Subst{F}{\Blank} \) to a wild endofunctor on \( \ContCart_I \).
@@ -289,10 +289,10 @@ It also commutes with composition under the interpretation of containers:
 for all \( F : \Cont_{I + 1} \) and \( G : \Cont_I \),
 there is an equivalence of types
 \( \llbracket \Subst{F}{G} \rrbracket \vec{X} \simeq \llbracket F \rrbracket(\vec{X}, \llbracket G \rrbracket\vec{X}) \), natural in \( \vec{X} : I \to \Type \).
-In particular, a fixed point of containers \( \varphi : \CartIso{\Subst{F}{G}}{G} \) induces a fixed point of \( \Ext{F}(\vec{X}, \Blank ) \),
-which is exactly a container fixed point in the sense of \cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
+In particular, a fixpoint of containers \( \varphi : \CartIso{\Subst{F}{G}}{G} \) induces a fixpoint of \( \Ext{F}(\vec{X}, \Blank ) \),
+which is exactly a container fixpoint in the sense of \cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
 
-We thus define smallest fixed points of a signature container \( F \) without reference to its associated functor \( \Ext{F} \),
+We thus define smallest fixpoints of a signature container \( F \) without reference to its associated functor \( \Ext{F} \),
 namely as initial algebras of the wild functor \( \Subst{F}{\Blank} \).
 Let us set this up precisely:
 \begin{problem}[note={\( \Subst{F}{\Blank} \)-algebras}]
@@ -349,15 +349,15 @@ an object \( 0 \) of a wild category \( \mathcal{C} \) is \emph{initial}
 if for any other object \( X \), the type of morphisms \( \mathcal{C}(0, X) \) is \emph{contractible}.
 Hence we say:
 \begin{definition}
-  A smallest fixed point of a signature container \( F : \Cont_{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
+  A smallest fixpoint of a signature container \( F : \Cont_{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
 \end{definition}
-Spelled out, a smallest \( F \)-fixed point consists of a \emph{carrier} \( M : \Cont_I \)
+Spelled out, a smallest \( F \)-fixpoint consists of a \emph{carrier} \( M : \Cont_I \)
 and a structure map \( m : \Cart{\Subst{F}{M}}{M} \)
 such that for any other algebra \( (G, g) \), the type of morphisms \( \Alg{\Subst{F}{\Blank}}((M, m), (G, g)) \) is contractible.
 The latter means that there is a unique map \( r : \Cart{M}{G} \) that commutes with the structure maps \( m \) and \( g \).
-As a consequence, the carriers of smallest fixed points are equivalent (hence equal) as containers.
+As a consequence, the carriers of smallest fixpoints are equivalent (hence equal) as containers.
 
-We now show, assuming access to \( \W \)-types, that all containers admit smallest fixed points in this sense:
+We now show, assuming access to \( \W \)-types, that all containers admit smallest fixpoints in this sense:
 Recall that for \( A : \Type \) and \( B : A \to \Type \),
 the type \( \W(A, B) \) has the single constructor
 \begin{equation*}
@@ -400,7 +400,7 @@ the constructors define equivalences
 \end{align*}
 for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
 
-We use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively, of the smallest fixed-point container:
+We use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively, of the smallest fixpoint container:
 \begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \Cont_{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \Cont_I \):
   \begin{align*}
@@ -410,7 +410,7 @@ We use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectiv
   \end{align*}
 \end{definition}
 
-These let us derive a fixed-point to substitution:
+These let us derive a fixpoint to substitution:
 \begin{problem}
   Define an equivalence of containers \( \In_F : F[{\mu F}] \CartEquiv {\mu F} \).
   \begin{construction}
@@ -489,10 +489,10 @@ which yields a morphism into \emph{any} other algebra:
   This is done by \( \W \)-induction on the shapes of \( \mu F \).
 \end{construction}
 
-In fact, this morphism is uniquely determined, hence we get a fixed point for any signature container:
+In fact, this morphism is uniquely determined, hence we get a fixpoint for any signature container:
 \begin{theorem}
   For all \( F : \Cont_{I + 1}\), the pair \( (\mu F, \In_F) \) is an initial \( \Subst{F}{\Blank} \)-algebra,
-  hence a smallest fixed-point of \( F \).
+  hence a smallest fixpoint of \( F \).
   \begin{proof}
     Let \( (G, \alpha) \) be a second \( \Subst{F}{\Blank} \)-algebra.
     By definition, \( \Rec_F(\alpha) : \Cart{\mu F}{G} \) is an algebra morphism.
@@ -530,9 +530,9 @@ In fact, this morphism is uniquely determined, hence we get a fixed point for an
   \end{proof}
 \end{theorem}
 
-\subsection{The \texorpdfstring{\( \mu \)-}{Fixed Point }Rule}
+\subsection{The \texorpdfstring{\( \mu \)-}{Fixpoint }Rule}
 
-Having convinced ourselves that fixed points do exist even for untruncated containers, we can now characterize their derivatives.
+Having convinced ourselves that fixpoints do exist even for untruncated containers, we can now characterize their derivatives.
 Let \( F : \Cont_2 \).
 If we think of \( \mu F \) as an \( F \)-branching tree, then \( \Der{\mu F} \) represents a type of trees with a hole.
 Such a hole must be either in the position of a leaf or occur recursively in a branch,
@@ -655,8 +655,8 @@ Thus, a strong \( \mu \)-rule for some container necessarily implies a strong ch
 
 We would like to establish the converse to this as well, but cannot do so directly,
 as the converse of \autoref{is-equiv-from-mu-rec} does not hold:
-in general, there are fixed points \( \varphi : \Cart{ \Subst{F}{G} }{ G } \) such that \( \mu F \) and \( G \) are not equivalent as containers.
-However, \( \mu F \) is the smallest among such fixed points, and embeds into any other (pre-)fixed point:
+in general, there are fixpoints \( \varphi : \Cart{ \Subst{F}{G} }{ G } \) such that \( \mu F \) and \( G \) are not equivalent as containers.
+However, \( \mu F \) is the smallest among such fixpoints, and embeds into any other (pre-)fixpoint:
 \begin{lemma}\label{is-embedding-mu-rec}
   If \( \alpha : \Cart{\Subst{F}{G}}{G} \) is an embedding of containers,
   then so is \( \Rec_F(\alpha) : \Cart{\mu F}{G} \).
