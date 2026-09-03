@@ -18,12 +18,12 @@ We would like to know:
 Is a strong \( \mu \)-rule a constructive taboo in the same way that a strong chain rule is?
 
 In the future we would also like to work out the behaviour of \( \Der \) on fixpoints other than \( \mu \).
-In their original work~\cite{AbbottEtAl2005DataDifferentiating}, \citeauthor{AbbottEtAl2005DataDifferentiating} derive a fixpoint rule also for the largest fixpoint, \( \nu F \).
-Recently, \citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} show that \( \Type \)-valued container functors preserve both smallest and largest fixpoints~\cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
+In their original work~\cite{AbbottEtAl2005DataDifferentiating}, \citeauthor{AbbottEtAl2005DataDifferentiating} derive a fixpoint rule also for the greatest fixpoint, \( \nu F \).
+Recently, \citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} show that \( \Type \)-valued container functors preserve both least and greatest fixpoints~\cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
 In either work, many of the intermediate lemmata hold for arbitrary fixpoints,
 and the same is true for a number of our results:
 The construction of the lax chain rule in \autoref{lax-chain-rule}, for example, only depends on the property of \( \In_F : \Cart{\Subst{F}{\mu F}}{\mu F} \) being \emph{some}
-\( \Subst{F}{\Blank} \)-fixpoint, not necessarily the smallest.
+\( \Subst{F}{\Blank} \)-fixpoint, not necessarily the least fixpoint.
 We could thus give for any \( \varphi : \CartIso{\Subst{F}{\varphi F}}{\varphi F} \) a \enquote{\( \varphi \)-rule}
 as an embedding \( \operatorname{\Op{\varphi-rule}} : \Cart{\mu F'}{\Der(\varphi F)} \) in which
 \(

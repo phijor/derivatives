@@ -243,7 +243,7 @@ Like in \autoref{discrete-strong-chain-rule}, this is the case for discrete cont
 
 To show how derivatives of untruncated containers interact with fixpoints,
 we first have to give a suitable specification of what we mean by such a \enquote{fixpoint}.
-Traditionally, the (smallest) fixpoint associated to a signature container is constructed as follows:
+Traditionally, the (least) fixpoint associated to a signature container is constructed as follows:
 Given an \( I \)-indexed and set-truncated container \( (\MkCont{S}{P}) \),
 it is interpreted as a functor \( \llbracket \MkCont{S}{P} \rrbracket : [\Set^I, \Set] \),
 which takes families \( \vec{X} : I \to \Set \) to
@@ -256,7 +256,7 @@ allowing concise proofs for a number of properties.
 In particular, given a signature container \( F : \Cont_{I+1} \), its interpretation \( \llbracket F \rrbracket(\vec{X}, \Blank) : [ \Set, \Set ] \)
 admits an initial algebra for any \( \vec{X} \).
 This initial algebra can be shown to lie in the image of the interpretation functor, hence it defines a necessarily unique \( I \)-indexed container \( \mu F \),
-which is regarded as the smallest fixpoint of \( F \).
+which is regarded as the least fixpoint of \( F \).
 
 Recently,
 \citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} have expanded upon this idea in~\cite{DamatoEtAl2025FormalisingInductiveCoinductive},
@@ -292,7 +292,7 @@ there is an equivalence of types
 In particular, a fixpoint of containers \( \varphi : \CartIso{\Subst{F}{G}}{G} \) induces a fixpoint of \( \Ext{F}(\vec{X}, \Blank ) \),
 which is exactly a container fixpoint in the sense of \cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
 
-We thus define smallest fixpoints of a signature container \( F \) without reference to its associated functor \( \Ext{F} \),
+We thus define least fixpoints of a signature container \( F \) without reference to its associated functor \( \Ext{F} \),
 namely as initial algebras of the wild functor \( \Subst{F}{\Blank} \).
 Let us set this up precisely:
 \begin{problem}[note={\( \Subst{F}{\Blank} \)-algebras}]
@@ -349,15 +349,15 @@ an object \( 0 \) of a wild category \( \mathcal{C} \) is \emph{initial}
 if for any other object \( X \), the type of morphisms \( \mathcal{C}(0, X) \) is \emph{contractible}.
 Hence we say:
 \begin{definition}
-  A smallest fixpoint of a signature container \( F : \Cont_{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
+  A least fixpoint of a signature container \( F : \Cont_{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
 \end{definition}
-Spelled out, a smallest \( F \)-fixpoint consists of a \emph{carrier} \( M : \Cont_I \)
+Spelled out, a least \( F \)-fixpoint consists of a \emph{carrier} \( M : \Cont_I \)
 and a structure map \( m : \Cart{\Subst{F}{M}}{M} \)
 such that for any other algebra \( (G, g) \), the type of morphisms \( \Alg{\Subst{F}{\Blank}}((M, m), (G, g)) \) is contractible.
 The latter means that there is a unique map \( r : \Cart{M}{G} \) that commutes with the structure maps \( m \) and \( g \).
-As a consequence, the carriers of smallest fixpoints are equivalent (hence equal) as containers.
+As a consequence, the carriers of least fixpoints are equivalent (hence equal) as containers.
 
-We now show, assuming access to \( \W \)-types, that all containers admit smallest fixpoints in this sense:
+We now show, assuming access to \( \W \)-types, that all containers admit least fixpoints in this sense:
 Recall that for \( A : \Type \) and \( B : A \to \Type \),
 the type \( \W(A, B) \) has the single constructor
 \begin{equation*}
@@ -400,7 +400,7 @@ the constructors define equivalences
 \end{align*}
 for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
 
-We use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively, of the smallest fixpoint container:
+We use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively, of the least fixpoint container:
 \begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \Cont_{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \Cont_I \):
   \begin{align*}
@@ -492,7 +492,7 @@ which yields a morphism into \emph{any} other algebra:
 In fact, this morphism is uniquely determined, hence we get a fixpoint for any signature container:
 \begin{theorem}
   For all \( F : \Cont_{I + 1}\), the pair \( (\mu F, \In_F) \) is an initial \( \Subst{F}{\Blank} \)-algebra,
-  hence a smallest fixpoint of \( F \).
+  hence a least fixpoint of \( F \).
   \begin{proof}
     Let \( (G, \alpha) \) be a second \( \Subst{F}{\Blank} \)-algebra.
     By definition, \( \Rec_F(\alpha) : \Cart{\mu F}{G} \) is an algebra morphism.
@@ -655,8 +655,8 @@ Thus, a strong \( \mu \)-rule for some container necessarily implies a strong ch
 
 We would like to establish the converse to this as well, but cannot do so directly,
 as the converse of \autoref{is-equiv-from-mu-rec} does not hold:
-in general, there are fixpoints \( \varphi : \Cart{ \Subst{F}{G} }{ G } \) such that \( \mu F \) and \( G \) are not equivalent as containers.
-However, \( \mu F \) is the smallest among such fixpoints, and embeds into any other (pre-)fixpoint:
+in general, there are fixpoints \( \varphi : \Subst{F}{G} \CartEquiv G \) such that \( \mu F \) and \( G \) are not equivalent as containers.
+If ordered with respect to embeddings, however, \( \mu F \) is the least pre-fixpoint of \( \Subst{F}{\Blank} \):
 \begin{lemma}\label{is-embedding-mu-rec}
   If \( \alpha : \Cart{\Subst{F}{G}}{G} \) is an embedding of containers,
   then so is \( \Rec_F(\alpha) : \Cart{\mu F}{G} \).
