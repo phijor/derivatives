@@ -665,73 +665,95 @@ If ordered with respect to embeddings, however, \( \mu F \) is the least pre-fix
   \end{proof}
 \end{lemma}
 
+Fix some \( S : \Type \) and a family \( P : S \to \Type \).
 Recall that non-dependent recursion on \( \W(S, P) \) into a type \( A \) is given by
 \begin{align*}
   \WRec &: \big(\big( { \textstyle \sum_{s : S} (P(s) \to A) } \big) \to A \big) \to (\W(S, P) \to A) \\
   \WRec&_h(\Sup(s, f)) \DefEq h(s, \WRec(h) \circ f)
 \end{align*}
-This map preserves embeddings:
+We can characterize the fibers of this map,
+and thus show that it preserves embeddings.
+\begin{problem}\label{prob:wrec-fiber-equiv}
+  Let \( A : \Type \) and \( { h : ( \sum_{s : S} (P(s) \to A) ) \to A } \).
+  For all \( s : S \) and \( f : P(s) \to \W(S, P) \),
+  define an equivalence
+  \[
+    \Fiber_{\WRec(h)}(\WRec(h, \Sup(s, f))) \simeq \prod_{p : P(s)} \Fiber_{\WRec(h)}(\WRec(h, f(p)))
+  \]
+  characterizing the fibers over the image of \( \WRec(h) : \W(S, P) \to A \).
+\end{problem}
+\begin{construction}
+  Abbreviate \( h^* \DefEq \WRec(h) \) and let \( s : S \), \( f : P(s) \to \W(S, P) \).
+  By definition, we have
+  \begin{align*}
+    \Fiber_{h^*}(h^*(\Sup(s, f)))
+      &\simeq
+      \smashoperator{\sum_{w : \W(S, P)}}\, h^*(w) = h(s, h^* \circ f)
+    \intertext{
+      Unfolding \( w \) via \( \WIn : \sum_{s : S } (P(s) \to \W(S, P)) \simeq \W(S, P) \), we obtain
+    }
+      &\simeq
+      \adjustlimits\sum_{s' : S} \sum_{\smash{f'} : P(s') \to \W(S, P)}
+        h^*(\Sup(s', f')) = (s, h^* \circ f)
+    \intertext{
+      By the computation rule for \( \W \), this is equivalent to
+    }
+      &\simeq
+      \adjustlimits\sum_{s' : S} \sum_{\smash{f'} : P(s') \to \W(S, P)}
+        (s', h^* \circ f') = (s, h^* \circ f)
+    \intertext{
+      Breaking up the path of pairs into a pair of paths, we rearrange:
+    }
+      &\simeq
+      \adjustlimits\sum_{(s\mathrlap{'} , q) : \Singl(s)} \sum_{\smash{f'} : P(s') \to \W(S, P)}
+        h^* \circ f' =_{q} h^* \circ f
+    \intertext{
+      Contracting \( \Singl(s) \) and applying function extensionality to the right,
+      we are left with
+    }
+      &\simeq
+      \sum_{\smash{f'} : P(s) \to \W(S, P)}
+        \prod_{p : P(s)}
+        h^*(f'(p)) = h^*(f'(p))
+    \intertext{
+      Distributing \( \Sigma \) and \( \Pi \),
+      we get
+    }
+      &\simeq
+        \prod_{p : P(s)}
+          \sum_{w : \W(S, P)}
+          h^*(w) = h^*(f(p)) \\
+      &\simeq
+        \prod_{p : P(s)}
+          \Fiber_{h^*}(h^*(f(p)))
+  \end{align*}
+  which finishes the construction of the desired equivalence.
+\end{construction}
+
 \begin{lemma}\label{is-embedding-W-rec}
-  Let \( S : \Type \) and \( P : S \to \Type \).
   For all \( A : \Type \),
-  if \( { h : ( \sum_{s : S} (P(s) \to A) ) \to A } \) is an embedding,
-  then so is \( \WRec_h : \W(S, P) \to A \).
+  if the function \( { h : ( \sum_{s : S} (P(s) \to A) ) \to A } \) is an embedding,
+  then so is \( \WRec(h) : \W(S, P) \to A \).
   \begin{proof}
-    It suffices to show that fibers over the image of \( \WRec_h \) are propositions,
-    i.e. that \( \prod_{w : \W(S, P)} \Op{isProp}(\Fiber_{\WRec_h}(\WRec_h(w)))  \).
+    Again let \( h^* \DefEq \WRec(h) \).
+    It suffices to show that fibers over the image of \( h^* \) are propositions,
+    i.e.\@ \( \prod_{w : \W(S, P)} \Op{isProp}(\Fiber_{h^*}(h^*(w)))  \).
     We do so by \( \W \)-induction.
-    Let \( s : S \), \( f : P(s) \to \W(S, P) \),
-    and consider the type of fibers over \( \Sup(s, f) \):
+    Let \( s : S \), \( f : P(s) \to \W(S, P) \).
+    By induction, we can assume
+    \[
+      \eta : \prod_{p : P(s)} \Op{isProp}(\Fiber_{h^*}(h^*(fp)))
+    \]
+    By \autoref{prob:wrec-fiber-equiv}, there is an equivalence over \( h^*(\Sup(s, f)) \), namely
     \begin{align*}
-      {} &\mathrel{\hphantom{\simeq}}
-        \Fiber_{\WRec_h}(\WRec_h(\Sup(s, f)))
-      \intertext{
-        By the computation rule for \( \W \)-recursion, it is equivalent to
-      }
-        &\simeq
-        \sum_{w : \W(S, P)} h(x) = h(s, \WRec_h \circ f)
-      \intertext{
-        where \( x \) is a term involving \( w \), to be expanded later.
-        Since \( h \) is an embedding, we can cancel it from the path type:
-      }
-        &\simeq
-        \sum_{w : \W(S, P)} x = (s, \WRec_h \circ f)
-      \intertext{
-        Unfolding \( w : \W(S, P) \) via \( \WIn \) and expanding \( x \),
-        we obtain
-      }
-        &\simeq
-        \adjustlimits\sum_{s' : S} \sum_{f' : P(s') \to \W(S, P)}
-          (s', \WRec_h \circ f') = (s, \WRec_h \circ f)
-      \intertext{
-        Breaking up the path of pairs into a pair of paths, we rearrange:
-      }
-        &\simeq
-        \adjustlimits\sum_{(s\mathrlap{'} , q) : \Singl(s)} \sum_{f' : P(s') \to \W(S, P)}
-          \WRec_h \circ f' =_{q} \WRec_h \circ f
-      \intertext{
-        Contracting \( \Singl(s) \) and applying function extensionality to the right,
-        we are left with
-      }
-        &\simeq
-        \sum_{f' : P(s) \to \W(S, P)}
-          \prod_{p : P(s)}
-          \WRec_h(f'(p)) = \WRec_h(f(p))
-      \intertext{
-        Distributing \( \Sigma \) over \( \Pi \),
-        we get
-      }
+      \Fiber_{h^*}(h^*(\Sup(s, f)))
         &\simeq
           \prod_{p : P(s)}
-            \sum_{w : \W(S, P)}
-            \WRec_h(w) = \WRec_h(f(p))
+            \Fiber_{h^*}(h^*(f(p)))
     \end{align*}
-    For any \( p : P(s) \), the codomain of this type is
-    \( \Fiber_{\WRec_h}(\WRec_h(f(p)) \).
-    But since \( f(p) : \W(S, P) \) is structurally smaller than \( \Sup(s, f) : \W(S, P) \),
-    this type is a proposition by the induction hypothesis.
-    Hence, all fibers over the image of \( \WRec_h \) are propositions,
-    and \( \WRec_h \) is an embedding.
+    By the induction hypothesis \( \eta \), the type on the right is a proposition.
+    Hence, all fibers over the image of \( h^* \) are propositions,
+    and \( h^* \) is an embedding.
   \end{proof}
 \end{lemma}
 
