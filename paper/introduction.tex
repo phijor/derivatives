@@ -3,24 +3,39 @@
 A container \cite{AbbottEtAl2005ContainersConstructingstrictly} encodes the signature of an inductive data type:
 it consists of a collection of shapes \( S \), each \( s : S \) representing a constructor,
 and for each a collection of positions \( P(s) \), indexing arguments of the constructor.
-Many operations on data types can be made precise as operations on containers,
-including sums \( F \CPlus G \), products \( F \CTimes G \) and substitution \( \Subst{F}{G} \), allowing us to reason about them.
+The container defines polynomial functor \( X \mapsto \sum_{s : S} X^{P(s)} \),
+called its \emph{extension}.
+Natural transformations of polynomial functors are a well-studied model of parametric polymorphism~\cite{BainbridgeEtAl1990Functorialpolymorphism}.
+\Citeauthor{AbbottEtAl2004ConstructingPolymorphicPrograms} show that
+the extension defines an equivalence between category of containers and that of polynomial functors and natural transformations.
+This lets us reason about type-polymorphic programs entirely in the language of containers;
+many operations on functors (sums, products, composition, etc.) are representable directly in terms of containers.
 
-Another important operation on containers is that of a derivative.
-It traces back to \citeauthor{Huet1997Zipper}'s \citetitle{Huet1997Zipper}~\cite{Huet1997Zipper},
-a procedure for computing a type of contexts around a subtree in a tree-shaped data type.
+Another important operation on polynomial functors that has found applications in computer science is that of the \emph{derivative}.
+In \citetitle{Huet1997Zipper}~\cite{Huet1997Zipper}, \citeauthor{Huet1997Zipper} describes a procedure for computing a type of contexts around a subtree in a tree-shaped data type.
 \Citeauthor{McBride2001DerivativeRegularType}~\cite{McBride2001DerivativeRegularType}
-notices that for the class of \enquote{regular types}, one-hole contexts behave like derivatives of functions in calculus:
+notices that for the class of \emph{regular types}, one-hole contexts behave like derivatives of functions in calculus:
 they satisfy similar rules for constants, sums and products, and their substitution follows a chain rule.
-\Citeauthor{AbbottEtAl2003DerivativesContainers} extend this to a derivative operation on containers,
+A regular type has a straightforward interpretation as a polynomial functor,
+and \citeauthor{McBride2001DerivativeRegularType}'s computation of one-hole contexts essentially describes the derivative of such functors:
+Given a polynomial \( F(X) = \sum_{s : S} X^{P(s)} \),
+its derivative
+\(
+  \Der{F}(X) = \sum_{s : S} \sum_{p : P(s)} X^{P(s) \setminus \{ p \}}
+\)
+is again a polynomial functor.\footnote{%
+  Notice the similarities with the analytic derivative \( \partial(\sum_i x^{b_i}) = \sum_i b_i x^{b_i - 1} \).
+}
+
+\Citeauthor{AbbottEtAl2003DerivativesContainers} make this connection precise by giving a derivative operation on containers,
 first in a categorical meta-language~\cite{AbbottEtAl2003DerivativesContainers},
 then in a type-theoretic one~\cite{AbbottEtAl2005DataDifferentiating}.
-They show that derivatives of containers satisfy a universal property with respect to a class of \enquote{cartesian}
-morphisms \( F \multimap G \) of containers.
+They show that derivatives of containers satisfy a universal property with respect to a class of \emph{cartesian}
+morphisms of containers.
 Namely, for any container \( G \) on which equality of positions is decidable,
-cartesian morphisms \( F \multimap \Der{G} \) are in 1-to-1 correspondence with cartesian morphisms \( F \CTimes \Id \multimap G \).
+cartesian morphisms \( F \to \Der{G} \) are in 1-to-1 correspondence with cartesian morphisms \( F \CTimes \Id \to G \).
 Furthermore, the laws of derivatives are encoded as isomorphisms:
-the chain rule, for example, becomes an isomorphism of containers
+the chain rule, for example, becomes an isomorphism of containers,
 \( \Der{(\Subst{F}{G})} \cong \Subst{(\Der{F})}{G} \CTimes \Der{G} \).
 
 In the meantime, other notions of containers have appeared,
