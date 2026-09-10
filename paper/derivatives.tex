@@ -89,8 +89,7 @@ and \citeauthor{AbbottEtAl2005ContainersConstructingstrictly} prove that
 \( \Ext{\Blank} \) is a fully-faithful functor into the category of endofunctors.
 In essence, morphisms of set-truncated containers represent exactly polymorphic functions,
 that is natural transformations of polynomial endofunctors of sets~\cite[{Theorem~3.4}]{AbbottEtAl2005ContainersConstructingstrictly}.
-Polynomial functors are closed under products, sums, composition and more.
-These correspond to operations on containers:
+Furthermore, we have the following basic operations on containers:
 \begin{definition}\label{container-operations}
   Given \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \), define the following:
   \begin{itemize}
@@ -124,15 +123,23 @@ These correspond to operations on containers:
   The \emph{identity container} is \( \Id \DefEq (\MkCont{1}{1}) \).
 \end{definition}
 For set-truncated containers,
-products and sums form a symmetric monoidal structure with units \( \CConst(1) \) and \( \CConst(0) \).
+these operations correspond exactly to (pointwise) products and sums, as well as composition, of polynomial functors.
+Products and sums of containers form a symmetric monoidal structure with units \( \CConst(1) \) and \( \CConst(0) \), respectively.
 The identity container \( \Id \DefEq (\MkCont{1}{1}) \)
 is a unit for substitution, which is a non-symmetric monoidal product.
-The extension functor \( \Ext{\Blank} \) is monoidal with respect to products, sums and substitution.
-We have \( \Ext{\CConst(A)}(X) \simeq A \) and \( \Ext{\CYo(A)}(X) \simeq (A \to X) \).%
-\footnote{
-  On \( h \)-sets, the composite \( \Ext{\Blank} \circ \CYo \) is essentially the Yoneda-embedding, whence the name \( \CYo \).
-}
-Furthermore, \( \Ext{\Id}(X) \simeq X \).
+The equivalence \( \Ext{\Blank} \) preserves all of these monoidal structures; it is easy to see that
+\begin{align*}
+  \Ext{F \CTimes G} &= \Ext{F} \times \Ext{G},
+    &
+  \Ext{F \CPlus G} &= \Ext{F} + \Ext{G},
+    &
+  \Ext{\Subst{F}{G}} &= \Ext{F} \circ \Ext{G}
+\end{align*}
+and that \( \Ext{\Id} \) is the identity functor.
+For any \( h \)-set \( A \), \( \Ext{\CConst{A}} \) is the constant functor \( \lambda \Blank.\, A \).
+Similarly, \( \Ext{\CYo(A)}(X) \simeq (A \to X) \)
+---
+the composite \( \Ext{\Blank} \circ \CYo \) is essentially the Yoneda-embedding, whence the name \( \CYo \).
 
 When constructing a morphism \( f : \Cart{F}{G} \), we will oftentimes factor it
 through (equivalent) auxiliary containers
