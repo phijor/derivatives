@@ -18,13 +18,13 @@ private
     ℓ ℓS ℓP : Level
 
 open Container
-open Cart
+open _⊸_
 
 ∂ : (F : Container ℓS ℓP) → Container (ℓ-max ℓS ℓP) ℓP
 ∂ F .Shape = Σ[ s ∈ F .Shape ] (F .Pos s) °
 ∂ F .Pos (s , p , _) = (F .Pos s) ∖ p
 
-∂[_] : {F G : Container ℓS ℓP} → Cart F G → Cart (∂ F) (∂ G)
+∂[_] : {F G : Container ℓS ℓP} → F ⊸ G → (∂ F) ⊸ (∂ G)
 ∂[_] {F} {G} [ f ◁ u ] = ∂f module ∂[-] where
   ∂-shape : (Σ[ s ∈ F .Shape ] F .Pos s °) → (Σ[ t ∈ G .Shape ] G .Pos t °)
   ∂-shape (s , _) .fst = f s
@@ -34,7 +34,7 @@ open Cart
   ∂-pos : (s : F .Shape) (p : F .Pos s °) → (G .Pos (f s) ∖ invEq (u s) (p .fst)) ≃ (F .Pos s ∖ (p .fst))
   ∂-pos s p = RemoveRespectInvEquiv (p .fst) (u s)
 
-  ∂f : Cart (∂ F) (∂ G)
+  ∂f : (∂ F) ⊸ (∂ G)
   ∂f .shape = ∂-shape
   ∂f .pos = uncurry ∂-pos
   {-# INLINE ∂f #-}

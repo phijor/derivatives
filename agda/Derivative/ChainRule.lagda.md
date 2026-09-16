@@ -28,13 +28,13 @@ private
     ℓ ℓS ℓP : Level
 
 open Container
-open Cart
+open _⊸_
 ```
 -->
 
 # The chain rule
 
-For any pair of containers, we can define a cartesian morphism
+For any pair of containers, we can define a linear morphism
 `chain-rule : ∂ F [ G ] ⊗ ∂ G ⊸ ∂ (F [ G ])`, a _lax_ chain rule.
 Under some circumstances, this morphism will be invertible.
 In this case we call the chain rule _strong_.
@@ -42,7 +42,7 @@ In this case we call the chain rule _strong_.
 module _ (F G : Container ℓ ℓ) where
   open Container F renaming (Shape to S ; Pos to P)
   open Container G renaming (Shape to T ; Pos to Q)
-  chain-rule : Cart (∂ F [ G ] ⊗ ∂ G) (∂ (F [ G ]))
+  chain-rule : (∂ F [ G ] ⊗ ∂ G) ⊸ (∂ (F [ G ]))
 ```
 
 The chain rule is defined by first using [`ungraftEquiv`](Derivative.Isolated.Grafting.html#ungraftEquiv)
@@ -51,7 +51,7 @@ and then distributing isolated points over Σ-types by means of [`Σ-isolate`](D
 ```agda
   chain-rule =
     ∂ F [ G ] ⊗ ∂ G
-      ⊸⟨ Equiv→Cart η₀ ⟩
+      ⊸⟨ Equiv→⊸ η₀ ⟩
     H
       ⊸⟨ η₁ ⟩
     ∂ (F [ G ])
@@ -84,7 +84,7 @@ and then distributing isolated points over Σ-types by means of [`Σ-isolate`](D
       η₀ : Equiv (∂ F [ G ] ⊗ ∂ G) H
       η₀ = Equiv-inv $ Equiv-shape $ invEquiv equiv-left
 
-      η₁ : Cart H (∂ (F [ G ]))
+      η₁ : H ⊸ (∂ (F [ G ]))
       η₁ .shape = Σ-map-snd λ (s , f) → Σ-isolate (P s) (Q ∘ f)
       η₁ .pos ((s , f) , (p° , q°)) = invEquiv (isIsolatedFst→Σ-remove-equiv (p° .snd))
 ```

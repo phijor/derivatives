@@ -318,7 +318,7 @@ This mirrors the notation `Σ[ a ∈ A ] B a` for `Σ A B`.
 <!--
 ```agda
 open Container
-open Cart
+open _⊸_
 private
   variable
     F G : Container ℓ-zero ℓ-zero
@@ -326,11 +326,11 @@ private
 -->
 
 **Definition 3.2**:
-A (cartesian) morphism of containers consists of a map of shapes,
+A linear morphism of containers consists of a map of shapes,
 and a family of equivalences of positions.
 ```agda
-_ : Cart F G ≃ (Σ[ fₛₕ ∈ (F .Shape → G .Shape) ] ∀ s → G .Pos (fₛₕ s) ≃ F .Pos s)
-_ = Cart-Σ-equiv
+_ : F ⊸ G ≃ (Σ[ fₛₕ ∈ (F .Shape → G .Shape) ] ∀ s → G .Pos (fₛₕ s) ≃ F .Pos s)
+_ = ⊸-Σ-equiv
 ```
 
 **Definition 3.3**:
@@ -341,16 +341,17 @@ _ : (F G : Container _ _) → Type ℓ-zero
 _ = Equiv
 ```
 
-Containers and cartesian morphisms assemble into a wild category.
+Containers and linear morphisms assemble into a wild category.
 Set-truncated containers form a 1-category.
 ```agda
 open import Derivative.Category ℓ-zero
+  renaming (∂ to ∂ₛ)
 
 _ : WildCat _ _
-_ = ℂont∞
+_ = ℂont⊸∞
 
 _ : Category _ _
-_ = ℂont
+_ = ℂont⊸
 ```
 
 **Definition 3.4**:
@@ -363,9 +364,9 @@ _ = isTruncatedContainer {ℓS = ℓ-zero} {ℓP = ℓ-zero}
 **Lemma 3.5**:
 Extensionality for morphisms says that we can compare them by their shape- and position maps.
 ```agda
-_ : (f g : Cart F G)
+_ : (f g : F ⊸ G)
   → (Σ[ p ∈ f .shape ≡ g .shape ] (PathP (λ i → ∀ s → G .Pos (p i s) ≃ F .Pos s) (f .pos) (g .pos))) ≃ (f ≡ g)
-_ = Cart≡Equiv
+_ = ⊸≡Equiv
 ```
 
 ### Derivatives, Universally
@@ -384,9 +385,9 @@ _ = λ S P → refl
 ```
 
 **Problem 3.7**:
-Extend the derivative to a functor on the wild category of containers and cartesian morphisms, `ℂont∞`.
+Extend the derivative to a functor on the wild category of containers and linear morphisms, `ℂont∞`.
 ```agda
-_ : WildFunctor ℂont∞ ℂont∞
+_ : WildFunctor ℂont⊸∞ ℂont⊸∞
 _ = ∂∞
 ```
 
@@ -402,7 +403,7 @@ _ = isTruncatedDerivative
 **Corollary 3.9**:
 \( \partial \) restricts to an endofunctor of the 1-category of set-truncated containers.
 ```agda
-_ : Functor ℂont ℂont
+_ : Functor ℂont⊸ ℂont⊸
 _ = ∂ₛ
 ```
 
@@ -412,10 +413,10 @@ This consists of two families of morphisms `unit` and `counit`,
 ```agda
 open import Derivative.Adjunction
 
-_ : Cart F (∂ (F ⊗Id))
+_ : F ⊸ (∂ (F ⊗Id))
 _ = unit _
 
-_ : Cart (∂ G ⊗Id) G
+_ : (∂ G ⊗Id) ⊸ G
 _ = counit _
 ```
 natural in \( F \) and \( G \), respectively,
@@ -499,15 +500,15 @@ open import Derivative.ChainRule
 **Problem 4.1**:
 The lax chain rule.
 ```agda
-_ : Cart (((∂ F) [ G ]) ⊗ ∂ G) (∂ (F [ G ]))
+_ : (((∂ F) [ G ]) ⊗ ∂ G) ⊸ (∂ (F [ G ]))
 _ = chain-rule _ _
 ```
 
 **Definition 4.2**:
 A morphism of containers is an embedding if its shape map is an embedding.
 ```agda
-isContainerEmbedding : Cart F G → Type _
-isContainerEmbedding = λ f → isEmbedding (Cart.shape f)
+isContainerEmbedding : F ⊸ G → Type _
+isContainerEmbedding = λ f → isEmbedding (shape f)
 ```
 
 **Proposition 4.3**:
@@ -581,11 +582,12 @@ _ = Containerᴵ.Container-Σ-equiv
 
 ```agda
 open Containerᴵ
-  using (₀ ; ₁ ; 𝟚 ; _⊸_ ; isContainerEquiv ; _⧟_ ; ↑ ; π₁)
+  using (₀ ; ₁ ; 𝟚 ; isContainerEquiv ; _⧟_ ; ↑ ; π₁)
   renaming
     ( _⊗_ to _⊗ᴵ_
     ; _⊕_ to _⊕ᴵ_
     ; _⋆_ to _⋆ᴵ_
+    ; _⊸_ to _⊸ᴵ_
     ; isContainerEmbedding to isContainerEmbeddingᴵ
     ; [-]-map to [_]-map
     )
@@ -622,7 +624,7 @@ open import Derivative.Indexed.ChainRule as IndexedChainRule
 _ :
   ∀ (F : Containerᴵ 𝟚)
   → (G : Containerᴵ _)
-  → ((∂₀ F [ G ]ᴵ) ⊕ᴵ ((∂₁ F [ G ]ᴵ) ⊗ᴵ ∂• G)) ⊸ ∂• (F [ G ]ᴵ)
+  → ((∂₀ F [ G ]ᴵ) ⊕ᴵ ((∂₁ F [ G ]ᴵ) ⊗ᴵ ∂• G)) ⊸ᴵ ∂• (F [ G ]ᴵ)
 _ = binary-chain-rule
 ```
 
@@ -664,8 +666,8 @@ open import Derivative.Indexed.Mu
 Substitution \( F[\_] \) is a (wild) endofunctor.
 ```agda
 _ : (F : Containerᴵ (Maybe Ix)) {G G′ : Containerᴵ Ix}
-  → G ⊸ G′
-  → (F [ G ]ᴵ) ⊸ (F [ G′ ]ᴵ)
+  → G ⊸ᴵ G′
+  → (F [ G ]ᴵ) ⊸ᴵ (F [ G′ ]ᴵ)
 _ = [_]-map
 
 _ = Containerᴵ.[-]-map-id
@@ -697,9 +699,9 @@ Derive a recursion principle for fixed-point containers.
 module _
   (F : Containerᴵ (Maybe Ix))
   (G : Containerᴵ Ix)
-  (α : F [ G ]ᴵ ⊸ G)
+  (α : F [ G ]ᴵ ⊸ᴵ G)
   where
-  _ : μ F ⊸ G
+  _ : μ F ⊸ᴵ G
   _ = μ-rec F G α
 
   _ : μ-in F ⋆ᴵ μ-rec F G α ≡ [ F ]-map (μ-rec F G α) ⋆ᴵ α
@@ -710,7 +712,7 @@ module _
 Every signature container admits a smallest fixed point in the wild category of containers.
 For any \( F[\_]\)-algebra \( α : F[G] ⊸ G \), there is a unique algebra map \( α^* : μ F ⊸ G \):
 ```agda
-  _ : ∃![ α* ∈ μ F ⊸ G ] μ-in F ⋆ᴵ α* ≡ [ F ]-map α* ⋆ᴵ α
+  _ : ∃![ α* ∈ μ F ⊸ᴵ G ] μ-in F ⋆ᴵ α* ≡ [ F ]-map α* ⋆ᴵ α
   _ = μ-rec-unique F G α
 ```
 
@@ -724,7 +726,7 @@ open import Derivative.Indexed.MuRule
 The lax \( μ \)-rule.
 ```agda
 _ : (F : Containerᴵ 𝟚)
-  → μ (↑ (∂₀ F [ μ F ]ᴵ) ⊕ᴵ (↑ (∂₁ F [ μ F ]ᴵ) ⊗ᴵ π₁)) ⊸ ∂• (μ F)
+  → μ (↑ (∂₀ F [ μ F ]ᴵ) ⊕ᴵ (↑ (∂₁ F [ μ F ]ᴵ) ⊗ᴵ π₁)) ⊸ᴵ ∂• (μ F)
 _ = μ-rule
 ```
 
@@ -732,7 +734,7 @@ _ = μ-rule
 The μ-recursor reflects equivalences:
 ```agda
 _ : (F : Containerᴵ (Maybe Ix)) (G : Containerᴵ Ix)
-  → (φ : (F [ G ]ᴵ) ⊸ G)
+  → (φ : (F [ G ]ᴵ) ⊸ᴵ G)
   → isContainerEquiv (μ-rec F G φ)
   → isContainerEquiv φ
 _ = isEquivFrom-μ-rec
@@ -751,7 +753,7 @@ _ = StrongFixRule.isEquiv-chain-rule
 The \( μ \)-recursor preserves embeddings.
 ```agda
 _ : (F : Containerᴵ (Maybe Ix)) (G : Containerᴵ Ix)
-  → (φ : (F [ G ]ᴵ) ⊸ G)
+  → (φ : (F [ G ]ᴵ) ⊸ᴵ G)
   → isContainerEmbeddingᴵ φ
   → isContainerEmbeddingᴵ (μ-rec F G φ)
 _ = isEmbedding-μ-rec

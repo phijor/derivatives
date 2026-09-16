@@ -120,44 +120,46 @@ _[_] : (F G : Container ℓ ℓ) → Container ℓ ℓ
 (F [ G ]) .Pos (s , f) = Σ[ p ∈ F .Pos s ] G .Pos (f p)
 ```
 
-### Cartesian morphisms
+### Linear morphisms
 
-A _cartesian morphism_ of containers consists of a map of shapes, and a family of equivalences of positions:
+A _linear morphism_ of containers consists of a map of shapes, and a family of equivalences of positions:
 ```agda
-record Cart {ℓS ℓT ℓP ℓQ} (F : Container ℓS ℓP) (G : Container ℓT ℓQ) : Type (ℓ-max (ℓ-max ℓS ℓP) (ℓ-max ℓT ℓQ)) where
+record _⊸_ {ℓS ℓT ℓP ℓQ} (F : Container ℓS ℓP) (G : Container ℓT ℓQ) : Type (ℓ-max (ℓ-max ℓS ℓP) (ℓ-max ℓT ℓQ)) where
   constructor [_◁_]
   field
     shape : F .Shape → G .Shape
     pos : ∀ s → G .Pos (shape s) ≃ F .Pos s
 
-open Cart
+infix 20 _⊸_
+
+open _⊸_
 ```
 
 We define morphisms as a `record`-type, but sometimes it is useful to view them as a \( Σ \)-type:
 ```agda
-unquoteDecl Cart-Σ-Iso = declareRecordIsoΣ Cart-Σ-Iso (quote Cart)
+unquoteDecl ⊸-Σ-Iso = declareRecordIsoΣ ⊸-Σ-Iso (quote _⊸_)
 
-Cart-Σ-equiv : ∀ {ℓS ℓT ℓP ℓQ} {F : Container ℓS ℓP} {G : Container ℓT ℓQ}
-  → Cart F G ≃ (Σ[ fₛₕ ∈ (F .Shape → G .Shape) ] ∀ s → G .Pos (fₛₕ s) ≃ F .Pos s)
-Cart-Σ-equiv = isoToEquiv Cart-Σ-Iso
+⊸-Σ-equiv : ∀ {ℓS ℓT ℓP ℓQ} {F : Container ℓS ℓP} {G : Container ℓT ℓQ}
+  → F ⊸ G ≃ (Σ[ fₛₕ ∈ (F .Shape → G .Shape) ] ∀ s → G .Pos (fₛₕ s) ≃ F .Pos s)
+⊸-Σ-equiv = isoToEquiv ⊸-Σ-Iso
 ```
 
 Container morphisms are (extensionally) equal if their maps on shapes and positions agree:
 ```agda
-Cart≡ : {F G : Container ℓS ℓP}
-  → {f g : Cart F G}
+⊸≡ : {F G : Container ℓS ℓP}
+  → {f g : F ⊸ G}
   → (p : f .shape ≡ g .shape)
   → (q : PathP (λ i → ∀ s → G .Pos (p i s) ≃ F .Pos s) (f .pos) (g .pos))
   → f ≡ g
-Cart≡ p q i .shape = p i
-Cart≡ p q i .pos = q i
+⊸≡ p q i .shape = p i
+⊸≡ p q i .pos = q i
 
-Cart≡Equiv : {F G : Container ℓS ℓP}
-  → (f g : Cart F G)
+⊸≡Equiv : {F G : Container ℓS ℓP}
+  → (f g : F ⊸ G)
   → (Σ[ p ∈ f .shape ≡ g .shape ] (PathP (λ i → ∀ s → G .Pos (p i s) ≃ F .Pos s) (f .pos) (g .pos))) ≃ (f ≡ g)
-Cart≡Equiv f g = strictIsoToEquiv iso module Cart≡Equiv where
+⊸≡Equiv f g = strictIsoToEquiv iso module ⊸≡Equiv where
   iso : Iso _ _
-  iso .Iso.fun = uncurry Cart≡
+  iso .Iso.fun = uncurry ⊸≡
   iso .Iso.inv p .fst = cong shape p
   iso .Iso.inv p .snd = cong pos p
   iso .Iso.rightInv _ = refl
@@ -166,13 +168,13 @@ Cart≡Equiv f g = strictIsoToEquiv iso module Cart≡Equiv where
 
 ### Composition
 
-Cartesian morphisms compose, and there is an identity morphism for each container.
+Linear morphisms compose, and there is an identity morphism for each container.
 ```agda
-_⋆_ : ∀ {F G H : Container ℓS ℓP} → Cart F G → Cart G H → Cart F H
+_⋆_ : ∀ {F G H : Container ℓS ℓP} → F ⊸ G → G ⊸ H → F ⊸ H
 (f ⋆ g) .shape = g .shape ∘ f .shape
 (f ⋆ g) .pos s = g .pos (f .shape s) ∙ₑ f .pos s
 
-id : (F : Container ℓS ℓP) → Cart F F
+id : (F : Container ℓS ℓP) → F ⊸ F
 id F .shape s = s
 id F .pos s = idEquiv _
 ```
@@ -182,34 +184,33 @@ which we assemble in [`Derivative.Category`](Derivative.Category.html).
 
 We define some notation that lets us compose chains of morphisms:
 ```agda
-module CartReasoning where
+module ⊸Reasoning where
   private
     variable
       F G H : Container ℓS ℓP
 
-  _⊸⟨_⟩_ : (F : Container ℓS ℓP) {G H : Container ℓS ℓP} → Cart F G → Cart G H → Cart F H
+  _⊸⟨_⟩_ : (F : Container ℓS ℓP) {G H : Container ℓS ℓP} → F ⊸ G → G ⊸ H → F ⊸ H
   _⊸⟨_⟩_ F {G} {H} f g = _⋆_ {F = F} {G = G} {H = H} f g
 
-  _⊸∎ : (F : Container ℓS ℓP) → Cart F F
+  _⊸∎ : (F : Container ℓS ℓP) → F ⊸ F
   F ⊸∎ = id F
   {-# INLINE _⊸∎ #-}
 
   infixr 0 _⊸⟨_⟩_
   infix 1 _⊸∎
 
-open CartReasoning public
+open ⊸Reasoning public
 ```
 
 ```agda
-TruncatedCart : {n k : HLevel} → (F G : TruncatedContainer n k ℓS ℓP) → Type _
-TruncatedCart F G = Cart (F .fst) (G .fst)
-{-# INJECTIVE_FOR_INFERENCE TruncatedCart #-}
+_⊸trunc_ : {n k : HLevel} → (F G : TruncatedContainer n k ℓS ℓP) → Type _
+_⊸trunc_ F G = (F .fst) ⊸ (G .fst)
 
-SetCart : (F G : TruncatedContainer 2 2 ℓS ℓP) → Type _
-SetCart = TruncatedCart {n = 2} {k = 2}
+_⊸set_ : (F G : TruncatedContainer 2 2 ℓS ℓP) → Type _
+_⊸set_ = _⊸trunc_ {n = 2} {k = 2}
 
-isOfHLevelCart : (n : HLevel) → {F G : TruncatedContainer n n ℓS ℓP} → isOfHLevel n (TruncatedCart F G)
-isOfHLevelCart n {F = _ , _ , trunc-pos-F} {G = _ , trunc-shape-G , trunc-pos-G} = isOfHLevelRetractFromIso n Cart-Σ-Iso
+isOfHLevel-⊸ : (n : HLevel) → {F G : TruncatedContainer n n ℓS ℓP} → isOfHLevel n (F ⊸trunc G)
+isOfHLevel-⊸ n {F = _ , _ , trunc-pos-F} {G = _ , trunc-shape-G , trunc-pos-G} = isOfHLevelRetractFromIso n ⊸-Σ-Iso
   $ isOfHLevelΣ n
     (isOfHLevelΠ n λ _ → trunc-shape-G)
     λ f → isOfHLevelΠ n λ s → isOfHLevel≃ n (trunc-pos-G (f s)) (trunc-pos-F s)
@@ -217,8 +218,8 @@ isOfHLevelCart n {F = _ , _ , trunc-pos-F} {G = _ , trunc-shape-G , trunc-pos-G}
 
 ### Equivalences
 
-A cartesian morphism is an _equivalence_ if its shape map is an equivalence of types.
-We wrap this in a new `record`, and use [`Equiv→Cart`](#Equiv→Cart) to project out the underlying morphism.
+A linear morphism is an _equivalence_ if its shape map is an equivalence of types.
+We wrap this in a new `record`, and use [`Equiv→⊸`](#Equiv→⊸) to project out the underlying morphism.
 ```agda
 record Equiv (F G : Container ℓS ℓP) : Type (ℓ-max ℓS ℓP) where
   constructor [_◁≃_]
@@ -226,9 +227,9 @@ record Equiv (F G : Container ℓS ℓP) : Type (ℓ-max ℓS ℓP) where
     shape : F .Shape ≃ G .Shape
     pos : ∀ s → G .Pos (equivFun shape s) ≃ F .Pos s
 
-Equiv→Cart : {F G : Container ℓS ℓP} → Equiv F G → Cart F G
-Equiv→Cart [ shape ◁≃ pos ] .shape = equivFun shape
-Equiv→Cart [ shape ◁≃ pos ] .pos = pos
+Equiv→⊸ : {F G : Container ℓS ℓP} → Equiv F G → F ⊸ G
+Equiv→⊸ [ shape ◁≃ pos ] .shape = equivFun shape
+Equiv→⊸ [ shape ◁≃ pos ] .pos = pos
 ```
 
 Equivalences compose and there is an identity equivalence:
@@ -296,16 +297,16 @@ _⊗Id : Container ℓS ℓP → Container ℓS ℓP
 F ⊗Id = F ⊗ Id
 ```
 
-This induces an action on cartesian morphisms.
+This induces an action on linear morphisms.
 ```agda
 [_]⊗_ :
   ∀ {F G : Container ℓS ℓP}
-  → Cart F G
+  → F ⊸ G
   → (H : Container ℓS ℓP)
-  → Cart (F ⊗ H) (G ⊗ H)
+  → (F ⊗ H) ⊸ (G ⊗ H)
 [_]⊗_ {F} {G} f H .shape s = f .shape (s .fst) , _
 [_]⊗_ {F} {G} f H .pos s = Sum.⊎-left-≃ (f .pos (s .fst))
 
-[_]⊗Id : {F G : Container ℓS ℓP} → Cart F G → Cart (F ⊗Id) (G ⊗Id)
+[_]⊗Id : {F G : Container ℓS ℓP} → F ⊸ G → (F ⊗Id) ⊸ (G ⊗Id)
 [_]⊗Id {ℓS} {ℓP} = [_]⊗ Id
 ```

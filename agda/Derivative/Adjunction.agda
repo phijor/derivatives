@@ -16,7 +16,7 @@ private
     ℓ : Level
 
 open Container
-open Cart
+open _⊸_
 
 module _ (F : Container ℓ ℓ) where
   open Container F renaming (Shape to S ; Pos to P)
@@ -28,7 +28,7 @@ module _ (F : Container ℓ ℓ) where
   unit-pos : (s : S) → Maybe (P s) ∖ nothing ≃ P s
   unit-pos s = removeNothingEquiv
 
-  unit : Cart F (∂ (F ⊗Id))
+  unit : F ⊸ (∂ (F ⊗Id))
   unit .shape = unit-shape
   unit .pos = unit-pos
 
@@ -40,18 +40,18 @@ module _ (G : Container ℓ ℓ) where
   counit-pos : ∀ (t : T) (q : (Q t)) → isIsolated q → Q t ≃ ((Q t ∖ q) ⊎ 𝟙*)
   counit-pos t q isolated-q = unreplace-isolated-equiv q isolated-q
 
-  counit : Cart (∂ G ⊗Id) G
+  counit : (∂ G ⊗Id) ⊸ G
   counit .shape = counit-shape
   counit .pos ((t , q , isolated-q) , _) = counit-pos t q isolated-q
 
-is-natural-unit : (F G : Container ℓ ℓ) (f : Cart F G) → unit F ⋆ ∂[ [ f ]⊗Id ] ≡ f ⋆ unit G
-is-natural-unit F G f = Cart≡ (funExt λ s → ΣPathP (refl′ (f .shape s , •) , Isolated≡ refl))
+is-natural-unit : (F G : Container ℓ ℓ) (f : F ⊸ G) → unit F ⋆ ∂[ [ f ]⊗Id ] ≡ f ⋆ unit G
+is-natural-unit F G f = ⊸≡ (funExt λ s → ΣPathP (refl′ (f .shape s , •) , Isolated≡ refl))
   $ funExt λ s → equivExt λ where
     (just q , _) → refl′ (equivFun (f .pos s) q)
     (nothing , nothing≢nothing) → ex-falso $ nothing≢nothing refl
 
-is-natural-counit : (F G : Container ℓ ℓ) (f : Cart F G) → [ ∂[ f ] ]⊗Id ⋆ counit G ≡ counit F ⋆ f
-is-natural-counit F G f = Cart≡ refl $ funExt λ { ((s , p°) , _) → equivExt (goal s p°) }
+is-natural-counit : (F G : Container ℓ ℓ) (f : F ⊸ G) → [ ∂[ f ] ]⊗Id ⋆ counit G ≡ counit F ⋆ f
+is-natural-counit F G f = ⊸≡ refl $ funExt λ { ((s , p°) , _) → equivExt (goal s p°) }
   where
     goal : (s : F .Shape) (p°@(p₀ , p₀≟_) : F .Pos s °)
       → (let (q₀ , q₀≟_) = ∂[ f ] .shape (s , p°) .snd)
@@ -66,27 +66,27 @@ is-natural-counit F G f = Cart≡ refl $ funExt λ { ((s , p°) , _) → equivEx
     ... | (yes p₀≡p) = refl
     ... | (no ¬p₀≡p) = cong {B = λ _ → Maybe (F .Pos s ∖ _)} just (Remove≡ $ refl′ p)
 
-zig : (F : Container ℓ ℓ) → Cart (F ⊗Id) (F ⊗Id)
+zig : (F : Container ℓ ℓ) → (F ⊗Id) ⊸ (F ⊗Id)
 zig F =
   F ⊗Id           ⊸⟨ [ unit F ]⊗Id ⟩
   (∂ (F ⊗Id) ⊗Id) ⊸⟨ counit (F ⊗Id) ⟩
   F ⊗Id           ⊸∎
 
 zig≡ : (F : Container ℓ ℓ) → [ unit F ]⊗Id ⋆ counit (F ⊗Id) ≡ id (F ⊗Id)
-zig≡ F = Cart≡ refl (funExt pos-path) module zig≡ where
+zig≡ F = ⊸≡ refl (funExt pos-path) module zig≡ where
   pos-path : ∀ s → (counit-pos (F ⊗Id) s nothing isIsolatedNothing) ∙ₑ maybe-equiv (unit-pos F (s .fst)) ≡ idEquiv _
   pos-path s = equivExt λ where
     (just p) → refl′ (just p)
     nothing → refl′ nothing
 
-zag : (G : Container ℓ ℓ) → Cart (∂ G) (∂ G)
+zag : (G : Container ℓ ℓ) → (∂ G) ⊸ (∂ G)
 zag G =
   ∂ G         ⊸⟨ unit (∂ G) ⟩
   ∂ (∂ G ⊗Id) ⊸⟨ ∂[ counit G ] ⟩
   ∂ G         ⊸∎
 
 zag≡ : (G : Container ℓ ℓ) → unit (∂ G) ⋆ ∂[ counit G ] ≡ id (∂ G)
-zag≡ G = Cart≡ (funExt shape-path) (funExt λ ∂s → equivExt (pos-path ∂s)) module zag≡ where
+zag≡ G = ⊸≡ (funExt shape-path) (funExt λ ∂s → equivExt (pos-path ∂s)) module zag≡ where
   shape-path : (s : Σ[ s ∈ Shape G ] Pos G s °) → ∂[ counit G ] .shape (unit-shape (∂ G) s) ≡ s
   shape-path (s , (p₀ , _)) = ΣPathP λ where
     .fst → refl′ s

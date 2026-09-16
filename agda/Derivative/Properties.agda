@@ -26,7 +26,7 @@ private
     ℓ ℓS ℓP : Level
 
 open Container
-open Cart
+open _⊸_
 
 ∂-Const : (S : Type ℓ) → Equiv (∂ (Const S)) (Const 𝟘*)
 ∂-Const S .Equiv.shape = uninhabEquiv (λ ()) (λ ())
@@ -143,12 +143,12 @@ module _ {Ix : Type ℓ} (F : Ix → Container ℓ ℓ) where
 
 import Derivative.Basics.RusselsParadox as RP
 
-no-weak-terminal : ¬ (Σ[ Y ∈ Container ℓ ℓ ] ∀ (X : Container ℓ ℓ) → Cart X Y)
-no-weak-terminal {ℓ} (Y@(T ◁ Q) , inh-cart) = RP.noSmallUniverseOfTypes (T , Q , code , code-sec) where
-  Q-fiber-equiv : (P : Type ℓ) → Cart (𝕪 P) (T ◁ Q) ≃ fiber Q P
+no-weak-terminal : ¬ (Σ[ Y ∈ Container ℓ ℓ ] ∀ (X : Container ℓ ℓ) → X ⊸ Y)
+no-weak-terminal {ℓ} (Y@(T ◁ Q) , inh-⊸) = RP.noSmallUniverseOfTypes (T , Q , code , code-sec) where
+  Q-fiber-equiv : (P : Type ℓ) → (𝕪 P) ⊸ (T ◁ Q) ≃ fiber Q P
   Q-fiber-equiv P =
-    Cart (𝕪 P) (T ◁ Q)
-      ≃⟨ Cart-Σ-equiv ⟩
+    (𝕪 P) ⊸ (T ◁ Q)
+      ≃⟨ ⊸-Σ-equiv ⟩
     Σ[ t ∈ (𝟙* → T) ] ((x : 𝟙*) → Q (t x) ≃ P)
       ≃⟨ invEquiv Σ-Π-≃ ⟩
     (𝟙* → Σ[ t ∈ T ] Q t ≃ P)
@@ -159,7 +159,7 @@ no-weak-terminal {ℓ} (Y@(T ◁ Q) , inh-cart) = RP.noSmallUniverseOfTypes (T ,
       ≃∎
 
   Q-inh-fiber : ∀ P → fiber Q P
-  Q-inh-fiber P = equivFun (Q-fiber-equiv P) (inh-cart (𝕪 P))
+  Q-inh-fiber P = equivFun (Q-fiber-equiv P) (inh-⊸ (𝕪 P))
 
   code : Type ℓ → T
   code = fst ∘ Q-inh-fiber
@@ -167,8 +167,8 @@ no-weak-terminal {ℓ} (Y@(T ◁ Q) , inh-cart) = RP.noSmallUniverseOfTypes (T ,
   code-sec : ∀ X → Q (code X) ≡ X
   code-sec = snd ∘ Q-inh-fiber
 
-no-terminal : ¬ (Σ[ Y ∈ Container ℓ ℓ ] ∀ (X : Container ℓ ℓ) → isContr (Cart X Y))
-no-terminal (Y , contr-cart) = no-weak-terminal (Y , fst ∘ contr-cart)
+no-terminal : ¬ (Σ[ Y ∈ Container ℓ ℓ ] ∀ (X : Container ℓ ℓ) → isContr (X ⊸ Y))
+no-terminal (Y , contr-⊸) = no-weak-terminal (Y , fst ∘ contr-⊸)
 
 private
   isEmpty→isContrΠ : ∀ {ℓ ℓ'} {A : Type ℓ} {B : A → Type ℓ'}
@@ -176,18 +176,18 @@ private
   isEmpty→isContrΠ ¬A .fst = ex-falso ∘ ¬A
   isEmpty→isContrΠ ¬A .snd f = funExt $ ex-falso ∘ ¬A
 
-no-internal-hom : ¬ (Σ[ _⇒_ ∈ ((F G : Container ℓ ℓ) → Container ℓ ℓ) ] ∀ F G H → Cart (F ⊗ G) H ≃ Cart F (G ⇒ H))
+no-internal-hom : ¬ (Σ[ _⇒_ ∈ ((F G : Container ℓ ℓ) → Container ℓ ℓ) ] ∀ F G H → (F ⊗ G) ⊸ H ≃ F ⊸ (G ⇒ H))
 no-internal-hom {ℓ} (_⇒_ , adj) = no-terminal (_ , is-terminal-∅⇒∅) where
   ∅ : Container ℓ ℓ
   ∅ .Shape = 𝟘*
   ∅ .Pos ()
 
-  is-contr-into-∅ : (X : Container ℓ ℓ) → isContr (Cart (X ⊗ ∅) ∅)
+  is-contr-into-∅ : (X : Container ℓ ℓ) → isContr ((X ⊗ ∅) ⊸ ∅)
   is-contr-into-∅ X@(S ◁ P) = isOfHLevelRespectEquiv 0 (invEquiv equiv) isContr-𝟙* where
-    equiv : (Cart (X ⊗ ∅) ∅) ≃ 𝟙
+    equiv : ((X ⊗ ∅) ⊸ ∅) ≃ 𝟙
     equiv =
-      Cart (X ⊗ ∅) ∅
-        ≃⟨ Cart-Σ-equiv ⟩
+      (X ⊗ ∅) ⊸ ∅
+        ≃⟨ ⊸-Σ-equiv ⟩
       Σ[ f ∈ ((S × 𝟘*) → 𝟘*) ] ((s : S × Shape ∅) → Pos ∅ (f s) ≃ (P (s .fst) ⊎ Pos ∅ (s .snd)))
         ≃⟨ Σ-contractSnd (λ f → isEmpty→isContrΠ λ ()) ⟩
       ((S × 𝟘*) → 𝟘*)
@@ -195,11 +195,11 @@ no-internal-hom {ℓ} (_⇒_ , adj) = no-terminal (_ , is-terminal-∅⇒∅) wh
       𝟙
         ≃∎
 
-  is-terminal-∅⇒∅ : (X : Container ℓ ℓ) → isContr (Cart X (∅ ⇒ ∅))
+  is-terminal-∅⇒∅ : (X : Container ℓ ℓ) → isContr (X ⊸ (∅ ⇒ ∅))
   is-terminal-∅⇒∅ X = isOfHLevelRespectEquiv 0 (adj X ∅ ∅) $ is-contr-into-∅ X
 
-no-weak-terminal-set : ¬ (Σ[ Y ∈ SetContainer ℓ ℓ ] ∀ (X : SetContainer ℓ ℓ) → SetCart X Y)
-no-weak-terminal-set {ℓ} ((Y@(T ◁ Q) , is-set-T , is-set-Q) , inh-set-cart) = RP.noSmallUniverseOfSets (T* , Q* , code , code-sec) where
+no-weak-terminal-set : ¬ (Σ[ Y ∈ SetContainer ℓ ℓ ] ∀ (X : SetContainer ℓ ℓ) → X ⊸set Y)
+no-weak-terminal-set {ℓ} ((Y@(T ◁ Q) , is-set-T , is-set-Q) , inh-set-⊸) = RP.noSmallUniverseOfSets (T* , Q* , code , code-sec) where
   T* : hSet ℓ
   T* = T , is-set-T
 
@@ -211,10 +211,10 @@ no-weak-terminal-set {ℓ} ((Y@(T ◁ Q) , is-set-T , is-set-Q) , inh-set-cart) 
   𝕪-set P .snd .fst = isSet-𝟙*
   𝕪-set P .snd .snd _ = str P
 
-  Q*-fiber-equiv : (P : hSet ℓ) → Cart (𝕪 ⟨ P ⟩) (T ◁ Q) ≃ fiber Q* P
+  Q*-fiber-equiv : (P : hSet ℓ) → (𝕪 ⟨ P ⟩) ⊸ (T ◁ Q) ≃ fiber Q* P
   Q*-fiber-equiv P*@(P , _) =
-    Cart (𝕪 P) (T ◁ Q)
-      ≃⟨ Cart-Σ-equiv ⟩
+    (𝕪 P) ⊸ (T ◁ Q)
+      ≃⟨ ⊸-Σ-equiv ⟩
     Σ[ t ∈ (𝟙* → T) ] ((x : 𝟙*) → Q (t x) ≃ P)
       ≃⟨ invEquiv Σ-Π-≃ ⟩
     (𝟙* → Σ[ t ∈ T ] Q t ≃ P)
@@ -227,7 +227,7 @@ no-weak-terminal-set {ℓ} ((Y@(T ◁ Q) , is-set-T , is-set-Q) , inh-set-cart) 
       ≃∎
 
   Q*-inh-fiber : ∀ P → fiber Q* P
-  Q*-inh-fiber P = equivFun (Q*-fiber-equiv P) (inh-set-cart (𝕪-set P))
+  Q*-inh-fiber P = equivFun (Q*-fiber-equiv P) (inh-set-⊸ (𝕪-set P))
 
   code : hSet ℓ → T
   code = fst ∘ Q*-inh-fiber
@@ -241,7 +241,7 @@ private
   ((F , is-set-F) ⊗ₛ (G , is-set-G)) .snd .fst = isSet× (is-set-F .fst) (is-set-G .fst)
   ((F , is-set-F) ⊗ₛ (G , is-set-G)) .snd .snd (s , t) = Sum.isSet⊎ (is-set-F .snd s) (is-set-G .snd t)
 
-no-internal-hom-set : ¬ (Σ[ _⇒_ ∈ ((F G : SetContainer ℓ ℓ) → SetContainer ℓ ℓ) ] ∀ F G H → SetCart (F ⊗ₛ G) H → SetCart F (G ⇒ H))
+no-internal-hom-set : ¬ (Σ[ _⇒_ ∈ ((F G : SetContainer ℓ ℓ) → SetContainer ℓ ℓ) ] ∀ F G H → (F ⊗ₛ G) ⊸set H → F ⊸set (G ⇒ H))
 no-internal-hom-set {ℓ} (_⇒_ , curry) = no-weak-terminal-set (∅ ⇒ ∅ , is-weak-terminal-∅⇒∅) where
   ∅ : SetContainer ℓ ℓ
   ∅ .fst .Shape = 𝟘*
@@ -249,7 +249,7 @@ no-internal-hom-set {ℓ} (_⇒_ , curry) = no-weak-terminal-set (∅ ⇒ ∅ , 
   ∅ .snd .fst ()
   ∅ .snd .snd ()
 
-  is-weak-terminal-∅⇒∅ : (X : SetContainer ℓ ℓ) → SetCart X (∅ ⇒ ∅)
+  is-weak-terminal-∅⇒∅ : (X : SetContainer ℓ ℓ) → X ⊸set (∅ ⇒ ∅)
   is-weak-terminal-∅⇒∅ X = curry X ∅ ∅ λ where
-    .Cart.shape ()
-    .Cart.pos ()
+    ._⊸_.shape ()
+    ._⊸_.pos ()
