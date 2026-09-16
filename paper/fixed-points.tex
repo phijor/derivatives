@@ -294,54 +294,63 @@ which is exactly a container fixpoint in the sense of \cite{DamatoEtAl2025Formal
 
 We thus define least fixpoints of a signature container \( F \) without reference to its associated functor \( \Ext{F} \),
 namely as initial algebras of the wild functor \( \Subst{F}{\Blank} \).
-Let us set this up precisely:
 \begin{problem}[note={\( \Subst{F}{\Blank} \)-algebras}]
-  Given \( F : \Cont_{I+1} \), define the structure of a wild category \( \Alg{\Subst{F}{\Blank}} \),
-  such that
-  \begin{itemize}
-    \item objects are of type \( \sum_{G : \Cont_I} \Cart{\Subst{F}{G}}{G} \),
-    \item morphisms \( \Alg{\Subst{F}{\Blank}}((G, g), (H, h)) \) are container morphisms
-      \( f : \Cart{G}{H} \) together with a path \( f_\sharp : f \circ g = h \circ \Subst{F}{f} \) ensuring that the square
-      \[
-        \begin{tikzcd}
-          \Subst{F}{G} \ar[r, -multimap, "\Subst{F}{f}", ""{swap,name=Ff}] & \Subst{F}{H} \\
-          G \ar[r, -multimap, "f"{swap}, ""{name=f}] & H
-          \ar[from=1-1, to=2-1, -multimap, "g"{swap}]
-          \ar[from=1-2, to=2-2, -multimap, "h"]
-          \ar[from=Ff, to=f, phantom, "{\scriptstyle f_\sharp}"]
-        \end{tikzcd}
-      \]
-      commutes.
-  \end{itemize}
+  Given \( F : \Cont_{I+1} \), define the structure of a wild category \( \Alg{\Subst{F}{\Blank}} \).
+  Its objects are of type \( \sum_{X : \Cont_I} \Cart{\Subst{F}{X}}{X} \),
+  and a morphism is of type
+  \[
+    \Alg{\Subst{F}{\Blank}}((X, f), (Y , g)) \DefEq \sum_{h : \Cart{X}{Y}} (h \circ f = g \circ \Subst{F}{h}),
+  \]
+  i.e.\@ a morphism \( h : \Cart{X}{Y} \) together with a path \( h_\square \) ensuring that the square
+  \[
+    \begin{tikzcd}
+      \Subst{F}{X} \ar[r, -multimap, "\Subst{F}{h}", ""{swap,name=Ff}] & \Subst{F}{Y} \\
+      X \ar[r, -multimap, "h"{swap}, ""{name=f}] & Y
+      \ar[from=1-1, to=2-1, -multimap, "f"{swap}]
+      \ar[from=1-2, to=2-2, -multimap, "g"]
+      \ar[from=Ff, to=f, phantom, "{\scriptstyle h_\square}"]
+    \end{tikzcd}
+  \]
+  commutes.
 \end{problem}
 \begin{construction}
   Identities and composite morphisms are defined as expected.
+  The filler of the commutative in a composite \( (h, h_\square) ; (k, k_\square) \) is
+  obtained by path composition of \( h_\square \) and \( k_\square \).
   However, unlike in 1-categories, unitality and associativity of composition is not automatically inherited from the base category \( \Cont_I \),
   since we have to ensure that there are higher paths between composite squares, such as
   \[
     \begin{tikzcd}
-      \Subst{F}{G} \ar[r, -multimap, "\Subst{F}{f}", ""{swap,name=Ff}]
-        & \Subst{F}{H} \ar[r, -multimap, "\Subst{F}{\id}", ""{swap,name=Fid}]
-        & \Subst{F}{H}  \\
-      G \ar[r, -multimap, "f"{swap}, ""{name=f}]
-        & H \ar[r, -multimap, "\id"{swap}, ""{name=id}]
-        & H
-      \ar[from=1-1, to=2-1, -multimap, "h"{swap}]
+      \Subst{F}{X} \ar[r, -multimap, "\Subst{F}{h}", ""{swap,name=Ff}]
+        & \Subst{F}{Y} \ar[r, -multimap, "\Subst{F}{\id}", ""{swap,name=Fid}]
+        & \Subst{F}{Y}  \\
+      X \ar[r, -multimap, "h"{swap}, ""{name=f}]
+        & Y \ar[r, -multimap, "\id"{swap}, ""{name=id}]
+        & Y
+      \ar[from=1-1, to=2-1, -multimap, "f"{swap}]
       \ar[from=1-2, to=2-2, -multimap, "g"]
       \ar[from=1-3, to=2-3, -multimap, "g"]
-      \ar[from=Ff, to=f, phantom, "{\scriptstyle f_\sharp}"]
-      \ar[from=Fid, to=id, phantom, "{\scriptstyle \id_\sharp}"]
+      \ar[from=Ff, to=f, phantom, "{\scriptstyle h_\square}"]
+      \ar[from=Fid, to=id, phantom, "{\scriptstyle \id_\square}"]
     \end{tikzcd}
     =
     \begin{tikzcd}
-      \Subst{F}{G} \ar[r, -multimap, "\Subst{F}{f}", ""{swap,name=Ff}] & \Subst{F}{H} \\
-      G \ar[r, -multimap, "f"{swap}, ""{name=f}] & H
-      \ar[from=1-1, to=2-1, -multimap, "h"{swap}]
+      \Subst{F}{X} \ar[r, -multimap, "\Subst{F}{h}", ""{swap,name=Ff}] & \Subst{F}{Y} \\
+      X \ar[r, -multimap, "h"{swap}, ""{name=f}] & Y
+      \ar[from=1-1, to=2-1, -multimap, "f"{swap}]
       \ar[from=1-2, to=2-2, -multimap, "g"]
-      \ar[from=Ff, to=f, phantom, "{\scriptstyle f_\sharp}"]
+      \ar[from=Ff, to=f, phantom, "{\scriptstyle f_\square}"]
     \end{tikzcd}
   \]
-  Fortunately, these higher paths are straightforward to construct by extensionality of container morphisms.
+  These higher paths are constructed by extensionality of container morphisms.
+  On shapes, the necessary coherences reduce to showing that path composition is unital and associative.
+  The coherences on positions are obtained following the same steps,
+  except that they are now displayed over the coherences of shapes.\footnote{%
+    We omit the construction of this wild category from the formalization.
+    Defining the necessary coherence between commutative squares is challenging for technical reasons;
+    a formal proof only obscures the intuition that \( \Subst{F}{\Blank} \) acts coherently also on homotopies of container morphisms.
+    At the same time, no further construction depends on these coherences.
+  }
 \end{construction}
 
 Unlike other concepts, we can express initiality in wild categories coherently as a \emph{property} of an object:
