@@ -30,10 +30,10 @@ is again a polynomial functor.\footnote{%
 \Citeauthor{AbbottEtAl2003DerivativesContainers} make this connection precise by giving a derivative operation on containers,
 first in a categorical meta-language~\cite{AbbottEtAl2003DerivativesContainers},
 then in a type-theoretic one~\cite{AbbottEtAl2005DataDifferentiating}.
-They show that derivatives of containers satisfy a universal property with respect to a class of \emph{cartesian}
+They show that derivatives of containers satisfy a universal property with respect to a class of \emph{linear}
 morphisms of containers.
 Namely, for any container \( G \) on which equality of positions is decidable,
-cartesian morphisms \( F \to \Der{G} \) are in 1-to-1 correspondence with cartesian morphisms \( F \CTimes \Id \to G \).
+linear morphisms \( F \to \Der{G} \) are in 1-to-1 correspondence with linear morphisms \( F \CTimes \Id \to G \).
 Furthermore, the laws of derivatives are encoded as isomorphisms:
 the chain rule, for example, becomes an isomorphism of containers,
 \( \Der{(\Subst{F}{G})} \cong \Subst{(\Der{F})}{G} \CTimes \Der{G} \).
@@ -77,7 +77,7 @@ Third, functions out of types pointed by an isolated point are characterized by 
 In \autoref{derivatives}, we use this to define a derivative that only ranges over isolated positions;
 this allows us to prove the following universal property
 by application of simple lemmata for isolated points:
-On the (wild) category \( \ContCart \) of containers and cartesian morphisms,
+On the (wild) category \( \ContCart \) of containers and linear morphisms,
 \( \Der \) is an endofunctor,
 and it is right adjoint to taking products with the identity container, \( \Maybe{\Blank} \).
 As a consequence, we can solve a problem left open in \cite[14]{AbbottEtAl2005DataDifferentiating}:
@@ -89,7 +89,7 @@ we essentially repurpose the proofs for the special case of discrete containers,
 but distribute isolated points over type formers whenever necessary.
 
 The goal of \autoref{chain-rule} is to derive a chain rule.
-While it is possible to give a \emph{lax} chain rule, i.e. a cartesian morphism
+While it is possible to give a \emph{lax} chain rule, i.e. a linear morphism
 from
 \( \Subst{(\Der{F})}{G} \CTimes \Der{G} \)
 to

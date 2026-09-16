@@ -49,7 +49,7 @@ We call \( (I + 1) \)-indexed containers \emph{signature containers}; their fixp
   \end{align*}
 \end{example}
 
-Cartesian morphisms between containers \(F , G : \Cont_{I} \) are defined by ranging over all indices \( I \):
+Linear morphisms between containers \(F , G : \Cont_{I} \) are defined by ranging over all indices \( I \):
 \[
   \Cart{F}{G} \DefEq \smashoperator[l]{\sum_{f : F_{\Sh} \to G_{\Sh}}} \prod_{i : I, s : F_{\Sh}} G_{\Ps}(i, f(s)) \simeq F_{\Ps}(i, s)
 \]
@@ -107,7 +107,7 @@ As promised in the discussion of \autoref{lax-chain-rule},
 its construction factors into smaller steps that make it obvious why, in general, it is not invertible:
 \begin{problem}[note={Lax chain rule for binary containers}]\label{binary-chain-rule}
   Let \( F : \Cont_2 \) and \( G : \Cont_1 \).
-  Define a cartesian morphism
+  Define a linear morphism
   \[
     \Chain_{F,G}
       :
@@ -558,7 +558,7 @@ Proving that this is the case even for untruncated containers is not entirely st
 There is however hope to recover at least a morphism out of \( \mu F' \) into \( \Der{\mu F} \) by recursion:
 
 \begin{problem}[note={Lax \( \mu \)-rule}]\label{mu-rule}
-  For \( F : \Cont_2 \), define by recursion a cartesian morphism
+  For \( F : \Cont_2 \), define by recursion a linear morphism
   \[
     \MuRule_F : \Cart{ \mu F' }{ \Der(\mu F) }
   \]
