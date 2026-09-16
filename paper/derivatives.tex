@@ -42,22 +42,30 @@ Cartesian morphisms capture the intuition of a \enquote{linear} map of datatypes
 the extension of \(f : \Cart{F}{G} \) as a natural transformation \( \Ext{f} : \Ext{F} \Rightarrow \Ext{G} \) can only permute data,
 not drop or duplicate it.
 
-In the remainder of this paper we will only consider cartesian morphisms.
-We are going to drop \enquote{cartesian} in writing, but retain the notation \( \Cart{F}{G} \).
-Morphisms of containers compose as expected, and together with an identity morphism \( \id_F : \Cart{F}{F} \)
-they form a wild category \( \ContCart \):
-composition is associative and unital, but we make no assumption on the truncation level of the type of morphisms \( \Cart{F}{G} \).
-Note that this wild category is \emph{not} univalent in the na{\"i}ve sense:
+\begin{todo-block}
+  Actually, we should just say \emph{linear morphism} and get rid of the over-use of cartesian.
+
+  Leave a note that \cite{AbbottEtAl2005DataDifferentiating} use \enquote{linear} and \enquote{cartesian} interchangeably.
+\end{todo-block}
+
+\paragraph{Categories of containers.}
+Morphisms of containers compose as expected, and together with an identity morphism \( \id_F : F \to F \)
+they form a wild category \( \Cont \):
+composition is associative and unital, but we make no assumption on the truncation level of the type of morphisms \( F \to G \).
+We denote by \( \ContCart \) the wide wild subcategory of \( \Cont \) containing only the cartesian morphisms.
+
+Note that neither \( \Cont \) nor \( \ContCart \) are univalent in the na{\"i}ve sense:
 The canonical map taking paths of containers \( F = G \) to categorical isomorphisms,\footnote{%
-  that is, pairs \( f : \Cart{F}{G}, g : \Cart{G}{F} \) with chosen paths \( fg = \id_F \) and \( gf = \id_G \)
+  that is, pairs \( f : F \to G, g : G \to F \) with chosen paths \( fg = \id_F \) and \( gf = \id_G \)
 }
-is \emph{not} an equivalence, unless shapes and positions of the involved containers are sets.
+is \emph{not} an equivalence, unless shapes and positions are sets.
 Instead, we are going to use the following definition when comparing containers:
 
 \begin{definition}
-  A cartesian morphism \( (f, u) : \Cart{F}{G} \) is an \emph{equivalence} of containers
-  if \( f : F_{\Sh} \to G_{\Sh} \) is an equivalence of types.
-  We write \( F \CartEquiv G \) for the type of equivalences of containers.
+  A morphism \( (f, u) : F \to G \) is an \emph{equivalence} of containers
+  if \( f : F_{\Sh} \to G_{\Sh} \) and \( u_s : G_{\Ps}(f(s)) \to F_{\Ps}(s) \) are equivalences of types for all \( s : F_{\Sh} \).
+  We write \( F \CartEquiv G \) for the type of equivalences of containers,
+  as they are necessarily cartesian morphisms.
 \end{definition}
 By an application of univalence, the type of equivalences \( F \CartEquiv G \) is equivalent to the type of paths, \( F = G \).
 While we cannot prove it internally, we think of the wild category of containers as an \( (\infty,1) \)-category
@@ -69,14 +77,16 @@ we define the following subtypes of containers:
 \begin{definition}
   A container \( (\MkCont{S}{P}) \) is \emph{\( (n,k) \)-truncated} if \( S \) is \( n \)-truncated,
   and \( P_s \) is \( k \)-truncated for all \( s : S \).
-  Write \( \ContCart_{n,k} \) for the wild subcategory of \( (n,k) \)-truncated containers.
+  Write \( \Cont_{n,k} \) for the wild subcategory of \( (n,k) \)-truncated containers,
+  and \(  \ContCart_{n,k} \) for its restriction to cartesian morphisms.
   A container is \emph{discrete} if \( P_s \) is a discrete type for all \( s : S \).
 \end{definition}
 Traditional set-based containers are \( (0,0) \)-truncated.
-In particular, \( \ContCart_{0,0} \) forms a univalent 1-category in which a morphism being an isomorphism is a proposition equivalent to it being an equivalence of containers.
+In particular, \( \Cont_{0,0} \) forms a univalent 1-category in which isomorphisms and equivalences of containers are equivalent types.
 An example of containers of higher truncation level are \citeauthor{Gylterud2011}'s \emph{symmetric containers}~\cite{Gylterud2011}:
 these have groupoids for shapes, and sets for positions, hence are exactly the \( (1,0) \)-truncated containers.
 
+\paragraph{Relationship with polynomial functors.}
 Any container defines a \enquote{polynomial} in types,
 that is a family \( \Type \to \Type \), called its \emph{extension}, \emph{extent} or \emph{interpretation}:
 \begin{definition}\label{wild-extension}
@@ -124,7 +134,7 @@ Furthermore, we have the following basic operations on containers:
 \end{definition}
 For set-truncated containers,
 these operations correspond exactly to (pointwise) products and sums, as well as composition, of polynomial functors.
-Products and sums of containers form a symmetric monoidal structure with units \( \CConst(1) \) and \( \CConst(0) \), respectively.
+Products and sums form a symmetric monoidal structure with units \( \CConst(1) \) and \( \CConst(0) \), respectively.
 The identity container \( \Id \DefEq (\MkCont{1}{1}) \)
 is a unit for substitution, which is a non-symmetric monoidal product.
 The equivalence \( \Ext{\Blank} \) preserves all of these monoidal structures; it is easy to see that
@@ -140,7 +150,12 @@ For any \( h \)-set \( A \), \( \Ext{\CConst{A}} \) is the constant functor \( \
 Similarly, \( \Ext{\CYo(A)}(X) \simeq (A \to X) \)
 ---
 the composite \( \Ext{\Blank} \circ \CYo \) is essentially the Yoneda-embedding, whence the name \( \CYo \).
+\begin{remark*}
+  The evident projection \( F \CTimes G \to G \) is not a cartesian morphism,
+  hence \( ( \ContCart_{0,0}, \CTimes, \CConst(1) ) \) is not a cartesian product.
+\end{remark*}
 
+\paragraph{Constructing cartesian morphisms.}
 When constructing a morphism \( f : \Cart{F}{G} \), we will oftentimes factor it
 through (equivalent) auxiliary containers
 \begin{equation*}
