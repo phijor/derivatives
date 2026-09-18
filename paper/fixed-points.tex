@@ -21,9 +21,13 @@ between \( F \) and \( \mu F \) is.
 
 \subsection{Indexed Containers}
 
-To define and reason about an operation \( \mu \) taking a container to a fixpoint,
-we first have to recall the definition of indexed containers.
-These encode data types polymorphic in more than one variable:
+Before we define and reason about an operation \( F \mapsto \mu F \) constructing fixpoints,
+we have to recall the definition of indexed containers.
+Intuitively, fixpoints are specified with respect to a \emph{signature}, binding a number of variables.
+One of these variables is a \enquote{recursion variable},
+indicating a placeholder for the recursive occurrence of the type.
+To encode such types as containers, we have to introduce containers whose positions are \emph{indexed}
+by some arbitrary type representing a number of bound variables:
 \begin{definition}[note={Indexed containers}]
   Let \( I : \Type \). The type of \emph{\( I \)-ary} or \emph{\( I \)-indexed containers} is
   \(
@@ -32,7 +36,12 @@ These encode data types polymorphic in more than one variable:
 \end{definition}
 Ordinary containers correspond to unary containers, \( \ICont{1} \).
 Each index \( i : I \) corresponds to a variable in the type that a container describes.
-In particular, \( (I + 1) \)-indexed containers are used to transcribe fixpoint expressions that contain an extra recursion variable.
+Consequently, the \emph{extent} of an indexed container takes \( I \)-indexed families of types to types,
+\begin{align*}
+  &\Ext{\MkCont{S}{P}} : (I \to \Type) \to \Type \\
+  &\Ext{\MkCont{S}{P}}(\vec{X}) \DefEq \sum_{s : S} \prod_{i : I} P_i(s) \to \vec{X}_i
+\end{align*}
+
 We call \( (I + 1) \)-indexed containers \emph{signature containers}; their fixpoints describe inductive types.
 \begin{example}
   \newcommand*{\Nil}{\Op{nil}}
@@ -54,7 +63,6 @@ Linear morphisms between containers \(F , G : \ICont{I} \) are defined by rangin
   \Cart{F}{G} \DefEq \smashoperator[l]{\sum_{f : F_{\Sh} \to G_{\Sh}}} \prod_{i : I, s : F_{\Sh}} G_{\Ps}(i, f(s)) \simeq F_{\Ps}(i, s)
 \]
 Together, \( I \)-indexed containers again assemble into a wild category, \( \IContCart{I} \).
-We denote by \( \IContCart{I}_{n,k} \) the wild subcategories of \( I \)-indexed, \( (n, k) \)-truncated containers.
 Each container in \( I \) variables is also one in \( I + 1 \) variables:
 For \( F : \ICont{I} \), denote by \( \Wk{F} : \ICont{I+1} \) the inclusion given by
 \[
