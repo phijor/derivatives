@@ -259,14 +259,8 @@ This fixpoint can be reflected back into containers,
 implying that they are closed under least fixpoint,
 and thus an adequate model of strictly-positive, inductive types.
 
-\Citeauthor{AltenkirchEtAl2015Indexedcontainers} give an explicit construction of this fixpoint~\cite{AltenkirchEtAl2015Indexedcontainers}.
-They notice that substitution \( \Subst{F}{\Blank} \) for a fixed \emph{indexed} container \( F \) defines an endofunctor of containers,
-and that this functor admits an initial algebra.
-The carrier of this algebra, \( \mu F \), represents the inductive type given by the \enquote{signature container} \( F \).
-This construction is carried out under the assumption of \( \Op{UIP} \), i.e.\@ that all types are \( h \)-sets.
-
 Recently,
-\citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} have expanded upon this idea in a univalent setting~\cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
+\citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} have investigated this in a univalent setting~\cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
 They show, without assuming \( \Op{UIP} \), that fixpoints of indexed containers exist,
 at least on a level of container \emph{functors}:
 for any signature container \( F : \ICont{I + 1} \) and \( \vec{X} : I \to \Type \),
@@ -278,14 +272,22 @@ thus proving that \( \mu F \) itself is defined universally among \emph{containe
 without needing to reference their interpretations.
 This, however, is hampered by the fact that we cannot (yet) internally prove that \( \Ext{\Blank} \) is a suitable embedding of containers and their morphisms, as discussed earlier.
 
-Instead, we retrace the construction of \cite{AltenkirchEtAl2015Indexedcontainers}.
-We first ensure, for any \( F : \ContCart_{I} \), that \( \Subst{F}{\Blank} \)-algebras form a wild category
+Alternatively, one may directly construct fixpoints in the category of containers~\cite{AltenkirchEtAl2015Indexedcontainers}:
+substitution \( \Subst{F}{\Blank} \) for a fixed \emph{indexed} container \( F \) is an endofunctor on containers,
+and this functor admits an initial algebra.
+The extent carrier of this algebra, \( \mu F \),
+is an initial \( \Ext{F}(\vec{X}, \Blank) \)-algebra
+representing the inductive type given by the \enquote{signature container} \( F \).
+This construction is carried out under the assumption of \( \Op{UIP} \), i.e.\@ that all types are \( h \)-sets.
+
+We retrace the construction of \cite{AltenkirchEtAl2015Indexedcontainers}, showing that it does not depend on \( \Op{UIP} \).
+We first ensure, for any \( F : \ICont{I + 1} \), that \( \Subst{F}{\Blank} \)-algebras form a wild category
 (which is not the case for arbitrary wild endofunctors).
 Secondly, we construct and initial object in this wild category of algebras.
 This construction does not make any reference to the associated container functors,
 avoiding the intricacies of \( \Ext{\Blank} \) as a functor of \( (\infty, 1) \)-categories.
 \begin{problem}
-  Given \( F : \ContCart_{I+1} \), extend \( \Subst{F}{\Blank} \) to a wild endofunctor on \( \ContCart_I \).
+  Given \( F : \ICont{I+1} \), extend \( \Subst{F}{\Blank} \) to a wild endofunctor on \( \ContCart_I \).
 \end{problem}
 \begin{construction}
   Straightforward.
