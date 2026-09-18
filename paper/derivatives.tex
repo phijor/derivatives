@@ -1,7 +1,8 @@
 \section{Derivatives of Containers}\label{derivatives}
 
-Containers were introduced to give categorical semantics to datatypes,
+Containers give categorical semantics to datatypes,
 in particular the inductively defined class of \emph{strictly-positive types}~\cite{Abbott2003CategoriesContainers}.
+Let us recall some definitions.
 \begin{definition}
   A \emph{container} \( (\MkCont{S}{P}) \) consists of \emph{shapes} \( S : \Type \) and
   a family \( P : S \to \Type \) of \emph{positions}.
@@ -38,62 +39,43 @@ one in which the mapping of positions is 1-to-1 between input and output:
   is an equivalence of types for each \( s : S \).
   We denote the subtype of linear morphisms by \( \Cart{F}{G} \).
 \end{definition}
-Linear morphisms capture the intuition of a \enquote{linear} map of datatypes:
-the extension of \(f : \Cart{F}{G} \) as a natural transformation \( \Ext{f} : \Ext{F} \Rightarrow \Ext{G} \) can only permute data,
-not drop or duplicate it.
-In particular \( \Ext{f} \) is a \emph{cartesian} natural transformation.
 
 \paragraph{Categories of containers.}
 Morphisms of containers compose as expected, and together with an identity morphism \( \id_F : F \to F \)
 they form a wild category \( \Cont \):
 composition is associative and unital, but we make no assumption on the truncation level of the type of morphisms \( F \to G \).
-We denote by \( \ContCart \) the wide wild subcategory of \( \Cont \) containing only the linear morphisms.
-
-Note that neither \( \Cont \) nor \( \ContCart \) are univalent in the na{\"i}ve sense:
-The canonical map taking paths of containers \( F = G \) to categorical isomorphisms,\footnote{%
-  that is, pairs \( f : F \to G, g : G \to F \) with chosen paths \( fg = \id_F \) and \( gf = \id_G \)
-}
-is \emph{not} an equivalence, unless shapes and positions are sets.
-Instead, we are going to use the following definition when comparing containers:
-
-\begin{definition}
-  A morphism \( (f, u) : F \to G \) is an \emph{equivalence} of containers
-  if \( f : F_{\Sh} \to G_{\Sh} \) and \( u_s : G_{\Ps}(f(s)) \to F_{\Ps}(s) \) are equivalences of types for all \( s : F_{\Sh} \).
-  We write \( F \CartEquiv G \) for the type of equivalences of containers,
-  as they are necessarily linear morphisms.
-\end{definition}
-By an application of univalence, the type of equivalences \( F \CartEquiv G \) is equivalent to the type of paths, \( F = G \).
-While we cannot prove it internally, we think of the wild category of containers as an \( (\infty,1) \)-category
-in which \( F \CartEquiv G \) is the \enquote{correct} notion of weak equivalence,
-representing the \( \infty \)-groupoid of paths \( F = G \).
-
-In cases where we do care about the truncation level of shapes and positions,
-we define the following subtypes of containers:
+A number of properties of containers only hold when this type is an \( h \)-set.
+To distinguish these cases, we introduce the following subtypes of \emph{truncated} containers:
 \begin{definition}
   A container \( (\MkCont{S}{P}) \) is \emph{\( (n,k) \)-truncated} if \( S \) is \( n \)-truncated,
   and \( P_s \) is \( k \)-truncated for all \( s : S \).
-  Write \( \Cont_{n,k} \) for the wild subcategory of \( (n,k) \)-truncated containers,
-  and \(  \ContCart_{n,k} \) for its restriction to linear morphisms.
   A container is \emph{discrete} if \( P_s \) is a discrete type for all \( s : S \).
 \end{definition}
 Traditional set-based containers are \( (0,0) \)-truncated.
-In particular, \( \Cont_{0,0} \) forms a univalent 1-category in which isomorphisms and equivalences of containers are equivalent types.
+In this case, morphisms form an \( h \)-set.
 An example of containers of higher truncation level are \citeauthor{Gylterud2011}'s \emph{symmetric containers}~\cite{Gylterud2011}:
 these have groupoids for shapes, and sets for positions, hence are exactly the \( (1,0) \)-truncated containers.
 
-\paragraph{Relationship with polynomial functors.}
-Any container defines a \enquote{polynomial} in types,
-that is a family \( \Type \to \Type \), called its \emph{extension}, \emph{extent} or \emph{interpretation}:
+We denote by \( \ContCart \) the wide wild subcategory of \( \Cont \) containing only the linear morphisms.
+Restricting to a subtype of containers,
+we write \( \Cont_{n,k} \) for the wild subcategory of \( (n,k) \)-truncated containers,
+and \( \ContCart_{n,k} \) for its restriction to linear morphisms.
+
+\paragraph{Relation to polynomial functors.}
+Each container defines a polynomial in types, that is a family \( \Type \to \Type \):
 \begin{definition}\label{wild-extension}
-  The \emph{extension} of a container \( F \JudgeEq (\MkCont{S}{P}) \) is \( \Ext{F} : \Type \to \Type \)
+  The \emph{extent}\footnote{also called \emph{extension} or \emph{interpretation}} of a container \( F \JudgeEq (\MkCont{S}{P}) \) is \( \Ext{F} : \Type \to \Type \)
   given by \( \Ext{F}(X) \DefEq \sum_{s : S} (P_s \to X) \).
 \end{definition}
-The extension of set-truncated containers defines an endofunctor of \( h \)-sets.
-Set-truncated containers and container morphisms form a 1-category,
-and \citeauthor{AbbottEtAl2005ContainersConstructingstrictly} prove that
-\( \Ext{\Blank} \) is a fully-faithful functor into the category of endofunctors.
+The extent of set-truncated containers defines an endofunctor of \( h \)-sets.
+\Citeauthor{AbbottEtAl2005ContainersConstructingstrictly} prove that
+\( \Ext{\Blank} \) fully-faithfully embeds \( \Cont_{0,0} \) into the category of set-endofunctors.
 In essence, morphisms of set-truncated containers represent exactly polymorphic functions,
 that is natural transformations of polynomial endofunctors of sets~\cite[{Theorem~3.4}]{AbbottEtAl2005ContainersConstructingstrictly}.
+Linear morphisms then capture the intuition of a \enquote{linear} map of datatypes,
+which can only permute data, not drop or duplicate it:
+The extent \( \Ext{f} : \Ext{F} \Rightarrow \Ext{G} \) of \(f : \Cart{F}{G} \) is a \emph{cartesian} natural transformation.
+
 Furthermore, we have the following basic operations on containers:
 \begin{definition}\label{container-operations}
   Given \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \), define the following:
@@ -122,9 +104,11 @@ Furthermore, we have the following basic operations on containers:
         (\Subst{F}{G})_{\Ps} &\DefEq \lambda (s, f).\, \sum_{p : P_s} Q_{fp}
       \end{align*}
   \end{itemize}
-  Furthermore, for any \( A : \Type \), we define
-  the \emph{constant-} \( \CConst(A) \DefEq (\MkCont{A}{0}) \)
-  and \emph{tuple} containers \( \CYo(A) \DefEq (\MkCont{1}{A}) \).
+  Additionally, given \( A : \Type \), we have
+  \begin{itemize}
+    \item a \emph{contant} \( \CConst(A) \DefEq (\MkCont{A}{0}) \),
+    \item a \emph{tuple} \( \CYo(A) \DefEq (\MkCont{1}{A}) \) for all \( A : \Type \).
+  \end{itemize}
   The \emph{identity container} is \( \Id \DefEq (\MkCont{1}{1}) \).
 \end{definition}
 For set-truncated containers,
@@ -141,17 +125,18 @@ The equivalence \( \Ext{\Blank} \) preserves all of these monoidal structures; i
   \Ext{\Subst{F}{G}} &= \Ext{F} \circ \Ext{G}
 \end{align*}
 and that \( \Ext{\Id} \) is the identity functor.
-For any \( h \)-set \( A \), \( \Ext{\CConst{A}} \) is the constant functor \( \lambda \Blank.\, A \).
+For all \( A : \Type \), \( \Ext{\CConst{A}} \) is the constant functor \( \lambda \Blank.\, A \).
 Similarly, \( \Ext{\CYo(A)}(X) \simeq (A \to X) \)
 ---
-the composite \( \Ext{\Blank} \circ \CYo \) is essentially the Yoneda-embedding, whence the name \( \CYo \).
-\begin{remark*}
-  The evident projection \( F \CTimes G \to G \) is not linear,
-  hence \( ( \ContCart_{0,0}, \CTimes, \CConst(1) ) \) is not a cartesian product.
-\end{remark*}
+the composite \( \Ext{\Blank} \circ \CYo \) is essentially the Yoneda-embedding when restricted to \( h \)-sets, whence the name \( \CYo \).
+% \begin{remark*}
+%   The evident projection \( F \CTimes G \to G \) is not linear,
+%   hence \( ( \ContCart_{0,0}, \CTimes, \CConst(1) ) \) is not a cartesian product.
+% \end{remark*}
 
 \paragraph{Constructing container morphisms.}
-When constructing a morphism \( f : \Cart{F}{G} \), we will oftentimes factor it
+When tasked to give a morphism \( f : \Cart{F}{G} \),
+it is oftentimes beneficial to factor it
 through (equivalent) auxiliary containers
 \begin{equation*}
   \begin{tikzcd}
@@ -166,7 +151,7 @@ from the act of defining an interesting morphism \( f' : \Cart{F'}{G'} \).
 In particular, \( f \) is an equivalence of containers if and only if \( f' \) is,
 which is often easier to characterize.
 
-Similarly, we will often implicitly use the following extensionality principle
+Similarly, we implicitly use the following extensionality principle
 to construct paths between container morphisms:
 \begin{lemma}[note={Extensionality of container morphisms}]\label{container-morphism-ext}
   Let \( F, G : \Cont \) and \( f, g : \Cart{F}{G} \).
@@ -177,6 +162,49 @@ to construct paths between container morphisms:
   in which the dependent path varies over the family \( B(t) \DefEq G_{\Ps}(t) \to F_{\Ps}(s) \).
   \begin{proof}
     By extensionality for paths in \( \Sigma \)- and \( \Pi \)-types, and the fact that paths of equivalences are the same as paths of their underlying functions.
+  \end{proof}
+\end{lemma}
+
+\paragraph{Univalence of containers.}
+The 1-category \( \Cont_{0,0} \) of set-truncated containers is univalent.
+However, neither \( \Cont \) nor \( \ContCart \) are univalent wild categories in the na{\"i}ve sense:
+The canonical map taking paths of containers \( F = G \) to categorical isomorphisms\footnote{%
+  that is, pairs \( f : F \to G, g : G \to F \) with chosen paths \( fg = \id_F \) and \( gf = \id_G \)
+}
+is in general \emph{not} an equivalence.
+To compare containers in general, we thus use the following notion of \enquote{sameness} of containers:
+\begin{definition}
+  A morphism \( (f, u) : F \to G \) is an \emph{equivalence} of containers
+  if \( f : F_{\Sh} \to G_{\Sh} \) and \( u_s : G_{\Ps}(f(s)) \to F_{\Ps}(s) \) are equivalences of types for all \( s : F_{\Sh} \).
+\end{definition}
+We write \( F \CartEquiv G \) for the type of equivalences of containers, as they are necessarily linear morphisms.
+By two applications of univalence, \( F \CartEquiv G \) is equivalent to \( F = G \).
+While we cannot prove it internally, we think of \( \Cont \) and \( \ContCart \) as \( (\infty,1) \)-categories
+in which \( F \CartEquiv G \) is the \enquote{correct} notion of weak equivalence,
+representing the \( \infty \)-groupoid of paths \( F = G \).
+Consequently, equivalences of containers enjoy a \( \Op{J} \)-like rule, that is, the following induction principle:
+\begin{problem}[note={Equivalence induction}]\label{container-J}
+  Let \( G : \Cont \) and \( P : \prod_{F : \Cont} F \simeq G \to \Type \).
+  Define a map
+  \[
+    \Op{J}_{\Cont} : P(G, \id_G) \to \prod_{F : \Cont} \prod_{e : F \simeq G} P(F, e)
+  \]
+  such that \( \Op{J}_{\Cont}(p, G, \id_G) = p \) for all \( p : P(G, \id_G) \).
+  \qed
+\end{problem}
+
+This \( \Op{J} \)-rule for containers is especially useful when reasoning about types of
+fillers of commutative diagrams, i.e.\@ certain types of identifications \( f_0; \ldots; f_n = g_0; \ldots; g_k \)
+of container morphisms.
+\begin{lemma}\label{container-precomp-equiv}
+  Let \( F, G, H : \Cont \) and \( e : F \simeq G \).
+  The precomposition map \( e ;\Blank : (G \to H) \to (F \to H) \)
+  is an equivalence of types of container morphisms.
+  In particular, \( (e;h = e;h') \simeq (h = h') \) for all \( h, h' : G \to H \).
+  \begin{proof}
+    By application of \( \Op{J}_{\Cont} \) to \( P(F, e) \DefEq \forall H\Where \IsEquiv(\lambda h : G \to H\Where e ; h) \)
+    it suffices to show that \( \id_G; \Blank \) is an equivalence.
+    This follows from left-unitality, \( \id_G ; h = h \).
   \end{proof}
 \end{lemma}
 
