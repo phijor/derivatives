@@ -251,55 +251,45 @@ Like in \autoref{discrete-strong-chain-rule}, this is the case for discrete cont
 
 To show how derivatives of untruncated containers interact with fixpoints,
 we first have to give a suitable specification of what we mean by such a \enquote{fixpoint}.
-Traditionally, the (least) fixpoint associated to a signature container is constructed as follows:
-Given an \( I \)-indexed and set-truncated container \( (\MkCont{S}{P}) \),
-it is interpreted as a functor \( \llbracket \MkCont{S}{P} \rrbracket : [\Set^I, \Set] \),
-which takes families \( \vec{X} : I \to \Set \) to
-\[
-  \llbracket \MkCont{S}{P} \rrbracket \vec{X} \DefEq \sum_{s : S} \prod_{i : I} P_i(s) \to \vec{X}_i
-\]
-This defines a full and faithful embedding of the category \( \IContCart{I}_{0,0} \) into the category of functors \( [\Set^I, \Set] \)~\cite[Thm.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
-Notably, this embedding reflects much of the structure of the functor category \( [\Set^I, \Set] \) back into containers,
-allowing concise proofs for a number of properties.
-In particular, given a signature container \( F : \Cont_{I+1} \), its interpretation \( \llbracket F \rrbracket(\vec{X}, \Blank) : [ \Set, \Set ] \)
-admits an initial algebra for any \( \vec{X} \).
-This initial algebra can be shown to lie in the image of the interpretation functor, hence it defines a necessarily unique \( I \)-indexed container \( \mu F \),
-which is regarded as the least fixpoint of \( F \).
+Just like in the non-indexed case,
+The extension of set-truncated indexed containers defines subcategory of functors \( [\Set^I, \Set] \)~\cite[Theorem.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
+In particular, given a signature container \( F : \ICont{I+1} \) and \( \vec{X} : I \to \Set \),
+the endofunctor \( \Ext{F}(\vec{X}, \Blank) : [ \Set, \Set ] \) admits an initial algebra.
+This fixpoint can be reflected back into containers,
+implying that they are closed under least fixpoint,
+and thus an adequate model of strictly-positive, inductive types.
+
+\Citeauthor{AltenkirchEtAl2015Indexedcontainers} give an explicit construction of this fixpoint~\cite{AltenkirchEtAl2015Indexedcontainers}.
+They notice that substitution \( \Subst{F}{\Blank} \) for a fixed \emph{indexed} container \( F \) defines an endofunctor of containers,
+and that this functor admits an initial algebra.
+The carrier of this algebra, \( \mu F \), represents the inductive type given by the \enquote{signature container} \( F \).
+This construction is carried out under the assumption of \( \Op{UIP} \), i.e.\@ that all types are \( h \)-sets.
 
 Recently,
-\citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} have expanded upon this idea in~\cite{DamatoEtAl2025FormalisingInductiveCoinductive},
-and taken untruncated \( I \)-indexed containers to wild functors typed \( [ \Type^I, \Type ] \).
-They show that for any \( F : \Cont_{I + 1} \) and \( \vec{X} : I \to \Type \),
-the wild functor \( \llbracket F \rrbracket(\vec{X}, \Blank) : [\Type, \Type] \) admits an initial algebra
-whose carrier is given by \( \llbracket \mu F \rrbracket\vec{X} \) --- the interpretation of some container \( \mu F : \Cont_I \).
+\citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} have expanded upon this idea in a univalent setting~\cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
+They show, without assuming \( \Op{UIP} \), that fixpoints of indexed containers exist,
+at least on a level of container \emph{functors}:
+for any signature container \( F : \ICont{I + 1} \) and \( \vec{X} : I \to \Type \),
+the wild functor \( \Ext{ F }(\vec{X}, \Blank) : [\Type, \Type] \) admits an initial algebra
+whose carrier is given by \( \Ext{ \mu F }\vec{X} \).
 Ideally, one would like to show that this construction is natural in \( \vec{X} \) and
-pull its properties back along \( \llbracket \Blank \rrbracket \),
+pull its properties back along \( \Ext{\Blank} \),
 thus proving that \( \mu F \) itself is defined universally among \emph{containers},
 without needing to reference their interpretations.
-This, however, is hampered by the fact that we cannot (yet) internally prove that the wild categories involved are suitably coherent,
-that is \( (\infty,1) \)-categories in an appropriate sense.
-If they were, one could attempt to show that \( \llbracket \Blank \rrbracket \) is a structure-preserving embedding:
-a particularly elegant way to show that \( \llbracket \Blank \rrbracket \) is fully faithful for sets
-is given by \citeauthor{Damato2023RevisitingContainersCubical} in \cite{Damato2023RevisitingContainersCubical} and relies almost exclusively on the Yoneda lemma,
-which should make the proof amenable to generalization.
+This, however, is hampered by the fact that we cannot (yet) internally prove that \( \Ext{\Blank} \) is a suitable embedding of containers and their morphisms, as discussed earlier.
 
-In light of this, we are going to define a notion of fixpoint entirely internal to the wild category of containers,
-which does not reference the interpretation functor \( \Ext{\Blank} \) at all.
-Barring the issues mentioned above, this should correspond to the more traditional definition of container fixpoints in terms of \( \Ext{\Blank} \).
-First, note that substitution into a fixed container behaves functorially:
+Instead, we retrace the construction of \cite{AltenkirchEtAl2015Indexedcontainers}.
+We first ensure, for any \( F : \ContCart_{I} \), that \( \Subst{F}{\Blank} \)-algebras form a wild category
+(which is not the case for arbitrary wild endofunctors).
+Secondly, we construct and initial object in this wild category of algebras.
+This construction does not make any reference to the associated container functors,
+avoiding the intricacies of \( \Ext{\Blank} \) as a functor of \( (\infty, 1) \)-categories.
 \begin{problem}
-  Given \( F : \Cont_{I+1} \), extend \( \Subst{F}{\Blank} \) to a wild endofunctor on \( \ContCart_I \).
+  Given \( F : \ContCart_{I+1} \), extend \( \Subst{F}{\Blank} \) to a wild endofunctor on \( \ContCart_I \).
 \end{problem}
 \begin{construction}
   Straightforward.
 \end{construction}
-It also commutes with composition under the interpretation of containers:
-for all \( F : \Cont_{I + 1} \) and \( G : \Cont_I \),
-there is an equivalence of types
-\( \llbracket \Subst{F}{G} \rrbracket \vec{X} \simeq \llbracket F \rrbracket(\vec{X}, \llbracket G \rrbracket\vec{X}) \), natural in \( \vec{X} : I \to \Type \).
-In particular, a fixpoint of containers \( \varphi : \CartIso{\Subst{F}{G}}{G} \) induces a fixpoint of \( \Ext{F}(\vec{X}, \Blank ) \),
-which is exactly a container fixpoint in the sense of \cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
-
 We thus define least fixpoints of a signature container \( F \) without reference to its associated functor \( \Ext{F} \),
 namely as initial algebras of the wild functor \( \Subst{F}{\Blank} \).
 \begin{problem}[note={\( \Subst{F}{\Blank} \)-algebras}]
@@ -443,23 +433,22 @@ We define a non-dependent recursion principle for maps out of \( \mu F \),
 which yields a morphism into \emph{any} other algebra:
 \begin{problem}[note={\( \mu \)-recursion}]\label{mu-rec}
   Define a recursion principle for morphisms out of \( \mu \)-containers.
-  That is, for any \( F : \Cont_{I+1} \), \( G : \Cont_I \) and \( \alpha : \Cart{F[G]}{G} \),
+  That is, for any \( F : \ICont{I+1} \), \( G : \ICont{I} \) and \( \alpha : \Subst{F}{G} \to G \),
   give a morphism
   \[
-      \Rec_{F}(\alpha) : \Cart{\mu F}{G}
+      \Rec_{F}(\alpha) : \mu F \to G
   \]
-  and a filler of
-    \begin{equation}\label{mu-rec-comm}
-      \begin{tikzcd}[column sep=huge]
-        \Subst{F}{\mu F} & \Subst{F}{G} \\
-        {\mu F}          & G
-        \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\Rec_F(\alpha)}"]
-        \ar[from=1-1, to=2-1, -multimap, "\In_F"{swap}]
-        \ar[from=2-1, to=2-2, -multimap, "\Rec_F(\alpha)"{swap}]
-        \ar[from=1-2, to=2-2, -multimap, "\alpha"]
-      \end{tikzcd}
-    \end{equation}
-    for all \( \alpha : \Cart{\Subst{F}{G}}{G} \).
+  together with a chosen filler
+  \begin{equation}\label{mu-rec-comm}
+    \begin{tikzcd}[column sep=huge]
+      \Subst{F}{\mu F} & \Subst{F}{G} \\
+      {\mu F}          & G
+      \ar[from=1-1, to=1-2, "\Subst{F}{\Rec_F(\alpha)}"]
+      \ar[from=1-1, to=2-1, "\In_F"{swap}]
+      \ar[from=2-1, to=2-2, "\Rec_F(\alpha)"{swap}]
+      \ar[from=1-2, to=2-2, "\alpha"]
+    \end{tikzcd}
+  \end{equation}
 \end{problem}
 \begin{construction}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
@@ -469,12 +458,12 @@ which yields a morphism into \emph{any} other algebra:
     \Rec_{\Sh} &: \W \to T \\
     \Rec_{\Sh} &\DefEq \lambda(\Sup(s, f)).\, \alpha_{\Sh} (s, \Rec_{\Sh} \circ f)
   \end{align*}
-  On positions, we define a map
-  \( {u : Q_i(\Rec_{\Sh}(w)) \to \bar{\W}(w)} \) by induction on \( w : \W \).
-  For \( w \JudgeEq \Sup(s, f) \), it is the composite
+  On positions we define
+  \( u : \prod_{w : \W(S, P)} Q_i(\Rec_{\Sh}(w)) \to \bar{\W}_{S,P,\vec{P}}(w) \) by \( \W \)-induction.
+  If \( w \JudgeEq \Sup(s, f) \), then \( u(w) \) is the composite
   \[
     \begin{tikzcd}
-      Q_i(\alpha_{\Sh}(s , \Rec_{\Sh} \circ f)
+      Q_i(\alpha_{\Sh}(s , \Rec_{\Sh} \circ f))
         \ar[r, dashed, "u"]
         \ar[d, "{\alpha_{\Ps}(i, \Rec_{\Sh} \circ f)}"{swap}]
         &
@@ -506,17 +495,20 @@ which yields a morphism into \emph{any} other algebra:
   This is done by \( \W \)-induction on the shapes of \( \mu F \).
 \end{construction}
 
-In fact, this morphism is uniquely determined, hence we get a fixpoint for any signature container:
-\begin{theorem}
-  For all \( F : \Cont_{I + 1}\), the pair \( (\mu F, \In_F) \) is an initial \( \Subst{F}{\Blank} \)-algebra,
-  hence a least fixpoint of \( F \).
+In fact, this morphism is uniquely determined, hence we get a fixpoint for any signature container.
+We establish this by proving that \( \Rec_F(\alpha) \) is unique as a coalgebra-to-algebra morphism:
+\begin{proposition}\label{mu-rec-coalg-to-alg-unique}
+  For all \( F : \ICont{I+1} \), \( G : \ICont{I} \) and \( \alpha : \Subst{F}{G} \to G \),
+  the type
+  \[
+    \sum_{\alpha^* : \mu F \to G} \alpha^* = \Out_F ; \Subst{F}{\alpha^*} ; \alpha
+  \]
+  is contractible with center \( (\Rec_F(\alpha), \Rec_F(\alpha)_\square) \), where
+  \( \Rec_F(\alpha)_\square \) is the filler of \eqref{mu-rec-out-filler}.
   \begin{proof}
-    Let \( (G, \alpha) \) be a second \( \Subst{F}{\Blank} \)-algebra.
-    By definition, \( \Rec_F(\alpha) : \Cart{\mu F}{G} \) is an algebra morphism.
-    It suffices to show that \( \Rec_F(\alpha) \) together with the filler \eqref{mu-rec-out-filler} is unique.
-    That is, for any other algebra morphism \( \alpha^* : \Cart{\mu F}{G} \),
-    there is a path \( p : \Rec_F(\alpha) = \alpha^* \),
-    and over this path, there is a path \( q \) connecting the commuting squares
+    Let \( \alpha^* : \mu F \to G \) and \( \alpha^*_\square : \alpha^* = \Out_F ; \Subst{F}{\alpha^*} ; \alpha \).
+    We need to give a path \( p : \Rec_F(\alpha) = \alpha^* \),
+    and over it a dependent path \( p_\square :  \Rec_F(\alpha)_\square =_p \alpha^*_\square \) connecting the commuting squares
     \[
       \begin{tikzcd}[column sep=huge]
         \Subst{F}{\mu F} & \Subst{F}{G} \\
@@ -539,13 +531,68 @@ In fact, this morphism is uniquely determined, hence we get a fixpoint for any s
     Let us sketch the proof.
     By extensionality of morphisms (\autoref{container-morphism-ext}), the path \( p \) can be given as a \( {\mu F}_{\!\Sh} \)-indexed family of paths.
     But \( {\mu F}_{\!\Sh} \) is a \( \W \)-type,
-    hence we define \( p \) by \( \W \)-induction as a composite of two paths, \( p_1 \) and \( p_2 \),
-    using the path \( \alpha^*_{\sharp} \) which ensures that \( \alpha^* \) is a morphism of algebras.
+    hence we define \( p \) by \( \W \)-induction as a composite of two paths, \( p_1 \) and \( p_2 \), using the path \( \alpha^*_{\square} \).
     The composite of these two paths is unique up to a unique dependent path, and from this we build the filler connecting the two squares above.
     In our mechanized proof, this construction makes extensive use Cubical Agda's primitive support for dependent path types and cube filling operations.
     This allows us to leave \texttt{transport} hell, and instead settle in \texttt{PathP}  purgatory.
   \end{proof}
+\end{proposition}
+
+From this, uniqueness as an algebra follows immediately,
+assuming that the relevant commutative squares have equivalent types of fillers.
+Unlike for set-truncated containers (where commutativity of both squares is a propositions)
+these fillers are data, and we have to ensure that we preserve their structure.
+\begin{theorem}\label{mu-initial-algebra}
+  For all \( F : \ICont{I + 1}\), the pair \( (\mu F, \In_F) \) is an initial \( \Subst{F}{\Blank} \)-algebra,
+  hence a least fixpoint of \( F \).
+  \begin{proof}
+    Let \( (G, \alpha) \) be a second \( \Subst{F}{\Blank} \)-algebra.
+    The claim follows from \autoref{mu-rec-coalg-to-alg-unique} if the respective types of square-fillers are equivalent.
+    We have
+    \[
+      (\alpha^* = \Out_F ; \Subst{F}{\alpha^*} ; \alpha)
+        \overset{(?)}{\simeq}
+      (\In_F ; \alpha^* = \In_F ; \Out_F ; \Subst{F}{\alpha^*} ; \alpha)
+        \simeq
+      (\In_F ; \alpha^* = \Subst{F}{\alpha^*} ; \alpha)
+    \]
+    in which \( (?) \) is an application of \autoref{container-precomp-equiv}:
+    precomposition with \( \In_F \) is an equivalence of types
+    \( \mu F \to G \) and \( \Subst{F}{\mu F} \to G \).
+  \end{proof}
 \end{theorem}
+
+With this we have shown that the construction of least fixpoints of containers
+{\`a} la \cite{AltenkirchEtAl2015Indexedcontainers} is valid in a univalent setting where \( \Op{UIP} \) is unavailable.
+We succeeded because we aligned our proof obligations with the only primitive at hand:
+\( \mu F \) is defined in terms of \( \W \)-types,
+so any property has to ultimately be established by \( \W \)-induction.
+Instead of proving initiality directly like \cite[Proposition~5.2]{AltenkirchEtAl2015Indexedcontainers} does,
+we go through \autoref{mu-rec-coalg-to-alg-unique} to show that \( \Rec \) is unique as a coalgebra-to-algebra morphism.
+Since all proof obligations (namely \( p \) and \( p_\square \) therein) are ultimately \( \W \)-indexed families,
+this can be shown by \( \W \)-induction alone,
+without any contentious transport that might require applications of \( \Op{UIP} \).
+Assuming \( \Op{UIP} \), the proof of \autoref{mu-initial-algebra} becomes trivial:
+the filler-types are inhabited propositions, so trivially equivalent.
+Our proof depends on univalence in the form of \autoref{container-precomp-equiv},
+and ultimately the fact that equivalence of containers is an identity system.
+
+Introducing a cut in this argument may seem inconsequential,
+but we believe that it nicely separates the computational aspect
+from the specification
+---
+on one hand \( \Rec \) is a unique fold-like operation (\autoref{mu-rec-coalg-to-alg-unique}),
+on the other \( \mu F \) is the minimal solution to a problem (\autoref{mu-initial-algebra}).
+
+In the future, we would like to apply the dual argument to greatest \( \Subst{F}{\Blank} \)-fixpoints,
+where unfolding \( \Op{corec} : G \to \nu F \) gives rise to a terminal coalgebra on \( \nu F \).
+The shapes of this fixpoint are an \emph{\( \Op{M} \)-type},
+whose existence is derivable both in a setting with \( \Op{UIP} \)~\cite{AltenkirchEtAl2015Indexedcontainers},
+and assuming univalence~\cite{AhrensEtAl2015NonWellfoundedTrees}.
+In particular, applications of \( \W \)-induction in \autoref{mu-rec-coalg-to-alg-unique}
+should translate into applications of the coinduction proof principle of \( \Op{M} \)-types.
+This would give us a unique algebra-to-coalgebra morphism,
+which would yield a greatest \( \Subst{F}{\Blank} \)-fixpoint.
 
 \subsection{The \texorpdfstring{\( \mu \)-}{Fixpoint }Rule}
 
