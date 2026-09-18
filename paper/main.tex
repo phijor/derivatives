@@ -165,7 +165,10 @@
 
 \DeclareMathOperator{\Cont}{\Op{Cont}}
 \NewDocumentCommand{\ContCart}{}{\operatorname{\Cont}^{{\scriptscriptstyle\multimap}}}
-\NewDocumentCommand{\IContCart}{m}{#1\operatorname{\Op{-Cont}}^{{\scriptscriptstyle\multimap}}}
+\NewDocumentCommand{\ICont}{m}{\Cont_{#1}}
+\NewDocumentCommand{\IContCart}{m}{\ContCart_{#1}}
+\NewDocumentCommand{\TruncCont}{m}{(#1)\operatorname{\Op{-Cont}}}
+\NewDocumentCommand{\TruncContCart}{m}{(#1)\operatorname{\Op{-Cont}}^{{\scriptscriptstyle\multimap}}}
 
 \NewDocumentCommand{\Der}{}{\partial}
 \NewDocumentCommand{\Id}{}{\Op{Id}}

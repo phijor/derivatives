@@ -27,10 +27,10 @@ These encode data types polymorphic in more than one variable:
 \begin{definition}[note={Indexed containers}]
   Let \( I : \Type \). The type of \emph{\( I \)-ary} or \emph{\( I \)-indexed containers} is
   \(
-    \Cont_{I} \DefEq \sum_{S : \Type} (I \to S \to \Type)
+    \ICont{I} \DefEq \sum_{S : \Type} (I \to S \to \Type)
   \).
 \end{definition}
-Ordinary containers correspond to unary containers, \( \Cont_{1} \).
+Ordinary containers correspond to unary containers, \( \ICont{1} \).
 Each index \( i : I \) corresponds to a variable in the type that a container describes.
 In particular, \( (I + 1) \)-indexed containers are used to transcribe fixpoint expressions that contain an extra recursion variable.
 We call \( (I + 1) \)-indexed containers \emph{signature containers}; their fixpoints describe inductive types.
@@ -49,28 +49,28 @@ We call \( (I + 1) \)-indexed containers \emph{signature containers}; their fixp
   \end{align*}
 \end{example}
 
-Linear morphisms between containers \(F , G : \Cont_{I} \) are defined by ranging over all indices \( I \):
+Linear morphisms between containers \(F , G : \ICont{I} \) are defined by ranging over all indices \( I \):
 \[
   \Cart{F}{G} \DefEq \smashoperator[l]{\sum_{f : F_{\Sh} \to G_{\Sh}}} \prod_{i : I, s : F_{\Sh}} G_{\Ps}(i, f(s)) \simeq F_{\Ps}(i, s)
 \]
-Together, \( I \)-indexed containers again assemble into a wild category, \( \ContCart_{I} \).
+Together, \( I \)-indexed containers again assemble into a wild category, \( \IContCart{I} \).
 We denote by \( \IContCart{I}_{n,k} \) the wild subcategories of \( I \)-indexed, \( (n, k) \)-truncated containers.
 Each container in \( I \) variables is also one in \( I + 1 \) variables:
-For \( F : \Cont_I \), denote by \( \Wk{F} : \Cont_{I+1} \) the inclusion given by
+For \( F : \ICont{I} \), denote by \( \Wk{F} : \ICont{I+1} \) the inclusion given by
 \[
   \Wk{F}_{\Ps}(\Just{i}) \DefEq F_{\Ps}(i), \quad \Wk{F}_{\Ps}(\Nothing) \DefEq 0
 \]
-To aid readability, we denote an \( I+1 \)-indexed container \( (\MkCont{S}{\bar{P}}) \) by \( (\MkCont{S}{\vec{P}, P}) \),
+To aid readability, we denote an \( (I+1) \)-indexed container \( (\MkCont{S}{\bar{P}}) \) by \( (\MkCont{S}{\vec{P}, P}) \),
 where \( \vec{P}_i \DefEq \bar{P}_{\Just(i)} \) and \( P \DefEq \bar{P}_{\Nothing} \).
 In particular, \( \Wk{(\MkCont{S}{P})} = (\MkCont{S}{P,0}) \).
-For \( i : I \), the \( i \)th projection container is \( \pi_i \DefEq (\MkCont{1}{\lambda j\,\Blank.\,{i = j}}) : \Cont_I \).
+For \( i : I \), the \( i \)th projection container is \( \pi_i \DefEq (\MkCont{1}{\lambda j\,\Blank.\,{i = j}}) : \ICont{I} \).
 If \( i \) is isolated, then \( i = j \) is a decidable proposition for any \( j : I \);
 in this case \( \pi_i \) is equivalent to a container whose \( i \)th type of positions is \( 1 \),
 and \( 0 \) for any other direction.
 As expected, indexed containers are closed under constants \( \CConst(A) \), sums \( (\CPlus) \) and products \( (\CTimes) \).
 Substitution generalizes to an operation that places a container inside the positions at index \( \Nothing : I + 1 \) of an \( (I + 1) \)-indexed container:
 \begin{definition}
-    Substitution is an operation \( \Subst{\Blank}{\Blank} : \Cont_{I+1} \to \Cont_{I} \to \Cont_{I} \),
+    Substitution is an operation \( \Subst{\Blank}{\Blank} : \ICont{I+1} \to \ICont{I} \to \ICont{I} \),
     defined as follows:
     \begin{align*}
       \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Sh} &\DefEq \sum_{s : S} P(s) \to T
@@ -82,8 +82,8 @@ Substitution generalizes to an operation that places a container inside the posi
 Similarly, we can lift derivatives to indexed containers.
 For an \( I \)-indexed container, we can take a derivative with respect to any index \( i : I \), as long as equality with \( i \) is decidable:
 \begin{definition}[note={Derivative of \( I \)-ary containers}]
-  Let \( F \JudgeEq (\MkCont{S}{P}) : \Cont_I \) and \( i : \Isolated{I} \).
-  The \( i \)th derivative \( {\Der_i}F \DefEq (\MkCont{S'}{P'}) : \Cont_I \) is defined as follows:
+  Let \( F \JudgeEq (\MkCont{S}{P}) : \ICont{I} \) and \( i : \Isolated{I} \).
+  The \( i \)th derivative \( {\Der_i}F \DefEq (\MkCont{S'}{P'}) : \ICont{I} \) is defined as follows:
   \begin{align*}
     S' &\DefEq \sum_{s : S} \Isolated{P_i(s)} \\
     P'(j, s, p) &\DefEq
@@ -106,7 +106,7 @@ Derivatives of composites follow a lax chain rule, which now accounts for multip
 As promised in the discussion of \autoref{lax-chain-rule},
 its construction factors into smaller steps that make it obvious why, in general, it is not invertible:
 \begin{problem}[note={Lax chain rule for binary containers}]\label{binary-chain-rule}
-  Let \( F : \Cont_2 \) and \( G : \Cont_1 \).
+  Let \( F : \ICont{2} \) and \( G : \ICont{1} \).
   Define a linear morphism
   \[
     \Chain_{F,G}
@@ -220,10 +220,10 @@ its construction factors into smaller steps that make it obvious why, in general
 This factorization makes it obvious that the binary chain rule is again an embedding of containers,
 and strong whenever isolated points distribute over dependent sums:
 \begin{proposition}\label{is-embedding-binary-chain-rule}
-  For \( F : \Cont_2 \) and \( G : \Cont_1 \), \( \Chain_{F,G} \) is an embedding. \qed
+  For \( F : \ICont{2} \) and \( G : \ICont{1} \), \( \Chain_{F,G} \) is an embedding. \qed
 \end{proposition}
 \begin{proposition}\label{strong-binary-chain-rule-iff-is-equiv-sigma-isolate}
-  For all \( F \JudgeEq (\MkCont{S}{P}) : \Cont_2 \) and \( G \JudgeEq (\MkCont{T}{Q}) : \Cont_1 \), the following are equivalent:
+  For all \( F \JudgeEq (\MkCont{S}{P}) : \ICont{2} \) and \( G \JudgeEq (\MkCont{T}{Q}) : \ICont{1} \), the following are equivalent:
   \begin{enumerate}
     \item \( \Chain_{F,G} \) is an equivalence of unary containers.
     \item For all \( s : S \) and \( f : P_1(s) \to T \), \( \SigmaIsolate_{P_1(s), Q(f(\Blank))} \) is an equivalence.
@@ -236,7 +236,7 @@ and strong whenever isolated points distribute over dependent sums:
 
 Like in \autoref{discrete-strong-chain-rule}, this is the case for discrete containers:
 \begin{proposition}\label{discrete-strong-binary-chain-rule}
-  If \( F : \Cont_2 \) and \( G : \Cont_1 \) are discrete, then \( \Chain_{F,G} \) is an equivalence. \qed
+  If \( F : \ICont{2} \) and \( G : \ICont{1} \) are discrete, then \( \Chain_{F,G} \) is an equivalence. \qed
 \end{proposition}
 
 \subsection{Fixpoints of Containers}\label{fixed-point-containers}
@@ -295,8 +295,8 @@ which is exactly a container fixpoint in the sense of \cite{DamatoEtAl2025Formal
 We thus define least fixpoints of a signature container \( F \) without reference to its associated functor \( \Ext{F} \),
 namely as initial algebras of the wild functor \( \Subst{F}{\Blank} \).
 \begin{problem}[note={\( \Subst{F}{\Blank} \)-algebras}]
-  Given \( F : \Cont_{I+1} \), define the structure of a wild category \( \Alg{\Subst{F}{\Blank}} \).
-  Its objects are of type \( \sum_{X : \Cont_I} \Cart{\Subst{F}{X}}{X} \),
+  Given \( F : \ICont{I+1} \), define the structure of a wild category \( \Alg{\Subst{F}{\Blank}} \).
+  Its objects are of type \( \sum_{X : \ICont{I}} \Cart{\Subst{F}{X}}{X} \),
   and a morphism is of type
   \[
     \Alg{\Subst{F}{\Blank}}((X, f), (Y , g)) \DefEq \sum_{h : \Cart{X}{Y}} (h \circ f = g \circ \Subst{F}{h}),
@@ -317,7 +317,7 @@ namely as initial algebras of the wild functor \( \Subst{F}{\Blank} \).
   Identities and composite morphisms are defined as expected.
   The filler of the commutative in a composite \( (h, h_\square) ; (k, k_\square) \) is
   obtained by path composition of \( h_\square \) and \( k_\square \).
-  However, unlike in 1-categories, unitality and associativity of composition is not automatically inherited from the base category \( \Cont_I \),
+  However, unlike in 1-categories, unitality and associativity of composition is not automatically inherited from the base category \( \ICont{I} \),
   since we have to ensure that there are higher paths between composite squares, such as
   \[
     \begin{tikzcd}
@@ -358,9 +358,9 @@ an object \( 0 \) of a wild category \( \mathcal{C} \) is \emph{initial}
 if for any other object \( X \), the type of morphisms \( \mathcal{C}(0, X) \) is \emph{contractible}.
 Hence we say:
 \begin{definition}
-  A least fixpoint of a signature container \( F : \Cont_{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
+  A least fixpoint of a signature container \( F : \ICont{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
 \end{definition}
-Spelled out, a least \( F \)-fixpoint consists of a \emph{carrier} \( M : \Cont_I \)
+Spelled out, a least \( F \)-fixpoint consists of a \emph{carrier} \( M : \ICont{I} \)
 and a structure map \( m : \Cart{\Subst{F}{M}}{M} \)
 such that for any other algebra \( (G, g) \), the type of morphisms \( \Alg{\Subst{F}{\Blank}}((M, m), (G, g)) \) is contractible.
 The latter means that there is a unique map \( r : \Cart{M}{G} \) that commutes with the structure maps \( m \) and \( g \).
@@ -411,7 +411,7 @@ for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
 
 We use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively, of the least fixpoint container:
 \begin{definition}
-  Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \Cont_{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \Cont_I \):
+  Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \ICont{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \ICont{I} \):
   \begin{align*}
     S^\mu &\DefEq \W(S, P) \\
     P^\mu_i & \DefEq \bar{\W}_{S,P,\vec{P}}
@@ -542,7 +542,7 @@ In fact, this morphism is uniquely determined, hence we get a fixpoint for any s
 \subsection{The \texorpdfstring{\( \mu \)-}{Fixpoint }Rule}
 
 Having convinced ourselves that fixpoints do exist even for untruncated containers, we can now characterize their derivatives.
-Let \( F : \Cont_2 \).
+Let \( F : \ICont{2} \).
 If we think of \( \mu F \) as an \( F \)-branching tree, then \( \Der{\mu F} \) represents a type of trees with a hole.
 Such a hole must be either in the position of a leaf or occur recursively in a branch,
 which are given by the positions \( P_0 \) and \( P_1 \).
@@ -567,7 +567,7 @@ Proving that this is the case even for untruncated containers is not entirely st
 There is however hope to recover at least a morphism out of \( \mu F' \) into \( \Der{\mu F} \) by recursion:
 
 \begin{problem}[note={Lax \( \mu \)-rule}]\label{mu-rule}
-  For \( F : \Cont_2 \), define by recursion a linear morphism
+  For \( F : \IContCart{2} \), define by recursion a linear morphism
   \[
     \MuRule_F : \Cart{ \mu F' }{ \Der(\mu F) }
   \]
@@ -581,7 +581,7 @@ There is however hope to recover at least a morphism out of \( \mu F' \) into \(
           \CTimes
         \Proj{1}
       )
-    : \Cont_2
+    : \ICont{2}
   \).
 \end{problem}
   \begin{construction}
@@ -597,7 +597,7 @@ There is however hope to recover at least a morphism out of \( \mu F' \) into \(
         \mathrel{\CartEquiv}
       { \Der_0{F}[ {\mu F} ] } \CPlus ( {\Der_1{F}[ {\mu F} ]} \CTimes \Highlight{Y} )
     \]
-    for any choice of \( \Highlight{Y} : \Cont_1 \).
+    for any choice of \( \Highlight{Y} : \ICont{1} \).
     In particular, for \( \Highlight{Y} \JudgeEq \Der(\mu F) \),
     the codomain of \( \gamma_{\Der{\mu F}} \) is exactly the domain of the binary chain rule (cf.~\autoref{binary-chain-rule}).
     Hence, we define \( \alpha \) as the following composite:
@@ -651,7 +651,7 @@ First, observe that recursion reflects equivalence, in the following sense:
 
 Thus, a strong \( \mu \)-rule for some container necessarily implies a strong chain rule between \( F \) and \( \mu F \):
 \begin{proposition}\label{strong-chain-rule-from-strong-mu-rule}
-  Let \( F : \Cont_{I + 1} \).
+  Let \( F : \ICont{I + 1} \).
   If \( \MuRule_F \) is an equivalence, then so is \( \Chain_{F,{\mu F}} \).
   \begin{proof}
     Assume that \( \MuRule_F \) is an equivalence.
@@ -768,7 +768,7 @@ and thus show that it preserves embeddings.
 
 This tells us that \( \MuRule_F \) embeds \( \mu F' \) as a subcontainer inside of \( \Der(\mu F) \):
 \begin{lemma}\label{is-embedding-mu-rule}
-  For all \( F : \Cont_{I + 1} \), the shape map \( (\MuRule_F)_{\Sh} \) is an embedding.
+  For all \( F : \ICont{I + 1} \), the shape map \( (\MuRule_F)_{\Sh} \) is an embedding.
   \begin{proof}
     By the indexed analogue of \autoref{is-embedding-chain-rule},
     the shape map of the chain rule is an embedding.
@@ -778,7 +778,7 @@ This tells us that \( \MuRule_F \) embeds \( \mu F' \) as a subcontainer inside 
 
 From this, we can conclude that a strong chain rule alone is enough to prove a strong \( \mu \)-rule:
 \begin{proposition}\label{strong-chain-rule-to-strong-mu-rule}
-  Let \( F : \Cont_{I + 1} \).
+  Let \( F : \ICont{I + 1} \).
   If  \( \Chain_{F,{\mu F}} \) is an equivalence, then so is \( \MuRule_F \).
   \begin{proof}
     Since \( \MuRule_F \) is always an embedding (\autoref{is-embedding-mu-rule}),
@@ -795,7 +795,7 @@ From this, we can conclude that a strong chain rule alone is enough to prove a s
 
 Thus, whether the \( \mu \)-rule is strong depends only on the chain rule:
 \begin{theorem}\label{strong-mu-rule-iff-strong-chain-rule}
-  For any container \( F : \Cont_{I + 1} \), the following are equivalent:
+  For any container \( F : \ICont{I + 1} \), the following are equivalent:
   \begin{enumerate}
     \item \( \MuRule_F \) is an equivalence.
     \item \( \Chain_{F,{\mu F}} \) is an equivalence.
@@ -818,11 +818,11 @@ First, note that \( \bar{\W} \) preserves discreteness:
 \end{lemma}
 This implies that discrete containers are closed under \( \mu \):
 \begin{lemma}\label{mu-discrete}
-  If \( F : \Cont_{I + 1} \) is a discrete container, then so is \( \mu F \).
+  If \( F : \ICont{I + 1} \) is a discrete container, then so is \( \mu F \).
 \end{lemma}
 Hence, we obtain a strong \( \mu \)-rule for discrete containers:
 \begin{proposition}[note={\cite[{Proposition 8.1}]{AbbottEtAl2005DataDifferentiating}}]
-  If \( F : \Cont_{I + 1} \) is discrete, then \( \MuRule_F \) is an equivalence.
+  If \( F : \ICont{I + 1} \) is discrete, then \( \MuRule_F \) is an equivalence.
   \begin{proof}
     By \autoref{strong-mu-rule-iff-strong-chain-rule}, it suffices to show that \( \Chain_{F,\mu F} \) is an equivalence.
     But \( \mu F \) is discrete (\autoref{mu-discrete}), and the chain rule between discrete containers is strong (\autoref{discrete-strong-binary-chain-rule}).

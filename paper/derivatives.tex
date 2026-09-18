@@ -58,8 +58,8 @@ these have groupoids for shapes, and sets for positions, hence are exactly the \
 
 We denote by \( \ContCart \) the wide wild subcategory of \( \Cont \) containing only the linear morphisms.
 Restricting to a subtype of containers,
-we write \( \Cont_{n,k} \) for the wild subcategory of \( (n,k) \)-truncated containers,
-and \( \ContCart_{n,k} \) for its restriction to linear morphisms.
+we write \( \TruncCont{n,k} \) for the wild subcategory of \( (n,k) \)-truncated containers,
+and \( \TruncContCart{n,k} \) for its restriction to linear morphisms.
 
 \paragraph{Relation to polynomial functors.}
 Each container defines a polynomial in types, that is a family \( \Type \to \Type \):
@@ -69,7 +69,7 @@ Each container defines a polynomial in types, that is a family \( \Type \to \Typ
 \end{definition}
 The extent of set-truncated containers defines an endofunctor of \( h \)-sets.
 \Citeauthor{AbbottEtAl2005ContainersConstructingstrictly} prove that
-\( \Ext{\Blank} \) fully-faithfully embeds \( \Cont_{0,0} \) into the category of set-endofunctors.
+\( \Ext{\Blank} \) fully-faithfully embeds \( \TruncCont{0,0} \) into the category of set-endofunctors.
 In essence, morphisms of set-truncated containers represent exactly polymorphic functions,
 that is natural transformations of polynomial endofunctors of sets~\cite[{Theorem~3.4}]{AbbottEtAl2005ContainersConstructingstrictly}.
 Linear morphisms then capture the intuition of a \enquote{linear} map of datatypes,
@@ -166,7 +166,7 @@ to construct paths between container morphisms:
 \end{lemma}
 
 \paragraph{Univalence of containers.}
-The 1-category \( \Cont_{0,0} \) of set-truncated containers is univalent.
+The 1-category \( \TruncCont{0,0} \) of set-truncated containers is univalent.
 However, neither \( \Cont \) nor \( \ContCart \) are univalent wild categories in the na{\"i}ve sense:
 The canonical map taking paths of containers \( F = G \) to categorical isomorphisms\footnote{%
   that is, pairs \( f : F \to G, g : G \to F \) with chosen paths \( fg = \id_F \) and \( gf = \id_G \)
@@ -275,10 +275,10 @@ as long as shapes are at least sets, and positions are at least propositions:
 Importantly, this turns \( \Der \) into an endofunctor on the 1-category of set-truncated containers,
 without having to assume that the containers are discrete:
 \begin{corollary}
-  Taking derivatives is an endofunctor \( \Der : \ContCart_{0,0} \to \ContCart_{0,0} \).
+  Taking derivatives is a functor \( \Der : \TruncContCart{0,0} \to \TruncContCart{0,0} \).
 \end{corollary}
 We believe that analogues of this hold for higher truncation levels.
-Symmetric containers, for example, form a bicategory \( \ContCart_{1,0} \),
+Symmetric containers, for example, form a bicategory \( \TruncContCart{1,0} \),
 and it should be straightforward (albeit tedious) to show that \( \Der \) restricts to a pseudo\-functor on this bicategory.
 
 We now show that this generalized derivative operation is right-adjoint to \( \Maybe{\Blank} \),
@@ -386,9 +386,9 @@ We can however complete the search for a suitable subcategory of differentiable 
 Our derivative is defined functorially for \emph{all} containers,
 and restricting the above wild adjunction to set-truncated containers yields the following:
 \begin{theorem}\label{derivative-adjunction-sets}
-  In the 1-category of set-truncated containers \( \ContCart_{0,0} \), \( \Der \) is right-adjoint to tensoring \( \Blank \CTimes \Id \). \qed
+  In \( \TruncContCart{0,0} \), \( \Der \) is right-adjoint to tensoring \( \Blank \CTimes \Id \). \qed
 \end{theorem}
-From this, we can extract the familiar natural isomorphism of morphism-sets in \( \ContCart_{0,0} \).
+From this, we can extract the familiar natural isomorphism of morphism-sets in \( \TruncContCart{0,0} \).
 In fact, the same argument lets us obtain a natural equivalence of morphism-types for arbitrary containers,
 which otherwise would be somewhat tedious to establish:
 there is an equivalence \( (\Cart{F}{\Der{G}}) \simeq (\Cart{\Maybe{F}}{G}) \) natural in \( F, G : \ContCart \),
@@ -402,7 +402,7 @@ Interestingly, the proof of \cite[{Theorem 5.1}]{AbbottEtAl2005DataDifferentiati
 Furthermore, we can iterate the adjunction and easily obtain a notion of \( n \)-fold derivatives.
 \begin{corollary}\label{nth-derivative-sets}
   For all \( n : \mathbb{N} \), there is an adjunction \( \Blank \CTimes \CYo{[n]} \dashv \Der^n \)
-  in the 1-category \( \ContCart_{0,0} \).
+  in the 1-category \( \TruncContCart{0,0} \).
 \end{corollary}
 Intuitively, \( \Der^n(\MkCont{S}{P}) \) encodes a type with \( n \) distinct holes:
 its type of shapes is equivalent to a type of tuples \( (s, p_1, \ldots, p_n) \)
