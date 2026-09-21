@@ -64,10 +64,11 @@ Then, we ask whether it behaves correctly:
 Does it satisfy a universal property like discrete containers do?
 Do the expected laws of derivatives hold? Is there a chain rule?
 
-To this end, in \autoref{isolated-points} we recall the notion of \emph{isolatedness} of a point in a type.
-This is a local notion of discreteness, considered in type theory, for example, by \citeauthor{KrausEtAl2013GeneralizationsHedberg’sTheorem}~\cite{KrausEtAl2013GeneralizationsHedberg’sTheorem}.
-To each type \( A \), we associate its \emph{set} of isolated points \( \Isolated{A} \)\kern-0.20em,
-and show how it distributes over various type formers.
+To this end, in \autoref{isolated-points} we recall the notion of \emph{isolatedness} of a point in a type,
+introduced initially to prove a local version of Hedberg's Theorem:
+if a point is isolated, then path spaces based at this point are \( h \)-propositions~\cite{Palmgren2011Proofrelevancefamilies}.
+Consequently, for an arbitrary type \( A \), its subtype of isolated points \( \Isolated{A} \) forms an \( h \)-set.
+We study how isolated points distribute over various type formers.
 We make three observations:
 First, isolated points distributing over \( \Sigma \)-types is a constructive taboo which would imply discreteness of arbitrary types.
 Second, removal of points from a type, \( A \setminus a \), is well-behaved even for arbitrary \( A : \Type \),

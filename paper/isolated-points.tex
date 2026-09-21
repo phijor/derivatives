@@ -26,15 +26,26 @@ we believe that a majority also hold with more fine-grained assumptions. %;
 \subsection{Isolated Points}\label{isolated-points-intro}
 
 Recall that a type is \emph{discrete} if equality of any pair of its points is decidable.
-In a univalent world, this is a rather strong property --- by Hedberg's Theorem, any such type forms a (homotopy) set,
-and can thus not have any interesting path structure.
-In some cases a type might have this property locally, however.
+In Martin--Löf type theory, this is a rather strong property
+---
+by Hedberg's Theorem, any discrete type has propositional identity types.
+Under the homotopical interpretation of types, discrete types thus cannot have any interesting path structure,
+and must form \( h \)-sets.
+
+In some cases a type might be locally discrete, however.
 Consider for example the sum \( A + 1 \) for an arbitrary type \( A \).
 Even if equality in this type is not decidable without further assumptions on \( A \),
-it should at least be possible to decide \( x = \Inr(\bullet) \), no matter which \( x : A + 1 \) we are given.
-After all, the constructors \( \Inl \) and \( \Inr \) are injective,
+it should at least be possible to decide \( x = \Nothing \), no matter which \( x : A + 1 \) we are given.
+After all, the constructors \( \Just \) and \( \Nothing \) are disjoint,
 so case analysis should yield a decision procedure, even without looking at points of \( A \).
-We call such points \emph{isolated}:
+We call such points \emph{isolated}:%
+\footnote{%
+  To the best of our knowledge,
+  the name \enquote{isolated} is due to \citeauthor{Voevodsky2015experimentallibraryformalized}.
+  In his 2010--2011 \emph{Foundations} library~\cite{Voevodsky2015experimentallibraryformalized},
+  \href{https://www.math.ias.edu/~vladimir/Foundations_library/uu0.html\#lab67}{\texttt{uu0.v}}
+  has a section titled \emph{Isolated points and types with decidable equality.}
+}
 \begin{definition}
   A point \( a : A \) is \emph{isolated} if \( a = b \) is decidable for all \( b : A \).
   That is, isolated points satisfy the predicate \( \IsIsolated : A \to \Type \),
@@ -47,8 +58,6 @@ We call such points \emph{isolated}:
   \)
   the subtype of isolated points.
 \end{definition}
-In this section, we are going to study some properties of isolated points.
-We are particularly interested to see how they interact with the various type formers such as binary- and dependent sums.
 
 In general, a decision procedure of equality is extra structure on a type;
 after all, there are possibly many ways to affirm that, \emph{yes}, \( a = b \) in an arbitrary type \( A \).
@@ -56,12 +65,12 @@ Therefore, the type \( \IsIsolated(a) \) might, \emph{a priori}, not be a propos
 Take for example the circle \( S^1 \): there are \( \mathbb{Z} \)-many proofs of \( \Op{Dec}(\Op{base} =_{S^1} \Op{base}) \).
 However, since equality has to be decidable uniformly for a point to be isolated, this does not happen:
 isolated points \emph{do} have trivial path spaces.\footnote{In fact \( S^1 \) is \emph{perfect}, i.e.\@ has no isolated points at all.}
-To prove this, \citeauthor{KrausEtAl2017NotionsAnonymousExistence} give the following
-\enquote{local} version of Hedberg's Theorem:
-\begin{lemma}[note={\cite[Theorem~3.12]{KrausEtAl2017NotionsAnonymousExistence}}]\label{is-prop-isolated-path}
+This was first noticed as a generalization to Hedberg's theorem in plain \textsc{MLTT} by \citeauthor{Palmgren2011Proofrelevancefamilies}:
+\begin{lemma}[note={{\cite[Theorem~6.2]{Palmgren2011Proofrelevancefamilies}}}]\label{is-prop-isolated-path}
   If \( a : A \) is isolated, then \( a = b \) is a proposition for all \( b : A \).
 \end{lemma}
-Importantly, this shows that being isolated is a property of a point:
+
+An important consequence of this is that being isolated is a property:
 \begin{corollary}\label{is-prop-isolated-dec-path}\label{is-prop-is-isolated}
   If \( a : A \) is isolated, then \( \Dec{(a = b)} \) is a proposition for all \( b : A \).
   In particular, \( \IsIsolated(a) \) is a proposition for all \( a : A \).
