@@ -183,15 +183,15 @@ It turns out that this requirement is not only sufficient, but also necessary.
 Inspecting the fibers of \( \SigmaIsolate \), we notice that they are all propositions,
 hence \( \SigmaIsolate \) must be an embedding:
 \begin{lemma}\label{sigma-isolate-fibers}
-  For all \( A : \Type \), \( B : A \to \Type \), and \( y \JudgeEq ((a, b), \Blank) : \Isolated{(\Sigma_{A} B)} \),
+  For all \( A : \Type \), \( B : A \to \Type \), and \( y \JudgeEq ((a, b), \Blank) : \Isolated{(\Sigma_{A} B)} \)
   there is an equivalence \( \Op{fiber}_{\SigmaIsolate}(y) \simeq \IsIsolated(a) \times \IsIsolated(b) \).
   \begin{proof}
     By extensionality of paths in \( \Sigma \)-types, we rephrase the type of fibers over \( y \) in terms of singletons
     over \( a \) and \( b \), namely
     \[
         \textstyle
-        \sum_{(a', \Blank) : \Singl(a)}
-        \sum_{(b', \Blank) : \Singl(p_{*}{b})}
+        \sum_{(a'\negthickspace, p) : \Singl(a)}
+        \sum_{(b'\negthickspace, \Blank) : \Singl(p_{*}{b})}
           \IsIsolated(a') \times \IsIsolated(b')
     \]
     The claim follows by contracting away these singletons.
