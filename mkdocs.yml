@@ -69,3 +69,6 @@ plugins:
 - gen-files:
     scripts:
       - "./scripts/gen_agda_pages.py"
+
+hooks:
+  - scripts/merge_search_index.py

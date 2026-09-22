@@ -7,6 +7,8 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
 
+    blindhuhn.url = "github:phijor/blindhuhn";
+    blindhuhn.inputs.nixpkgs.follows = "nixpkgs";
     cornelis.url = "github:agda/cornelis";
     cornelis.inputs.nixpkgs.follows = "nixpkgs";
   };

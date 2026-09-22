@@ -30,9 +30,16 @@
 
         buildInputs = [ cubical ];
 
+        nativeBuildInputs = [
+          inputs'.blindhuhn.packages.default
+        ];
+
         postInstall = ''
           mkdir -p $html
-          agda --html --html-dir=$html --html-highlight=code agda/README.lagda.md
+          blindhuhn --html --html-dir=$html --html-highlight=code \
+            --library-file=${pkgs.agdaPackages.mkLibraryFile [ cubical ]} \
+            --blindhuhn-index derivative \
+            agda/README.lagda.md
         '';
 
         meta = {
@@ -71,6 +78,7 @@
               ./docs/.nav.yml
               ./mkdocs.yml
               ./scripts/gen_agda_pages.py
+              ./scripts/merge_search_index.py
             ];
           };
 
@@ -79,7 +87,9 @@
         ];
 
         buildPhase = ''
-          AGDA_HTML_DIR="${config.packages.derivative.html}" mkdocs -v build
+          AGDA_HTML_DIR="${config.packages.derivative.html}" \
+          AGDA_SEARCH_INDEX_FILE="${config.packages.derivative.html}/index.json" \
+          mkdocs -v build
         '';
 
         installPhase = ''
