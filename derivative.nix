@@ -8,6 +8,13 @@
       ...
     }:
     let
+      inherit (pkgs.haskell.lib.compose) justStaticExecutables;
+      # This derivation pollutes $PATH with binaries of its dependencies
+      # (in particular, Agda) if used as a build input.  This messes with
+      # which version of Agda is picked up.  This is fixed by only keeping
+      # the static `blindhuhn` executable.
+      blindhuhn = justStaticExecutables inputs'.blindhuhn.packages.default;
+
       cubical = pkgs.agdaPackages.cubical;
 
       src =
@@ -31,7 +38,7 @@
         buildInputs = [ cubical ];
 
         nativeBuildInputs = [
-          inputs'.blindhuhn.packages.default
+          blindhuhn
         ];
 
         postInstall = ''
