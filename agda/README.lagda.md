@@ -686,6 +686,11 @@ _ : (F : Containerᴵ (Maybe Ix)) → Containerᴵ Ix
 _ = μ
 ```
 
+**TODO**: Description of lists as a fixpoint.
+```agda
+import Derivative.Indexed.List
+```
+
 **Problem 5.13**:
 Define an equivalence of containers \( F [ {μ F} ] ⧟ μ F \).
 ```agda

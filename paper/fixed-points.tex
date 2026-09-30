@@ -42,22 +42,6 @@ Consequently, the \emph{extent} of an indexed container takes \( I \)-indexed fa
   &\Ext{\MkCont{S}{P}}(\vec{X}) \DefEq \sum_{s : S} \prod_{i : I} P_i(s) \to \vec{X}_i
 \end{align*}
 
-We call \( (I + 1) \)-indexed containers \emph{signature containers}; their fixpoints describe inductive types.
-\begin{example}
-  \newcommand*{\Nil}{\Op{nil}}
-  \newcommand*{\Cons}{\Op{cons}}
-  In the informal specification \( \Op{List}(X) = \mu Y.\, 1 + X \times Y \),
-  the expression \( L(X, Y) = 1 + X \times Y \) is transcribed into a binary container \( L \), indexed by the type \( 2 \).
-  Its positions at index \( \Op{y} \DefEq \Inr(\bullet) : 2 \) encode occurrences of the recursion variable \( Y \),
-  those at \( \Op{x} \DefEq \Inl(\bullet) : 2 \) occurrences of \( X \).
-  It has two shapes, \( \Nil \) and \( \Cons \),
-  over which there are positions
-  \begin{align*}
-    L_{\Ps}(\Op{x}, \Nil) &\DefEq 0 & L_{\Ps}(\Op{x}, \Cons) &\DefEq 1 \\
-    L_{\Ps}(\Op{y}, \Nil) &\DefEq 0 & L_{\Ps}(\Op{y}, \Cons) &\DefEq 1 \qedhere
-  \end{align*}
-\end{example}
-
 Linear morphisms between containers \(F , G : \ICont{I} \) are defined by ranging over all indices \( I \):
 \[
   \Cart{F}{G} \DefEq \smashoperator[l]{\sum_{f : F_{\Sh} \to G_{\Sh}}} \prod_{i : I, s : F_{\Sh}} G_{\Ps}(i, f(s)) \simeq F_{\Ps}(i, s)
@@ -419,7 +403,27 @@ use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively
   \end{align*}
 \end{definition}
 
-These let us derive a fixpoint to substitution:
+\begin{example}
+  \newcommand*{\Nil}{\Op{nil}}
+  \newcommand*{\Cons}{\Op{cons}}
+  In the informal specification \( \Op{List}(X) = \mu Y.\, 1 + X \times Y \),
+  the expression \( L(X, Y) = 1 + X \times Y \) is transcribed into a container in two variables, \( L \JudgeEq (\MkCont{S}{X, Y}) : \Cont_2 \).
+  It has two shapes, \( S \DefEq \{ \Nil,  \Cons \} \),
+  over which there are positions
+  \begin{align*}
+    X(\Nil) &\DefEq 0 & X(\Cons) &\DefEq 1 \\
+    Y(\Nil) &\DefEq 0 & Y(\Cons) &\DefEq 1
+  \end{align*}
+  Its fixpoint is equivalent to the usual description of lists as a container:
+  the shapes \( ({\mu L})_{\Sh} \JudgeEq \W(S, Y) \)
+  are trees with either unary (\( Y(\Cons) \)) or nullary (\( Y(\Nil) \))
+  branching, hence there is a unique tree for each depth \( n : \mathbb{N} \).
+  An \( X \)-labeled path \( x : \WPath_{S, Y, X}(t) \) to a node in a tree \( t : \W(S, Y) \)
+  thus corresponds exactly to some number \( k : \Fin{\Op{depth}(t)} \).
+  This defines an equivalence \( \mu L \CartEquiv (\MkCont{n : \mathbb{N}}{\Fin{n}}) \).
+\end{example}
+
+In general, \( \mu F \) is a fixpoint of substitution into \( \Subst{F}{\Blank} \):
 \begin{problem}
   Define an equivalence of containers \( \In_F : F[{\mu F}] \CartEquiv {\mu F} \).
   \begin{construction}
