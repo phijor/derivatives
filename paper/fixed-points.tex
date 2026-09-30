@@ -254,7 +254,7 @@ we first have to give a suitable specification of what we mean by such a \enquot
 Just like in the non-indexed case,
 The extension of set-truncated indexed containers defines subcategory of functors \( [\Set^I, \Set] \)~\cite[Theorem.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
 In particular, given a signature container \( F : \ICont{I+1} \) and \( \vec{X} : I \to \Set \),
-the endofunctor \( \Ext{F}(\vec{X}, \Blank) : [ \Set, \Set ] \) admits an initial algebra.
+the endofunctor \( \Ext{F}(\vec{X}, \Blank) : [ \Set, \Set ] \) admits an initial algebra~\cite[Proposition~5.3]{AbbottEtAl2005ContainersConstructingstrictly}.
 This fixpoint can be reflected back into containers,
 implying that they are closed under least fixpoint,
 and thus an adequate model of strictly-positive, inductive types.
@@ -272,13 +272,12 @@ thus proving that \( \mu F \) itself is defined universally among \emph{containe
 without needing to reference their interpretations.
 This, however, is hampered by the fact that we cannot (yet) internally prove that \( \Ext{\Blank} \) is a suitable embedding of containers and their morphisms, as discussed earlier.
 
-Alternatively, one may directly construct fixpoints in the category of containers~\cite{AltenkirchEtAl2015Indexedcontainers}:
-substitution \( \Subst{F}{\Blank} \) for a fixed \emph{indexed} container \( F \) is an endofunctor on containers,
+Assuming \( \Op{UIP} \) (i.e.\@ that all types are \( h \)-sets),
+it is possible to directly construct fixpoints in the category of containers~\cite{AltenkirchEtAl2015Indexedcontainers}:
+substitution \( \Subst{F}{\Blank} \) into a fixed \( F : \ICont_{I+1} \) is an endofunctor on containers,
 and this functor admits an initial algebra.
-The extent carrier of this algebra, \( \mu F \),
-is an initial \( \Ext{F}(\vec{X}, \Blank) \)-algebra
-representing the inductive type given by the \enquote{signature container} \( F \).
-This construction is carried out under the assumption of \( \Op{UIP} \), i.e.\@ that all types are \( h \)-sets.
+The extent of the carrier of this algebra, \( \mu F \),
+is again the initial \( \Ext{F}(\vec{X}, \Blank) \)-algebra.
 
 We retrace the construction of \cite{AltenkirchEtAl2015Indexedcontainers}, showing that it does not depend on \( \Op{UIP} \).
 We first ensure, for any \( F : \ICont{I + 1} \), that \( \Subst{F}{\Blank} \)-algebras form a wild category
@@ -409,7 +408,8 @@ the constructors define equivalences
 \end{align*}
 for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
 
-We use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively, of the least fixpoint container:
+We follow \cite[\S~7]{AbbottEtAl2005ContainersConstructingstrictly} and
+use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively, of the least fixpoint container:
 \begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \ICont{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \ICont{I} \):
   \begin{align*}
