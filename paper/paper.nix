@@ -79,7 +79,15 @@
         '';
       };
       make-shells.latex = {
-        inputsFrom = [ config.packages.paper ];
+        inputsFrom = [
+          config.packages.paper
+        ];
+        packages = [
+          pkgs.tinymist
+          pkgs.typst
+          pkgs.typstyle
+          pkgs.websocat
+        ];
       };
     };
 
