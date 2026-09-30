@@ -314,7 +314,7 @@ namely as initial algebras of the wild functor \( \Subst{F}{\Blank} \).
 \end{problem}
 \begin{construction}
   Identities and composite morphisms are defined as expected.
-  The filler of the commutative in a composite \( (h, h_\square) ; (k, k_\square) \) is
+  The filler of the commutative square in a composite \( (h, h_\square) ; (k, k_\square) \) is
   obtained by path composition of \( h_\square \) and \( k_\square \).
   However, unlike in 1-categories, unitality and associativity of composition is not automatically inherited from the base category \( \ICont{I} \),
   since we have to ensure that there are higher paths between composite squares, such as
@@ -435,20 +435,20 @@ We define a non-dependent recursion principle for maps out of \( \mu F \),
 which yields a morphism into \emph{any} other algebra:
 \begin{problem}[note={\( \mu \)-recursion}]\label{mu-rec}
   Define a recursion principle for morphisms out of \( \mu \)-containers.
-  That is, for any \( F : \ICont{I+1} \), \( G : \ICont{I} \) and \( \alpha : \Subst{F}{G} \to G \),
+  That is, for any \( F : \ICont{I+1} \), \( G : \ICont{I} \) and \( \alpha : \Cart{\Subst{F}{G}}{G} \),
   give a morphism
   \[
-      \Rec_{F}(\alpha) : \mu F \to G
+      \Rec_{F}(\alpha) : \Cart{\mu F}{G}
   \]
   together with a chosen filler
   \begin{equation}\label{mu-rec-comm}
     \begin{tikzcd}[column sep=huge]
       \Subst{F}{\mu F} & \Subst{F}{G} \\
       {\mu F}          & G
-      \ar[from=1-1, to=1-2, "\Subst{F}{\Rec_F(\alpha)}"]
-      \ar[from=1-1, to=2-1, "\In_F"{swap}]
-      \ar[from=2-1, to=2-2, "\Rec_F(\alpha)"{swap}]
-      \ar[from=1-2, to=2-2, "\alpha"]
+      \ar[from=1-1, to=1-2, -multimap, "\Subst{F}{\Rec_F(\alpha)}"]
+      \ar[from=1-1, to=2-1, -multimap, "\In_F"{swap}]
+      \ar[from=2-1, to=2-2, -multimap, "\Rec_F(\alpha)"{swap}]
+      \ar[from=1-2, to=2-2, -multimap, "\alpha"]
     \end{tikzcd}
   \end{equation}
 \end{problem}
@@ -500,15 +500,15 @@ which yields a morphism into \emph{any} other algebra:
 In fact, this morphism is uniquely determined, hence we get a fixpoint for any signature container.
 We establish this by proving that \( \Rec_F(\alpha) \) is unique as a coalgebra-to-algebra morphism:
 \begin{proposition}\label{mu-rec-coalg-to-alg-unique}
-  For all \( F : \ICont{I+1} \), \( G : \ICont{I} \) and \( \alpha : \Subst{F}{G} \to G \),
+  For all \( F : \ICont{I+1} \), \( G : \ICont{I} \) and \( \alpha : \Cart{\Subst{F}{G}}{G} \),
   the type
   \[
-    \sum_{\alpha^* : \mu F \to G} \alpha^* = \Out_F ; \Subst{F}{\alpha^*} ; \alpha
+    \sum_{\alpha^* : \Cart{\mu F}{G}} \alpha^* = \Out_F ; \Subst{F}{\alpha^*} ; \alpha
   \]
   is contractible with center \( (\Rec_F(\alpha), \Rec_F(\alpha)_\square) \), where
   \( \Rec_F(\alpha)_\square \) is the filler of \eqref{mu-rec-out-filler}.
   \begin{proof}
-    Let \( \alpha^* : \mu F \to G \) and \( \alpha^*_\square : \alpha^* = \Out_F ; \Subst{F}{\alpha^*} ; \alpha \).
+    Let \( \alpha^* : \Cart{\mu F}{G} \) and \( \alpha^*_\square : \alpha^* = \Out_F ; \Subst{F}{\alpha^*} ; \alpha \).
     We need to give a path \( p : \Rec_F(\alpha) = \alpha^* \),
     and over it a dependent path \( p_\square :  \Rec_F(\alpha)_\square =_p \alpha^*_\square \) connecting the commuting squares
     \[
