@@ -312,3 +312,9 @@ module Discrete (F : Container ℓ 𝟚) (discrete-F : ∀ ix s → Discrete (Po
 
   isEquiv-μ-rule : isContainerEquiv (μ-rule F)
   isEquiv-μ-rule = StrongChainRule.isEquiv-μ-rule F isEquiv-μ-chain-rule
+
+  μ-rule-equiv :
+    μ ((↑ (∂₀ F [ μ F ])) ⊕ ((↑ (∂₁ F [ μ F ])) ⊗ π₁))
+      ⧟
+    ∂• (μ F)
+  μ-rule-equiv = isContainerEquiv→Equiv (μ-rule F) isEquiv-μ-rule
