@@ -239,44 +239,58 @@ Just like in the non-indexed case,
 The extension of set-truncated indexed containers defines subcategory of functors \( [\Set^I, \Set] \)~\cite[Theorem.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
 In particular, given a signature container \( F : \ICont{I+1} \) and \( \vec{X} : I \to \Set \),
 the endofunctor \( \Ext{F}(\vec{X}, \Blank) : [ \Set, \Set ] \) admits an initial algebra~\cite[Proposition~5.3]{AbbottEtAl2005ContainersConstructingstrictly}.
-This fixpoint can be reflected back into containers,
-implying that they are closed under least fixpoint,
-and thus an adequate model of strictly-positive, inductive types.
+This initial algebra is itself the extent of some container \( \mu F : \ICont{I} \).
+Furthermore, \( \Ext{\Blank} \) embeds set-truncated containers full and faithfully into \( [\Set^I, \Set] \)~\cite[Theorem.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
+% This reflects much of the structure of the functor category \( [ \Set^I, \Set ] \) back into containers.
+It follows that \( \mu F \) represents a unique solution to the fixpoint problem \( Y = \Ext{F}(\vec{X}, Y) \)
 
 Recently,
 \citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} have investigated this in a univalent setting~\cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
-They show, without assuming \( \Op{UIP} \), that fixpoints of indexed containers exist,
-at least on a level of container \emph{functors}:
+They show, without assuming \( \Op{UIP} \), that fixpoints of indexed containers exist on a level of container \emph{functors}:
 for any signature container \( F : \ICont{I + 1} \) and \( \vec{X} : I \to \Type \),
 the wild functor \( \Ext{ F }(\vec{X}, \Blank) : [\Type, \Type] \) admits an initial algebra
 whose carrier is given by \( \Ext{ \mu F }\vec{X} \).
-Ideally, one would like to show that this construction is natural in \( \vec{X} \) and
-pull its properties back along \( \Ext{\Blank} \),
-thus proving that \( \mu F \) itself is defined universally among \emph{containers},
-without needing to reference their interpretations.
-This, however, is hampered by the fact that we cannot (yet) internally prove that \( \Ext{\Blank} \) is a suitable embedding of containers and their morphisms, as discussed earlier.
+Unfortunately, we cannot (yet) internally prove that \( \Ext{\Blank} \) is a suitable embedding of the \( (\infty, 1) \)-category of containers
+into \( \Type \)-valued endofunctors, preventing us from showing that \( \mu F \) is unique among containers.
+A candidate proof by \citeauthor{Damato2023RevisitingContainersCubical} based on the Yoneda lemma~\cite{Damato2023RevisitingContainersCubical}
+should be amenable to generalization to \( (\infty, 1) \)-categories,
+but alas, it is unclear how to define those internal to HoTT.
 
-Assuming \( \Op{UIP} \) (i.e.\@ that all types are \( h \)-sets),
-it is possible to directly construct fixpoints in the category of containers~\cite{AltenkirchEtAl2015Indexedcontainers}:
-substitution \( \Subst{F}{\Blank} \) into a fixed \( F : \ICont_{I+1} \) is an endofunctor on containers,
-and this functor admits an initial algebra.
-The extent of the carrier of this algebra, \( \mu F \),
-is again the initial \( \Ext{F}(\vec{X}, \Blank) \)-algebra.
+We instead observe that substitution \( \Subst{F}{\Blank} \) into a fixed \( F : \ICont{I+1} \) itself is a wild endofunctor on containers,
+and that the ordinary fixpoint container \( \mu F \) is the carrier of its initial algebra.
+To our knowledge, this is a novel approach:
+although the construction of the container \( \mu F \) itself is well known,
+we do not need to appeal to its associated polynomial functor \( \Ext{\mu F} \)
+to argue why it is a fixpoint,
+unlike previous work~\cite{AbbottEtAl2005ContainersConstructingstrictly,AltenkirchEtAl2015Indexedcontainers,DamatoEtAl2025FormalisingInductiveCoinductive}.
+Thus, our proofs avoid the intricacies of \( \Ext{\Blank} \) as an \( (\infty, 1) \)-functor imparted on us in a univalent setting.
+At times, this even simplifies proofs --- at least when reasoning about morphisms, we never have to verify naturality conditions.
+Concretely, we first prove that \( \Subst{F}{\Blank} \)-algebras form a wild category
+(which is not the case for arbitrary wild endofunctors),
+and then construct an initial object in this wild category of algebras.
 
-We retrace the construction of \cite{AltenkirchEtAl2015Indexedcontainers}, showing that it does not depend on \( \Op{UIP} \).
-We first ensure, for any \( F : \ICont{I + 1} \), that \( \Subst{F}{\Blank} \)-algebras form a wild category
-(which is not the case for arbitrary wild endofunctors).
-Secondly, we construct and initial object in this wild category of algebras.
-This construction does not make any reference to the associated container functors,
-avoiding the intricacies of \( \Ext{\Blank} \) as a functor of \( (\infty, 1) \)-categories.
 \begin{problem}
-  Given \( F : \ICont{I+1} \), extend \( \Subst{F}{\Blank} \) to a wild endofunctor on \( \ContCart_I \).
+  Given \( F : \ICont{I+1} \), extend \( \Subst{F}{\Blank} \) to a wild endofunctor on \( \IContCart{I} \)\kern-.2em.
 \end{problem}
 \begin{construction}
-  Straightforward.
+  Let \( F \JudgeEq (\MkCont{S}{\vec{P}, P}) \).
+  Given \( h : (\MkCont{T}{Q}) \to (\MkCont{U}{R}) \),
+  define the shape map
+  \[
+    \Subst{F}{h}_{\Sh} : {\textstyle \sum_{s : S} (P_s \to T) \to \sum_{s : S} (P_s \to U) }
+  \]
+  by postcomposition with \( h_{\Sh} : T \to U \).
+  On positions, given \( s : S \) and \( f : P_s \to T \), apply \( h_{\Ps}(i, f(p)) : R_i(h_{\Sh}(f_p) \simeq Q_i(f_p) \)
+  to the second component of the \( \Sigma \) of
+  \[
+    \Subst{F}{h}_{\Ps}(i, (s, f)) : {\textstyle
+      \big(\vec{P}_i(s) + \sum_{p \in P_s} R_i(h_{\Sh}(f_p)\big)
+        \simeq
+      \big(\vec{P}_i(s) + \sum_{p \in P_s} Q_i(f_p)\big)
+      }
+  \]
+  By extensionality of container morphisms, this action preserves identities and composites.
 \end{construction}
-We thus define least fixpoints of a signature container \( F \) without reference to its associated functor \( \Ext{F} \),
-namely as initial algebras of the wild functor \( \Subst{F}{\Blank} \).
 \begin{problem}[note={\( \Subst{F}{\Blank} \)-algebras}]
   Given \( F : \ICont{I+1} \), define the structure of a wild category \( \Alg{\Subst{F}{\Blank}} \).
   Its objects are of type \( \sum_{X : \ICont{I}} \Cart{\Subst{F}{X}}{X} \),
@@ -591,7 +605,7 @@ on one hand \( \Rec \) is a unique fold-like operation (\autoref{mu-rec-coalg-to
 on the other \( \mu F \) is the minimal solution to a problem (\autoref{mu-initial-algebra}).
 
 For conciseness, we have stated the results of this section only for the subcategory of linear morphisms.
-In general, \( \Subst{F}{\Blank} \) is a wild endofunctor on \( \ICont_{I} \),
+In general, \( \Subst{F}{\Blank} \) is a wild endofunctor on \( \ICont{I} \),
 and \( \mu F \) its initial algebra.
 We refer the reader to \S~4.3 of the first-named author's thesis~\cite{Joram2026DatatypesSymmetriesHomotopy}
 for a treatment that separates the linear and non-linear case.
