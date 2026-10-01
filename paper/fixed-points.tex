@@ -33,7 +33,7 @@ To encode such parametrized types, we have to index positions by a type represen
   \).
 \end{definition}
 Ordinary containers correspond to unary containers, \( \ICont{1} \).
-Each parameter \( i : I \) corresponds to a variable in the type that a container describes.
+Each \( i : I \) corresponds to a parameter of the type that a container describes.
 Consequently, the \emph{extent} of a parametrized container takes \( I \)-indexed families of types to types,
 \begin{align*}
   &\Ext{\MkCont{S}{P}} : (I \to \Type) \to \Type \\
@@ -45,7 +45,7 @@ Linear morphisms between containers \(F , G : \ICont{I} \) are defined by rangin
   \Cart{F}{G} \DefEq \smashoperator[l]{\sum_{f : F_{\Sh} \to G_{\Sh}}} \prod_{i : I, s : F_{\Sh}} G_{\Ps}(i, f(s)) \simeq F_{\Ps}(i, s)
 \]
 Together, parametrized containers again assemble into a wild category, \( \IContCart{I} \).
-Each container in \( I \) variables is also one in \( I + 1 \) variables:
+Each container in \( I \) parameters is also one in \( I + 1 \) parameters:
 For \( F : \ICont{I} \), denote by \( \Wk{F} : \ICont{I+1} \) the inclusion given by
 \[
   \Wk{F}_{\Ps}(\Just{i}) \DefEq F_{\Ps}(i), \quad \Wk{F}_{\Ps}(\Nothing) \DefEq 0
@@ -426,7 +426,7 @@ use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively
   \newcommand*{\Nil}{\Op{nil}}
   \newcommand*{\Cons}{\Op{cons}}
   In the informal specification \( \Op{List}(X) = \mu Y.\, 1 + X \times Y \),
-  the expression \( L(X, Y) = 1 + X \times Y \) is transcribed into a container in two variables, \( L \JudgeEq (\MkCont{S}{X, Y}) : \Cont_2 \).
+  the expression \( L(X, Y) = 1 + X \times Y \) is transcribed into a container in two parameters, \( L \JudgeEq (\MkCont{S}{X, Y}) : \Cont_2 \).
   It has two shapes, \( S \DefEq \{ \Nil,  \Cons \} \),
   over which there are positions
   \begin{align*}
@@ -675,7 +675,7 @@ There is however hope to recover at least a morphism out of \( \mu F' \) into \(
     \(
       \alpha : \Cart{ \Subst{F'}{\Der{\mu F}} }{ \Der{\mu F} }
     \).
-    First note that \( F' \) is a container in two variables,
+    First note that \( F' \) is a container in two parameters,
     and substitution into the second replaces \( \Proj{1} \), i.e.\@ there is an equivalence
     \[
       \gamma_{\Highlight{Y}} :
