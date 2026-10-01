@@ -280,11 +280,10 @@ and then construct an initial object in this wild category of algebras.
 \begin{construction}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P}, P}) \).
   Given \( h : (\MkCont{T}{Q}) \to (\MkCont{U}{R}) \),
-  define the shape map
+  define the shape map by postcomposition,
   \[
-    \Subst{F}{h}_{\Sh} : {\textstyle \sum_{s : S} (P_s \to T) \to \sum_{s : S} (P_s \to U) }
+    \Subst{F}{h}_{\Sh} \DefEq \Sigma(\Op{id}_S, h_{\Sh} \circ \Blank) : {\textstyle \sum_{s : S} (P_s \to T) \to \sum_{s : S} (P_s \to U) }.
   \]
-  by postcomposition with \( h_{\Sh} : T \to U \).
   On positions, given \( s : S \) and \( f : P_s \to T \), apply \( h_{\Ps}(i, f(p)) : R_i(h_{\Sh}(f_p) \simeq Q_i(f_p) \)
   to the second component of the \( \Sigma \) of
   \[
