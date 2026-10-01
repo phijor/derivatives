@@ -627,7 +627,7 @@ which would yield a greatest \( \Subst{F}{\Blank} \)-fixpoint.
 \subsection{The \texorpdfstring{\( \mu \)-}{Fixpoint }Rule}
 
 Having convinced ourselves that fixpoints do exist even for untruncated containers, we can now characterize their derivatives.
-Let \( F : \ICont{2} \).
+Let \( F \JudgeEq (\MkCont{S}{P_0, P_1}) : \ICont{2} \).
 If we think of \( \mu F \) as an \( F \)-branching tree, then \( \Der{\mu F} \) represents a type of trees with a hole.
 Such a hole must be either in the position of a leaf or occur recursively in a branch,
 which are given by the positions \( P_0 \) and \( P_1 \).
@@ -713,6 +713,8 @@ There is however hope to recover at least a morphism out of \( \mu F' \) into \(
   \end{construction}
 
 One advantage of defining the \( \mu \)-rule by recursion is that it highlights the dependency on the chain rule.
+In fact, we will spend the remainder of this chapter proving that \( \MuRule_F \) is strong
+if and only if \( \Chain_{F,\mu F} \) is~(\autoref{strong-mu-rule-iff-strong-chain-rule}).
 First, observe that recursion reflects equivalence, in the following sense:
 \begin{lemma}\label{is-equiv-from-mu-rec}
   Let \( \alpha : \Cart{\Subst{F}{G}}{G} \).
@@ -761,9 +763,13 @@ If ordered with respect to embeddings, however, \( \mu F \) is the least pre-fix
 
 Fix some \( S : \Type \) and a family \( P : S \to \Type \).
 Recall that non-dependent recursion on \( \W(S, P) \) into a type \( A \) is given by
+a map
 \begin{align*}
-  \WRec &: \big(\big( { \textstyle \sum_{s : S} (P(s) \to A) } \big) \to A \big) \to (\W(S, P) \to A) \\
-  \WRec&_h(\Sup(s, f)) \DefEq h(s, \WRec(h) \circ f)
+  \WRec &: \big(\big( { \textstyle \sum_{s : S} (P(s) \to A) } \big) \to A \big) \to (\W(S, P) \to A)
+\end{align*}
+such that for any \( h : \left(\sum_{s : S} (P(s) \to A)\right) \to A \),
+\begin{align*}
+  \WRec&(h, \Sup(s, f)) \JudgeEq h(s, \WRec(h) \circ f).
 \end{align*}
 We can characterize the fibers of this map,
 and thus show that it preserves embeddings.
@@ -853,7 +859,7 @@ and thus show that it preserves embeddings.
 
 This tells us that \( \MuRule_F \) embeds \( \mu F' \) as a subcontainer inside of \( \Der(\mu F) \):
 \begin{lemma}\label{is-embedding-mu-rule}
-  For all \( F : \ICont{I + 1} \), the shape map \( (\MuRule_F)_{\Sh} \) is an embedding.
+  For all \( F : \ICont{I + 1} \), \( \MuRule_F : \Cart{\mu F'}{\Der(\mu F)} \) is an embedding.
   \begin{proof}
     By the parametrized analogue of \autoref{is-embedding-chain-rule},
     the shape map of the chain rule is an embedding.
