@@ -16,27 +16,25 @@ This raises the question: if in general the chain rule is lax,
 is it ever possible to have a strong fixpoint rule?
 It appears that the answer to this question is \enquote{it depends}:
 we are able to show (cf.~\autoref{strong-mu-rule-iff-strong-chain-rule})
-that the fixpoint rule for an \( (I + 1) \)-indexed container \( F \) is strong if and only if the chain rule
+that the fixpoint rule for container \( F \) is strong if and only if the chain rule
 between \( F \) and \( \mu F \) is.
 
-\subsection{Indexed Containers}
+\subsection{Parametrized Containers}
 
 Before we define and reason about an operation \( F \mapsto \mu F \) constructing fixpoints,
-we have to recall the definition of indexed containers.
-Intuitively, fixpoints are specified with respect to a \emph{signature}, binding a number of variables.
-One of these variables is a \enquote{recursion variable},
-indicating a placeholder for the recursive occurrence of the type.
-To encode such types as containers, we have to introduce containers whose positions are \emph{indexed}
-by some arbitrary type representing a number of bound variables:
-\begin{definition}[note={Indexed containers}]
-  Let \( I : \Type \). The type of \emph{\( I \)-ary} or \emph{\( I \)-indexed containers} is
+we have to recall how types that depend on a number of \emph{type parameters} are modeled by containers.
+Ordinary containers express dependency on a single parameter,
+but what if we would like to encode the type \enquote{binary trees with \( X \)-labeled nodes and \( Y \)-labeled leaves}?
+To encode such parametrized types, we have to index positions by a type representing those \emph{parameters}:
+\begin{definition}[note={Parametrized containers}]
+  Let \( I : \Type \). The type of \emph{\( I \)-parametrized containers} is
   \(
     \ICont{I} \DefEq \sum_{S : \Type} (I \to S \to \Type)
   \).
 \end{definition}
 Ordinary containers correspond to unary containers, \( \ICont{1} \).
-Each index \( i : I \) corresponds to a variable in the type that a container describes.
-Consequently, the \emph{extent} of an indexed container takes \( I \)-indexed families of types to types,
+Each parameter \( i : I \) corresponds to a variable in the type that a container describes.
+Consequently, the \emph{extent} of a parametrized container takes \( I \)-indexed families of types to types,
 \begin{align*}
   &\Ext{\MkCont{S}{P}} : (I \to \Type) \to \Type \\
   &\Ext{\MkCont{S}{P}}(\vec{X}) \DefEq \sum_{s : S} \prod_{i : I} P_i(s) \to \vec{X}_i
@@ -46,21 +44,22 @@ Linear morphisms between containers \(F , G : \ICont{I} \) are defined by rangin
 \[
   \Cart{F}{G} \DefEq \smashoperator[l]{\sum_{f : F_{\Sh} \to G_{\Sh}}} \prod_{i : I, s : F_{\Sh}} G_{\Ps}(i, f(s)) \simeq F_{\Ps}(i, s)
 \]
-Together, \( I \)-indexed containers again assemble into a wild category, \( \IContCart{I} \).
+Together, parametrized containers again assemble into a wild category, \( \IContCart{I} \).
 Each container in \( I \) variables is also one in \( I + 1 \) variables:
 For \( F : \ICont{I} \), denote by \( \Wk{F} : \ICont{I+1} \) the inclusion given by
 \[
   \Wk{F}_{\Ps}(\Just{i}) \DefEq F_{\Ps}(i), \quad \Wk{F}_{\Ps}(\Nothing) \DefEq 0
 \]
-To aid readability, we denote an \( (I+1) \)-indexed container \( (\MkCont{S}{\bar{P}}) \) by \( (\MkCont{S}{\vec{P}, P}) \),
+To aid readability, we denote a container \( (\MkCont{S}{\bar{P}}) \) with \( (I+1) \) parameters by \( (\MkCont{S}{\vec{P}, P}) \),
 where \( \vec{P}_i \DefEq \bar{P}_{\Just(i)} \) and \( P \DefEq \bar{P}_{\Nothing} \).
 In particular, \( \Wk{(\MkCont{S}{P})} = (\MkCont{S}{P,0}) \).
 For \( i : I \), the \( i \)th projection container is \( \pi_i \DefEq (\MkCont{1}{\lambda j\,\Blank.\,{i = j}}) : \ICont{I} \).
 If \( i \) is isolated, then \( i = j \) is a decidable proposition for any \( j : I \);
 in this case \( \pi_i \) is equivalent to a container whose \( i \)th type of positions is \( 1 \),
 and \( 0 \) for any other direction.
-As expected, indexed containers are closed under constants \( \CConst(A) \), sums \( (\CPlus) \) and products \( (\CTimes) \).
-Substitution generalizes to an operation that places a container inside the positions at index \( \Nothing : I + 1 \) of an \( (I + 1) \)-indexed container:
+As expected, parametrized containers are closed under constants \( \CConst(A) \), sums \( (\CPlus) \) and products \( (\CTimes) \).
+Substitution generalizes to an operation on containers in \( I + 1 \) parameters;
+it places a container inside the positions of the parameter \( \Nothing : I + 1 \):
 \begin{definition}
     Substitution is an operation \( \Subst{\Blank}{\Blank} : \ICont{I+1} \to \ICont{I} \to \ICont{I} \),
     defined as follows:
@@ -71,33 +70,37 @@ Substitution generalizes to an operation that places a container inside the posi
         \qedhere
     \end{align*}
 \end{definition}
-Similarly, we can lift derivatives to indexed containers.
-For an \( I \)-indexed container, we can take a derivative with respect to any index \( i : I \), as long as equality with \( i \) is decidable:
-\begin{definition}[note={Derivative of \( I \)-ary containers}]
+Similarly, we can lift derivatives to parametrized containers.
+We can take a derivative with respect to any parameter \( i : I \), as long as equality with \( i \) is decidable:
+\begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{P}) : \ICont{I} \) and \( i : \Isolated{I} \).
-  The \( i \)th derivative \( {\Der_i}F \DefEq (\MkCont{S'}{P'}) : \ICont{I} \) is defined as follows:
-  \begin{align*}
-    S' &\DefEq \sum_{s : S} \Isolated{P_i(s)} \\
-    P'(j, s, p) &\DefEq
-      \begin{cases}
-        P_i(s) \setminus p & \text{if } i = j \\
-        P_j(s) & \text{otherwise}
-      \end{cases}
-      \qedhere
-  \end{align*}
+  The \emph{derivative in parameter \( i \)} is the container \( {\Der_i}F : \ICont{I} \) defined as follows:
+  \[
+    {\Der_i(F)} \DefEq \left(
+      \MkCont%
+        {\sum_{s : S} \Isolated{P_i(s)}}%
+        {\lambda (j , s , p)\Where
+          \begin{cases}
+            P_i(s) \setminus p & \text{if } i = j \\
+            P_j(s) & \text{otherwise}
+          \end{cases}
+        }%
+    \right)
+  \]
 \end{definition}
 
-In order to reduce visual clutter, we investigate only derivatives of \emph{binary} containers, indexed by \( 2 = 1 + 1 \).
-However, our arguments apply to \( (I + 1) \)-indexed containers in general.
-In particular, we write \( \Der_0 \) and \( \Der_1 \) for the two possible derivatives of a binary container,
+In order to reduce visual clutter, we investigate derivatives of containers in two parameters,
+that is, those parametrized by the type \( 2 = 1 + 1 \).
+However, our arguments apply to containers of \( (I + 1) \) parameters in general.
+In particular, we write \( \Der_0 \) and \( \Der_1 \) for the two possible derivatives of two-parameter containers,
 that is \( \Der_{\Inl(\bullet)} \) and \( \Der_{\Inr(\bullet)} \).
 In the unary case, we omit the subscript and simply write \( \Der \) for \( \Der_{\bullet} \).
 
-Derivatives of indexed containers satisfy the same basic laws for constants, sums and products as in the unary case.
+Derivatives of parametrized containers satisfy the same basic laws for constants, sums and products as in the unary case.
 Derivatives of composites follow a lax chain rule, which now accounts for multiple indices.
 As promised in the discussion of \autoref{lax-chain-rule},
 its construction factors into smaller steps that make it obvious why, in general, it is not invertible:
-\begin{problem}[note={Lax chain rule for binary containers}]\label{binary-chain-rule}
+\begin{problem}[note={Lax chain rule for two-parameter containers}]\label{binary-chain-rule}
   Let \( F : \ICont{2} \) and \( G : \ICont{1} \).
   Define a linear morphism
   \[
@@ -209,7 +212,7 @@ its construction factors into smaller steps that make it obvious why, in general
   \end{construction}
 \end{problem}
 
-This factorization makes it obvious that the binary chain rule is again an embedding of containers,
+This factorization makes it obvious that the chain rule for two-parameter containers is again an embedding of containers,
 and strong whenever isolated points distribute over dependent sums:
 \begin{proposition}\label{is-embedding-binary-chain-rule}
   For \( F : \ICont{2} \) and \( G : \ICont{1} \), \( \Chain_{F,G} \) is an embedding. \qed
@@ -235,9 +238,11 @@ Like in \autoref{discrete-strong-chain-rule}, this is the case for discrete cont
 
 To show how derivatives of untruncated containers interact with fixpoints,
 we first have to give a suitable specification of what we mean by such a \enquote{fixpoint}.
-Just like in the non-indexed case,
-The extension of set-truncated indexed containers defines subcategory of functors \( [\Set^I, \Set] \)~\cite[Theorem.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
-In particular, given a signature container \( F : \ICont{I+1} \) and \( \vec{X} : I \to \Set \),
+In the tradition of \citeauthor{BainbridgeEtAl1990Functorialpolymorphism},
+we are looking for a (least) solution to a fixpoint problem \( Y = F(\vec{X}, Y) \)
+for some functor \( F \) depending on some number of (type) parameters \( \vec{X} \).
+If \( F \) is a functor of sets arising from a container, this problem always has a unique least solution:
+Given any \emph{set-truncated} \( {F : \ICont{I+1}} \) and \( {\vec{X} : I \to \Set} \),
 the endofunctor \( \Ext{F}(\vec{X}, \Blank) : [ \Set, \Set ] \) admits an initial algebra~\cite[Proposition~5.3]{AbbottEtAl2005ContainersConstructingstrictly}.
 This initial algebra is itself the extent of some container \( \mu F : \ICont{I} \).
 Furthermore, \( \Ext{\Blank} \) embeds set-truncated containers full and faithfully into \( [\Set^I, \Set] \)~\cite[Theorem.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
@@ -246,7 +251,7 @@ It follows that \( \mu F \) represents a unique solution to the fixpoint problem
 
 Recently,
 \citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} have investigated this in a univalent setting~\cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
-They show, without assuming \( \Op{UIP} \), that fixpoints of indexed containers exist on a level of container \emph{functors}:
+They show, without assuming \( \Op{UIP} \), that fixpoints exist at the level of container \emph{functors}:
 for any signature container \( F : \ICont{I + 1} \) and \( \vec{X} : I \to \Type \),
 the wild functor \( \Ext{ F }(\vec{X}, \Blank) : [\Type, \Type] \) admits an initial algebra
 whose carrier is given by \( \Ext{ \mu F }\vec{X} \).
@@ -680,7 +685,7 @@ There is however hope to recover at least a morphism out of \( \mu F' \) into \(
     \]
     for any choice of \( \Highlight{Y} : \ICont{1} \).
     In particular, for \( \Highlight{Y} \JudgeEq \Der(\mu F) \),
-    the codomain of \( \gamma_{\Der{\mu F}} \) is exactly the domain of the binary chain rule (cf.~\autoref{binary-chain-rule}).
+    the codomain of \( \gamma_{\Der{\mu F}} \) is exactly the domain of the parametrized chain rule (cf.~\autoref{binary-chain-rule}).
     Hence, we define \( \alpha \) as the following composite:
     \begin{equation*}
       \begin{tikzcd}[column sep=large]
@@ -851,7 +856,7 @@ This tells us that \( \MuRule_F \) embeds \( \mu F' \) as a subcontainer inside 
 \begin{lemma}\label{is-embedding-mu-rule}
   For all \( F : \ICont{I + 1} \), the shape map \( (\MuRule_F)_{\Sh} \) is an embedding.
   \begin{proof}
-    By the indexed analogue of \autoref{is-embedding-chain-rule},
+    By the parametrized analogue of \autoref{is-embedding-chain-rule},
     the shape map of the chain rule is an embedding.
     This lifts to \( \alpha \), and from there to \( \MuRule_F \JudgeEq \Rec_F(\alpha) \) by \autoref{is-embedding-mu-rec}.
   \end{proof}
