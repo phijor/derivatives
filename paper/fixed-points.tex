@@ -238,16 +238,17 @@ Like in \autoref{discrete-strong-chain-rule}, this is the case for discrete cont
 
 To show how derivatives of untruncated containers interact with fixpoints,
 we first have to give a suitable specification of what we mean by such a \enquote{fixpoint}.
-In the tradition of \citeauthor{BainbridgeEtAl1990Functorialpolymorphism},
-we are looking for a (least) solution to a fixpoint problem \( Y = F(\vec{X}, Y) \)
+In the traditional understanding of parametric polymorphism as functors and natural transformations {\`a la}~\cite{BainbridgeEtAl1990Functorialpolymorphism},
+an inductive type is a (least) solution to a fixpoint problem \( Y = F(\vec{X}, Y) \)
 for some functor \( F \) depending on some number of (type) parameters \( \vec{X} \).
-If \( F \) is a functor of sets arising from a container, this problem always has a unique least solution:
-Given any \emph{set-truncated} \( {F : \ICont{I+1}} \) and \( {\vec{X} : I \to \Set} \),
-the endofunctor \( \Ext{F}(\vec{X}, \Blank) : [ \Set, \Set ] \) admits an initial algebra~\cite[Proposition~5.3]{AbbottEtAl2005ContainersConstructingstrictly}.
+This perspective is easily adapted when reasoning in terms of containers.
+For any \emph{set-truncated} container \( {F : \ICont{I+1}} \),
+the fixpoint problem \( Y = \Ext{F}(\vec{X}, Y) \) always has a unique least solution:
+the endofunctor \( \Ext{F}(\vec{X}, \Blank) : [ \Set, \Set ] \) admits an initial algebra,
+naturally for all parameters \( {\vec{X} : I \to \Set} \)~\cite[Proposition~5.3]{AbbottEtAl2005ContainersConstructingstrictly}.
 This initial algebra is itself the extent of some container \( \mu F : \ICont{I} \).
-Furthermore, \( \Ext{\Blank} \) embeds set-truncated containers full and faithfully into \( [\Set^I, \Set] \)~\cite[Theorem.~3.4]{AbbottEtAl2005ContainersConstructingstrictly}.
-% This reflects much of the structure of the functor category \( [ \Set^I, \Set ] \) back into containers.
-It follows that \( \mu F \) represents a unique solution to the fixpoint problem \( Y = \Ext{F}(\vec{X}, Y) \)
+Since \( \Ext{\Blank} \) embeds set-truncated containers full and faithfully into \( [\Set^I, \Set] \),
+it follows that \( \mu F \) represents a \emph{unique} solution to the fixpoint problem \( Y = \Ext{F}(\vec{X}, Y) \)
 
 Recently,
 \citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} have investigated this in a univalent setting~\cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
