@@ -25,21 +25,21 @@ Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
   Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
   As usual, we have to construct a map on shapes and an equivalence of positions.
   On shapes, our goal is a map
-  \[
-    \big(\sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} (P_s \setminus p \to T) \big)
-      \times
-    \sum_{t : T} \Isolated{Q_t}
-      \to
-    \Big(
-      \sum\nolimits_{(s, f) : \sum_{s : S} (P_s \to T)} \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)}
-    \Big)
-  \]
-  Let us first reshape the left side by some equivalences.
+  \begin{multline*}
+    {\Chain_{F,G}^{\Sh}} :
+      \sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} (P_s \setminus p \to T)
+        \times
+      \sum\nolimits_{t : T} \Isolated{Q_t}
+      \\
+    \to
+      \sum\nolimits_{(s, f) : \sum_{s : S} (P_s \to T)} \Isolated{\left( \sum\nolimits_{p : P_s} Q_{fp} \right)}
+  \end{multline*}
+  Let us first reshape its domain by some equivalences.
   By reassociating the sums, we obtain
   \begin{align*}
       %
     &\mathrel{\hphantom{\simeq}}
-      \big(\sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} P_s \setminus p \to T \big)
+      \sum\nolimits_{(s, p) : \sum_{s : S} \Isolated{P_s}} (P_s \setminus p \to T)
         \times
       \sum_{t : T} \Isolated{Q_t}
     \\
@@ -55,21 +55,21 @@ Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
     By permuting the sum yet again, we are left with
   }
     &\simeq
-      \sum\nolimits_{(s, f) : \sum_{s : S} (P_s \to T)} \big( \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})} \big)
+      \sum\nolimits_{(s, f) : \sum_{s : S} \,(P_s \to T)} \bigl( \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})} \bigr)
   \end{align*}
   Denote this equivalence by \( \lambda \).
   Now, the left and the right only differ in
   \begin{align*}
     \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})}
       \qquad\text{vs.}\qquad
-    \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)}
+    \Isolated{\bigl( \sum_{p : P_s} Q_{fp} \bigr)}
   \end{align*}
   \Autoref{sigma-isolate} gives us a map
   \(
     \SigmaIsolate_{P_s,Q_{f(\Blank)}} :
       \sum_{p : \Isolated{P_s}} \Isolated{(Q_{fp})}
         \to
-      \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)}
+      \Isolated{\bigl( \sum_{p : P_s} Q_{fp} \bigr)}
   \),
   hence
   \(
@@ -84,13 +84,13 @@ Precisely, we obtain the following \emph{directed} or \emph{lax} chain rule:
   Extend \( f \) to a map \( \bar{f} \DefEq \Graft_{p_0}(f, t) : P_s \to T \).
   Our goal becomes to construct an equivalence
   \[
-      \big(
+      \bigl(
         \sum_{p : P_s} Q_{\bar{f}(p)}
-      \big) \setminus (p_0 , q_0)
+      \bigr) \setminus (p_0 , q_0)
     \simeq
-      \big(
+      \bigl(
         \smashoperator{\sum_{p : P_s \setminus p_0}} Q_{f(p)}
-      \big)
+      \bigr)
         +
       (Q_t \setminus q_0),
   \]
@@ -119,7 +119,7 @@ in which
   \eta_{\Sh} :
     { \sum_{s : S} \sum_{f : P_s \to T} \sum_{p : \Isolated{P_s}} \Isolated{Q_{fp}} }%
       \to
-    { \sum_{s : S} \sum_{f : P_s \to T} \Isolated{\big( \sum_{p : P_s} Q_{fp} \big)} }
+    { \sum_{s : S} \sum_{f : P_s \to T} \Isolated{\bigl( \sum_{p : P_s} Q_{fp} \bigr)} }
 \)
 applies \( \SigmaIsolate_{P_s,Q_{f(\Blank)}} \).
 We will make this factorization explicit in the derivation of the chain rule for parametrized containers (\autoref{binary-chain-rule}).

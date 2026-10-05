@@ -163,9 +163,9 @@ First, observe that any dependent pair of isolated points defines an isolated po
       \sum\nolimits_{a_0 : \Isolated{A}} \Isolated{B(a_0)}
         \to
       \Isolated{%
-        \big(
+        \left(
           \sum\nolimits_{a : A} B(a)
-        \big)
+        \right)
       }.
   \]
   \begin{proof}
@@ -378,9 +378,9 @@ on the paths of the indexing type \( A \):
   There is a map
   \[
     \operatorname{\Op{\Sigma-remove}}_p :
-    \Big(\smashoperator{\sum_{a : A \setminus a_0}} B(a)\Big) + \big(B(a_0) \setminus b_0\big)
+    \Bigl(\smashoperator{\sum_{a : A \setminus a_0}} B(a)\Bigr) + \bigl(B(a_0) \setminus b_0\bigr)
       \to
-    \Big(\sum_{a : A} B(a) \Big) \setminus (a_0 , b_0)
+    \Bigl(\sum_{a : A} B(a) \Bigr) \setminus (a_0 , b_0)
   \]
   \begin{construction}
     We define \( \operatorname{\Op{\Sigma-remove}}_p(x) \) by cases.
@@ -414,9 +414,9 @@ This map is an equivalence whenever we can decide if we are removing from a chos
     \[
       \SigmaRemove^{\Inv}
         :
-      \Big(\sum_{a : A} B(a) \Big) \setminus (a_0 , b_0)
+      \Bigl(\sum_{a : A} B(a) \Bigr) \setminus (a_0 , b_0)
         \to
-      \Big(\smashoperator{\sum_{a : A \setminus a_0}} B(a)\Big) + \big(B(a_0) \setminus b_0\big)
+      \Bigl(\smashoperator{\sum_{a : A \setminus a_0}} B(a)\Bigr) + \bigl(B(a_0) \setminus b_0\bigr)
     \]
     as follows:
     Introduce \( a : A \), \( b : B(a) \) and \( h : (a_0 , b_0) \neq (a , b) \),
@@ -453,7 +453,7 @@ and a single point \( b_0 : B \).
   For types \( A \) and \( B \), construct a function
   \[
     \Graft : \prod_{a_0 : \Isolated{A}}
-      \big((A \setminus a_0 \to B) \times B \big)
+      \bigl((A \setminus a_0 \to B) \times B \bigr)
         \to
       (A \to B)
   \]
@@ -508,7 +508,7 @@ It follows that grafting is an inverse to \( \Op{detach} \):
 As presented here, \( \Graft \) characterizes non-dependent functions out of types with an isolated point \( a_0 : A \).
 This generalizes to dependent functions, in that we can derive an equivalence
 \(
-  \big( (\prod_{a : A \setminus a_0} B(a)) \times B(a_0) \big) \simeq \big(\prod_{a : A} B(a) \big)
+  \bigl( (\prod_{a : A \setminus a_0} B(a)) \times B(a_0) \bigr) \simeq \bigl(\prod_{a : A} B(a) \bigr)
 \)
 for families \( B \) over \( A \).
 We understand this as an \enquote{elimination operation} in the sense of \cite[{\S4}]{McBrideMcKinna2004viewleft}:

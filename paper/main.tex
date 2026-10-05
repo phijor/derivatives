@@ -28,6 +28,7 @@
 \usepackage{hyperref}
 
 \colorlet{Highlight}{purple!85!black}
+\colorlet{Highlight2}{teal!95!black}
 \colorlet{Url}{Aquamarine!85!black}
 \colorlet{Cite}{YellowOrange!85!black}
 \colorlet{Link}{violet!85!black}
@@ -40,6 +41,7 @@
 }
 
 \NewDocumentCommand{\Highlight}{m}{\textcolor{Highlight}{#1}}
+\NewDocumentCommand{\HighlightAlt}{m}{\textcolor{Highlight2}{#1}}
 
 \NewDocumentCommand{\TypeTopology}{m O{}}{\href{https://www.cs.bham.ac.uk/~mhe/TypeTopology/#1.html\IfValueT{#2}{\##2}}{\texttt{#1}}}
 

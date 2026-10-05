@@ -66,7 +66,7 @@ it places a container inside the positions of the parameter \( \Nothing : I + 1 
     \begin{align*}
       \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Sh} &\DefEq \sum_{s : S} P(s) \to T
         \\
-      \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Ps} &\DefEq \lambda i\, (s, f).\, \vec{P}_i(s) + \smashoperator{\sum_{p : P(s)}} Q_i(fp)
+      \Subst{(\MkCont{S}{\vec{P}, P})}{(\MkCont{T}{Q})}_{\Ps} &\DefEq \lambda i\, (s, f).\, \vec{P}_i(s) + \smashoperator{\sum_{p : P(s)}} Q_i(f_p)
         \qedhere
     \end{align*}
 \end{definition}
@@ -107,7 +107,7 @@ its construction factors into smaller steps that make it obvious why, in general
     \Chain_{F,G}
       :
     \Cart%
-      {(\Der_0{F})[G] \CPlus \big( (\Der_1{F})[G] \CTimes \Der{G} \big)}%
+      {(\Der_0{F})[G] \CPlus \bigl( (\Der_1{F})[G] \CTimes \Der{G} \bigr)}%
       {\Der{(F[G])}}
   \]
   \begin{construction}
@@ -117,7 +117,7 @@ its construction factors into smaller steps that make it obvious why, in general
     We define auxiliary containers \( H_1, H_2 \) and factor the morphism through a pair of equivalences as follows:
     \[
       \begin{tikzcd}[column sep=large]
-        {\mathllap{\L \DefEq {}} {(\Der_0{F})[G] \CPlus \big( (\Der_1{F})[G] \CTimes \Der{G} \big)}}
+        {\mathllap{\L \DefEq {}} {(\Der_0{F})[G] \CPlus \bigl( (\Der_1{F})[G] \CTimes \Der{G} \bigr)}}
           \ar[d, multimap-multimap]
           \ar[r, -multimap, dashed, "\Chain_{F,G}"]
           &
@@ -139,11 +139,11 @@ its construction factors into smaller steps that make it obvious why, in general
           \notag
           \\
         &\simeq
-          \sum_{s : S} \left(\Isolated{P_0(s)} \times (P_1(s) \to T)\right) + \smashoperator[l]{\sum_{p : \Isolated{P_1(s)}}} \sum_{f : \Highlight{P_1(s) \to T}} {\Isolated{Q(f(p))}}
+          \sum_{s : S} \left(\Isolated{P_0(s)} \times (P_1(s) \to T)\right) + \smashoperator[l]{\sum_{p : \Isolated{P_1(s)}}} \sum_{f : \Highlight{P_1(s) \to T}} {\Isolated{Q(f_p)}}
           \label{binary-chain-rule-shape-equiv}%
           \\
         &\simeq
-          \sum_{s : S} \smashoperator[r]{\sum_{f : P_1(s) \to T}} \Big(\Isolated{P_0(s)} + \smashoperator{\sum_{p : \Isolated{P_1(s)}}} \Isolated{Q(fp)}\Big)
+          \sum_{s : S} \smashoperator[r]{\sum_{f : P_1(s) \to T}} \,\bigl(\Isolated{P_0(s)} + \sum\nolimits_{p : \Isolated{P_1(s)}} \Isolated{Q(f_p)}\bigr)
           \eqcolon U_1
           \notag
     \end{align}
@@ -156,11 +156,11 @@ its construction factors into smaller steps that make it obvious why, in general
       U_2
       &\DefEq
       \sum_{s : S} \sum_{f : P_1(s) \to T}
-        \Isolated{P_0(s)} + \Isolated{\big( \smashoperator{\sum_{p : P_1(s)}} Q(fp) \big)}
+        \Isolated{\Highlight{P_0(s)}} + \Isolated{\Bigl( \HighlightAlt{ \sum\nolimits_{p : P_1(s)} Q(f_p) } \Bigr)}
         \\
       &\simeq
       \sum_{s : S} \sum_{f : P_1(s) \to T}
-        \Isolated{\big( P_0(s) + \smashoperator{\sum_{p : {P_1(s)}}} Q(fp) \big)}
+        \Isolated{\bigl( \Highlight{P_0(s)} + \HighlightAlt{ \sum\nolimits_{p : {P_1(s)}} Q(f_p) } \bigr)}
         \\
       &\simeq
         {\R}_{\Sh}
@@ -182,22 +182,22 @@ its construction factors into smaller steps that make it obvious why, in general
         \simeq
       ( \Isolated{P_0(s)} \setminus p_0 ) + B
     \]
-    for \( B \DefEq {\textstyle \sum_{p : P_1(s)} Q(fp) } \), which is an instance of \autoref{sum-remove-equiv}.
+    for \( B \DefEq {\textstyle \sum_{p : P_1(s)} Q(f_p) } \), which is an instance of \autoref{sum-remove-equiv}.
 
-    When \( u \JudgeEq (s, f, \Inr(p_1, q)) \) for some \( p_1 : \Isolated{P_1(s)} \) and \( q : \Isolated{Q(fp)} \),
+    When \( u \JudgeEq (s, f, \Inr(p_1, q)) \) for some \( p_1 : \Isolated{P_1(s)} \) and \( q : \Isolated{Q(f_p)} \),
     we rewrite the type of positions as follows:
     \begin{align}
       H_2^{\Ps}(\eta_{\Sh}(s , f , \Inr(p_1, q)))
         &\mathrel{\JudgeEq}
-          \big( P_0(s) + \smashoperator{\sum_{p : P_1(s)}} Q(f p) \big) \setminus \Inr(p_1, q)
+          \bigl( P_0(s) + \sum\nolimits_{p : P_1(s)} Q(f_p) \bigr) \setminus \Inr(p_1, q)
           \notag
           \\
         &\simeq
-          P_0(s) + \big( \smashoperator{\sum_{p : P_1(s)}} Q(f p) \big) \setminus (p_1, q)
+          P_0(s) + \Bigl( \sum\nolimits_{p : P_1(s)} Q(f_p) \Bigr) \setminus (p_1, q)
           \label{binary-chain-rule-pos-equiv-sum-minus}
           \\
         &\simeq
-          P_0(s) + \smashoperator{\sum_{p : P_1(s) \setminus p}} Q(f p) + (Q(f\,p_1) \setminus q)
+          P_0(s) + \sum\nolimits_{p : P_1(s) \setminus p} Q(f_p) + (Q(f_{p_1}) \setminus q)
           \label{binary-chain-rule-pos-equiv-sigma-minus}
           \\
         &\mathrel{\JudgeEq}
@@ -208,7 +208,7 @@ its construction factors into smaller steps that make it obvious why, in general
     For \eqref{binary-chain-rule-pos-equiv-sigma-minus},
     we split the \( \Sigma \)-type by applying \autoref{is-equiv-sigma-remove}.
     This is justified since both \( p_1 \) and \( q \) are isolated points,
-    and together, the pair \( (p_1, q) \) is isolated in \( \sum_{p : P_1(s)} Q(f p) \) by \autoref{is-isolated-pair}.
+    and together, the pair \( (p_1, q) \) is isolated in \( \sum_{p : P_1(s)} Q(f_p) \) by \autoref{is-isolated-pair}.
   \end{construction}
 \end{problem}
 
@@ -285,13 +285,13 @@ and then construct an initial object in this wild category of algebras.
   \[
     \Subst{F}{h}_{\Sh} \DefEq \Sigma(\Op{id}_S, h_{\Sh} \circ \Blank) : {\textstyle \sum_{s : S} (P_s \to T) \to \sum_{s : S} (P_s \to U) }.
   \]
-  On positions, given \( s : S \) and \( f : P_s \to T \), apply \( h_{\Ps}(i, f(p)) : R_i(h_{\Sh}(f_p) \simeq Q_i(f_p) \)
+  On positions, given \( s : S \) and \( f : P_s \to T \), apply \( h_{\Ps}(i, f_p) : R_i(h_{\Sh}(f_p)) \simeq Q_i(f_p) \)
   to the second component of the \( \Sigma \) of
   \[
     \Subst{F}{h}_{\Ps}(i, (s, f)) : {\textstyle
-      \big(\vec{P}_i(s) + \sum_{p \in P_s} R_i(h_{\Sh}(f_p)\big)
+      \bigl(\vec{P}_i(s) + \sum_{p \in P_s} R_i(h_{\Sh}(f_p)) \bigr)
         \simeq
-      \big(\vec{P}_i(s) + \sum_{p \in P_s} Q_i(f_p)\big)
+      \bigl(\vec{P}_i(s) + \sum_{p \in P_s} Q_i(f_p)\bigr)
       }
   \]
   By extensionality of container morphisms, this action preserves identities and composites.
@@ -766,7 +766,7 @@ Fix some \( S : \Type \) and a family \( P : S \to \Type \).
 Recall that non-dependent recursion on \( \W(S, P) \) into a type \( A \) is given by
 a map
 \begin{align*}
-  \WRec &: \big(\big( { \textstyle \sum_{s : S} (P(s) \to A) } \big) \to A \big) \to (\W(S, P) \to A)
+  \WRec &: \bigl(\bigl( { \textstyle \sum_{s : S} (P(s) \to A) } \bigr) \to A \bigr) \to (\W(S, P) \to A)
 \end{align*}
 such that for any \( h : \left(\sum_{s : S} (P(s) \to A)\right) \to A \),
 \begin{align*}
@@ -815,7 +815,7 @@ and thus show that it preserves embeddings.
       &\simeq
       \sum_{\smash{f'} : P(s) \to \W(S, P)}
         \prod_{p : P(s)}
-        h^*(f'(p)) = h^*(f'(p))
+        h^*(f'_p) = h^*(f'_p)
     \intertext{
       Distributing \( \Sigma \) and \( \Pi \),
       we get
@@ -823,10 +823,10 @@ and thus show that it preserves embeddings.
       &\simeq
         \prod_{p : P(s)}
           \sum_{w : \W(S, P)}
-          h^*(w) = h^*(f(p)) \\
+          h^*(w) = h^*(f_p) \\
       &\simeq
         \prod_{p : P(s)}
-          \Fiber_{h^*}(h^*(f(p)))
+          \Fiber_{h^*}(h^*(f_p))
   \end{align*}
   which finishes the construction of the desired equivalence.
 \end{construction}
@@ -843,14 +843,14 @@ and thus show that it preserves embeddings.
     Let \( s : S \), \( f : P(s) \to \W(S, P) \).
     By induction, we can assume
     \[
-      \eta : \prod_{p : P(s)} \Op{isProp}(\Fiber_{h^*}(h^*(fp)))
+      \eta : \prod_{p : P(s)} \Op{isProp}(\Fiber_{h^*}(h^*(f_p)))
     \]
     By \autoref{prob:wrec-fiber-equiv}, there is an equivalence over \( h^*(\Sup(s, f)) \), namely
     \begin{align*}
       \Fiber_{h^*}(h^*(\Sup(s, f)))
         &\simeq
           \prod_{p : P(s)}
-            \Fiber_{h^*}(h^*(f(p)))
+            \Fiber_{h^*}(h^*(f_p))
     \end{align*}
     By the induction hypothesis \( \eta \), the type on the right is a proposition.
     Hence, all fibers over the image of \( h^* \) are propositions,
