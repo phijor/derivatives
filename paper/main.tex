@@ -111,6 +111,28 @@
 \newkeytheorem{remark*}[name=Remark,style=remark,numbered=false]
 \newkeytheorem{example}[style=marked-definition,sibling=theorem]
 
+% HOTFIX: capitalize the names of referenced environments ("Proposition 2.3",
+% not "proposition 2.3").  `keytheorems` defines both `\<env>autorefname` and
+% `\<env>Autorefname` for every environment, but only lets us pick between them
+% per call site (via its own `\Autoref`); there is no global switch.  So alias
+% the lower-case names to the capitalized ones for every registered environment.
+% This reaches into `keytheorems`' internals and may break when it is updated.
+% TODO: drop all of this and switch to `\zcref` from `zref-clever`, which
+% handles capitalization properly via `\zcsetup{S}`.
+\ExplSyntaxOn
+\prop_map_inline:Nn \g__keythms_thmnames_prop
+  { \cs_set_eq:cc { #1 autorefname } { #1 Autorefname } }
+\ExplSyntaxOff
+
+% `keytheorems` does not touch hyperref's own counters, so set those by hand.
+% These have to wait until `\begin{document}`, since hyperref's language
+% support (re)defines them there and would clobber a preamble definition.
+\AtBeginDocument{%
+  \def\sectionautorefname{Section}%
+  \def\subsectionautorefname{Section}%
+  \def\subsubsectionautorefname{Section}%
+}
+
 % A custom tikzcd arrow tip, a lollipop (⊸).
 % https://tex.stackexchange.com/a/730357
 \tikzset{
