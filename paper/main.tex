@@ -4,6 +4,7 @@
 \usepackage[american]{babel}
 \usepackage{amsmath}
 \usepackage{amssymb}
+
 \usepackage[
   backend=biber,
   style=alphabetic,
@@ -13,8 +14,33 @@
   hyperref=true,
   backref=true,
   seconds=true,
-  alldates=iso,
+  alldates=year, % Only ever show years in bibliography
+  urldate=iso,  % Show full dates for URLs ("visited on 20XX-YY-ZZ")
+  isbn=false % supress ISBNs, a DOI should be enough to find a publication
 ]{biblatex}
+% Allow breaking URLs after digits and lower-case letters in bibliography
+\setcounter{biburlnumpenalty}{9000}
+\setcounter{biburllcpenalty}{9000}
+
+% https://tex.stackexchange.com/a/229505/238834
+\newcommand*{\Clearbibfields}{%
+  % Clear publisher for books
+  \ifboolexpr{test {\ifentrytype{book}}}{}{\clearlist{publisher}}%
+  % Same for editors
+  \clearname{editor}%
+  % Page ranges are redundant when a DOI or URL locates the publication,
+  % except in journal articles, where they locate it within a volume
+  \ifboolexpr{test {\ifentrytype{article}}}{}{\clearfield{pages}}%
+}
+\AtEveryBibitem{\Clearbibfields}
+\AtEveryCitekey{\Clearbibfields}
+
+\DeclareFieldFormat{eprint:nottingham}{%
+  Nottingham {\textsc{eTheses}}\addcolon\space
+  \ifhyperref
+    {\href{https://eprints.nottingham.ac.uk/id/eprint/#1}{\nolinkurl{#1}}}
+    {\nolinkurl{#1}}}
+
 \usepackage{authblk}
 \usepackage{mathtools}
 \usepackage{bussproofs}
