@@ -262,13 +262,12 @@ A candidate proof by \citeauthor{Damato2023RevisitingContainersCubical} based on
 should be amenable to generalization to \( (\infty, 1) \)-categories,
 but alas, it is unclear how to define those internal to HoTT.
 
-We instead observe that substitution \( \Subst{F}{\Blank} \) into a fixed \( F : \ICont{I+1} \) itself is a wild endofunctor on containers,
+We instead observe that in a univalent setting, it is easier to follow \citeauthor{Abbott2003CategoriesContainers}'s original conception of container fixpoint~\cite[Definition~5.1.6]{Abbott2003CategoriesContainers} directly:
+We prove that substitution \( \Subst{F}{\Blank} \) into a fixed \( F : \ICont{I+1} \) itself is a wild endofunctor on containers,
 and that the ordinary fixpoint container \( \mu F \) is the carrier of its initial algebra.
-To our knowledge, this is a novel approach:
-although the construction of the container \( \mu F \) itself is well known,
-we do not need to appeal to its associated polynomial functor \( \Ext{\mu F} \)
-to argue why it is a fixpoint,
-unlike previous work~\cite{AbbottEtAl2005ContainersConstructingstrictly,AltenkirchEtAl2015Indexedcontainers,DamatoEtAl2025FormalisingInductiveCoinductive}.
+The construction of the container \( \mu F \) itself is well known,
+but unlike previous work~\cite{Abbott2003CategoriesContainers,AbbottEtAl2005ContainersConstructingstrictly,AltenkirchEtAl2015Indexedcontainers,DamatoEtAl2025FormalisingInductiveCoinductive},
+we do not reason about the associated polynomial functor \( \Ext{\mu F} \) to prove that \( \mu F \) is a fixpoint.
 Thus, our proofs avoid the intricacies of \( \Ext{\Blank} \) as an \( (\infty, 1) \)-functor imparted on us in a univalent setting.
 At times, this even simplifies proofs --- at least when reasoning about morphisms, we never have to verify naturality conditions.
 Concretely, we first prove that \( \Subst{F}{\Blank} \)-algebras form a wild category
@@ -359,7 +358,7 @@ Unlike other concepts, we can express initiality in wild categories coherently a
 an object \( 0 \) of a wild category \( \mathcal{C} \) is \emph{initial}
 if for any other object \( X \), the type of morphisms \( \mathcal{C}(0, X) \) is \emph{contractible}.
 Hence we say:
-\begin{definition}
+\begin{definition}[note={\cite[Definition~5.1.6]{Abbott2003CategoriesContainers}}]
   A least fixpoint of a signature container \( F : \ICont{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
 \end{definition}
 Spelled out, a least \( F \)-fixpoint consists of a \emph{carrier} \( M : \ICont{I} \)
@@ -411,7 +410,7 @@ the constructors define equivalences
 \end{align*}
 for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
 
-We follow \cite[\S~7]{AbbottEtAl2005ContainersConstructingstrictly} and
+We follow \cites[\S~5]{AbbottEtAl2005ContainersConstructingstrictly}[\S~7]{AbbottEtAl2005DataDifferentiating} and
 use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively, of the least fixpoint container:
 \begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \ICont{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \ICont{I} \):
