@@ -495,11 +495,10 @@ The universe of finite sets,
 comes with a map \( \El \DefEq \Fst : \FinSet \to \Type \) projecting out the underlying type.
 Together, these form the container of \emph{bags}, \( \Bag \DefEq (\MkCont{\FinSet}{\El}) \).
 As written, the shapes of this container quantify over all types, hence live in a higher universe.
-There are however equivalent small replacements of this type,
-such as the one given by \citeauthor{FinsterEtAl2021CartesianBicategoryPolynomial} in \cite[Theorem~25]{FinsterEtAl2021CartesianBicategoryPolynomial}.
-
+It is possible to replace \( \FinSet \) by a higher inductive type in \( \Type \)~\cite[Theorem~25]{FinsterEtAl2021CartesianBicategoryPolynomial};
+the present form, however, makes the following immediate:
 \begin{proposition}\label{bag-fixed-point}
-  The container \( \Bag \) is a fixpoint of derivation:
+  \( \Bag \) is a \( \Der \)-fixpoint:
   there is an equivalence \( \CartIso{\Der{\Bag}}{\Bag} \).
   \begin{proof}
     First, note that finite sets are closed under addition and removal of points:
