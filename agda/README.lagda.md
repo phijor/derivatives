@@ -714,7 +714,7 @@ module _
 ```
 
 **Theorem 5.15**:
-Every signature container admits a smallest fixed point in the wild category of containers.
+Every container admits a smallest fixed point in the wild category of containers.
 For any \( F[\_]\)-algebra \( α : F[G] ⊸ G \), there is a unique algebra map \( α^* : μ F ⊸ G \):
 ```agda
   _ : ∃![ α* ∈ μ F ⊸ᴵ G ] μ-in F ⋆ᴵ α* ≡ [ F ]-map α* ⋆ᴵ α

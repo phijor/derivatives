@@ -253,7 +253,7 @@ it follows that \( \mu F \) represents a \emph{unique} solution to the fixpoint 
 Recently,
 \citeauthor{DamatoEtAl2025FormalisingInductiveCoinductive} have investigated this in a univalent setting~\cite{DamatoEtAl2025FormalisingInductiveCoinductive}.
 They show, without assuming \( \Op{UIP} \), that fixpoints exist at the level of container \emph{functors}:
-for any signature container \( F : \ICont{I + 1} \) and \( \vec{X} : I \to \Type \),
+for any container \( F : \ICont{I + 1} \) and all parameters \( \vec{X} : I \to \Type \),
 the wild functor \( \Ext{ F }(\vec{X}, \Blank) : [\Type, \Type] \) admits an initial algebra
 whose carrier is given by \( \Ext{ \mu F }\vec{X} \).
 Unfortunately, we cannot (yet) internally prove that \( \Ext{\Blank} \) is a suitable embedding of the \( (\infty, 1) \)-category of containers
@@ -359,7 +359,7 @@ an object \( 0 \) of a wild category \( \mathcal{C} \) is \emph{initial}
 if for any other object \( X \), the type of morphisms \( \mathcal{C}(0, X) \) is \emph{contractible}.
 Hence we say:
 \begin{definition}[note={\cite[Definition~5.1.6]{Abbott2003CategoriesContainers}}]
-  A least fixpoint of a signature container \( F : \ICont{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
+  A least fixpoint of a container \( F : \ICont{I + 1} \) is an initial \( \Subst{F}{\Blank} \)-algebra.
 \end{definition}
 Spelled out, a least \( F \)-fixpoint consists of a \emph{carrier} \( M : \ICont{I} \)
 and a structure map \( m : \Cart{\Subst{F}{M}}{M} \)
@@ -519,7 +519,7 @@ which yields a morphism into \emph{any} other algebra:
   This is done by \( \W \)-induction on the shapes of \( \mu F \).
 \end{construction}
 
-In fact, this morphism is uniquely determined, hence we get a fixpoint for any signature container.
+In fact, this morphism is uniquely determined, hence we get a fixpoint for any container in \( I + 1 \) parameters.
 We establish this by proving that \( \Rec_F(\alpha) \) is unique as a coalgebra-to-algebra morphism:
 \begin{proposition}\label{mu-rec-coalg-to-alg-unique}
   For all \( F : \ICont{I+1} \), \( G : \ICont{I} \) and \( \alpha : \Cart{\Subst{F}{G}}{G} \),
