@@ -384,6 +384,13 @@ _ : (S : Type) (P : S → Type)
 _ = λ S P → refl
 ```
 
+**TODO**: Description of the [derivative of the container of lists](Derivative.Indexed.List.md#derivative-of-list), \( ((n : ℕ) \lhd [n]) \).
+```agda
+open import Derivative.Indexed.List using (∂List)
+```
+??? note
+    We define lists as a \( 1 \)-indexed container (introduced [below](#indexed-containers)) to avoid having to define them twice.
+
 **Problem 3.7**:
 Extend the derivative to a functor on the wild category of containers and linear morphisms, `ℂont∞`.
 ```agda
@@ -560,7 +567,7 @@ _ = isStrongSets≃AllSetsDiscrete
 
 ## Derivatives of Fixed Points
 
-### Indexed Containers
+### Indexed Containers { #indexed-containers }
 
 ```agda
 import Derivative.Indexed.Container as Containerᴵ
@@ -686,9 +693,9 @@ _ : (F : Containerᴵ (Maybe Ix)) → Containerᴵ Ix
 _ = μ
 ```
 
-**TODO**: Description of lists as a fixpoint.
+**TODO**: Description of [lists as a fixpoint](Derivative.Indexed.List.md#list-as-fixpoint).
 ```agda
-import Derivative.Indexed.List
+open import Derivative.Indexed.List using (μL⧟List)
 ```
 
 **Problem 5.13**:

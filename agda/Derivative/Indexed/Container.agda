@@ -199,6 +199,12 @@ idₑ : (F : Container ℓ Ix) → F ⧟ F
 idₑ F .Equiv.shape = idEquiv _
 idₑ F .Equiv.pos ix s = idEquiv _
 
+⧟-shape : ∀ {S S′ : Type ℓ} {P : Ix → S′ → Type ℓ}
+  → (e : S ≃ S′)
+  → (S ◁ λ ix → P ix ∘ equivFun e) ⧟ (S′ ◁ P)
+⧟-shape {P} e .Equiv.shape = e
+⧟-shape {P} e .Equiv.pos ix s = idEquiv (P ix (equivFun e s))
+
 isContainerEquiv : {F G : Container ℓ Ix} → F ⊸ G → Type _
 isContainerEquiv f = isEquiv (_⊸_.shape f)
 

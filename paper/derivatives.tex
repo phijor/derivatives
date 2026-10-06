@@ -242,10 +242,35 @@ and define a derivative in terms of \emph{isolated} positions:
   The derivative of a container \( \Der{(\MkCont{S}{P})} \DefEq (\MkCont{S'}{P'}) \)
   has shapes \( S' \DefEq \sum_{s : S} \Isolated{P_s} \) and positions \( P'(s , p) \DefEq P_s \setminus p \).
 \end{definition}
+\begin{example}
+  Ordered lists are encoded in the container \( \List \DefEq (\MkCont{n : \Nat}{\Fin{n}}) \);
+  its extent is the ordinary list functor \( \Ext{\List}(X) = \sum_{n : \Nat} X^{\Fin{n}} \).
+  Intuitively, \( \Der{\List} \) computes a type equivalent to \emph{pairs of lists},
+  i.e. \( \Der{\List} \simeq \List \CTimes \List \).
 
-\begin{todo-block}
-  Give an example. Maybe compute \( \Der{(\MkCont{(n : \mathbb{N})}{\Fin{n}})} \) and show that its pairs of lists.
-\end{todo-block}
+  We compute this as follows.
+  First, note that the standard finite types are discrete, hence \( \Isolated{\Fin{n}} \simeq \Fin{n} \) for all \( n : \Nat \).
+  Thus, we expand
+  \[
+    \Der{\List} \simeq \bigl( \MkCont{ (n, k) : {\textstyle \sum_{n : \Nat} \Fin{n}} }{ {\Fin{n} \setminus k} } \bigr)
+  \]
+  Next, observe that pairs of lists of length \( m \) and \( n \) correspond uniquely to lists of length \( m + 1 + n \) with a hole at position \( m \):
+  The map \( \lambda (m, n)\Where (m + 1 + n, m) \) extends to an equivalence of type \( \Nat \times \Nat \simeq \sum_{n : \Nat} \Fin{n} \),
+  which induces an equivalence
+  \(
+    \Fin{m + 1 + n} \setminus m \simeq \Fin{m} + \Fin{n}
+  \).
+  Therefore,
+  \[
+    \List \CTimes \List
+      \simeq
+    \bigl( \MkCont{ (m, n) : {\Nat \times \Nat} }{ {\Fin{m} + \Fin{n}} } \bigr)
+      \simeq
+    \bigl( \MkCont{ (n, k) : {\textstyle \sum_{n : \Nat} \Fin{n}} }{ {\Fin{n} \setminus k} } \bigr)
+  \]
+  and
+  \( \Der{\List} \simeq \List \CTimes \List \) as desired.
+\end{example}
 
 We can not only take the derivative of a container, but also act functorially on morphisms:
 \begin{problem}

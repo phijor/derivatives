@@ -84,6 +84,9 @@ If we remove that point, the resulting type is empty.
 ```agda
 isProp→isEmptyRemove : isProp A → ∀ a₀ → ¬ (A ∖ a₀)
 isProp→isEmptyRemove is-prop a₀ (a , a₀≢a) = a₀≢a (is-prop a₀ a)
+
+isProp→remove-empty-equiv : isProp A → ∀ a₀ → (A ∖ a₀) ≃ 𝟘
+isProp→remove-empty-equiv is-prop a₀ = Empty.uninhabEquiv (isProp→isEmptyRemove is-prop a₀) λ ()
 ```
 
 The same applies to types that are contractible, i.e. homotopically a point:
