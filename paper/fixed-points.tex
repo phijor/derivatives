@@ -435,10 +435,10 @@ use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively
   Its fixpoint is equivalent to the usual description of lists as a container:
   the shapes \( ({\mu L})_{\Sh} \JudgeEq \W(S, Y) \)
   are trees with either unary (\( Y(\Cons) \)) or nullary (\( Y(\Nil) \))
-  branching, hence there is a unique tree for each depth \( n : \mathbb{N} \).
+  branching, hence there is a unique tree for each depth \( n : \Nat \).
   An \( X \)-labeled path \( x : \WPath_{S, Y, X}(t) \) to a node in a tree \( t : \W(S, Y) \)
   thus corresponds exactly to some number \( k : \Fin{\Op{depth}(t)} \).
-  This defines an equivalence \( \mu L \CartEquiv (\MkCont{n : \mathbb{N}}{\Fin{n}}) \).
+  This defines an equivalence \( \mu L \CartEquiv (\MkCont{n : \Nat}{\Fin{n}}) \).
 \end{example}
 
 In general, \( \mu F \) is a fixpoint of substitution into \( \Subst{F}{\Blank} \):

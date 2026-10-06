@@ -405,7 +405,7 @@ Interestingly, the proof of \cite[{Theorem 5.1}]{AbbottEtAl2005DataDifferentiati
 
 Furthermore, we can iterate the adjunction and easily obtain a notion of \( n \)-fold derivatives.
 \begin{corollary}\label{nth-derivative-sets}
-  For all \( n : \mathbb{N} \), there is an adjunction \( \Blank \CTimes \CYo{[n]} \dashv \Der^n \)
+  For all \( n : \Nat \), there is an adjunction \( \Blank \CTimes \CYo{[n]} \dashv \Der^n \)
   in the 1-category \( \TruncContCart{0,0} \).
 \end{corollary}
 Intuitively, \( \Der^n(\MkCont{S}{P}) \) encodes a type with \( n \) distinct holes:
@@ -488,10 +488,10 @@ Famously, bags cannot be expressed as set-truncated containers, but can be if on
 Let us reproduce \citeauthor{Gylterud2011}'s construction~\cite[{Example~3.6.1}]{Gylterud2011} of bags as a symmetric container,
 but in the language of HoTT.
 Recall that a type is considered finite
-if there is some \( n : \mathbb{N} \) for which it is merely equivalent to \( \Fin{n} : \Type \).%
+if there is some \( n : \Nat \) for which it is merely equivalent to \( \Fin{n} : \Type \).%
 \footnote{Specifically, such types are called Bishop-finite~\cite[{Definition~4.4}]{FruminEtAl2018FiniteSetsHomotopy}.}
 The universe of finite sets,
-\( \FinSet \DefEq \sum_{X : \Type} \sum_{n : \mathbb{N}} \lVert X \simeq \Fin{n} \rVert \),
+\( \FinSet \DefEq \sum_{X : \Type} \sum_{n : \Nat} \lVert X \simeq \Fin{n} \rVert \),
 comes with a map \( \El \DefEq \Fst : \FinSet \to \Type \) projecting out the underlying type.
 Together, these form the container of \emph{bags}, \( \Bag \DefEq (\MkCont{\FinSet}{\El}) \).
 As written, the shapes of this container quantify over all types, hence live in a higher universe.
@@ -545,8 +545,8 @@ of types closed under addition and removal of single points:
     for the details we refer the reader to the formalization.
   \end{proof}
 \end{proposition}
-\( \Bag \) is an instance of the above for the predicate \( P(A) \DefEq \sum_{n : \mathbb{N}} \PropTrunc{X \simeq \Fin{n}} \).
+\( \Bag \) is an instance of the above for the predicate \( P(A) \DefEq \sum_{n : \Nat} \PropTrunc{X \simeq \Fin{n}} \).
 In the formalization, we provide another example:
-for \( P(A) \DefEq \lVert A \hookrightarrow \mathbb{N} \rVert \),
+for \( P(A) \DefEq \lVert A \hookrightarrow \Nat \rVert \),
 \( \Bag_P \) is a container representing countable multisets,
 and again a \( \Der{} \)-fixpoint.
