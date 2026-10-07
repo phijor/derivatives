@@ -89,15 +89,15 @@ and then distributing isolated points over Σ-types by means of [`Σ-isolate`](D
       η₁ .pos ((s , f) , (p° , q°)) = invEquiv (isIsolatedFst→Σ-remove-equiv (p° .snd))
 ```
 
-The map of shapes of the chain rule is always an embedding,
-hence `chain-rule` is an embedding of containers.
+The map of shapes of the chain rule,
 ```agda
-  chain-shape-map :
-    (Σ[ (s , p) ∈ Σ[ s ∈ S ] (P s °) ] (P s ∖ (p .fst) → T)) × (Σ[ t ∈ T ] Q t °)
-      →
-    Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p ∈ (P s) ] Q (f p)) °
-  chain-shape-map = chain-rule .shape
-
+  _ : (Σ[ (s , (p , _)) ∈ Σ[ s ∈ S ] (P s °) ] (P s ∖ p → T)) × (Σ[ t ∈ T ] Q t °)
+        →
+      Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p ∈ (P s) ] Q (f p)) °
+  _ = chain-rule .shape
+```
+is always an embedding, hence `chain-rule` is an embedding of containers.
+```agda
   isContainerEmbeddingChainRule : isContainerEmbedding chain-rule
   isContainerEmbeddingChainRule = isEmbedding-∘
     {f = Σ-map-snd λ (s , f) → Σ-isolate (P s) (Q ∘ f)}
@@ -106,7 +106,7 @@ hence `chain-rule` is an embedding of containers.
     (isEquiv→isEmbedding $ equivIsEquiv $ chain-rule.η₀ .Equiv.shape)
 ```
 
-It is an equivalence of shapes if and only if `Σ-isolate (P s) (Q ∘ f)` is an equivalence.
+The chain rule is an equivalence of containers if and only if `Σ-isolate (P s) (Q ∘ f)` is an equivalence.
 ```agda
   isEquivChainRule→isEquiv-Σ-isolated :
     isContainerEquiv chain-rule → (∀ s → (f : P s → T) → isEquiv (Σ-isolate (P s) (Q ∘ f)))
