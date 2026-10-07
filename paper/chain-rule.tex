@@ -130,11 +130,15 @@ Note that \( \SigmaIsolate \) is always an embedding (cf.~\autoref{is-embedding-
 hence we can think of \( \Chain_{F,G} \) as embedding \( \Subst{(\Der{F})}{G} \CTimes \Der{G} \)
 as a subcontainer inside \( \Der(\Subst{F}{G}) \):
 \begin{definition}
-  A morphism \( f : \Cart{F}{G} \) is an embedding of containers if \( f_{\Sh} : F_{\Sh} \to G_{\Sh} \) is an embedding.
+  A morphism \( f : \Cart{F}{G} \) is an embedding of containers if \( f_{\Sh} : F_{\Sh} \to G_{\Sh} \) is an embedding.%
+  \footnote{
+    Embeddings are monomorphisms in \( \ContCart \):
+    if \( f : \Cart{F}{G} \) is an embedding, then \( f_{\Sh} \) is left-cancellable
+    and each \( f_{\Ps}(s) \) is right-cancellable (since it is an equivalence).
+    Thus, by extensionality~(\autoref{container-morphism-ext}),
+    \( f \circ g = f \circ h \) implies \( g = h \) for parallel \( g, h : \Cart{H}{F} \).
+  }
 \end{definition}
-\begin{todo-block}
-  In \( \Cont_{0,0} \), these are exactly the monos.
-\end{todo-block}
 \begin{proposition}\label{is-embedding-chain-rule}
   For all \( F, G : \Cont \), \( \Chain_{F,G} : \Cart{ \Subst{(\Der{F})}{G} \CTimes \Der{G} }{\Der{(\Subst{F}{G})}} \) is an embedding.
   \begin{proof}
