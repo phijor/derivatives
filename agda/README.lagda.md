@@ -574,7 +574,7 @@ import Derivative.Indexed.Container as Containerᴵ
 ```
 
 **Definition 5.1**:
-Indexed containers have positions indexed by some \( \mathsf{Ix} : \Type \).
+Indexed containers have positions indexed by some \( \mathsf{Ix} : \mathsf{Type} \).
 ```agda
 Containerᴵ : (Ix : Type) → Type _
 Containerᴵ = Containerᴵ.Container ℓ-zero
