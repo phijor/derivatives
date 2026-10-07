@@ -1,8 +1,21 @@
 # Overview
 
+This site documents the Agda implementation of the results of [_Derivatives of Containers in Univalent Foundations (arXiv:2512.17484)_](https://arxiv.org/abs/2512.17484).
+The overview on this page mirrors the paper.
+It lists each numbered result and links it to the corresponding implementation in the library.
+Many submodules of this library have additional documentation
+which explains proofs and constructions in greater detail than what would have appropriate for the paper.
+
+The library does not depend on additional `postulate`s, nor does it have any open holes.
+It is accepted by Agda in `--safe` mode.
 ```agda
 {-# OPTIONS --safe #-}
 ```
+
+The Agda source code, as well as further documentation, can be found at
+<center>
+  <a href="https://codeberg.org/phijor/derivatives">codeberg.org/phijor/derivatives</a>
+</center>
 
 ## Basic notation and definitions
 
