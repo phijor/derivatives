@@ -7,6 +7,7 @@ module Derivative.Container where
 
 open import Derivative.Prelude
 import      Derivative.Basics.Decidable as Dec
+open import Derivative.Basics.Embedding using (isEmbedding ; isEquiv→isEmbedding)
 import      Derivative.Basics.Maybe as Maybe
 open import Derivative.Basics.Sum as Sum using (_⊎_)
 
@@ -287,6 +288,23 @@ Equiv-pos : ∀ {S : Type ℓS} {P P′ : S → Type ℓP}
   → Equiv (S ◁ P) (S ◁ P′)
 Equiv-pos {S} e .Equiv.shape = idEquiv S
 Equiv-pos {S} e .Equiv.pos = e
+```
+
+### Embeddings
+
+A linear morphism is an _embedding_ of containers if its map of shapes is an embedding of types.
+```agda
+isContainerEmbedding : ∀ {ℓS ℓT ℓP ℓQ} {F : Container ℓS ℓP} {G : Container ℓT ℓQ}
+  → F ⊸ G → Type (ℓ-max ℓS ℓT)
+isContainerEmbedding f = isEmbedding (f .shape)
+```
+
+Every equivalence of containers is in particular an embedding.
+```agda
+Equiv→isContainerEmbedding : {F G : Container ℓS ℓP}
+  → (e : Equiv F G)
+  → isContainerEmbedding (Equiv→⊸ e)
+Equiv→isContainerEmbedding e = isEquiv→isEmbedding (e .Equiv.shape .snd)
 ```
 
 ### More operations

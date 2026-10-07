@@ -89,7 +89,8 @@ and then distributing isolated points over Σ-types by means of [`Σ-isolate`](D
       η₁ .pos ((s , f) , (p° , q°)) = invEquiv (isIsolatedFst→Σ-remove-equiv (p° .snd))
 ```
 
-The map of shapes of the chain rule is always an embedding.
+The map of shapes of the chain rule is always an embedding,
+hence `chain-rule` is an embedding of containers.
 ```agda
   chain-shape-map :
     (Σ[ (s , p) ∈ Σ[ s ∈ S ] (P s °) ] (P s ∖ (p .fst) → T)) × (Σ[ t ∈ T ] Q t °)
@@ -97,8 +98,8 @@ The map of shapes of the chain rule is always an embedding.
     Σ[ (s , f) ∈ Σ[ s ∈ S ] (P s → T) ] (Σ[ p ∈ (P s) ] Q (f p)) °
   chain-shape-map = chain-rule .shape
 
-  isEmbedding-chain-shape-map : isEmbedding chain-shape-map
-  isEmbedding-chain-shape-map = isEmbedding-∘
+  isContainerEmbeddingChainRule : isContainerEmbedding chain-rule
+  isContainerEmbeddingChainRule = isEmbedding-∘
     {f = Σ-map-snd λ (s , f) → Σ-isolate (P s) (Q ∘ f)}
     {h = equivFun $ chain-rule.η₀ .Equiv.shape}
     (isEmbedding-Σ-map-snd λ (s , f) → isEmbedding-Σ-isolate (P s) (Q ∘ f))

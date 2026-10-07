@@ -514,15 +514,15 @@ _ = chain-rule _ _
 **Definition 4.2**:
 A morphism of containers is an embedding if its shape map is an embedding.
 ```agda
-isContainerEmbedding : F ⊸ G → Type _
-isContainerEmbedding = λ f → isEmbedding (shape f)
+_ : {F G : Container ℓ ℓ} → F ⊸ G → Type _
+_ = isContainerEmbedding
 ```
 
 **Proposition 4.3**:
 The chain rule is an embedding of containers.
 ```agda
 _ : isContainerEmbedding (chain-rule F G)
-_ = isEmbedding-chain-shape-map _ _
+_ = isContainerEmbeddingChainRule _ _
 ```
 
 **Proposition 4.4**:
@@ -627,6 +627,7 @@ open IndexedDerivative using (∂• ; ∂₀ ; ∂₁)
 The chain rule for binary containers.
 ```agda
 open import Derivative.Indexed.ChainRule as IndexedChainRule
+  renaming (isContainerEmbeddingChainRule to isContainerEmbeddingChainRuleᴵ)
 
 _ :
   ∀ (F : Containerᴵ 𝟚)
@@ -640,7 +641,7 @@ The binary chain rule is an embedding.
 ```agda
 _ : (F : Containerᴵ 𝟚) (G : Containerᴵ 𝟙)
   → isContainerEmbeddingᴵ (binary-chain-rule F G)
-_ = isContainerEmbeddingChainRule
+_ = isContainerEmbeddingChainRuleᴵ
 ```
 
 **Proposition 5.7**:
