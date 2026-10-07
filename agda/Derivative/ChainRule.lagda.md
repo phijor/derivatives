@@ -109,7 +109,7 @@ hence `chain-rule` is an embedding of containers.
 It is an equivalence of shapes if and only if `Σ-isolate (P s) (Q ∘ f)` is an equivalence.
 ```agda
   isEquivChainRule→isEquiv-Σ-isolated :
-    isEquiv (chain-rule .shape) → (∀ s → (f : P s → T) → isEquiv (Σ-isolate (P s) (Q ∘ f)))
+    isContainerEquiv chain-rule → (∀ s → (f : P s → T) → isEquiv (Σ-isolate (P s) (Q ∘ f)))
   isEquivChainRule→isEquiv-Σ-isolated is-equiv-chain-shape-map = is-equiv-Σ-isolate where
     is-equiv-Σ-Σ-isolate : isEquiv (Σ-map-snd {A = Σ[ s ∈ S ] (P s → T)} (λ (s , f) → Σ-isolate (P s) (Q ∘ f)))
     is-equiv-Σ-Σ-isolate = isEquiv[f∘equivFunA≃B]→isEquiv[f]
@@ -123,7 +123,7 @@ It is an equivalence of shapes if and only if `Σ-isolate (P s) (Q ∘ f)` is an
   isEquiv-Σ-isolated→isEquivChainRule :
     (∀ s → (f : P s → T) → isEquiv (Σ-isolate (P s) (Q ∘ f)))
       →
-    isEquiv (chain-rule .shape)
+    isContainerEquiv chain-rule
   isEquiv-Σ-isolated→isEquivChainRule is-equiv-Σ-isolate = isEquiv-∘
     {f = equivFun $ chain-rule.η₀ .Equiv.shape}
     {g = Σ-map-snd λ ((s , f)) → Σ-isolate (P s) (Q ∘ f)}
@@ -131,7 +131,7 @@ It is an equivalence of shapes if and only if `Σ-isolate (P s) (Q ∘ f)` is an
     (equivIsEquiv $ chain-rule.η₀ .Equiv.shape)
 
   isEquivChainRule≃isEquiv-Σ-isolated :
-    isEquiv (chain-rule .shape) ≃ (∀ s → (f : P s → T) → isEquiv (Σ-isolate (P s) (Q ∘ f)))
+    isContainerEquiv chain-rule ≃ (∀ s → (f : P s → T) → isEquiv (Σ-isolate (P s) (Q ∘ f)))
   isEquivChainRule≃isEquiv-Σ-isolated = propBiimpl→Equiv
     (isPropIsEquiv _) (isPropΠ2 λ s f → isPropIsEquiv _)
     isEquivChainRule→isEquiv-Σ-isolated
@@ -142,7 +142,7 @@ The chain rule is _strong_ if it is an equivalence of containers,
 that is, whenever its shape map is an equivalence.
 ```agda
 isStrong : (F G : Container ℓ ℓ) → Type _
-isStrong F G = isEquiv (chain-shape-map F G)
+isStrong F G = isContainerEquiv (chain-rule F G)
 ```
 
 It is _globally strong_ if this is the case for any choice of containers.
@@ -240,7 +240,7 @@ isStrongSets→AllSetsDiscrete {ℓ} is-equiv-chain-shape-map (A , is-set-A) = d
 AllSetsDiscrete→isStrongSets :
   ((A : hSet ℓ) → Discrete ⟨ A ⟩)
     →
-  ((F G : SetContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape))
+  ((F G : SetContainer ℓ ℓ) → isStrong (F .fst) (G .fst))
 AllSetsDiscrete→isStrongSets discrete (F , is-set-F) (G , is-set-G) = DiscreteContainer→isStrong
   (F , disc-F)
   (G , disc-G)
@@ -252,7 +252,7 @@ AllSetsDiscrete→isStrongSets discrete (F , is-set-F) (G , is-set-G) = Discrete
     disc-G t = discrete (G .Pos t , is-set-G .snd t)
 
 isStrongSets≃AllSetsDiscrete :
-  ((F G : SetContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape))
+  ((F G : SetContainer ℓ ℓ) → isStrong (F .fst) (G .fst))
     ≃
   ((A : hSet ℓ) → Discrete ⟨ A ⟩)
 isStrongSets≃AllSetsDiscrete = propBiimpl→Equiv

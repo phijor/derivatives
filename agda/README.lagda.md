@@ -532,7 +532,7 @@ module _ (F G : Container ℓ ℓ) where
   open Container F renaming (Shape to S ; Pos to P)
   open Container G renaming (Shape to T ; Pos to Q)
 
-  _ : isEquiv (chain-rule F G .shape) ≃ (∀ s → (f : P s → T) → isEquiv (Σ-isolate (P s) (Q ∘ f)))
+  _ : isContainerEquiv (chain-rule F G) ≃ (∀ s → (f : P s → T) → isEquiv (Σ-isolate (P s) (Q ∘ f)))
   _ = isEquivChainRule≃isEquiv-Σ-isolated F G
 ```
 
@@ -540,7 +540,7 @@ module _ (F G : Container ℓ ℓ) where
 For discrete containers, the chain rule is an equivalence.
 Therefore it is an isomorphism in the 1-category of set-truncated containers, `ℂont`.
 ```agda
-_ : (F G : DiscreteContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape)
+_ : (F G : DiscreteContainer ℓ ℓ) → isStrong (F .fst) (G .fst)
 _ = DiscreteContainer→isStrong
 ```
 
@@ -548,7 +548,7 @@ _ = DiscreteContainer→isStrong
 The chain rule is invertible for arbitrary containers if and only if arbitrary types are discrete.
 This is impossible in the presence of types of higher truncation level.
 ```agda
-_ : ((F G : Container ℓ ℓ) → isEquiv (chain-rule F G .shape)) ≃ ((A : Type ℓ) → Discrete A)
+_ : ((F G : Container ℓ ℓ) → isStrong F G) ≃ ((A : Type ℓ) → Discrete A)
 _ = isGloballyStrong≃AllTypesDiscrete
 
 _ : ¬ isGloballyStrong ℓ-zero
@@ -559,7 +559,7 @@ _ = ¬isGloballyStrong
 The chain rule is an equivalence for all set-truncated containers if and only if all sets are discrete.
 ```agda
 _ :
-  ((F G : SetContainer ℓ ℓ) → isEquiv (chain-rule (F .fst) (G .fst) .shape))
+  ((F G : SetContainer ℓ ℓ) → isStrong (F .fst) (G .fst))
     ≃
   ((A : hSet ℓ) → Discrete ⟨ A ⟩)
 _ = isStrongSets≃AllSetsDiscrete
@@ -589,12 +589,13 @@ _ = Containerᴵ.Container-Σ-equiv
 
 ```agda
 open Containerᴵ
-  using (₀ ; ₁ ; 𝟚 ; isContainerEquiv ; _⧟_ ; ↑ ; π₁)
+  using (₀ ; ₁ ; 𝟚 ; _⧟_ ; ↑ ; π₁)
   renaming
     ( _⊗_ to _⊗ᴵ_
     ; _⊕_ to _⊕ᴵ_
     ; _⋆_ to _⋆ᴵ_
     ; _⊸_ to _⊸ᴵ_
+    ; isContainerEquiv to isContainerEquivᴵ
     ; isContainerEmbedding to isContainerEmbeddingᴵ
     ; [-]-map to [_]-map
     )
@@ -648,7 +649,7 @@ _ = isContainerEmbeddingChainRuleᴵ
 Like for unary containers, the binary chain rule is an equivalence iff `Σ-isolate` is.
 ```agda
 _ : (F : Containerᴵ 𝟚) (G : Containerᴵ 𝟙) →
-  isContainerEquiv (binary-chain-rule F G)
+  isContainerEquivᴵ (binary-chain-rule F G)
     ≃
   (∀ s f → isEquiv (Σ-isolate (F .Pos ₁ s) (G .Pos _ ∘ f)))
 _ = isEquivBinaryChainRule≃isEquiv-Σ-isolate
@@ -660,7 +661,7 @@ For discrete containers, the binary chain rule is an equivalence.
 _ : (F : Containerᴵ 𝟚) (G : Containerᴵ 𝟙)
   → (∀ s → Discrete (Pos F ₁ s))
   → (∀ t → Discrete (Pos G • t))
-  → isContainerEquiv (binary-chain-rule F G)
+  → isContainerEquivᴵ (binary-chain-rule F G)
 _ = DiscreteContainer→isEquivBinaryChainRule
 ```
 
@@ -748,8 +749,8 @@ The μ-recursor reflects equivalences:
 ```agda
 _ : (F : Containerᴵ (Maybe Ix)) (G : Containerᴵ Ix)
   → (φ : (F [ G ]ᴵ) ⊸ᴵ G)
-  → isContainerEquiv (μ-rec F G φ)
-  → isContainerEquiv φ
+  → isContainerEquivᴵ (μ-rec F G φ)
+  → isContainerEquivᴵ φ
 _ = isEquivFrom-μ-rec
 ```
 
@@ -757,8 +758,8 @@ _ = isEquivFrom-μ-rec
 If the \( μ \)-rule is an equivalence, then so is the corresponding chain rule.
 ```agda
 _ : (F : Containerᴵ 𝟚)
-  → isContainerEquiv (μ-rule F)
-  → isContainerEquiv (binary-chain-rule F (μ F))
+  → isContainerEquivᴵ (μ-rule F)
+  → isContainerEquivᴵ (binary-chain-rule F (μ F))
 _ = StrongFixRule.isEquiv-chain-rule
 ```
 
@@ -793,8 +794,8 @@ _ = isContainerEmbedding-μ-rule
 If the chain rule is an equivalence, so is the μ-rule.
 ```agda
 _ : (F : Containerᴵ 𝟚)
-  → isContainerEquiv (binary-chain-rule F (μ F))
-  → isContainerEquiv (μ-rule F)
+  → isContainerEquivᴵ (binary-chain-rule F (μ F))
+  → isContainerEquivᴵ (μ-rule F)
 _ = StrongChainRule.isEquiv-μ-rule
 ```
 
@@ -802,7 +803,7 @@ _ = StrongChainRule.isEquiv-μ-rule
 The \( μ \)-rule is an equivalence if and only if the corresponding chain rule is.
 ```agda
 _ : (F : Containerᴵ 𝟚)
-  → isContainerEquiv (μ-rule F) ≃ isContainerEquiv (binary-chain-rule F (μ F))
+  → isContainerEquivᴵ (μ-rule F) ≃ isContainerEquivᴵ (binary-chain-rule F (μ F))
 _ = isContainerEquiv-μ-rule≃isContainerEquiv-binary-chain-rule
 ```
 
@@ -837,6 +838,6 @@ _ = μ-discrete
 **Proposition 5.26**:
 For discrete containers the \( μ \)-rule is an equivalence.
 ```agda
-_ : (F : Containerᴵ 𝟚) → (∀ ix s → Discrete (F .Pos ix s)) → isContainerEquiv (μ-rule F)
+_ : (F : Containerᴵ 𝟚) → (∀ ix s → Discrete (F .Pos ix s)) → isContainerEquivᴵ (μ-rule F)
 _ = Discrete.isEquiv-μ-rule
 ```

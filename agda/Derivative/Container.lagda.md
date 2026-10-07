@@ -220,6 +220,16 @@ isOfHLevel-⊸ n {F = _ , _ , trunc-pos-F} {G = _ , trunc-shape-G , trunc-pos-G}
 ### Equivalences
 
 A linear morphism is an _equivalence_ if its shape map is an equivalence of types.
+```agda
+isContainerEquiv : ∀ {ℓS ℓT ℓP ℓQ} {F : Container ℓS ℓP} {G : Container ℓT ℓQ}
+  → F ⊸ G → Type (ℓ-max ℓS ℓT)
+isContainerEquiv f = isEquiv (f .shape)
+
+isPropIsContainerEquiv : ∀ {ℓS ℓT ℓP ℓQ} {F : Container ℓS ℓP} {G : Container ℓT ℓQ}
+  → {f : F ⊸ G} → isProp (isContainerEquiv f)
+isPropIsContainerEquiv {f} = isPropIsEquiv (f .shape)
+```
+
 We wrap this in a new `record`, and use [`Equiv→⊸`](#Equiv→⊸) to project out the underlying morphism.
 ```agda
 record Equiv (F G : Container ℓS ℓP) : Type (ℓ-max ℓS ℓP) where
@@ -231,6 +241,17 @@ record Equiv (F G : Container ℓS ℓP) : Type (ℓ-max ℓS ℓP) where
 Equiv→⊸ : {F G : Container ℓS ℓP} → Equiv F G → F ⊸ G
 Equiv→⊸ [ shape ◁≃ pos ] .shape = equivFun shape
 Equiv→⊸ [ shape ◁≃ pos ] .pos = pos
+```
+
+The two presentations convert into each other:
+```agda
+isContainerEquiv→Equiv : {F G : Container ℓS ℓP}
+  → (f : F ⊸ G) → isContainerEquiv f → Equiv F G
+isContainerEquiv→Equiv f is-equiv-f = [ (f .shape , is-equiv-f) ◁≃ f .pos ]
+
+equivIsContainerEquiv : {F G : Container ℓS ℓP}
+  → (e : Equiv F G) → isContainerEquiv (Equiv→⊸ e)
+equivIsContainerEquiv e = equivIsEquiv (e .Equiv.shape)
 ```
 
 Equivalences compose and there is an identity equivalence:
@@ -301,10 +322,20 @@ isContainerEmbedding f = isEmbedding (f .shape)
 
 Every equivalence of containers is in particular an embedding.
 ```agda
+isContainerEquiv→isContainerEmbedding : ∀ {ℓS ℓT ℓP ℓQ}
+  → {F : Container ℓS ℓP} {G : Container ℓT ℓQ}
+  → {f : F ⊸ G}
+  → isContainerEquiv f
+  → isContainerEmbedding f
+isContainerEquiv→isContainerEmbedding = isEquiv→isEmbedding
+
 Equiv→isContainerEmbedding : {F G : Container ℓS ℓP}
   → (e : Equiv F G)
   → isContainerEmbedding (Equiv→⊸ e)
-Equiv→isContainerEmbedding e = isEquiv→isEmbedding (e .Equiv.shape .snd)
+Equiv→isContainerEmbedding e =
+  isContainerEquiv→isContainerEmbedding
+    {f = Equiv→⊸ e}
+    (equivIsContainerEquiv e)
 ```
 
 ### More operations
