@@ -686,7 +686,18 @@ _ = Containerᴵ.[-]-map-⋆
 **Problem 5.10**:
 \( F[\_] \)-algebras form a wild category.
 ```agda
+private module _ (F : Containerᴵ (Maybe Ix)) where
+  Alg : Type _
+  Alg = Σ[ X ∈ Containerᴵ Ix ] (F [ X ]ᴵ ⊸ᴵ X)
+
+  AlgHom : Alg → Alg → Type _
+  AlgHom (X , f) (Y , g) = Σ[ h ∈ X ⊸ᴵ Y ] f ⋆ᴵ h ≡ [ F ]-map h ⋆ᴵ g
 ```
+??? note
+    We chose to omit the proof that \( F[\_] \)-algebras form a wild category from the formalization.
+    Defining the necessary coherence between commutative squares is challenging for technical reasons;
+    a formal proof only obscures the intuition that \( F[\_] \) acts coherently also on homotopies of container morphisms.
+    At the same time, no further construction depends on these coherences.
 
 **Definition 5.12**:
 For any \( I+1 \)-indexed container \( F \) there is an \( I \)-indexed fixed point container \( μ F \).
