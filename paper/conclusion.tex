@@ -50,7 +50,8 @@ They show that \( \Der{F} = [\Id, F] \) if \( F \) is discrete.
 The adjunction of \autoref{derivative-adjunction-sets} is such a universal morphism, natural in all \( F \),
 hence \( \Der = [\Id, \Blank] \) as functors.
 Iterating the adjunction, we can describe \( n \)-hole contexts as linear exponentials \( \Der^n = [\CYo\Fin{n}, \Blank] \).
-We conjecture that \( [\CYo(H), \Blank] \) exists for arbitrary \( H : \Type \):
+We conjecture that \( [\CYo(H), (\MkCont{S}{P})] \) exists for arbitrary \( H : \Type \):
 for any embedding \( f : H \hookrightarrow P_s \) whose fibers are decidable,
 the complement \( P_s -_f H \DefEq \sum_{p : P_s} \neg \Fiber_f(p) \) satisfies, among other things, \( (P_s -_f H) + H \simeq P_s \).
-This indicates that a type of contexts with \enquote{\( H \)-shaped} holes may exist, independently of the truncation level of \( H \).
+The construction of this equivalence does not depend on discreteness or the truncation level of \( H \).
+This indicates that a type of contexts with \enquote{\( H \)-shaped} holes may exist even if \( H \) is a higher type.
