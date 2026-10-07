@@ -1,7 +1,7 @@
 <!--
 ```agda
 {-# OPTIONS --safe #-}
-module Derivative.Bag where
+module Derivative.Examples.Bag where
 
 open import Derivative.Prelude
 open import Derivative.Container

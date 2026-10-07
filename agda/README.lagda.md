@@ -397,9 +397,9 @@ _ : (S : Type) (P : S → Type)
 _ = λ S P → refl
 ```
 
-**TODO**: Description of the [derivative of the container of lists](Derivative.Indexed.List.md#derivative-of-list), \( ((n : ℕ) \lhd [n]) \).
+**TODO**: Description of the [derivative of the container of lists](Derivative.Examples.List.md#derivative-of-list), \( ((n : ℕ) \lhd [n]) \).
 ```agda
-open import Derivative.Indexed.List using (∂List)
+open import Derivative.Examples.List using (∂List)
 ```
 ??? note
     We define lists as a \( 1 \)-indexed container (introduced [below](#indexed-containers)) to avoid having to define them twice.
@@ -488,7 +488,7 @@ _ = prod-rule _ _
 **Proposition 3.15**:
 The `Bag` container is a fixed point of \( \partial \).
 ```agda
-open import Derivative.Bag
+open import Derivative.Examples.Bag
 
 _ : Equiv (∂ Bag) Bag
 _ = ∂-Bag-equiv
@@ -504,7 +504,7 @@ module _
   (is-P-∖ : ∀ {A : Type} → P A → (a : A °) → P (A ∖° a))
   where
 
-  open Derivative.Bag.Universe P is-prop-P is-P-+1 is-P-∖
+  open Derivative.Examples.Bag.Universe P is-prop-P is-P-+1 is-P-∖
     renaming (uBag to Bagᴾ)
 
   _ : Equiv (∂ Bagᴾ) Bagᴾ
@@ -719,9 +719,9 @@ _ : (F : Containerᴵ (Maybe Ix)) → Containerᴵ Ix
 _ = μ
 ```
 
-**TODO**: Description of [lists as a fixpoint](Derivative.Indexed.List.md#list-as-fixpoint).
+**TODO**: Description of [lists as a fixpoint](Derivative.Examples.List.md#list-as-fixpoint).
 ```agda
-open import Derivative.Indexed.List using (μL⧟List)
+open import Derivative.Examples.List using (μL⧟List)
 ```
 
 **Problem 5.13**:

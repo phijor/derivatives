@@ -3,7 +3,7 @@
 <!--
 ```agda
 {-# OPTIONS -WnoUnsupportedIndexedMatch --safe #-}
-module Derivative.Indexed.List where
+module Derivative.Examples.List where
 
 open import Derivative.Prelude
 open import Derivative.Basics.W
