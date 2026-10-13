@@ -142,95 +142,93 @@ module _ (F : Container ℓ (Maybe Ix)) where
       Wᴰ S (P nothing) (P (just i)) (sup s f)
         ≃∎
 
-  μ-rec-β' : (G : Container ℓ Ix)
-    → (α : (F [ G ]) ⊸ G)
-    → μ-rec G α ≡ μ-out ⋆ [-]-map F (μ-rec G α) ⋆ α
-  μ-rec-β' G α = ⊸≡-ext (μ-rec.shape-β G α) λ where
-    ix (sup s f) → refl
+  module μ-rec-coalgebra-to-algebra (G : Container ℓ Ix) (α : (F [ G ]) ⊸ G) where
+    β : μ-rec G α ≡ μ-out ⋆ [-]-map F (μ-rec G α) ⋆ α
+    β = ⊸≡-ext (μ-rec.shape-β G α) λ where
+      ix (sup s f) → refl
 
-  μ-rec-unique' : (G : Container ℓ Ix)
-    → (α : (F [ G ]) ⊸ G)
-    → isContr (Σ[ α* ∈ μ F ⊸ G ] α* ≡ μ-out ⋆ [-]-map F α* ⋆ α )
-  μ-rec-unique' G α .fst .fst = μ-rec G α
-  μ-rec-unique' G α .fst .snd = μ-rec-β' G α
-  μ-rec-unique' G α .snd (ζ , ζ-β) = ΣPathP (goal , goal-coh) where
-    module α = _⊸_ α
-    module ζ = _⊸_ ζ
+    unique : isContr (Σ[ α* ∈ μ F ⊸ G ] α* ≡ μ-out ⋆ [-]-map F α* ⋆ α )
+    unique .fst .fst = μ-rec G α
+    unique .fst .snd = β
+    unique .snd (ζ , ζ-β) = ΣPathP (goal , goal-coh) where
+      module α = _⊸_ α
+      module ζ = _⊸_ ζ
 
-    shape-≡-ext : ∀ w → μ-rec.shape G α w ≡ ζ.shape w
-    shape-≡-ext w@(sup s f) = p ∙ q
-      module shape-≡-ext where
-        p = cong α.shape (ΣPathP (refl′ s , funExt (shape-≡-ext ∘ f)))
-        q = sym $ cong _⊸_.shape ζ-β ≡$ w
+      shape-≡-ext : ∀ w → μ-rec.shape G α w ≡ ζ.shape w
+      shape-≡-ext w@(sup s f) = p ∙ q
+        module shape-≡-ext where
+          p = cong α.shape (ΣPathP (refl′ s , funExt (shape-≡-ext ∘ f)))
+          q = sym $ cong _⊸_.shape ζ-β ≡$ w
 
-        filler = compPath-filler p q
+          filler = compPath-filler p q
 
-    shape-≡ : μ-rec.shape G α ≡ ζ.shape
-    shape-≡ = funExt shape-≡-ext
+      shape-≡ : μ-rec.shape G α ≡ ζ.shape
+      shape-≡ = funExt shape-≡-ext
 
-    pos-≡-ext : ∀ ix (w : W S (P ₁)) → PathP (λ i → Pos G ix (shape-≡ i w) ≃ μ.pos F ix w) (μ-rec.pos G α ix w) (ζ.pos ix w)
-    pos-≡-ext ix (sup s f) = compPathP' {B = B} {p = p} {q = q} pᴰ qᴰ
-      module pos-≡ where
-        B : Shape G → Type _
-        B t = Pos G ix t ≃ μ.pos F ix (sup s f)
+      pos-≡-ext : ∀ ix (w : W S (P ₁)) → PathP (λ i → Pos G ix (shape-≡ i w) ≃ μ.pos F ix w) (μ-rec.pos G α ix w) (ζ.pos ix w)
+      pos-≡-ext ix (sup s f) = compPathP' {B = B} {p = p} {q = q} pᴰ qᴰ
+        module pos-≡ where
+          B : Shape G → Type _
+          B t = Pos G ix t ≃ μ.pos F ix (sup s f)
 
-        open shape-≡-ext s f using (p ; q)
+          open shape-≡-ext s f using (p ; q)
 
-        yᴰ : _ ≃ _
-        yᴰ = α.pos ix (s , ζ.shape ∘ f) ∙ₑ ⊎-right-≃ (Σ-cong-equiv-snd' (ζ.pos ix ∘ f)) ∙ₑ Wᴰ-in-equiv _ _ _ s f
+          yᴰ : _ ≃ _
+          yᴰ = α.pos ix (s , ζ.shape ∘ f) ∙ₑ ⊎-right-≃ (Σ-cong-equiv-snd' (ζ.pos ix ∘ f)) ∙ₑ Wᴰ-in-equiv _ _ _ s f
 
-        pᴰ-fun : PathP (λ i → Pos G ix (shape-≡-ext.p s f i) → μ.pos F ix (sup s f)) (equivFun $ μ-rec.pos G α ix (sup s f)) (equivFun yᴰ)
-        pᴰ-fun i =
-          equivFun (α.pos ix (s , shape-≡ i ∘ f))
-          ⨟ᴰ ⊎-map-right (Σ-map-snd {B = λ p₁ → Pos G ix (shape-≡ i (f p₁))} λ p₁ → equivFun (pos-≡-ext ix (f p₁) i))
-          ⨟ᴰ Wᴰ-in _ _ _ s f
+          pᴰ-fun : PathP (λ i → Pos G ix (shape-≡-ext.p s f i) → μ.pos F ix (sup s f)) (equivFun $ μ-rec.pos G α ix (sup s f)) (equivFun yᴰ)
+          pᴰ-fun i =
+            equivFun (α.pos ix (s , shape-≡ i ∘ f))
+            ⨟ᴰ ⊎-map-right (Σ-map-snd {B = λ p₁ → Pos G ix (shape-≡ i (f p₁))} λ p₁ → equivFun (pos-≡-ext ix (f p₁) i))
+            ⨟ᴰ Wᴰ-in _ _ _ s f
 
-        pᴰ : PathP (λ i → B (shape-≡-ext.p s f i)) (μ-rec.pos G α ix (sup s f)) yᴰ
-        pᴰ = equivPathP pᴰ-fun
+          pᴰ : PathP (λ i → B (shape-≡-ext.p s f i)) (μ-rec.pos G α ix (sup s f)) yᴰ
+          pᴰ = equivPathP pᴰ-fun
 
-        qᴰ : PathP (λ i → B (shape-≡-ext.q s f i)) yᴰ (ζ.pos ix (sup s f))
-        qᴰ i = ζ-β (~ i) ._⊸_.pos ix (sup s f)
+          qᴰ : PathP (λ i → B (shape-≡-ext.q s f i)) yᴰ (ζ.pos ix (sup s f))
+          qᴰ i = ζ-β (~ i) ._⊸_.pos ix (sup s f)
 
-        filler : SquareP (λ z i → B (compPath-filler p q z i)) pᴰ (compPathP' {B = B} {p = p} {q = q} pᴰ qᴰ) _ qᴰ
-        filler = compPathP'-filler {B = B} {p = p} {q = q} pᴰ qᴰ
+          filler : SquareP (λ z i → B (compPath-filler p q z i)) pᴰ (compPathP' {B = B} {p = p} {q = q} pᴰ qᴰ) _ qᴰ
+          filler = compPathP'-filler {B = B} {p = p} {q = q} pᴰ qᴰ
 
-    pos-≡ : PathP (λ i → ∀ ix w → Pos G ix (shape-≡ i w) ≃ μ.pos F ix w) (μ-rec.pos G α) ζ.pos
-    pos-≡ = funExt₂ pos-≡-ext
+      pos-≡ : PathP (λ i → ∀ ix w → Pos G ix (shape-≡ i w) ≃ μ.pos F ix w) (μ-rec.pos G α) ζ.pos
+      pos-≡ = funExt₂ pos-≡-ext
 
-    goal : μ-rec G α ≡ ζ
-    goal = ⊸≡ shape-≡ pos-≡
+      goal : μ-rec G α ≡ ζ
+      goal = ⊸≡ shape-≡ pos-≡
 
-    goal-coh-shape : Square {A = W S (P nothing) → Shape G}
-      (λ i → μ-rec-β' G α i ._⊸_.shape)
-      (λ i → ζ-β i ._⊸_.shape)
-      shape-≡
-      λ i z → α.shape (_⊸_.shape ([-]-map F (goal i)) (_⊸_.shape μ-out z))
-    goal-coh-shape i j (sup s f) = shape-≡-ext.filler s f (~ j) i
+      goal-coh-shape : Square {A = W S (P nothing) → Shape G}
+        (cong _⊸_.shape β)
+        (cong _⊸_.shape ζ-β)
+        shape-≡
+        λ i z → α.shape (_⊸_.shape ([-]-map F (goal i)) (_⊸_.shape μ-out z))
+      goal-coh-shape i j (sup s f) = shape-≡-ext.filler s f (~ j) i
 
-    goal-coh-pos-ext : ∀ ix w
-      → SquareP (λ i j → Pos G ix (goal-coh-shape i j w) ≃ μ.pos F ix w)
-        (λ i → μ-rec-β' G α i ._⊸_.pos ix w)
-        (λ i → ζ-β i ._⊸_.pos ix w)
-        (λ i → pos-≡-ext ix w i)
-        λ i → (α.pos ix (_⊸_.shape ([-]-map F (goal i)) (_⊸_.shape μ-out w))) ∙ₑ (_⊸_.pos ([-]-map F (goal i)) ix (_⊸_.shape μ-out w) ∙ₑ _⊸_.pos μ-out ix w)
-    goal-coh-pos-ext ix (sup s f) = equivSquareP λ i j → equivFun (pos-≡.filler ix s f (~ j) i)
+      goal-coh-pos-ext : ∀ ix w
+        → SquareP (λ i j → Pos G ix (goal-coh-shape i j w) ≃ μ.pos F ix w)
+          (λ i → β i ._⊸_.pos ix w)
+          (λ i → ζ-β i ._⊸_.pos ix w)
+          (λ i → pos-≡-ext ix w i)
+          λ i → (α.pos ix (_⊸_.shape ([-]-map F (goal i)) (_⊸_.shape μ-out w))) ∙ₑ (_⊸_.pos ([-]-map F (goal i)) ix (_⊸_.shape μ-out w) ∙ₑ _⊸_.pos μ-out ix w)
+      goal-coh-pos-ext ix (sup s f) = equivSquareP λ i j → equivFun (pos-≡.filler ix s f (~ j) i)
 
-    goal-coh-pos : SquareP (λ i j → ∀ ix w → Pos G ix (goal-coh-shape i j w) ≃ μ.pos F ix w)
-      (λ i → μ-rec-β' G α i ._⊸_.pos)
-      (λ i → ζ-β i ._⊸_.pos)
-      pos-≡
-      λ i ix w → (α.pos ix (_⊸_.shape ([-]-map F (goal i)) (_⊸_.shape μ-out w))) ∙ₑ (_⊸_.pos ([-]-map F (goal i)) ix (_⊸_.shape μ-out w) ∙ₑ _⊸_.pos μ-out ix w)
-    goal-coh-pos i j ix w = goal-coh-pos-ext ix w i j
+      goal-coh-pos : SquareP (λ i j → ∀ ix w → Pos G ix (goal-coh-shape i j w) ≃ μ.pos F ix w)
+        (cong _⊸_.pos β)
+        (cong _⊸_.pos ζ-β)
+        pos-≡
+        λ i ix w → (α.pos ix (_⊸_.shape ([-]-map F (goal i)) (_⊸_.shape μ-out w))) ∙ₑ (_⊸_.pos ([-]-map F (goal i)) ix (_⊸_.shape μ-out w) ∙ₑ _⊸_.pos μ-out ix w)
+      goal-coh-pos i j ix w = goal-coh-pos-ext ix w i j
 
-    goal-coh : Square (μ-rec-β' G α) ζ-β goal (cong (λ f → μ-out ⋆ [-]-map F f ⋆ α) goal)
-    goal-coh i j ._⊸_.shape = goal-coh-shape i j
-    goal-coh i j ._⊸_.pos = goal-coh-pos i j
+      goal-coh : Square β ζ-β goal (cong (λ f → μ-out ⋆ [-]-map F f ⋆ α) goal)
+      goal-coh i j ._⊸_.shape = goal-coh-shape i j
+      goal-coh i j ._⊸_.pos = goal-coh-pos i j
 
   opaque
     μ-rec-unique : (G : Container ℓ Ix)
       → (α : (F [ G ]) ⊸ G)
       → isContr (Σ[ α* ∈ μ F ⊸ G ] μ-in ⋆ α* ≡ [-]-map F α* ⋆ α )
-    μ-rec-unique G α = isOfHLevelRespectEquiv 0 (Σ-cong-equiv-snd comm-square-equiv) $ μ-rec-unique' G α
+    μ-rec-unique G α = isOfHLevelRespectEquiv 0 (Σ-cong-equiv-snd comm-square-equiv)
+      $ μ-rec-coalgebra-to-algebra.unique G α
       where module _ (α* : μ F ⊸ G) where
         cancel : μ-in ⋆ (μ-out ⋆ ([-]-map F α* ⋆ α)) ≡ [-]-map F α* ⋆ α
         cancel =
@@ -264,8 +262,9 @@ module _ (F : Container ℓ (Maybe Ix)) where
     → isContainerEquiv (μ-rec G φ)
     → isContainerEquiv φ
   isEquivFrom-μ-rec G φ is-equiv-μ-rec = is-equiv-φ where
+    open μ-rec-coalgebra-to-algebra G φ using (β)
     is-equiv-comp : isContainerEquiv (μ-out ⋆ [-]-map F (μ-rec G φ) ⋆ φ)
-    is-equiv-comp = subst isContainerEquiv (μ-rec-β' G φ) is-equiv-μ-rec
+    is-equiv-comp = subst isContainerEquiv β is-equiv-μ-rec
 
     is-equiv-μ-out⋆F[μ-rec] : isContainerEquiv (μ-out ⋆ [-]-map F (μ-rec G φ))
     is-equiv-μ-out⋆F[μ-rec] = isContainerEquivComp

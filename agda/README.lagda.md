@@ -752,7 +752,14 @@ module _
   _ = μ-rec-β F G α
 ```
 
-**Theorem 5.15**:
+**Proposition 5.15**:
+The recursion principle for containers is unique as a coalgebra-to-algebra morphism.
+```agda
+  _ : ∃![ α* ∈ μ F ⊸ᴵ G ] α* ≡ μ-out F ⋆ᴵ [ F ]-map α* ⋆ᴵ α
+  _ = μ-rec-coalgebra-to-algebra.unique F G α
+```
+
+**Theorem 5.16**:
 Every container admits a smallest fixed point in the wild category of containers.
 For any \( F[\_]\)-algebra \( α : F[G] ⊸ G \), there is a unique algebra map \( α^* : μ F ⊸ G \):
 ```agda
