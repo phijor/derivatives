@@ -34,7 +34,10 @@ def prepare_md(md: Path):
 
     target: TextIO
     with mkdocs_gen_files.open(md.name, "w+", encoding="utf-8") as target:
-        target.write(exclude_agda_blocks_from_search(md.read_text(encoding="utf-8")))
+        content = md.read_text(encoding="utf-8")
+        for patch in [retarget_readme_links, exclude_agda_blocks_from_search]:
+            content = patch(content)
+        target.write(content)
 
 
 def prepare_html(html: Path):
@@ -48,8 +51,22 @@ def prepare_html(html: Path):
     with mkdocs_gen_files.open(target_name, "w+", encoding="utf-8") as target:
         # See `exclude_agda_blocks_from_search` for why `data-search-exclude` is necessary.
         target.write('<pre class="Agda" data-search-exclude>\n')
-        target.write(html.read_text(encoding="utf-8"))
+        target.write(retarget_readme_links(html.read_text(encoding="utf-8")))
         target.write("</pre>\n")
+
+
+def retarget_readme_links(content: str) -> str:
+    # Agda names each module's page after the module, so the `README` module
+    # links to itself -- and is linked to -- as `README.html`.  MkDocs, however,
+    # treats `README.md` as a directory index and renders it as `index.html`,
+    # so every one of those links points at a page that is never written.
+    #
+    # Retarget them at the page that is actually produced.  Anchors are preserved,
+    # as Agda's `id` attributes survive into the rendered page unchanged.
+    #
+    # Matching on the opening quote keeps this from touching a module whose
+    # name merely ends in `README`, such as `Foo.README.html`.
+    return content.replace('href="README.html', 'href="index.html')
 
 
 def exclude_agda_blocks_from_search(content: str) -> str:

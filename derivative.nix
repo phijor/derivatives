@@ -59,52 +59,6 @@
     {
       packages.derivative = derivative;
       packages.default = config.packages.derivative;
-      packages.mkdocs-env = (
-        pkgs.python314.withPackages (p: [
-          p.mkdocs
-          p.mkdocs-awesome-nav
-          p.mkdocs-gen-files
-          p.mkdocs-material
-
-          p.black
-        ])
-      );
-
-      packages.site = pkgs.stdenvNoCC.mkDerivation {
-        pname = "site";
-        version = "0.1.0";
-
-        meta.license = lib.licenses.mit;
-
-        src =
-          with lib.fileset;
-          toSource {
-            root = ./.;
-            fileset = unions [
-              ./docs/javascript
-              ./docs/stylesheets
-              ./docs/.nav.yml
-              ./mkdocs.yml
-              ./scripts/gen_agda_pages.py
-              ./scripts/merge_search_index.py
-            ];
-          };
-
-        nativeBuildInputs = [
-          config.packages.mkdocs-env
-        ];
-
-        buildPhase = ''
-          AGDA_HTML_DIR="${config.packages.derivative.html}" \
-          AGDA_SEARCH_INDEX_FILE="${config.packages.derivative.html}/index.json" \
-          mkdocs -v build
-        '';
-
-        installPhase = ''
-          mkdir -p $out
-          cp -vr site $out
-        '';
-      };
 
       make-shells.default = {
         inputsFrom = [ config.packages.derivative ];

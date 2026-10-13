@@ -1,0 +1,48 @@
+Make the documentation readable straight from the filesystem.
+
+font: false
+  Drops the `fonts.googleapis.com` / `fonts.gstatic.com` stylesheet in favour
+  of the system font stack.
+
+navigation.instant
+  Instant loading fetches pages over XHR, which browsers forbid for `file://`
+  URLs.  The offline plugin refuses to run alongside it.
+
+offline
+  Emits the search index as JavaScript (the Fetch API is likewise unavailable),
+  forces `use_directory_urls: false`, and rewrites the absolute paths that
+  `site_url` would otherwise produce -- those resolve against the filesystem
+  root and break every link and stylesheet.
+
+MathJax is *not* patched here: it is vendored for both variants, so `mkdocs.yml`
+already points at the local copy.
+
+diff --git a/mkdocs.yml b/mkdocs.yml
+index 09bca0b..f18c644 100644
+--- a/mkdocs.yml
++++ b/mkdocs.yml
+@@ -7,6 +7,7 @@ use_directory_urls: false
+ 
+ theme:
+   name: material
++  font: false
+   palette:
+     - media: "(prefers-color-scheme: light)"
+       scheme: default
+@@ -27,8 +28,6 @@ theme:
+     - content.code.copy
+     - navigation.expand
+     - navigation.indexes
+-    - navigation.instant
+-    - navigation.instant.progress
+     - navigation.tabs
+     - navigation.tabs.sticky
+     - navigation.top
+@@ -69,6 +68,7 @@ markdown_extensions:
+ 
+ plugins:
+ - search
++- offline
+ - awesome-nav
+ - gen-files:
+     scripts:

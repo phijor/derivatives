@@ -21,6 +21,7 @@
         ./artifact.nix
         ./derivative.nix
         ./paper/paper.nix
+        ./site.nix
         ./scripts/default.nix
       ];
       systems = [

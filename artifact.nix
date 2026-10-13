@@ -32,7 +32,9 @@
 
           mkdir -p stage
           # Stage the MkDocs-based site we build
-          stage ${config.packages.site}/site documentation
+          # The offline variant, not `packages.site`: the deployed site uses
+          # absolute URLs and CDN assets, so it only renders behind a server.
+          stage ${config.packages.site-offline}/site documentation
           # Stage everything that is tracked by git.
           # To avoid including files from a dirty tree, run `nix build --no-allow-dirty .#artifact`.
           stage ${./.} source
