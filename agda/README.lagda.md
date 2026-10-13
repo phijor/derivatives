@@ -162,7 +162,7 @@ isolated point in the corresponding type of pairs:
   _ = Σ-isolate A B
 ```
 
-**Proposition 2.11, Proposition 2.12**:
+**Lemma 2.11, Proposition 2.12**:
 The fibers of this map are propositions, hence it is an embedding.
 ```agda
   _ : (a : A) (b : B a) (h : isIsolated {A = Σ A B} (a , b))
@@ -449,7 +449,7 @@ _ = ContainerEquivJ
 open import Derivative.Derivative
 ```
 
-**Definition 3.6**:
+**Definition 3.11**:
 The derivative of an untruncated container.
 Its shapes contain an _isolated_ position.
 ```agda
@@ -458,21 +458,22 @@ _ : (S : Type) (P : S → Type)
 _ = λ S P → refl
 ```
 
-**TODO**: Description of the [derivative of the container of lists](Derivative.Examples.List.md#derivative-of-list), \( ((n : ℕ) \lhd [n]) \).
+**Example 3.12**:
+Description of the [derivative of the container of lists](Derivative.Examples.List.md#derivative-of-list), \( ((n : ℕ) \lhd [n]) \).
 ```agda
 open import Derivative.Examples.List using (∂List)
 ```
 ??? note
     We define lists as a \( 1 \)-parametrized container (introduced [below](#parametrized-containers)) to avoid having to define them twice.
 
-**Problem 3.7**:
+**Problem 3.13**:
 Extend the derivative to a functor on the wild category of containers and linear morphisms, `ℂont∞`.
 ```agda
 _ : WildFunctor ℂont⊸∞ ℂont⊸∞
 _ = ∂∞
 ```
 
-**Proposition 3.8**:
+**Proposition 3.14**:
 Taking derivatives preserves the truncation level of containers (except for very low levels).
 ```agda
 _ : ∀ (n k : HLevel)
@@ -481,14 +482,14 @@ _ : ∀ (n k : HLevel)
 _ = isTruncatedDerivative
 ```
 
-**Corollary 3.9**:
+**Corollary 3.15**:
 \( \partial \) restricts to an endofunctor of the 1-category of set-truncated containers.
 ```agda
 _ : Functor ℂont⊸ ℂont⊸
 _ = ∂ₛ
 ```
 
-**Problem 3.10**:
+**Problem 3.16**:
 Define a wild adjunction \( \_ \otimes \mathsf{Id} \dashv \partial \).
 This consists of two families of morphisms `unit` and `counit`,
 ```agda
@@ -521,7 +522,7 @@ _ : -⊗Id ⊣∞ ∂∞
 _ = ⊗Id-∂-wild-adjunction
 ```
 
-**Theorem 3.11**:
+**Theorem 3.17**:
 The above restricts to an adjunction in the 1-category of set-truncated containers.
 ```agda
 _ : -⊗Idₛ ⊣ ∂ₛ
@@ -534,7 +535,7 @@ _ = ⊗Id-∂-adjunction
 open import Derivative.Properties
 ```
 
-**Proposition 3.13**:
+**Proposition 3.19**:
 Derivative of containers whose positions are propositions.
 ```agda
 _ : (S : Type) {P : S → Type}
@@ -543,7 +544,7 @@ _ : (S : Type) {P : S → Type}
 _ = ∂-prop-trunc
 ```
 
-**Proposition 3.14**:
+**Proposition 3.20**:
 The sum- and product rules.
 ```agda
 _ : Equiv (∂ (F ⊕ G)) (∂ F ⊕ ∂ G)
@@ -553,7 +554,7 @@ _ : Equiv (∂ (F ⊗ G)) ((∂ F ⊗ G) ⊕ (F ⊗ ∂ G))
 _ = prod-rule _ _
 ```
 
-**Proposition 3.15**:
+**Proposition 3.21**:
 The `Bag` container is a fixed point of \( \partial \).
 ```agda
 open import Derivative.Examples.Bag
@@ -562,7 +563,7 @@ _ : Equiv (∂ Bag) Bag
 _ = ∂-Bag-equiv
 ```
 
-**Proposition 3.16**:
+**Proposition 3.22**:
 Any predicate closed under addition and removal of single points induces a fixed point of \( \partial \).
 ```agda
 module _
@@ -683,14 +684,14 @@ open Containerᴾ
 open Containerᴾ.Container
 ```
 
-**Definition 5.3**:
+**Definition 5.2**:
 Substitution for parametrized containers.
 ```agda
 _[_]ᴾ : (F : Containerᴾ (Maybe Ix)) (G : Containerᴾ Ix) → Containerᴾ Ix
 _[_]ᴾ = Containerᴾ._[_]
 ```
 
-**Definition 5.4**:
+**Definition 5.3**:
 The derivative of a parametrized container is defined for each _isolated_ index \( i : \mathsf{Ix}^\circ \).
 ```agda
 import Derivative.Parametrized.Derivative as ParametrizedDerivative
@@ -705,7 +706,7 @@ and the two derivatives of binary containers.
 open ParametrizedDerivative using (∂• ; ∂₀ ; ∂₁)
 ```
 
-**Problem 5.5**:
+**Problem 5.4**:
 The chain rule for binary containers.
 ```agda
 open import Derivative.Parametrized.ChainRule as ParametrizedChainRule
@@ -718,7 +719,7 @@ _ :
 _ = binary-chain-rule
 ```
 
-**Proposition 5.6**:
+**Proposition 5.5**:
 The binary chain rule is an embedding.
 ```agda
 _ : (F : Containerᴾ 𝟚) (G : Containerᴾ 𝟙)
@@ -726,7 +727,7 @@ _ : (F : Containerᴾ 𝟚) (G : Containerᴾ 𝟙)
 _ = isContainerEmbeddingChainRuleᴾ
 ```
 
-**Proposition 5.7**:
+**Proposition 5.6**:
 Like for unary containers, the binary chain rule is an equivalence iff `Σ-isolate` is.
 ```agda
 _ : (F : Containerᴾ 𝟚) (G : Containerᴾ 𝟙) →
@@ -736,7 +737,7 @@ _ : (F : Containerᴾ 𝟚) (G : Containerᴾ 𝟙) →
 _ = isEquivBinaryChainRule≃isEquiv-Σ-isolate
 ```
 
-**Proposition 5.8**:
+**Proposition 5.7**:
 For discrete containers, the binary chain rule is an equivalence.
 ```agda
 _ : (F : Containerᴾ 𝟚) (G : Containerᴾ 𝟙)
@@ -752,7 +753,7 @@ _ = DiscreteContainer→isEquivBinaryChainRule
 open import Derivative.Parametrized.Mu
 ```
 
-**Problem 5.9**:
+**Problem 5.8**:
 Substitution \( F[\_] \) is a (wild) endofunctor.
 ```agda
 _ : (F : Containerᴾ (Maybe Ix)) {G G′ : Containerᴾ Ix}
@@ -764,7 +765,7 @@ _ = Containerᴾ.[-]-map-id
 _ = Containerᴾ.[-]-map-⋆
 ```
 
-**Problem 5.10**:
+**Problem 5.9**:
 \( F[\_] \)-algebras form a wild category.
 ```agda
 private module _ (F : Containerᴾ (Maybe Ix)) where
@@ -780,14 +781,22 @@ private module _ (F : Containerᴾ (Maybe Ix)) where
     a formal proof only obscures the intuition that \( F[\_] \) acts coherently also on homotopies of container morphisms.
     At the same time, no further construction depends on these coherences.
 
-**Definition 5.12**:
+**Definition 5.10**:
+A (least) container fixpoint is an initial \( F[\_] \)-algebra.
+```agda
+  isLeastFixpoint : (μ : Alg) → Type _
+  isLeastFixpoint μ = ∀ h → isContr (AlgHom μ h)
+```
+
+**Definition 5.11**:
 For any \( I+1 \)-parametrized container \( F \) there is an \( I \)-parametrized fixed point container \( μ F \).
 ```agda
 _ : (F : Containerᴾ (Maybe Ix)) → Containerᴾ Ix
 _ = μ
 ```
 
-**TODO**: Description of [lists as a fixpoint](Derivative.Examples.List.md#list-as-fixpoint).
+**Example 5.12**:
+Lists can be described [as a fixpoint](Derivative.Examples.List.md#list-as-fixpoint).
 ```agda
 open import Derivative.Examples.List using (μL⧟List)
 ```
@@ -822,11 +831,14 @@ The recursion principle for containers is unique as a coalgebra-to-algebra morph
 ```
 
 **Theorem 5.16**:
-Every container admits a smallest fixed point in the wild category of containers.
+Every container admits a least fixed point in the wild category of containers.
 For any \( F[\_]\)-algebra \( α : F[G] ⊸ G \), there is a unique algebra map \( α^* : μ F ⊸ G \):
 ```agda
   _ : ∃![ α* ∈ μ F ⊸ᴾ G ] μ-in F ⋆ᴾ α* ≡ [ F ]-map α* ⋆ᴾ α
   _ = μ-rec-unique F G α
+
+_ : (F : Containerᴾ (Maybe Ix)) → isLeastFixpoint F (μ F , μ-in F)
+_ = uncurry ∘ μ-rec-unique
 ```
 
 ### The Fixed Point Rule
@@ -835,7 +847,7 @@ For any \( F[\_]\)-algebra \( α : F[G] ⊸ G \), there is a unique algebra map 
 open import Derivative.Parametrized.MuRule
 ```
 
-**Problem 5.16**:
+**Problem 5.17**:
 The lax \( μ \)-rule.
 ```agda
 _ : (F : Containerᴾ 𝟚)
@@ -843,7 +855,7 @@ _ : (F : Containerᴾ 𝟚)
 _ = μ-rule
 ```
 
-**Lemma 5.17**:
+**Lemma 5.18**:
 The μ-recursor reflects equivalences:
 ```agda
 _ : (F : Containerᴾ (Maybe Ix)) (G : Containerᴾ Ix)
@@ -853,7 +865,7 @@ _ : (F : Containerᴾ (Maybe Ix)) (G : Containerᴾ Ix)
 _ = isEquivFrom-μ-rec
 ```
 
-**Proposition 5.18**:
+**Proposition 5.19**:
 If the \( μ \)-rule is an equivalence, then so is the corresponding chain rule.
 ```agda
 _ : (F : Containerᴾ 𝟚)
@@ -862,7 +874,7 @@ _ : (F : Containerᴾ 𝟚)
 _ = StrongFixRule.isEquiv-chain-rule
 ```
 
-**Lemma 5.19**:
+**Lemma 5.20**:
 The \( μ \)-recursor preserves embeddings.
 ```agda
 _ : (F : Containerᴾ (Maybe Ix)) (G : Containerᴾ Ix)
@@ -872,7 +884,21 @@ _ : (F : Containerᴾ (Maybe Ix)) (G : Containerᴾ Ix)
 _ = isEmbedding-μ-rec
 ```
 
-**Lemma 5.20**:
+**Problem 5.21**:
+If the algebra \( \mathsf{sup}^* \) is an embedding,
+the fibers of the \( \mathsf{W} \)-recursor over its own image can be characterized recursively:
+a fiber over a node is the product of the fibers over its children.
+```agda
+_ : {S : Type} {P : S → Type} {A : Type}
+  → (sup* : (Σ[ s ∈ S ] (P s → A)) → A)
+  → isEmbedding sup*
+  → (s : S) (f : P s → W S P)
+  → fiber (W-rec sup*) (W-rec sup* (sup s f))
+    ≃ ((p : P s) → fiber (W-rec sup*) (W-rec sup* (f p)))
+_ = isEmbedding→W-rec-fiber-equiv
+```
+
+**Lemma 5.22**:
 The recursor for \( \mathsf{W} \)-types preserves embeddings.
 ```agda
 _ : {S : Type} {P : S → Type} {A : Type}
@@ -882,14 +908,14 @@ _ : {S : Type} {P : S → Type} {A : Type}
 _ = isEmbedding-W-rec
 ```
 
-**Lemma 5.21**:
+**Lemma 5.23**:
 The lax \( μ \)-rule is an embedding of containers.
 ```agda
 _ : (F : Containerᴾ 𝟚) → isContainerEmbeddingᴾ (μ-rule F)
 _ = isContainerEmbedding-μ-rule
 ```
 
-**Proposition 5.22**:
+**Proposition 5.24**:
 If the chain rule is an equivalence, so is the μ-rule.
 ```agda
 _ : (F : Containerᴾ 𝟚)
@@ -898,7 +924,7 @@ _ : (F : Containerᴾ 𝟚)
 _ = StrongChainRule.isEquiv-μ-rule
 ```
 
-**Theorem 5.23**:
+**Theorem 5.25**:
 The \( μ \)-rule is an equivalence if and only if the corresponding chain rule is.
 ```agda
 _ : (F : Containerᴾ 𝟚)
@@ -914,7 +940,7 @@ _ : (S : Type) (P Q : S → Type)
 _ = Wᴰ
 ```
 
-**Lemma 5.24**:
+**Lemma 5.26**:
 If both branching \( P : S → \mathsf{Type} \) and labeling of nodes \( Q : S → \mathsf{Type} \) are discrete,
 then paths into any \( x : \mathsf{W}(S, P) \) are discrete:
 ```agda
@@ -925,7 +951,7 @@ _ : (S : Type) (P Q : S → Type)
 _ = discrete-Wᴰ
 ```
 
-**Lemma 5.25**:
+**Lemma 5.27**:
 If \( F \) is a discrete container, then so is \( μ F \):
 ```agda
 _ : (F : Containerᴾ 𝟚)
@@ -934,7 +960,7 @@ _ : (F : Containerᴾ 𝟚)
 _ = μ-discrete
 ```
 
-**Proposition 5.26**:
+**Proposition 5.28**:
 For discrete containers the \( μ \)-rule is an equivalence.
 ```agda
 _ : (F : Containerᴾ 𝟚) → (∀ ix s → Discrete (F .Pos ix s)) → isContainerEquivᴾ (μ-rule F)
