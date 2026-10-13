@@ -1,14 +1,14 @@
--- TODO: Clean up imports
+## Fixed Points
+
+<!--
+```agda
 {-# OPTIONS -WnoUnsupportedIndexedMatch --safe #-}
 module Derivative.Indexed.Mu where
 
 open import Derivative.Indexed.Container
-open import Derivative.Indexed.Derivative
 open import Derivative.Indexed.Univalence
-open import Derivative.Indexed.ChainRule
 
 open import Derivative.Prelude
-open import Derivative.Basics.Decidable
 open import Derivative.Basics.Equiv
 open import Derivative.Basics.Function
 open import Derivative.Basics.Maybe
@@ -16,15 +16,9 @@ open import Derivative.Basics.Sigma
 open import Derivative.Basics.Sum
 open import Derivative.Basics.W
 
-open import Derivative.Isolated
-open import Derivative.Remove
-
 open import Cubical.Foundations.Path
 open import Cubical.Foundations.Equiv.Properties using (congEquiv)
-open import Cubical.Foundations.Transport using (substEquiv)
-open import Cubical.Data.Sigma
 open import Cubical.Functions.Embedding
-open import Cubical.Functions.Surjection
 
 private
   variable
@@ -32,7 +26,12 @@ private
     Ix : Type
 
 open Container
+```
+-->
 
+The fixpoint container \( \mu F \) is defined in terms of a \( \mathsf{W} \)-type:
+For \( F = (S \lhd \vec{P}, P ) \), shapes of \( \mu F \) are \( P \)-branching trees.
+```agda
 μ : (F : Container ℓ (Maybe Ix)) → Container ℓ Ix
 μ {ℓ} {Ix} F = shape ◁ pos module μ where
   open Container F renaming (Shape to S ; Pos to P)
@@ -42,10 +41,15 @@ open Container
 
   pos : Ix → shape → Type ℓ
   pos ix = Wᴰ S (P nothing) (P (just ix))
+```
 
+\( \mu F \) is a fixpoint of \( F[\_] \):
+the containers \( F[ \mu F ] \) and \( \mu F \) are equivalent.
+This defines an \( F[\_] \)-algebra, \( \mathsf{in}_F : F[ \mu F ] ⊸ \mu F \).
+```agda
 module _ (F : Container ℓ (Maybe Ix)) where
   open Container F renaming (Shape to S ; Pos to P)
-  
+
   μ-in-equiv : Equiv (F [ μ F ]) (μ F)
   μ-in-equiv = [ shape ◁≃ pos ] where
     shape : Shape (F [ μ F ]) ≃ Shape (μ F)
@@ -56,7 +60,10 @@ module _ (F : Container ℓ (Maybe Ix)) where
 
   μ-in : F [ μ F ] ⊸ μ F
   μ-in = Equiv.as-⊸ μ-in-equiv
+```
 
+In the other direction, this is a coalgebra \( \mathsf{out}_F : \mu F ⊸ F[ \mu F ] \).
+```agda
   μ-out-equiv : Equiv (μ F) (F [ μ F ])
   μ-out-equiv = [ shape ◁≃ pos ] where
     shape : Shape (μ F) ≃ Shape (F [ μ F ])
@@ -68,7 +75,10 @@ module _ (F : Container ℓ (Maybe Ix)) where
 
   μ-out : μ F ⊸ F [ μ F ]
   μ-out = Equiv.as-⊸ μ-out-equiv
+```
 
+Of course, both are inverses of each other.
+```agda
   μ-in-out : μ-in ⋆ μ-out ≡ id (F [ μ F ])
   μ-in-out = ⊸≡-ext shape-path λ ix (s , f) → funExt (pos-path ix s f) where
     shape-path : W-in ⨟ W-out ≡ idfun _
@@ -79,17 +89,11 @@ module _ (F : Container ℓ (Maybe Ix)) where
       → (p : (F [ μ F ]) .Pos ix _) → Wᴰ-out S _ _ s f (Wᴰ-in S _ _ s f p) ≡ p
     pos-path ix s f (inl _) = refl
     pos-path ix s f (inr _) = refl
+```
 
-  μ-rec-Π : (G : Container ℓ Ix)
-    → (F [ G ]) Π⊸ G
-    → μ F Π⊸ G
-  μ-rec-Π G α = W-elim goal where
-    module _ (s : S) (f : P nothing s → W S (P nothing)) where
-      goal : (∀ p → Σ[ t ∈ G .Shape ] ∀ ix → Pos G ix t ≃ Pos (μ F) ix (f p))
-        → Σ[ t ∈ G .Shape ] ∀ ix → Pos G ix t ≃ Pos (μ F) ix (sup s f)
-      goal rec .fst = α (s , fst ∘ rec) .fst
-      goal rec .snd = λ ix → α (s , fst ∘ rec) .snd ix ∙ₑ ⊎-right-≃ (Σ-cong-equiv-snd λ p → rec p .snd ix) ∙ₑ Wᴰ-in-equiv _ _ _ s f
-
+The induction principle of \( \mathsf{W} \)-types lets us define a recursor:
+any \( F[\_] \)-algebra induces a linear map out of \( \mu F \).
+```agda
   μ-rec : (G : Container ℓ Ix)
     → (F [ G ]) ⊸ G
     → μ F ⊸ G
@@ -103,7 +107,27 @@ module _ (F : Container ℓ (Maybe Ix)) where
 
     shape-β : shape ≡ φ.shape ∘ Σ-map-snd (λ s (f : P ₁ s → W S _) → shape ∘ f) ∘ W-out
     shape-β = funExt λ { (sup s f) → refl }
+```
 
+We need to prove that its maps on positions are equivalences.
+We do so, again, by \( \mathsf{W} \)-induction!
+```agda
+    pos' : ∀ i → (s : W S (P ₁)) → Q i (shape s) ≃ Pos (μ F) i s
+    pos' i (sup s f) =
+      Q i (φ.shape (s , shape ∘ f))
+        ≃⟨ φ.pos i (s , shape ∘ f) ⟩
+      (P (just i) s ⊎ (Σ[ p ∈ P nothing s ] Q i (shape (f p))))
+        ≃⟨ ⊎-right-≃ (Σ-cong-equiv-snd λ p → pos' i (f p)) ⟩
+      (P (just i) s ⊎ (Σ[ p ∈ P nothing s ] Pos (μ F) i (f p)))
+        ≃⟨ Wᴰ-in-equiv S (P nothing) (P (just i)) s f ⟩
+      Wᴰ S (P nothing) (P (just i)) (sup s f)
+        ≃∎
+```
+
+The above conveys that, recursively, the position maps are a composite of three equivalences.
+To get slightly better computational behavior, however, we split the construction into two steps:
+First define the underlying map by induction, then show (you've guessed it — by induction) that it is an equivalence.
+```agda
     pos-fun : ∀ i → (s : W S (P ₁)) → Q i (shape s) → Pos (μ F) i s
     pos-fun i (sup s f) =
       Q i (φ.shape (s , shape ∘ f))
@@ -130,30 +154,37 @@ module _ (F : Container ℓ (Maybe Ix)) where
     pos i w .fst = pos-fun i w
     pos i w .snd = is-equiv-pos-fun i w
     {-# INLINE pos #-}
+```
 
-    pos' : ∀ i → (s : W S (P ₁)) → Q i (shape s) ≃ Pos (μ F) i s
-    pos' i (sup s f) =
-      Q i (φ.shape (s , shape ∘ f))
-        ≃⟨ φ.pos i (s , shape ∘ f) ⟩
-      (P (just i) s ⊎ (Σ[ p ∈ P nothing s ] Q i (shape (f p))))
-        ≃⟨ ⊎-right-≃ (Σ-cong-equiv-snd λ p → pos i (f p)) ⟩
-      (P (just i) s ⊎ (Σ[ p ∈ P nothing s ] Pos (μ F) i (f p)))
-        ≃⟨ Wᴰ-in-equiv S (P nothing) (P (just i)) s f ⟩
-      Wᴰ S (P nothing) (P (just i)) (sup s f)
-        ≃∎
-
+The recursor is unique as a coalgebra-to-algebra morphism.
+It is obvious that it is *some* coalgebra-to-algebra morphism:
+```agda
   module μ-rec-coalgebra-to-algebra (G : Container ℓ Ix) (α : (F [ G ]) ⊸ G) where
     β : μ-rec G α ≡ μ-out ⋆ [-]-map F (μ-rec G α) ⋆ α
     β = ⊸≡-ext (μ-rec.shape-β G α) λ where
       ix (sup s f) → refl
+```
 
+To show that it is unique, we reach for the only tool at our disposal:
+\( \mathsf{W} \)-induction.
+This works out nicely: morphisms out of \( \mu F \) are equivalent to \( \mathsf{W} \)-indexed families.
+By function extensionality, it follows that paths (and higher paths) of coalgebra-to-algebra morphisms
+are also (equivalent to) \( \mathsf{W} \)-indexed families.
+Consequently, we can show that recursion is unique entirely by induction and some path-algebra.
+```agda
     unique : isContr (Σ[ α* ∈ μ F ⊸ G ] α* ≡ μ-out ⋆ [-]-map F α* ⋆ α )
     unique .fst .fst = μ-rec G α
     unique .fst .snd = β
-    unique .snd (ζ , ζ-β) = ΣPathP (goal , goal-coh) where
+```
+Given any other map \( \zeta \) that makes the desired square commute,
+```agda
+    unique .snd (ζ , ζ-β) = ΣPathP (hom-path , hom-square) where
       module α = _⊸_ α
       module ζ = _⊸_ ζ
-
+```
+we prove that their shapes agree up to a path.
+We remember the paths (\(p, q\)) which we used to construct this:
+```agda
       shape-≡-ext : ∀ w → μ-rec.shape G α w ≡ ζ.shape w
       shape-≡-ext w@(sup s f) = p ∙ q
         module shape-≡-ext where
@@ -164,7 +195,12 @@ module _ (F : Container ℓ (Maybe Ix)) where
 
       shape-≡ : μ-rec.shape G α ≡ ζ.shape
       shape-≡ = funExt shape-≡-ext
+```
 
+The paths of positions are obtained by the same (inductive) argument,
+except that the composition is now displayed over \( p \) and \( q \).
+Again, we remember the paths \( p^D, q^D \) involved.
+```agda
       pos-≡-ext : ∀ ix (w : W S (P ₁)) → PathP (λ i → Pos G ix (shape-≡ i w) ≃ μ.pos F ix w) (μ-rec.pos G α ix w) (ζ.pos ix w)
       pos-≡-ext ix (sup s f) = compPathP' {B = B} {p = p} {q = q} pᴰ qᴰ
         module pos-≡ where
@@ -193,36 +229,75 @@ module _ (F : Container ℓ (Maybe Ix)) where
 
       pos-≡ : PathP (λ i → ∀ ix w → Pos G ix (shape-≡ i w) ≃ μ.pos F ix w) (μ-rec.pos G α) ζ.pos
       pos-≡ = funExt₂ pos-≡-ext
+```
 
-      goal : μ-rec G α ≡ ζ
-      goal = ⊸≡ shape-≡ pos-≡
+By extensionality of morphisms, \( \zeta \) agrees with the recursor:
+```agda
+      hom-path : μ-rec G α ≡ ζ
+      hom-path = ⊸≡ shape-≡ pos-≡
+```
 
-      goal-coh-shape : Square {A = W S (P nothing) → Shape G}
+Both maps are coalgebra-to-algebra morphisms, i.e. they make some squares commute up to some path.
+To show that the paths `ζ-β` and `β` agree over the identification `hom-path : μ-rec G α ≡ ζ` that we have just constructed,
+we observe the following:
+On shapes, `ζ-β` is used to define `hom-path` as a composition of some paths \( p \) and \( q \).
+Unfolding this, we obtain a square
+```agda
+      -- On `w = sup s f`, we observe the following:
+      -- * `βₛₕ` is `refl`; this degenerates the left edge.
+      -- * on the right, `ζ-βₛₕ` is `sym q` for the path `q` from above.
+      -- * at the bottom this is exactly `p`.
+      -- * at the top `shape-≡` is p ∙ q.
+      --
+      --                          p ∙ q = shape-≡
+      --    μ-rec.shape w  ∙ ---------------------> ∙  ζ.shape w
+      --                   |                        |
+      --        βₛₕ = refl |                        | ζ-βₛₕ = sym q
+      --                   v                        v
+      --    μ-rec.shape w  ∙ ---------------------> ∙  α.shape (s , ζ.shape ∘ f)
+      --                               p
+      --
+      -- This square always has a (unique) filler!
+      hom-square-shape : Square {A = W S (P nothing) → Shape G}
         (cong _⊸_.shape β)
         (cong _⊸_.shape ζ-β)
         shape-≡
-        λ i z → α.shape (_⊸_.shape ([-]-map F (goal i)) (_⊸_.shape μ-out z))
-      goal-coh-shape i j (sup s f) = shape-≡-ext.filler s f (~ j) i
+        λ i z → α.shape (_⊸_.shape ([-]-map F (hom-path i)) (_⊸_.shape μ-out z))
+      hom-square-shape i j (sup s f) = shape-≡-ext.filler s f (~ j) i
+```
+This serves as our desired filler on shapes.
 
-      goal-coh-pos-ext : ∀ ix w
-        → SquareP (λ i j → Pos G ix (goal-coh-shape i j w) ≃ μ.pos F ix w)
+With a little bit of work (but following the same idea),
+we see that the same is true on positions.
+```agda
+      hom-square-pos-ext : ∀ ix w
+        → SquareP (λ i j → Pos G ix (hom-square-shape i j w) ≃ μ.pos F ix w)
           (λ i → β i ._⊸_.pos ix w)
           (λ i → ζ-β i ._⊸_.pos ix w)
           (λ i → pos-≡-ext ix w i)
-          λ i → (α.pos ix (_⊸_.shape ([-]-map F (goal i)) (_⊸_.shape μ-out w))) ∙ₑ (_⊸_.pos ([-]-map F (goal i)) ix (_⊸_.shape μ-out w) ∙ₑ _⊸_.pos μ-out ix w)
-      goal-coh-pos-ext ix (sup s f) = equivSquareP λ i j → equivFun (pos-≡.filler ix s f (~ j) i)
+          λ i → (α.pos ix (_⊸_.shape ([-]-map F (hom-path i)) (_⊸_.shape μ-out w))) ∙ₑ (_⊸_.pos ([-]-map F (hom-path i)) ix (_⊸_.shape μ-out w) ∙ₑ _⊸_.pos μ-out ix w)
+      hom-square-pos-ext ix (sup s f) = equivSquareP λ i j → equivFun (pos-≡.filler ix s f (~ j) i)
 
-      goal-coh-pos : SquareP (λ i j → ∀ ix w → Pos G ix (goal-coh-shape i j w) ≃ μ.pos F ix w)
+      hom-square-pos : SquareP (λ i j → ∀ ix w → Pos G ix (hom-square-shape i j w) ≃ μ.pos F ix w)
         (cong _⊸_.pos β)
         (cong _⊸_.pos ζ-β)
         pos-≡
-        λ i ix w → (α.pos ix (_⊸_.shape ([-]-map F (goal i)) (_⊸_.shape μ-out w))) ∙ₑ (_⊸_.pos ([-]-map F (goal i)) ix (_⊸_.shape μ-out w) ∙ₑ _⊸_.pos μ-out ix w)
-      goal-coh-pos i j ix w = goal-coh-pos-ext ix w i j
+        λ i ix w → (α.pos ix (_⊸_.shape ([-]-map F (hom-path i)) (_⊸_.shape μ-out w))) ∙ₑ (_⊸_.pos ([-]-map F (hom-path i)) ix (_⊸_.shape μ-out w) ∙ₑ _⊸_.pos μ-out ix w)
+      hom-square-pos i j ix w = hom-square-pos-ext ix w i j
+```
 
-      goal-coh : Square β ζ-β goal (cong (λ f → μ-out ⋆ [-]-map F f ⋆ α) goal)
-      goal-coh i j ._⊸_.shape = goal-coh-shape i j
-      goal-coh i j ._⊸_.pos = goal-coh-pos i j
+Together, we see that both commutative squares agree:
+```agda
+      hom-square : Square β ζ-β hom-path (cong (λ f → μ-out ⋆ [-]-map F f ⋆ α) hom-path)
+      hom-square i j ._⊸_.shape = hom-square-shape i j
+      hom-square i j ._⊸_.pos = hom-square-pos i j
+```
 
+Since equivalences of containers are an identity system,
+we can equivalently reshape the coalgebra-to-algebra square to an \( F[\_] \)-algebra square:
+canceling `μ-in` and `μ-out` is an equivalence.
+Hence, maps out of \( \mu F \) are unique, and it forms the initial \( F[\_] \)-algebra.
+```agda
   opaque
     μ-rec-unique : (G : Container ℓ Ix)
       → (α : (F [ G ]) ⊸ G)
@@ -251,12 +326,19 @@ module _ (F : Container ℓ (Maybe Ix)) where
             ≃⟨ compPathrEquiv cancel ⟩
           (μ-in ⋆ α* ≡ [-]-map F α* ⋆ α)
             ≃∎
+```
 
+We did not compute this directly, but it follows that `μ-rec` has a computation rule:
+```agda
     μ-rec-β : (G : Container ℓ Ix)
       → (α : (F [ G ]) ⊸ G)
       → μ-in ⋆ μ-rec G α ≡ [-]-map F (μ-rec G α) ⋆ α
     μ-rec-β G α = μ-rec-unique G α .fst .snd
+```
 
+Two important (and immediate) consequences of this construction are the following.
+First, the recursor reflects fixpoints:
+```agda
   isEquivFrom-μ-rec : (G : Container ℓ Ix)
     → (φ : (F [ G ]) ⊸ G)
     → isContainerEquiv (μ-rec G φ)
@@ -275,7 +357,12 @@ module _ (F : Container ℓ (Maybe Ix)) where
 
     is-equiv-φ : isContainerEquiv φ
     is-equiv-φ = isContainerEquivCompRight' (μ-out ⋆ [-]-map F (μ-rec G φ)) φ is-equiv-μ-out⋆F[μ-rec] is-equiv-comp
+```
 
+Second, it preserves container embeddings.
+In some sense, it is also a least pre-fixpoint with respect to embeddings:
+if \( F[G] \leq G \), then \( \mu F \leq G \).
+```agda
   isEmbedding-μ-rec : (G : Container ℓ Ix)
     → (α : (F [ G ]) ⊸ G)
     → isContainerEmbedding α
@@ -285,3 +372,4 @@ module _ (F : Container ℓ (Maybe Ix)) where
 
     goal : isEmbedding α.shape → isEmbedding (W-rec α.shape)
     goal = isEmbedding-W-rec α.shape
+```
