@@ -771,10 +771,9 @@ such that for any \( h : \left(\sum_{s : S} (P(s) \to A)\right) \to A \),
 \begin{align*}
   \WRec&(h, \Sup(s, f)) \JudgeEq h(s, \WRec(h) \circ f).
 \end{align*}
-We can characterize the fibers of this map,
-and thus show that it preserves embeddings.
+We can characterize the fibers of \( \WRec(h) \) when \( h \) is an embedding:
 \begin{problem}\label{prob:wrec-fiber-equiv}
-  Let \( A : \Type \) and \( { h : ( \sum_{s : S} (P(s) \to A) ) \to A } \).
+  Let \( A : \Type \) and \( { h : ( \sum_{s : S} (P(s) \to A) ) \hookrightarrow A } \).
   For all \( s : S \) and \( f : P(s) \to \W(S, P) \),
   define an equivalence
   \[
@@ -794,9 +793,15 @@ and thus show that it preserves embeddings.
     }
       &\simeq
       \adjustlimits\sum_{s' : S} \sum_{\smash{f'} : P(s') \to \W(S, P)}
-        h^*(\Sup(s', f')) = (s, h^* \circ f)
+        h^*(\Sup(s', f')) = h(s, h^* \circ f)
     \intertext{
       By the computation rule for \( \W \), this is equivalent to
+    }
+      &\simeq
+      \adjustlimits\sum_{s' : S} \sum_{\smash{f'} : P(s') \to \W(S, P)}
+        h(s', h^* \circ f') = h(s, h^* \circ f)
+    \intertext{
+      Since \( h \) is an embedding, it can be cancelled from the path type
     }
       &\simeq
       \adjustlimits\sum_{s' : S} \sum_{\smash{f'} : P(s') \to \W(S, P)}
@@ -830,6 +835,7 @@ and thus show that it preserves embeddings.
   which finishes the construction of the desired equivalence.
 \end{construction}
 
+Consequently, \( \WRec \) preserves embeddings.
 \begin{lemma}\label{is-embedding-W-rec}
   For all \( A : \Type \),
   if the function \( { h : ( \sum_{s : S} (P(s) \to A) ) \to A } \) is an embedding,
