@@ -1,9 +1,9 @@
 {-# OPTIONS --safe #-}
-module Derivative.Indexed.Univalence where
+module Derivative.Parametrized.Univalence where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Equiv using (univalenceᴰ ; symEquiv)
-open import Derivative.Indexed.Container
+open import Derivative.Parametrized.Container
 
 open import Cubical.Data.Sigma
 open import Cubical.Foundations.Equiv.Properties

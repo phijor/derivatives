@@ -401,7 +401,7 @@ _ = λ S P → refl
 open import Derivative.Examples.List using (∂List)
 ```
 ??? note
-    We define lists as a \( 1 \)-indexed container (introduced [below](#indexed-containers)) to avoid having to define them twice.
+    We define lists as a \( 1 \)-parametrized container (introduced [below](#parametrized-containers)) to avoid having to define them twice.
 
 **Problem 3.7**:
 Extend the derivative to a functor on the wild category of containers and linear morphisms, `ℂont∞`.
@@ -586,89 +586,89 @@ _ = isStrongSets≃AllSetsDiscrete
 
 ## Derivatives of Fixed Points
 
-### Indexed Containers { #indexed-containers }
+### Parametrized Containers { #parametrized-containers }
 
 ```agda
-import Derivative.Indexed.Container as Containerᴵ
+import Derivative.Parametrized.Container as Containerᴾ
 ```
 
 **Definition 5.1**:
-Indexed containers have positions indexed by some \( \mathsf{Ix} : \mathsf{Type} \).
+Parametrized containers have positions indexed by some \( \mathsf{Ix} : \mathsf{Type} \).
 ```agda
-Containerᴵ : (Ix : Type) → Type _
-Containerᴵ = Containerᴵ.Container ℓ-zero
+Containerᴾ : (Ix : Type) → Type _
+Containerᴾ = Containerᴾ.Container ℓ-zero
 
-_ : Containerᴵ Ix ≃ (Σ[ S ∈ Type ] (Ix → S → Type))
-_ = Containerᴵ.Container-Σ-equiv
+_ : Containerᴾ Ix ≃ (Σ[ S ∈ Type ] (Ix → S → Type))
+_ = Containerᴾ.Container-Σ-equiv
 ```
 
 ??? note "Overloading notation"
-    Unfortunately, Agda does not allow overloading the names of definitions for indexed and non-indexed containers.
-    The indexed versions are suffixed with `ᴵ`, if necessary.
+    Unfortunately, Agda does not allow overloading the names of definitions for parametrized and unary containers.
+    The parametrized versions are suffixed with `ᴾ`, if necessary.
 
 ```agda
-open Containerᴵ
+open Containerᴾ
   using (₀ ; ₁ ; 𝟚 ; _⧟_ ; ↑ ; π₁)
   renaming
-    ( _⊗_ to _⊗ᴵ_
-    ; _⊕_ to _⊕ᴵ_
-    ; _⋆_ to _⋆ᴵ_
-    ; _⊸_ to _⊸ᴵ_
-    ; isContainerEquiv to isContainerEquivᴵ
-    ; isContainerEmbedding to isContainerEmbeddingᴵ
+    ( _⊗_ to _⊗ᴾ_
+    ; _⊕_ to _⊕ᴾ_
+    ; _⋆_ to _⋆ᴾ_
+    ; _⊸_ to _⊸ᴾ_
+    ; isContainerEquiv to isContainerEquivᴾ
+    ; isContainerEmbedding to isContainerEmbeddingᴾ
     ; [-]-map to [_]-map
     )
-open Containerᴵ.Container
+open Containerᴾ.Container
 ```
 
 **Definition 5.3**:
-Substitution for indexed containers.
+Substitution for parametrized containers.
 ```agda
-_[_]ᴵ : (F : Containerᴵ (Maybe Ix)) (G : Containerᴵ Ix) → Containerᴵ Ix
-_[_]ᴵ = Containerᴵ._[_]
+_[_]ᴾ : (F : Containerᴾ (Maybe Ix)) (G : Containerᴾ Ix) → Containerᴾ Ix
+_[_]ᴾ = Containerᴾ._[_]
 ```
 
 **Definition 5.4**:
-The derivative of an indexed container is defined for each _isolated_ index \( i : \mathsf{Ix}^\circ \).
+The derivative of a parametrized container is defined for each _isolated_ index \( i : \mathsf{Ix}^\circ \).
 ```agda
-import Derivative.Indexed.Derivative as IndexedDerivative
+import Derivative.Parametrized.Derivative as ParametrizedDerivative
 
-∂ᴵ : (i : Ix °) → (F : Containerᴵ Ix) → Containerᴵ Ix
-∂ᴵ = IndexedDerivative.∂
+∂ᴾ : (i : Ix °) → (F : Containerᴾ Ix) → Containerᴾ Ix
+∂ᴾ = ParametrizedDerivative.∂
 ```
 
-Shorthands for the derivative of unary containers (`∂ᴵ tt°`),
+Shorthands for the derivative of unary containers (`∂ᴾ tt°`),
 and the two derivatives of binary containers.
 ```agda
-open IndexedDerivative using (∂• ; ∂₀ ; ∂₁)
+open ParametrizedDerivative using (∂• ; ∂₀ ; ∂₁)
 ```
 
 **Problem 5.5**:
 The chain rule for binary containers.
 ```agda
-open import Derivative.Indexed.ChainRule as IndexedChainRule
-  renaming (isContainerEmbeddingChainRule to isContainerEmbeddingChainRuleᴵ)
+open import Derivative.Parametrized.ChainRule as ParametrizedChainRule
+  renaming (isContainerEmbeddingChainRule to isContainerEmbeddingChainRuleᴾ)
 
 _ :
-  ∀ (F : Containerᴵ 𝟚)
-  → (G : Containerᴵ _)
-  → ((∂₀ F [ G ]ᴵ) ⊕ᴵ ((∂₁ F [ G ]ᴵ) ⊗ᴵ ∂• G)) ⊸ᴵ ∂• (F [ G ]ᴵ)
+  ∀ (F : Containerᴾ 𝟚)
+  → (G : Containerᴾ _)
+  → ((∂₀ F [ G ]ᴾ) ⊕ᴾ ((∂₁ F [ G ]ᴾ) ⊗ᴾ ∂• G)) ⊸ᴾ ∂• (F [ G ]ᴾ)
 _ = binary-chain-rule
 ```
 
 **Proposition 5.6**:
 The binary chain rule is an embedding.
 ```agda
-_ : (F : Containerᴵ 𝟚) (G : Containerᴵ 𝟙)
-  → isContainerEmbeddingᴵ (binary-chain-rule F G)
-_ = isContainerEmbeddingChainRuleᴵ
+_ : (F : Containerᴾ 𝟚) (G : Containerᴾ 𝟙)
+  → isContainerEmbeddingᴾ (binary-chain-rule F G)
+_ = isContainerEmbeddingChainRuleᴾ
 ```
 
 **Proposition 5.7**:
 Like for unary containers, the binary chain rule is an equivalence iff `Σ-isolate` is.
 ```agda
-_ : (F : Containerᴵ 𝟚) (G : Containerᴵ 𝟙) →
-  isContainerEquivᴵ (binary-chain-rule F G)
+_ : (F : Containerᴾ 𝟚) (G : Containerᴾ 𝟙) →
+  isContainerEquivᴾ (binary-chain-rule F G)
     ≃
   (∀ s f → isEquiv (Σ-isolate (F .Pos ₁ s) (G .Pos _ ∘ f)))
 _ = isEquivBinaryChainRule≃isEquiv-Σ-isolate
@@ -677,40 +677,40 @@ _ = isEquivBinaryChainRule≃isEquiv-Σ-isolate
 **Proposition 5.8**:
 For discrete containers, the binary chain rule is an equivalence.
 ```agda
-_ : (F : Containerᴵ 𝟚) (G : Containerᴵ 𝟙)
+_ : (F : Containerᴾ 𝟚) (G : Containerᴾ 𝟙)
   → (∀ s → Discrete (Pos F ₁ s))
   → (∀ t → Discrete (Pos G • t))
-  → isContainerEquivᴵ (binary-chain-rule F G)
+  → isContainerEquivᴾ (binary-chain-rule F G)
 _ = DiscreteContainer→isEquivBinaryChainRule
 ```
 
 ### Fixed Points of Containers
 
 ```agda
-open import Derivative.Indexed.Mu
+open import Derivative.Parametrized.Mu
 ```
 
 **Problem 5.9**:
 Substitution \( F[\_] \) is a (wild) endofunctor.
 ```agda
-_ : (F : Containerᴵ (Maybe Ix)) {G G′ : Containerᴵ Ix}
-  → G ⊸ᴵ G′
-  → (F [ G ]ᴵ) ⊸ᴵ (F [ G′ ]ᴵ)
+_ : (F : Containerᴾ (Maybe Ix)) {G G′ : Containerᴾ Ix}
+  → G ⊸ᴾ G′
+  → (F [ G ]ᴾ) ⊸ᴾ (F [ G′ ]ᴾ)
 _ = [_]-map
 
-_ = Containerᴵ.[-]-map-id
-_ = Containerᴵ.[-]-map-⋆
+_ = Containerᴾ.[-]-map-id
+_ = Containerᴾ.[-]-map-⋆
 ```
 
 **Problem 5.10**:
 \( F[\_] \)-algebras form a wild category.
 ```agda
-private module _ (F : Containerᴵ (Maybe Ix)) where
+private module _ (F : Containerᴾ (Maybe Ix)) where
   Alg : Type _
-  Alg = Σ[ X ∈ Containerᴵ Ix ] (F [ X ]ᴵ ⊸ᴵ X)
+  Alg = Σ[ X ∈ Containerᴾ Ix ] (F [ X ]ᴾ ⊸ᴾ X)
 
   AlgHom : Alg → Alg → Type _
-  AlgHom (X , f) (Y , g) = Σ[ h ∈ X ⊸ᴵ Y ] f ⋆ᴵ h ≡ [ F ]-map h ⋆ᴵ g
+  AlgHom (X , f) (Y , g) = Σ[ h ∈ X ⊸ᴾ Y ] f ⋆ᴾ h ≡ [ F ]-map h ⋆ᴾ g
 ```
 ??? note
     We chose to omit the proof that \( F[\_] \)-algebras form a wild category from the formalization.
@@ -719,9 +719,9 @@ private module _ (F : Containerᴵ (Maybe Ix)) where
     At the same time, no further construction depends on these coherences.
 
 **Definition 5.12**:
-For any \( I+1 \)-indexed container \( F \) there is an \( I \)-indexed fixed point container \( μ F \).
+For any \( I+1 \)-parametrized container \( F \) there is an \( I \)-parametrized fixed point container \( μ F \).
 ```agda
-_ : (F : Containerᴵ (Maybe Ix)) → Containerᴵ Ix
+_ : (F : Containerᴾ (Maybe Ix)) → Containerᴾ Ix
 _ = μ
 ```
 
@@ -733,7 +733,7 @@ open import Derivative.Examples.List using (μL⧟List)
 **Problem 5.13**:
 Define an equivalence of containers \( F [ {μ F} ] ⧟ μ F \).
 ```agda
-_ : (F : Containerᴵ (Maybe Ix)) → (F [ μ F ]ᴵ) ⧟ (μ F)
+_ : (F : Containerᴾ (Maybe Ix)) → (F [ μ F ]ᴾ) ⧟ (μ F)
 _ = μ-in-equiv
 ```
 
@@ -741,21 +741,21 @@ _ = μ-in-equiv
 Derive a recursion principle for fixed-point containers.
 ```agda
 module _
-  (F : Containerᴵ (Maybe Ix))
-  (G : Containerᴵ Ix)
-  (α : F [ G ]ᴵ ⊸ᴵ G)
+  (F : Containerᴾ (Maybe Ix))
+  (G : Containerᴾ Ix)
+  (α : F [ G ]ᴾ ⊸ᴾ G)
   where
-  _ : μ F ⊸ᴵ G
+  _ : μ F ⊸ᴾ G
   _ = μ-rec F G α
 
-  _ : μ-in F ⋆ᴵ μ-rec F G α ≡ [ F ]-map (μ-rec F G α) ⋆ᴵ α
+  _ : μ-in F ⋆ᴾ μ-rec F G α ≡ [ F ]-map (μ-rec F G α) ⋆ᴾ α
   _ = μ-rec-β F G α
 ```
 
 **Proposition 5.15**:
 The recursion principle for containers is unique as a coalgebra-to-algebra morphism.
 ```agda
-  _ : ∃![ α* ∈ μ F ⊸ᴵ G ] α* ≡ μ-out F ⋆ᴵ [ F ]-map α* ⋆ᴵ α
+  _ : ∃![ α* ∈ μ F ⊸ᴾ G ] α* ≡ μ-out F ⋆ᴾ [ F ]-map α* ⋆ᴾ α
   _ = μ-rec-coalgebra-to-algebra.unique F G α
 ```
 
@@ -763,50 +763,50 @@ The recursion principle for containers is unique as a coalgebra-to-algebra morph
 Every container admits a smallest fixed point in the wild category of containers.
 For any \( F[\_]\)-algebra \( α : F[G] ⊸ G \), there is a unique algebra map \( α^* : μ F ⊸ G \):
 ```agda
-  _ : ∃![ α* ∈ μ F ⊸ᴵ G ] μ-in F ⋆ᴵ α* ≡ [ F ]-map α* ⋆ᴵ α
+  _ : ∃![ α* ∈ μ F ⊸ᴾ G ] μ-in F ⋆ᴾ α* ≡ [ F ]-map α* ⋆ᴾ α
   _ = μ-rec-unique F G α
 ```
 
 ### The Fixed Point Rule
 
 ```agda
-open import Derivative.Indexed.MuRule
+open import Derivative.Parametrized.MuRule
 ```
 
 **Problem 5.16**:
 The lax \( μ \)-rule.
 ```agda
-_ : (F : Containerᴵ 𝟚)
-  → μ (↑ (∂₀ F [ μ F ]ᴵ) ⊕ᴵ (↑ (∂₁ F [ μ F ]ᴵ) ⊗ᴵ π₁)) ⊸ᴵ ∂• (μ F)
+_ : (F : Containerᴾ 𝟚)
+  → μ (↑ (∂₀ F [ μ F ]ᴾ) ⊕ᴾ (↑ (∂₁ F [ μ F ]ᴾ) ⊗ᴾ π₁)) ⊸ᴾ ∂• (μ F)
 _ = μ-rule
 ```
 
 **Lemma 5.17**:
 The μ-recursor reflects equivalences:
 ```agda
-_ : (F : Containerᴵ (Maybe Ix)) (G : Containerᴵ Ix)
-  → (φ : (F [ G ]ᴵ) ⊸ᴵ G)
-  → isContainerEquivᴵ (μ-rec F G φ)
-  → isContainerEquivᴵ φ
+_ : (F : Containerᴾ (Maybe Ix)) (G : Containerᴾ Ix)
+  → (φ : (F [ G ]ᴾ) ⊸ᴾ G)
+  → isContainerEquivᴾ (μ-rec F G φ)
+  → isContainerEquivᴾ φ
 _ = isEquivFrom-μ-rec
 ```
 
 **Proposition 5.18**:
 If the \( μ \)-rule is an equivalence, then so is the corresponding chain rule.
 ```agda
-_ : (F : Containerᴵ 𝟚)
-  → isContainerEquivᴵ (μ-rule F)
-  → isContainerEquivᴵ (binary-chain-rule F (μ F))
+_ : (F : Containerᴾ 𝟚)
+  → isContainerEquivᴾ (μ-rule F)
+  → isContainerEquivᴾ (binary-chain-rule F (μ F))
 _ = StrongFixRule.isEquiv-chain-rule
 ```
 
 **Lemma 5.19**:
 The \( μ \)-recursor preserves embeddings.
 ```agda
-_ : (F : Containerᴵ (Maybe Ix)) (G : Containerᴵ Ix)
-  → (φ : (F [ G ]ᴵ) ⊸ᴵ G)
-  → isContainerEmbeddingᴵ φ
-  → isContainerEmbeddingᴵ (μ-rec F G φ)
+_ : (F : Containerᴾ (Maybe Ix)) (G : Containerᴾ Ix)
+  → (φ : (F [ G ]ᴾ) ⊸ᴾ G)
+  → isContainerEmbeddingᴾ φ
+  → isContainerEmbeddingᴾ (μ-rec F G φ)
 _ = isEmbedding-μ-rec
 ```
 
@@ -823,24 +823,24 @@ _ = isEmbedding-W-rec
 **Lemma 5.21**:
 The lax \( μ \)-rule is an embedding of containers.
 ```agda
-_ : (F : Containerᴵ 𝟚) → isContainerEmbeddingᴵ (μ-rule F)
+_ : (F : Containerᴾ 𝟚) → isContainerEmbeddingᴾ (μ-rule F)
 _ = isContainerEmbedding-μ-rule
 ```
 
 **Proposition 5.22**:
 If the chain rule is an equivalence, so is the μ-rule.
 ```agda
-_ : (F : Containerᴵ 𝟚)
-  → isContainerEquivᴵ (binary-chain-rule F (μ F))
-  → isContainerEquivᴵ (μ-rule F)
+_ : (F : Containerᴾ 𝟚)
+  → isContainerEquivᴾ (binary-chain-rule F (μ F))
+  → isContainerEquivᴾ (μ-rule F)
 _ = StrongChainRule.isEquiv-μ-rule
 ```
 
 **Theorem 5.23**:
 The \( μ \)-rule is an equivalence if and only if the corresponding chain rule is.
 ```agda
-_ : (F : Containerᴵ 𝟚)
-  → isContainerEquivᴵ (μ-rule F) ≃ isContainerEquivᴵ (binary-chain-rule F (μ F))
+_ : (F : Containerᴾ 𝟚)
+  → isContainerEquivᴾ (μ-rule F) ≃ isContainerEquivᴾ (binary-chain-rule F (μ F))
 _ = isContainerEquiv-μ-rule≃isContainerEquiv-binary-chain-rule
 ```
 
@@ -866,7 +866,7 @@ _ = discrete-Wᴰ
 **Lemma 5.25**:
 If \( F \) is a discrete container, then so is \( μ F \):
 ```agda
-_ : (F : Containerᴵ 𝟚)
+_ : (F : Containerᴾ 𝟚)
   → (∀ ix s → Discrete (F .Pos ix s))
   → (∀ w → Discrete (μ F .Pos • w))
 _ = μ-discrete
@@ -875,6 +875,6 @@ _ = μ-discrete
 **Proposition 5.26**:
 For discrete containers the \( μ \)-rule is an equivalence.
 ```agda
-_ : (F : Containerᴵ 𝟚) → (∀ ix s → Discrete (F .Pos ix s)) → isContainerEquivᴵ (μ-rule F)
+_ : (F : Containerᴾ 𝟚) → (∀ ix s → Discrete (F .Pos ix s)) → isContainerEquivᴾ (μ-rule F)
 _ = Discrete.isEquiv-μ-rule
 ```

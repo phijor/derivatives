@@ -1,5 +1,5 @@
 {-# OPTIONS --safe #-}
-module Derivative.Indexed.Container where
+module Derivative.Parametrized.Container where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Embedding using (isEmbedding-Σ-map-snd ; isEmbeddingPostComp)

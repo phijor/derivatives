@@ -12,10 +12,10 @@ open import Derivative.Basics.Sum
 open import Derivative.Basics.Unit
 open import Derivative.Isolated.Base
 open import Derivative.Remove
-open import Derivative.Indexed.Container hiding (_[_])
-open import Derivative.Indexed.Derivative
-open import Derivative.Indexed.Mu
-open import Derivative.Indexed.MuRule
+open import Derivative.Parametrized.Container hiding (_[_])
+open import Derivative.Parametrized.Derivative
+open import Derivative.Parametrized.Mu
+open import Derivative.Parametrized.MuRule
 
 import Cubical.Data.Nat as Nat
 import Cubical.Data.Sigma as Sigma

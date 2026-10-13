@@ -1,5 +1,5 @@
 {-# OPTIONS --safe #-}
-module Derivative.Indexed.ChainRule where
+module Derivative.Parametrized.ChainRule where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
@@ -10,8 +10,8 @@ open import Derivative.Basics.Sum
 open import Derivative.Isolated
 open import Derivative.Remove
 
-open import Derivative.Indexed.Container
-open import Derivative.Indexed.Derivative
+open import Derivative.Parametrized.Container
+open import Derivative.Parametrized.Derivative
 
 open import Cubical.Foundations.Transport using (substEquiv ; substEquiv' ; subst⁻)
 open import Cubical.Data.Sigma

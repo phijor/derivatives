@@ -1,5 +1,5 @@
 {-# OPTIONS -WnoUnsupportedIndexedMatch --lossy-unification --safe #-}
-module Derivative.Indexed.MuRule where
+module Derivative.Parametrized.MuRule where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
@@ -13,10 +13,10 @@ open import Derivative.Basics.W
 open import Derivative.Isolated
 open import Derivative.Remove
 
-open import Derivative.Indexed.Container
-open import Derivative.Indexed.Mu
-open import Derivative.Indexed.Derivative
-open import Derivative.Indexed.ChainRule
+open import Derivative.Parametrized.Container
+open import Derivative.Parametrized.Mu
+open import Derivative.Parametrized.Derivative
+open import Derivative.Parametrized.ChainRule
 
 open import Cubical.Foundations.Path
 open import Cubical.Data.Sigma

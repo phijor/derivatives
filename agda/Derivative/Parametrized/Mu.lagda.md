@@ -3,10 +3,10 @@
 <!--
 ```agda
 {-# OPTIONS -WnoUnsupportedIndexedMatch --safe #-}
-module Derivative.Indexed.Mu where
+module Derivative.Parametrized.Mu where
 
-open import Derivative.Indexed.Container
-open import Derivative.Indexed.Univalence
+open import Derivative.Parametrized.Container
+open import Derivative.Parametrized.Univalence
 
 open import Derivative.Prelude
 open import Derivative.Basics.Equiv

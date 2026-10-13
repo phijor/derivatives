@@ -1,5 +1,5 @@
 {-# OPTIONS --safe #-}
-module Derivative.Indexed.Derivative where
+module Derivative.Parametrized.Derivative where
 
 open import Derivative.Prelude
 open import Derivative.Basics.Decidable
@@ -7,7 +7,7 @@ open import Derivative.Basics.Sigma
 open import Derivative.Isolated
 open import Derivative.Remove
 
-open import Derivative.Indexed.Container
+open import Derivative.Parametrized.Container
 
 
 private
