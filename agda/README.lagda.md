@@ -38,7 +38,7 @@ open import Derivative.Basics.W
 open import Cubical.Data.Nat.Base
 open import Cubical.Functions.Surjection
 open import Cubical.Categories.Category.Base
-open import Cubical.Categories.Functor.Base
+open import Cubical.Categories.Functor.Base hiding (Id)
 open import Cubical.Categories.Adjoint
 open import Cubical.WildCat.Base
 open import Cubical.WildCat.Functor hiding (_$_)
@@ -338,20 +338,12 @@ private
 ```
 -->
 
-**Definition 3.2**:
+**Definition 3.2, 3.3**:
 A linear morphism of containers consists of a map of shapes,
 and a family of equivalences of positions.
 ```agda
 _ : F ⊸ G ≃ (Σ[ fₛₕ ∈ (F .Shape → G .Shape) ] ∀ s → G .Pos (fₛₕ s) ≃ F .Pos s)
 _ = ⊸-Σ-equiv
-```
-
-**Definition 3.3**:
-A morphism is an equivalence of containers if its shape map is an equivalence of types.
-We bundle this into a record.
-```agda
-_ : (F G : Container _ _) → Type ℓ-zero
-_ = Equiv
 ```
 
 Containers and linear morphisms assemble into a wild category.
@@ -373,12 +365,82 @@ _ : (n k : HLevel) → (F : Container _ _) → Type _
 _ = isTruncatedContainer {ℓS = ℓ-zero} {ℓP = ℓ-zero}
 ```
 
-**Lemma 3.5**:
+**Definition 3.5**:
+The extent of a container.
+```agda
+⟦_⟧ : (F : Container _ _) → Type → Type
+⟦ S ◁ P ⟧ X = Σ[ s ∈ S ] (P s → X)
+```
+
+**Definition 3.6**
+Basic operations on containers.
+<!--
+```agda
+module _ where
+```
+-->
+* Product:
+  ```agda
+  _ = _⊗_
+  ```
+* Sum:
+  ```agda
+  _ = _⊕_
+  ```
+* Substitution:
+  ```agda
+  _ = _[_]
+  ```
+* Constants:
+  ```agda
+  _ : Type → Container ℓ-zero _
+  _ = Const
+  ```
+* Tuples:
+  ```agda
+  _ : Type → Container ℓ-zero _
+  _ = 𝕪
+  ```
+* Identity:
+  ```agda
+  _ : Container ℓ-zero ℓ-zero
+  _ = Id
+  ```
+
+
+**Lemma 3.7**:
 Extensionality for morphisms says that we can compare them by their shape- and position maps.
 ```agda
 _ : (f g : F ⊸ G)
   → (Σ[ p ∈ f .shape ≡ g .shape ] (PathP (λ i → ∀ s → G .Pos (p i s) ≃ F .Pos s) (f .pos) (g .pos))) ≃ (f ≡ g)
 _ = ⊸≡Equiv
+```
+
+**Definition 3.8**:
+A morphism is an equivalence of containers if its shape map is an equivalence of types.
+We bundle this into a record.
+```agda
+_ : (F G : Container _ _) → Type ℓ-zero
+_ = Equiv
+```
+
+Equivalences of containers form an identity system.
+```agda
+open import Derivative.Parametrized.Univalence using (ContainerEquivJ ; containerEquivPreCompEquiv)
+```
+??? note
+    This is defined for parametrized containers (introduced [below](#parametrized-containers)) to avoid having to define it twice.
+
+**Problem 3.9**:
+Equivalence-induction for containers.
+```agda
+_ = ContainerEquivJ
+```
+
+**Lemma 3.10**:
+Precomposition with a container equivalence is an equivalence of types.
+```agda
+_ = ContainerEquivJ
 ```
 
 ### Derivatives, Universally
