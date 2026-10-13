@@ -358,7 +358,6 @@ Containers and linear morphisms assemble into a wild category.
 Set-truncated containers form a 1-category.
 ```agda
 open import Derivative.Category ℓ-zero
-  renaming (∂ to ∂ₛ)
 
 _ : WildCat _ _
 _ = ℂont⊸∞
@@ -452,12 +451,19 @@ _ = zig≡ _
 _ : unit (∂ G) ⋆ ∂[ counit G ] ≡ id (∂ G)
 _ = zag≡ _
 ```
+These data assemble into a wild adjunction:
+```agda
+open import Derivative.Basics.WildCategories using (_⊣∞_)
+
+_ : -⊗Id ⊣∞ ∂∞
+_ = ⊗Id-∂-wild-adjunction
+```
 
 **Theorem 3.11**:
 The above restricts to an adjunction in the 1-category of set-truncated containers.
 ```agda
-_ : -⊗Id ⊣ ∂ₛ
-_ = -⊗Id⊣∂
+_ : -⊗Idₛ ⊣ ∂ₛ
+_ = ⊗Id-∂-adjunction
 ```
 
 ### Basic Laws of Derivatives

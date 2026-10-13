@@ -71,14 +71,14 @@ However, set-truncated containers _do_ form a proper 1-category.
 
 Again, if restricted to set-containers, this is a functor of 1-categories.
 ```agda
-∂ : Functor ℂont⊸ ℂont⊸
-∂ .Functor.F-ob = ob module ∂ₛ where
+∂ₛ : Functor ℂont⊸ ℂont⊸
+∂ₛ .Functor.F-ob = ob module ∂ₛ where
   ob : SetContainer ℓ ℓ → SetContainer ℓ ℓ
   ob (F , is-trunc-F) .fst = ∂.∂ F
   ob (F , is-trunc-F) .snd = ∂.isTruncatedDerivative 0 1 is-trunc-F
-∂ .Functor.F-hom = ∂.∂[_]
-∂ .Functor.F-id = ∂∞ .WildFunctor.F-id
-∂ .Functor.F-seq = ∂∞ .WildFunctor.F-seq
+∂ₛ .Functor.F-hom = ∂.∂[_]
+∂ₛ .Functor.F-id = ∂∞ .WildFunctor.F-id
+∂ₛ .Functor.F-seq = ∂∞ .WildFunctor.F-seq
 ```
 
 ### Universal property of \( ∂ \)
@@ -90,40 +90,56 @@ open TriangleIdentities using (Δ₁ ; Δ₂)
 ```
 -->
 
-In [`Derivative.Adjunction`](Derivative.Adjunction.html), we construct a wild adjunction \( \_ ⊗ \mathsf{Id} ⊣ ∂ \).
-Here, we show that this is an ordinary adjunction of functors of 1-categories, if restricted to set-truncated containers.
-First, we ensure that \( \_ ⊗ \mathsf{Id} \) is an endofunctor:
+In [`Derivative.Adjunction`](Derivative.Adjunction.html), we construct the ingredients of a wild adjunction \( \_ ⊗ \mathsf{Id} ⊣ ∂ \).
+Let us assemble these parts.
+First, we ensure that \( \_ ⊗ \mathsf{Id} \) is a (wild) endofunctor:
 ```agda
-_⊗Id₀ : SetContainer ℓ ℓ → SetContainer ℓ ℓ
-((F , is-set-shape , is-set-pos) ⊗Id₀) .fst = F ⊗Id
-((F , is-set-shape , is-set-pos) ⊗Id₀) .snd .fst = isSet× is-set-shape isSet-𝟙*
-((F , is-set-shape , is-set-pos) ⊗Id₀) .snd .snd (s , _) = isSet⊎ (is-set-pos s) isSet-𝟙*
+-⊗Id : WildFunctor ℂont⊸∞ ℂont⊸∞
+-⊗Id .WildFunctor.F-ob = _⊗Id
+-⊗Id .WildFunctor.F-hom = [_]⊗Id
+-⊗Id .WildFunctor.F-id = ⊸≡ refl $ funExt λ s → equivExt λ { (just s) → refl ; nothing → refl }
+-⊗Id .WildFunctor.F-seq f g = ⊸≡ refl $ funExt λ s → equivExt λ { (just s) → refl ; nothing → refl }
 
--⊗Id : Functor ℂont⊸ ℂont⊸
--⊗Id .Functor.F-ob = _⊗Id₀
--⊗Id .Functor.F-hom = [_]⊗Id
--⊗Id .Functor.F-id = ⊸≡ refl $ funExt λ s → equivExt λ { (just s) → refl ; nothing → refl }
--⊗Id .Functor.F-seq f g = ⊸≡ refl $ funExt λ s → equivExt λ { (just s) → refl ; nothing → refl }
+_⊗Idₛ : SetContainer ℓ ℓ → SetContainer ℓ ℓ
+((F , is-set-shape , is-set-pos) ⊗Idₛ) .fst = F ⊗Id
+((F , is-set-shape , is-set-pos) ⊗Idₛ) .snd .fst = isSet× is-set-shape isSet-𝟙*
+((F , is-set-shape , is-set-pos) ⊗Idₛ) .snd .snd (s , _) = isSet⊎ (is-set-pos s) isSet-𝟙*
 ```
 
-Then, we verify that the unit and counit are indeed proper natural transformations.
+Then, we verify that this indeed is a wild adjunction \( \_ ⊗ \mathsf{Id} ⊣ ∂ \):
 ```agda
-η : 𝟙⟨ ℂont⊸ ⟩ ⇒ ∂ ∘F -⊗Id
+open import Derivative.Basics.WildCategories using (_⊣∞_ ; WildAdjunction)
+
+⊗Id-∂-wild-adjunction : -⊗Id ⊣∞ ∂∞
+⊗Id-∂-wild-adjunction .WildAdjunction.η = unit
+⊗Id-∂-wild-adjunction .WildAdjunction.ε = counit
+⊗Id-∂-wild-adjunction .WildAdjunction.η-is-natural = is-natural-unit _ _
+⊗Id-∂-wild-adjunction .WildAdjunction.ε-is-natural = is-natural-counit _ _
+⊗Id-∂-wild-adjunction .WildAdjunction.zig = zig≡
+⊗Id-∂-wild-adjunction .WildAdjunction.zag = zag≡
+```
+
+If we restrict this to set-truncated containers, we obtain an ordinary adjunction of functors of 1-categories:
+```agda
+-⊗Idₛ : Functor ℂont⊸ ℂont⊸
+-⊗Idₛ .Functor.F-ob = _⊗Idₛ
+-⊗Idₛ .Functor.F-hom = [_]⊗Id
+-⊗Idₛ .Functor.F-id = -⊗Id .WildFunctor.F-id
+-⊗Idₛ .Functor.F-seq = -⊗Id .WildFunctor.F-seq
+
+η : 𝟙⟨ ℂont⊸ ⟩ ⇒ ∂ₛ ∘F -⊗Idₛ
 η .NatTrans.N-ob (F , _) = unit F
 η .NatTrans.N-hom f = sym (is-natural-unit _ _ f)
 
-ε : -⊗Id ∘F ∂ ⇒ 𝟙⟨ ℂont⊸ ⟩
+ε : -⊗Idₛ ∘F ∂ₛ ⇒ 𝟙⟨ ℂont⊸ ⟩
 ε .NatTrans.N-ob (G , _) = counit G
 ε .NatTrans.N-hom f = is-natural-counit _ _ f
-```
 
-Finally, we use the zig-zag equations to assemble this into an adjunction.
-```agda
--⊗Id⊣∂ : -⊗Id ⊣ ∂
--⊗Id⊣∂ ._⊣_.η = η
--⊗Id⊣∂ ._⊣_.ε = ε
--⊗Id⊣∂ ._⊣_.triangleIdentities .Δ₁ (F , _) = zig≡ F
--⊗Id⊣∂ ._⊣_.triangleIdentities .Δ₂ (G , _) = zag≡ G
+⊗Id-∂-adjunction : -⊗Idₛ ⊣ ∂ₛ
+⊗Id-∂-adjunction ._⊣_.η = η
+⊗Id-∂-adjunction ._⊣_.ε = ε
+⊗Id-∂-adjunction ._⊣_.triangleIdentities .Δ₁ (F , _) = zig≡ F
+⊗Id-∂-adjunction ._⊣_.triangleIdentities .Δ₂ (G , _) = zag≡ G
 ```
 
 From this we extract the (natural) equivalence of hom-sets \( (F ⊸ ∂ G) ≃ (F ⊗ \mathsf{Id} ⊸ G) \).
@@ -131,13 +147,13 @@ From this we extract the (natural) equivalence of hom-sets \( (F ⊸ ∂ G) ≃ 
 private
   _⊸ₛ_ = _⊸set_
 
-⊸-equiv : (F G : SetContainer ℓ ℓ) → (F ⊸ₛ (∂ₛ.ob G)) ≃ ((F ⊗Id₀) ⊸ₛ G)
+⊸-equiv : (F G : SetContainer ℓ ℓ) → (F ⊸ₛ (∂ₛ.ob G)) ≃ ((F ⊗Idₛ) ⊸ₛ G)
 ⊸-equiv F G .fst f = [ f ]⊗Id ⋆ counit (G .fst)
 ⊸-equiv F G .snd = isoToIsEquiv (invIso iso) where
 
-  nat-hom-adj : NaturalBijection._⊣_ -⊗Id ∂
-  nat-hom-adj = adj→adj' -⊗Id ∂ -⊗Id⊣∂
+  nat-hom-adj : NaturalBijection._⊣_ -⊗Idₛ ∂ₛ
+  nat-hom-adj = adj→adj' -⊗Idₛ ∂ₛ ⊗Id-∂-adjunction
 
-  iso : Iso ((F ⊗Id₀) ⊸ₛ G) (F ⊸ₛ (∂ₛ.ob G))
+  iso : Iso ((F ⊗Idₛ) ⊸ₛ G) (F ⊸ₛ (∂ₛ.ob G))
   iso = nat-hom-adj .NaturalBijection._⊣_.adjIso {c = F} {d = G}
 ```
