@@ -529,6 +529,21 @@ _ : -⊗Idₛ ⊣ ∂ₛ
 _ = ⊗Id-∂-adjunction
 ```
 
+**Corollary 3.18**:
+There is an adjunction \( \_ ⊗ \mathsf{y}[n] ⊣ ∂^n \) in the 1-category
+of set-truncated containers and linear morphisms.
+
+We have decided to not formalize this as stated.
+This follows directly from composing `⊗Id-∂-adjunction` with itself \( n \) times.
+The added overhead of a formal statement is, in our opinion, not worth the marginal gain.
+
+We do, however, prove something much more general which is discussed in the conclusion
+of the paper, and [below](#future-work):
+It is possible to construct a _wild_ right-adjoint \( ∂^H \) to \( \_ ⊗ \mathsf{y}(H) \),
+for an _arbitrary type_ \( H \).
+For \( H = [n] \), one can (but we do not) prove that \( ∂^n \) and \( ∂^{[n]} \) are propositionally equal,
+hence \( \_ ⊗ \mathsf{y}[n] ⊣ ∂^n \).
+
 ### Basic Laws of Derivatives
 
 ```agda
@@ -965,4 +980,74 @@ For discrete containers the \( μ \)-rule is an equivalence.
 ```agda
 _ : (F : Containerᴾ 𝟚) → (∀ ix s → Discrete (F .Pos ix s)) → isContainerEquivᴾ (μ-rule F)
 _ = Discrete.isEquiv-μ-rule
+```
+
+## Future work { #future-work }
+
+In the conclusion of the paper, we conjecture that \( \_ ⊗ \mathsf{y}(H) \)
+has a (wild) right-adjoint for arbitrary types \( H \).
+This is indeed the case.
+We decided not to include this fact in the main body of the paper in order not to make it longer than it needs to be.
+
+We define a notion of _higher derivative_ relative to some type \( H \) of holes.
+```agda
+import Derivative.Relative as Rel
+```
+Instead of considering isolated positions,
+we notice that isolated points are exactly _decidable_ embeddings of *the* point \( 1 \):
+```agda
+open import Derivative.Basics.DecidableEmbedding
+  as DecEmb
+  using (_↪°_ ; isDecEmbedding ; Isolated≃DecEmbUnit ; _-_)
+
+_ : A ° ≃ (𝟙 ↪° A)
+_ = Isolated≃DecEmbUnit
+```
+
+This yields a notion of a derivative operation \( ∂^H \) that captures the intuition of "context with a \( H \)-shaped hole":
+Shapes of \( ∂^H(S \lhd P) \) are a shape \( s : S \) together with a decidable embedding \( H ↪° P_s \):
+```agda
+_ : (H : Type) (S : Type) (P : S → Type)
+  → Shape (Rel.∂ H (S ◁ P)) ≡ (Σ[ s ∈ S ] (H ↪° P s))
+_ = λ H S P → refl
+```
+
+For \( H = 1 \), this corresponds exactly to the ordinary ("first") derivative:
+```agda
+_ : (F : Container ℓ-zero ℓ-zero) → Equiv (∂ F) (Rel.∂ 𝟙 F)
+_ = Rel.firstDerivativeEquiv
+```
+
+The proof that \( ∂^H \) is right-adjoint to \( \_ ⊗ 𝕪(H) \) is largely like that of Problem 3.16 above.
+An isolated point splits a type into two disconnected components:
+if \( a : A \) is isolated, then \( A \simeq (A ∖ a) + 1 \).
+Similarly, if \( H \) embeds _decidably_ into \( A \), then it splits \( A \) into two components
+— the image of \( h \) and its complement.
+```agda
+_ : {H : Type} → (h : H → A) → DecEmb.isDecEmbedding h → (A - h) ⊎ H ≃ A
+_ = curry DecEmb.remove-sum-left-equiv
+
+_ : A ≃ (A ⊎ B) - inr
+_ = DecEmb.sum-inr-remove-equiv
+```
+
+This lets us construct a wild adjunction following essentially the same argument as before:
+```agda
+module _ (H : Type) (F G : Container ℓ-zero ℓ-zero) where
+  open Rel using () renaming (∂[_] to ∂-map)
+
+  _ : F ⊸ Rel.∂ H (F ⊗ 𝕪 H)
+  _ = Rel.unit H F
+
+  _ : (Rel.∂ H G ⊗ 𝕪 H) ⊸ G
+  _ = Rel.counit H G
+
+  _ = Rel.is-natural-unit H
+  _ = Rel.is-natural-counit H
+
+  _ : ([ Rel.unit H F ]⊗ (𝕪 H)) ⋆ Rel.counit H (F ⊗ 𝕪 H) ≡ id (F ⊗ 𝕪 H)
+  _ = Rel.zig≡ H F
+
+  _ : Rel.unit H (Rel.∂ H G) ⋆ ∂-map H (Rel.counit H G) ≡ id (Rel.∂ H G)
+  _ = Rel.zag≡ H G
 ```

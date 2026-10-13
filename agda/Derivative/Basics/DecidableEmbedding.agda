@@ -72,8 +72,8 @@ module Notation (ι : X ↪° A) where
 DecEmbedding : (ℓX : Level) → (A : Type ℓA) → Type (ℓ-max (ℓ-suc ℓX) ℓA)
 DecEmbedding ℓX A = Σ[ X ∈ Type ℓX ] (X ↪° A)
 
-test : A ° ≃ (𝟙 ↪° A)
-test {A = A} =
+Isolated≃DecEmbUnit : A ° ≃ (𝟙 ↪° A)
+Isolated≃DecEmbUnit {A = A} =
   Σ[ a ∈ A ] (∀ b → Dec (a ≡ b))
     ≃⟨ Σ-cong-equiv-snd (λ a → invEquiv $ Σ-contractSnd λ locally-dec → isContrΠ λ b → inhProp→isContr (locallyDiscrete→locallyIsPropPath a locally-dec b) isPropIsProp) ⟩
   Σ[ a ∈ A ] (∀ b → Dec (a ≡ b)) × (∀ b → isProp (a ≡ b))

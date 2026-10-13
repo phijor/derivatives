@@ -121,3 +121,13 @@ module _ (R : Type ℓ) where
     ((s , f) , _) → invEquivPathP $ funExt λ where
       (inl p) → refl
       (inr r) → refl
+
+module _ where
+  open import Derivative.Derivative using () renaming (∂ to ∂¹)
+  open import Derivative.Basics.Unit using (isContr-𝟙*)
+
+  firstDerivativeEquiv : (F : Container ℓ-zero ℓ-zero) → Equiv (∂¹ F) (∂ 𝟙 F)
+  firstDerivativeEquiv _ .Equiv.shape = Σ-cong-equiv-snd λ s → Isolated≃DecEmbUnit
+  firstDerivativeEquiv F@(S ◁ P) .Equiv.pos (s , p , p-isolated) = pos-equiv where
+    pos-equiv : (P s - const p) ≃ (P s ∖ p)
+    pos-equiv = Σ-cong-equiv-snd λ p → preCompEquiv {C = ⊥} $ invEquiv $ Σ-contractFst isContr-𝟙*
