@@ -380,12 +380,12 @@ the type \( \W(A, B) \) has the single constructor
 \end{equation*}
 Each \( w : \W(A, B) \) is a well-founded tree with \( A \)-labeled nodes, and \( B(a) \)-branching subtrees.
 A finite path to some node inside \( w \), labelled by a family \( C : A \to \Type \),
-can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \) with two constructors, namely
+can be defined as an inductive family \( \WPath_{A,B,C} : \W(A,B) \to \Type \) with two constructors, namely
 \begin{center}
   \hspace*{\fill}
   {
     \AxiomC{\( c : C(a) \)}
-    \UnaryInfC{\( \WTop(c) : \bar{\W}_{A, B, C}(\Sup(a, f)) \)}
+    \UnaryInfC{\( \WTop(c) : \WPath_{A, B, C}(\Sup(a, f)) \)}
     \DisplayProof
   }
   \hfill%
@@ -394,29 +394,29 @@ can be defined as an inductive family \( \bar{\W}_{A,B,C} : \W(A,B) \to \Type \)
   {
     \AxiomC{\( b : B(a) \)}
     \AxiomC{\( w : \WPath_{A,B,C}(f(b)) \)}
-    \BinaryInfC{\( \WBelow(b, w) : \bar{\W}_{A, B, C}(\Sup(a, f)) \)}
+    \BinaryInfC{\( \WBelow(b, w) : \WPath_{A, B, C}(\Sup(a, f)) \)}
     \DisplayProof
   }
   \hspace*{\fill}
 \end{center}
 for all \( a : A \) and \( f : B(a) \to \W(A, B) \).
-Both \( \W \) and \( \bar{\W} \) can be described by unfolding them by one level
+Both \( \W \) and \( \WPath \) can be described by unfolding them by one level
 ---
 the constructors define equivalences
 \begin{align*}
   \WIn &: \sum_{a : A} (B(a) \to \W(A, B)) \simeq \W(A, B)
     \\
-  \WPathIn_{a, f} &: C(a) + \smashoperator{\sum_{b : B(a)}} \bar{\W}_{A,B,C}(f(b)) \simeq \bar{\W}_{A,B,C}(\Sup(a, f))
+  \WPathIn_{a, f} &: C(a) + \smashoperator{\sum_{b : B(a)}} \WPath_{A,B,C}(f(b)) \simeq \WPath_{A,B,C}(\Sup(a, f))
 \end{align*}
 for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
 
 We follow \cites[\S~5]{AbbottEtAl2005ContainersConstructingstrictly}[\S~7]{AbbottEtAl2005DataDifferentiating} and
-use \( \W \) and \( \bar{\W} \) to define the shapes and positions, respectively, of the least fixpoint container:
+use \( \W \) and \( \WPath \) to define the shapes and positions, respectively, of the least fixpoint container:
 \begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \ICont{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \ICont{I} \):
   \begin{align*}
     S^\mu &\DefEq \W(S, P) \\
-    P^\mu_i & \DefEq \bar{\W}_{S,P,\vec{P}}
+    P^\mu_i & \DefEq \WPath_{S,P,\vec{P}}
     \qedhere
   \end{align*}
 \end{definition}
@@ -476,14 +476,14 @@ which yields a morphism into \emph{any} other algebra:
 \end{problem}
 \begin{construction}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
-  Abbreviate \( \Rec \DefEq \Rec_{F}(\alpha) \), \( \W \DefEq \W(S, P) \) and \( \bar{\W} \DefEq \bar{\W}(S,P,\vec{P}) \).
+  Abbreviate \( \Rec \DefEq \Rec_{F}(\alpha) \), \( \W \DefEq \W(S, P) \) and \( \WPath \DefEq \WPath(S,P,\vec{P}) \).
   On shapes, \( \Rec \)  is defined by \( \W \)-recursion,
   \begin{align*}
     \Rec_{\Sh} &: \W \to T \\
     \Rec_{\Sh} &\DefEq \lambda(\Sup(s, f)).\, \alpha_{\Sh} (s, \Rec_{\Sh} \circ f)
   \end{align*}
   On positions we define
-  \( u : \prod_{w : \W(S, P)} Q_i(\Rec_{\Sh}(w)) \to \bar{\W}_{S,P,\vec{P}}(w) \) by \( \W \)-induction.
+  \( u : \prod_{w : \W(S, P)} Q_i(\Rec_{\Sh}(w)) \to \WPath_{S,P,\vec{P}}(w) \) by \( \W \)-induction.
   If \( w \JudgeEq \Sup(s, f) \), then \( u(w) \) is the composite
   \[
     \begin{tikzcd}
@@ -491,12 +491,12 @@ which yields a morphism into \emph{any} other algebra:
         \ar[r, dashed, "u"]
         \ar[d, "{\alpha_{\Ps}(i, \Rec_{\Sh} \circ f)}"{swap}]
         &
-      \bar{\W}(\Sup(s, f))
+      \WPath(\Sup(s, f))
         \\
       \vec{P}_i(s) + \sum_{p \in P(s)} Q_i(\Rec_{\Sh}(f(p)))
         \ar[r, "u^*"{swap}]
         &
-      \vec{P}_i(s) + \sum_{p \in P(s)} \bar{\W}(f(p))
+      \vec{P}_i(s) + \sum_{p \in P(s)} \WPath(f(p))
         \ar[u, "\WPathIn"{swap}]
     \end{tikzcd}
   \]
@@ -883,7 +883,7 @@ From this, we can conclude that a strong chain rule alone is enough to prove a s
     Assume \( \Chain_{F,{\mu F}} \) to be an equivalence.
     By \autoref{strong-binary-chain-rule-iff-is-equiv-sigma-isolate}, this is equivalent to isolated pairs
     \( (p_1, \bar{w}) \)
-    having isolated components \( p_1 : P_1(s) \) and \( \bar{w} : \bar{\W}(f{p_1}) \),
+    having isolated components \( p_1 : P_1(s) \) and \( \bar{w} : \WPath(f{p_1}) \),
     for all \( s : S \) and \( f : P_1(s) \to \W_{\!S}(P_1) \).
     This property is exactly what is needed to define a section to the shape map.
   \end{proof}
@@ -904,10 +904,10 @@ Thus, whether the \( \mu \)-rule is strong depends only on the chain rule:
 
 With this at hand, we can give a proof that the \( \mu \)-rule is strong for discrete containers
 that factors solely through the properties of the chain rule.
-First, note that \( \bar{\W} \) preserves discreteness:
+First, note that \( \WPath \) preserves discreteness:
 \begin{lemma}
   If \( B, C : A \to \Type \) are families of discrete types,
-  then \( \bar{\W}_{A,B,C} \) is a discrete family.
+  then \( \WPath_{A,B,C} \) is a discrete family.
   \begin{proof}
     By induction on \( \W(A, B) \) and unfolding via \( \WPathIn \).
   \end{proof}
