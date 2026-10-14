@@ -416,7 +416,7 @@ use \( \W \) and \( \WPath \) to define the shapes and positions, respectively, 
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \ICont{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \ICont{I} \):
   \begin{align*}
     S^\mu &\DefEq \W_{S}(P) \\
-    P^\mu_i & \DefEq \WPath_{S,P,\vec{P}}
+    P^\mu_i & \DefEq \WPath_{S,P}(\vec{P}_i)
     \qedhere
   \end{align*}
 \end{definition}
@@ -476,14 +476,14 @@ which yields a morphism into \emph{any} other algebra:
 \end{problem}
 \begin{construction}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
-  Abbreviate \( \Rec \DefEq \Rec_{F}(\alpha) \), \( \W \DefEq \W_{S}(P) \) and \( \WPath \DefEq \WPath(S,P,\vec{P}) \).
+  Abbreviate \( \Rec \DefEq \Rec_{F}(\alpha) \), \( \W \DefEq \W_{S}(P) \) and \( \WPath \DefEq \WPath(S,P,\vec{P}_i) \).
   On shapes, \( \Rec \)  is defined by \( \W \)-recursion,
   \begin{align*}
     \Rec_{\Sh} &: \W \to T \\
     \Rec_{\Sh} &\DefEq \lambda(\Sup(s, f)).\, \alpha_{\Sh} (s, \Rec_{\Sh} \circ f)
   \end{align*}
   On positions we define
-  \( u : \prod_{w : \W_{S}(P)} Q_i(\Rec_{\Sh}(w)) \to \WPath_{S,P,\vec{P}}(w) \) by \( \W \)-induction.
+  \( u : \prod_{w : \W_{S}(P)} Q_i(\Rec_{\Sh}(w)) \to \WPath(w) \) by \( \W \)-induction.
   If \( w \JudgeEq \Sup(s, f) \), then \( u(w) \) is the composite
   \[
     \begin{tikzcd}
