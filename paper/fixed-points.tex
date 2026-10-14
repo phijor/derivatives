@@ -369,18 +369,18 @@ As a consequence, the carriers of least fixpoints are equivalent (hence equal) a
 
 We now show, assuming access to \( \W \)-types, that all containers admit least fixpoints in this sense:
 Recall that for \( A : \Type \) and \( B : A \to \Type \),
-the type \( \W(A, B) \) has the single constructor
+the type \( \W_{A}(B) \) has the single constructor
 \begin{equation*}
   {
     \AxiomC{\( a : A \)}
-    \AxiomC{\( f : B(a) \to \W(A, B) \)}
-    \BinaryInfC{\( \Sup(a, f) : \W(A, B) \)}
+    \AxiomC{\( f : B(a) \to \W_{A}(B) \)}
+    \BinaryInfC{\( \Sup(a, f) : \W_{A}(B) \)}
     \DisplayProof
   }
 \end{equation*}
-Each \( w : \W(A, B) \) is a well-founded tree with \( A \)-labeled nodes, and \( B(a) \)-branching subtrees.
+Each \( w : \W_{A}(B) \) is a well-founded tree with \( A \)-labeled nodes, and \( B(a) \)-branching subtrees.
 A finite path to some node inside \( w \), labelled by a family \( C : A \to \Type \),
-can be defined as an inductive family \( \WPath_{A,B,C} : \W(A,B) \to \Type \) with two constructors, namely
+can be defined as an inductive family \( \WPath_{A,B,C} : \W_{A}(B) \to \Type \) with two constructors, namely
 \begin{center}
   \hspace*{\fill}
   {
@@ -399,23 +399,23 @@ can be defined as an inductive family \( \WPath_{A,B,C} : \W(A,B) \to \Type \) w
   }
   \hspace*{\fill}
 \end{center}
-for all \( a : A \) and \( f : B(a) \to \W(A, B) \).
+for all \( a : A \) and \( f : B(a) \to \W_{A}(B) \).
 Both \( \W \) and \( \WPath \) can be described by unfolding them by one level
 ---
 the constructors define equivalences
 \begin{align*}
-  \WIn &: \sum_{a : A} (B(a) \to \W(A, B)) \simeq \W(A, B)
+  \WIn &: \sum_{a : A} (B(a) \to \W_{A}(B)) \simeq \W_{A}(B)
     \\
   \WPathIn_{a, f} &: C(a) + \smashoperator{\sum_{b : B(a)}} \WPath_{A,B,C}(f(b)) \simeq \WPath_{A,B,C}(\Sup(a, f))
 \end{align*}
-for all \( a : A \) and \( f : B(a) \to \W(A, B)\).
+for all \( a : A \) and \( f : B(a) \to \W_{A}(B)\).
 
 We follow \cites[\S~5]{AbbottEtAl2005ContainersConstructingstrictly}[\S~7]{AbbottEtAl2005DataDifferentiating} and
 use \( \W \) and \( \WPath \) to define the shapes and positions, respectively, of the least fixpoint container:
 \begin{definition}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) : \ICont{I+1} \), define \( {\mu F} \DefEq (\MkCont{S^\mu}{P^\mu}) : \ICont{I} \):
   \begin{align*}
-    S^\mu &\DefEq \W(S, P) \\
+    S^\mu &\DefEq \W_{S}(P) \\
     P^\mu_i & \DefEq \WPath_{S,P,\vec{P}}
     \qedhere
   \end{align*}
@@ -433,10 +433,10 @@ use \( \W \) and \( \WPath \) to define the shapes and positions, respectively, 
     Y(\Nil) &\DefEq 0 & Y(\Cons) &\DefEq 1
   \end{align*}
   Its fixpoint is equivalent to the usual description of lists as a container:
-  the shapes \( ({\mu L})_{\Sh} \JudgeEq \W(S, Y) \)
+  the shapes \( ({\mu L})_{\Sh} \JudgeEq \W_{S}(Y) \)
   are trees with either unary (\( Y(\Cons) \)) or nullary (\( Y(\Nil) \))
   branching, hence there is a unique tree for each depth \( n : \Nat \).
-  An \( X \)-labeled path \( x : \WPath_{S, Y, X}(t) \) to a node in a tree \( t : \W(S, Y) \)
+  An \( X \)-labeled path \( x : \WPath_{S, Y, X}(t) \) to a node in a tree \( t : \W_{S}(Y) \)
   thus corresponds exactly to some number \( k : \Fin{\Op{depth}(t)} \).
   This defines an equivalence \( \mu L \CartEquiv (\MkCont{n : \Nat}{\Fin{n}}) \).
 \end{example}
@@ -446,7 +446,7 @@ In general, \( \mu F \) is a fixpoint of substitution into \( \Subst{F}{\Blank} 
   Define an equivalence of containers \( \In_F : F[{\mu F}] \CartEquiv {\mu F} \).
   \begin{construction}
     Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) \).
-    Shapes of \( \Subst{F}{\mu F} \) are \( \sum_{s : S} (P(s) \to \W(S, P)) \),
+    Shapes of \( \Subst{F}{\mu F} \) are \( \sum_{s : S} (P(s) \to \W_{S}(P)) \),
     hence \( \WIn \) establishes an equivalence with the shapes of \( \mu F \).
     Similarly, the positions of \( \Subst{F}{\mu F} \) are equivalent to those of \( \mu F \) via \( \WPathIn \).
   \end{construction}
@@ -476,14 +476,14 @@ which yields a morphism into \emph{any} other algebra:
 \end{problem}
 \begin{construction}
   Let \( F \JudgeEq (\MkCont{S}{\vec{P},P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
-  Abbreviate \( \Rec \DefEq \Rec_{F}(\alpha) \), \( \W \DefEq \W(S, P) \) and \( \WPath \DefEq \WPath(S,P,\vec{P}) \).
+  Abbreviate \( \Rec \DefEq \Rec_{F}(\alpha) \), \( \W \DefEq \W_{S}(P) \) and \( \WPath \DefEq \WPath(S,P,\vec{P}) \).
   On shapes, \( \Rec \)  is defined by \( \W \)-recursion,
   \begin{align*}
     \Rec_{\Sh} &: \W \to T \\
     \Rec_{\Sh} &\DefEq \lambda(\Sup(s, f)).\, \alpha_{\Sh} (s, \Rec_{\Sh} \circ f)
   \end{align*}
   On positions we define
-  \( u : \prod_{w : \W(S, P)} Q_i(\Rec_{\Sh}(w)) \to \WPath_{S,P,\vec{P}}(w) \) by \( \W \)-induction.
+  \( u : \prod_{w : \W_{S}(P)} Q_i(\Rec_{\Sh}(w)) \to \WPath_{S,P,\vec{P}}(w) \) by \( \W \)-induction.
   If \( w \JudgeEq \Sup(s, f) \), then \( u(w) \) is the composite
   \[
     \begin{tikzcd}
@@ -757,15 +757,15 @@ If ordered with respect to embeddings, however, \( \mu F \) is the least pre-fix
   If \( \alpha : \Cart{\Subst{F}{G}}{G} \) is an embedding of containers,
   then so is \( \Rec_F(\alpha) : \Cart{\mu F}{G} \).
   \begin{proof}
-    This is a direct application of the next result (\autoref{is-embedding-W-rec}) to the shape map \( \Rec_{F^{\prime}}(\alpha)_{\Sh} : \W(S,P) \to T \).
+    This is a direct application of the next result (\autoref{is-embedding-W-rec}) to the shape map \( \Rec_{F^{\prime}}(\alpha)_{\Sh} : \W_{S}(P) \to T \).
   \end{proof}
 \end{lemma}
 
 Fix some \( S : \Type \) and a family \( P : S \to \Type \).
-Recall that non-dependent recursion on \( \W(S, P) \) into a type \( A \) is given by
+Recall that non-dependent recursion on \( \W_{S}(P) \) into a type \( A \) is given by
 a map
 \begin{align*}
-  \WRec &: \bigl(\bigl( { \textstyle \sum_{s : S} (P(s) \to A) } \bigr) \to A \bigr) \to (\W(S, P) \to A)
+  \WRec &: \bigl(\bigl( { \textstyle \sum_{s : S} (P(s) \to A) } \bigr) \to A \bigr) \to (\W_{S}(P) \to A)
 \end{align*}
 such that for any \( h : \left(\sum_{s : S} (P(s) \to A)\right) \to A \),
 \begin{align*}
@@ -774,50 +774,50 @@ such that for any \( h : \left(\sum_{s : S} (P(s) \to A)\right) \to A \),
 We can characterize the fibers of \( \WRec(h) \) when \( h \) is an embedding:
 \begin{problem}\label{prob:wrec-fiber-equiv}
   Let \( A : \Type \) and \( { h : ( \sum_{s : S} (P(s) \to A) ) \hookrightarrow A } \).
-  For all \( s : S \) and \( f : P(s) \to \W(S, P) \),
+  For all \( s : S \) and \( f : P(s) \to \W_{S}(P) \),
   define an equivalence
   \[
     \Fiber_{\WRec(h)}(\WRec(h, \Sup(s, f))) \simeq \prod_{p : P(s)} \Fiber_{\WRec(h)}(\WRec(h, f(p)))
   \]
-  characterizing the fibers over the image of \( \WRec(h) : \W(S, P) \to A \).
+  characterizing the fibers over the image of \( \WRec(h) : \W_{S}(P) \to A \).
 \end{problem}
 \begin{construction}
-  Abbreviate \( h^* \DefEq \WRec(h) \) and let \( s : S \), \( f : P(s) \to \W(S, P) \).
+  Abbreviate \( h^* \DefEq \WRec(h) \) and let \( s : S \), \( f : P(s) \to \W_{S}(P) \).
   By definition, we have
   \begin{align*}
     \Fiber_{h^*}(h^*(\Sup(s, f)))
       &\simeq
-      \smashoperator{\sum_{w : \W(S, P)}}\, h^*(w) = h(s, h^* \circ f)
+      \smashoperator{\sum_{w : \W_{S}(P)}}\, h^*(w) = h(s, h^* \circ f)
     \intertext{
-      Unfolding \( w \) via \( \WIn : \sum_{s : S } (P(s) \to \W(S, P)) \simeq \W(S, P) \), we obtain
+      Unfolding \( w \) via \( \WIn : \sum_{s : S } (P(s) \to \W_{S}(P)) \simeq \W_{S}(P) \), we obtain
     }
       &\simeq
-      \adjustlimits\sum_{s' : S} \sum_{\smash{f'} : P(s') \to \W(S, P)}
+      \adjustlimits\sum_{s' : S} \sum_{\smash{f'} : P(s') \to \W_{S}(P)}
         h^*(\Sup(s', f')) = h(s, h^* \circ f)
     \intertext{
       By the computation rule for \( \W \), this is equivalent to
     }
       &\simeq
-      \adjustlimits\sum_{s' : S} \sum_{\smash{f'} : P(s') \to \W(S, P)}
+      \adjustlimits\sum_{s' : S} \sum_{\smash{f'} : P(s') \to \W_{S}(P)}
         h(s', h^* \circ f') = h(s, h^* \circ f)
     \intertext{
       Since \( h \) is an embedding, it can be cancelled from the path type
     }
       &\simeq
-      \adjustlimits\sum_{s' : S} \sum_{\smash{f'} : P(s') \to \W(S, P)}
+      \adjustlimits\sum_{s' : S} \sum_{\smash{f'} : P(s') \to \W_{S}(P)}
         (s', h^* \circ f') = (s, h^* \circ f)
     \intertext{
       Breaking up the path of pairs into a pair of paths, we rearrange:
     }
       &\simeq
-      \adjustlimits\sum_{(s\mathrlap{'} , q) : \Singl(s)} \sum_{\smash{f'} : P(s') \to \W(S, P)}
+      \adjustlimits\sum_{(s\mathrlap{'} , q) : \Singl(s)} \sum_{\smash{f'} : P(s') \to \W_{S}(P)}
         h^* \circ f' =_{q} h^* \circ f
     \intertext{
       Contracting \( \Singl(s) \) and applying function extensionality to the right,
       we are left with
     }
       &\simeq
-      \sum_{\smash{f'} : P(s) \to \W(S, P)}
+      \sum_{\smash{f'} : P(s) \to \W_{S}(P)}
         \prod_{p : P(s)}
         h^*(f'_p) = h^*(f_p)
     \intertext{
@@ -826,7 +826,7 @@ We can characterize the fibers of \( \WRec(h) \) when \( h \) is an embedding:
     }
       &\simeq
         \prod_{p : P(s)}
-          \sum_{w : \W(S, P)}
+          \sum_{w : \W_{S}(P)}
           h^*(w) = h^*(f_p) \\
       &\simeq
         \prod_{p : P(s)}
@@ -839,13 +839,13 @@ Consequently, \( \WRec \) preserves embeddings.
 \begin{lemma}\label{is-embedding-W-rec}
   For all \( A : \Type \),
   if the function \( { h : ( \sum_{s : S} (P(s) \to A) ) \to A } \) is an embedding,
-  then so is \( \WRec(h) : \W(S, P) \to A \).
+  then so is \( \WRec(h) : \W_{S}(P) \to A \).
   \begin{proof}
     Again let \( h^* \DefEq \WRec(h) \).
     It suffices to show that fibers over the image of \( h^* \) are propositions,
-    i.e.\@ \( \prod_{w : \W(S, P)} \Op{isProp}(\Fiber_{h^*}(h^*(w)))  \).
+    i.e.\@ \( \prod_{w : \W_{S}(P)} \Op{isProp}(\Fiber_{h^*}(h^*(w)))  \).
     We do so by \( \W \)-induction.
-    Let \( s : S \), \( f : P(s) \to \W(S, P) \).
+    Let \( s : S \), \( f : P(s) \to \W_{S}(P) \).
     By induction, we can assume
     \[
       \eta : \prod_{p : P(s)} \Op{isProp}(\Fiber_{h^*}(h^*(f_p)))
@@ -909,7 +909,7 @@ First, note that \( \WPath \) preserves discreteness:
   If \( B, C : A \to \Type \) are families of discrete types,
   then \( \WPath_{A,B,C} \) is a discrete family.
   \begin{proof}
-    By induction on \( \W(A, B) \) and unfolding via \( \WPathIn \).
+    By induction on \( \W_{A}(B) \) and unfolding via \( \WPathIn \).
   \end{proof}
 \end{lemma}
 This implies that discrete containers are closed under \( \mu \):

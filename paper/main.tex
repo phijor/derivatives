@@ -156,7 +156,17 @@
 \DeclareMathOperator{\Prop}{\Op{Prop}}
 \DeclareMathOperator{\Set}{\Op{Set}}
 \DeclareMathOperator{\Nat}{\mathbb{N}}
-\DeclareMathOperator{\W}{\Op{W}}
+% The sans-serif "W" leaves an awkward gap before a subscript, so tuck the
+% subscript under its right arm.  \WSubOp builds an operator that grabs a
+% following `_{...}' itself, which keeps the kern in one place instead of
+% spread over every use site.  The leading \kern0pt is what \DeclareMathOperator
+% does too: without it TeX sees a single-character \mathop nucleus and centers
+% it on the math axis, dropping the glyph below the baseline.
+\newcommand*{\WSubKern}{\mkern-2mu}
+\NewDocumentCommand{\WSubOp}{m e{_}}{%
+  \mathop{\kern0pt #1\IfValueT{#2}{\WSubKern}}\nolimits\IfValueT{#2}{_{#2}}%
+}
+\newcommand*{\W}{\WSubOp{\Op{W}}}
 \DeclareMathOperator{\WRec}{\Op{W-rec}}
 \DeclarePairedDelimiter{\Fin}{\lbrack}{\rbrack}
 \DeclareMathOperator{\FinSet}{\Op{FinSet}}
@@ -231,7 +241,7 @@
 
 \DeclareMathOperator{\WIn}{\Op{W-in}}
 \DeclareMathOperator{\WPathIn}{\Op{\bar{W}-in}}
-\DeclareMathOperator{\WPath}{\Op{\bar{W}}}
+\newcommand*{\WPath}{\WSubOp{\Op{\bar{W}}}}
 \DeclareMathOperator{\WTop}{\Op{top}}
 \DeclareMathOperator{\WBelow}{\Op{below}}
 
