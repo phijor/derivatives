@@ -47,4 +47,4 @@ Further details are in `source/README.md`;
 ## License
 
 The Agda code is licensed under the MIT license (`source/LICENSE`).
-The contents of `source/paper/` are licensed under CC BY 4.0 (`source/paper/LICENSE`).
+The rendered documentation (`documentation.tar.gz`) and the contents of `source/paper/` are licensed under CC BY 4.0 (`source/paper/LICENSE`).
