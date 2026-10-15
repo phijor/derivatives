@@ -134,6 +134,49 @@ the composite \( \Ext{\Blank} \circ \CYo \) is essentially the Yoneda-embedding 
 %   hence \( ( \ContCart_{0,0}, \CTimes, \CConst(1) ) \) is not a cartesian product.
 % \end{remark*}
 
+\paragraph{Univalence of containers.}
+The 1-category \( \TruncCont{0,0} \) of set-truncated containers is univalent.
+However, neither \( \Cont \) nor \( \ContCart \) is a univalent wild category in the na{\"i}ve sense:
+The canonical map taking paths of containers \( F = G \) to categorical isomorphisms\footnote{%
+  that is, pairs \( f : F \to G, g : G \to F \) with chosen paths \( fg = \id_F \) and \( gf = \id_G \)
+}
+is in general \emph{not} an equivalence.
+To compare containers in general, we thus use the following notion of \enquote{sameness} of containers:
+\begin{definition}
+  A morphism \( (f, u) : F \to G \) is an \emph{equivalence} of containers
+  if \( f : F_{\Sh} \to G_{\Sh} \) and \( u_s : G_{\Ps}(f(s)) \to F_{\Ps}(s) \) are equivalences of types for all \( s : F_{\Sh} \).
+\end{definition}
+We write \( F \CartEquiv G \) for the type of equivalences of containers, as they are necessarily linear morphisms.
+By two applications of univalence, \( F \CartEquiv G \) is equivalent to \( F = G \).
+While we cannot prove it internally, we think of \( \Cont \) and \( \ContCart \) as \( (\infty,1) \)-categories
+in which \( F \CartEquiv G \) is the \enquote{correct} notion of weak equivalence,
+representing the \( \infty \)-groupoid of paths \( F = G \).
+Consequently, equivalences of containers enjoy a \( \Op{J} \)-like rule, that is, the following induction principle:
+\begin{problem}[note={Equivalence induction}]\label{container-J}
+  Let \( G : \Cont \) and \( P : \prod_{F : \Cont} F \CartEquiv G \to \Type \).
+  Define a map
+  \[
+    \Op{J}_{\Cont} : P(G, \id_G) \to \prod_{F : \Cont} \prod_{e : F \CartEquiv G} P(F, e)
+  \]
+  such that \( \Op{J}_{\Cont}(p, G, \id_G) = p \) for all \( p : P(G, \id_G) \).
+  \qed
+\end{problem}
+
+This \( \Op{J} \)-rule for containers is especially useful when reasoning about types of
+fillers of commutative diagrams, i.e.\@ certain types of identifications \( f_0; \ldots; f_n = g_0; \ldots; g_k \)
+of container morphisms.
+\begin{lemma}\label{container-precomp-equiv}
+  Let \( F, G, H : \Cont \) and \( e : F \CartEquiv G \).
+  The precomposition map \( e ;\Blank : (G \to H) \to (F \to H) \)
+  is an equivalence of types of container morphisms.
+  In particular, \( (e;h = e;h') \simeq (h = h') \) for all \( h, h' : G \to H \).
+  \begin{proof}
+    By application of \( \Op{J}_{\Cont} \) to \( P(F, e) \DefEq \forall H\Where \Op{isEquiv}(\lambda h : G \to H\Where e ; h) \)
+    it suffices to show that \( \id_G; \Blank \) is an equivalence.
+    This follows from left-unitality, \( \id_G ; h = h \).
+  \end{proof}
+\end{lemma}
+
 \paragraph{Constructing container morphisms.}
 When tasked to give a morphism \( f : \Cart{F}{G} \),
 it is oftentimes beneficial to factor it
@@ -162,49 +205,6 @@ to construct paths between container morphisms:
   in which the dependent path varies over the family \( B(t) \DefEq G_{\Ps}(t) \to F_{\Ps}(s) \).
   \begin{proof}
     By extensionality for paths in \( \Sigma \)- and \( \Pi \)-types, and the fact that paths of equivalences are the same as paths of their underlying functions.
-  \end{proof}
-\end{lemma}
-
-\paragraph{Univalence of containers.}
-The 1-category \( \TruncCont{0,0} \) of set-truncated containers is univalent.
-However, neither \( \Cont \) nor \( \ContCart \) is a univalent wild category in the na{\"i}ve sense:
-The canonical map taking paths of containers \( F = G \) to categorical isomorphisms\footnote{%
-  that is, pairs \( f : F \to G, g : G \to F \) with chosen paths \( fg = \id_F \) and \( gf = \id_G \)
-}
-is in general \emph{not} an equivalence.
-To compare containers in general, we thus use the following notion of \enquote{sameness} of containers:
-\begin{definition}
-  A morphism \( (f, u) : F \to G \) is an \emph{equivalence} of containers
-  if \( f : F_{\Sh} \to G_{\Sh} \) and \( u_s : G_{\Ps}(f(s)) \to F_{\Ps}(s) \) are equivalences of types for all \( s : F_{\Sh} \).
-\end{definition}
-We write \( F \CartEquiv G \) for the type of equivalences of containers, as they are necessarily linear morphisms.
-By two applications of univalence, \( F \CartEquiv G \) is equivalent to \( F = G \).
-While we cannot prove it internally, we think of \( \Cont \) and \( \ContCart \) as \( (\infty,1) \)-categories
-in which \( F \CartEquiv G \) is the \enquote{correct} notion of weak equivalence,
-representing the \( \infty \)-groupoid of paths \( F = G \).
-Consequently, equivalences of containers enjoy a \( \Op{J} \)-like rule, that is, the following induction principle:
-\begin{problem}[note={Equivalence induction}]\label{container-J}
-  Let \( G : \Cont \) and \( P : \prod_{F : \Cont} F \simeq G \to \Type \).
-  Define a map
-  \[
-    \Op{J}_{\Cont} : P(G, \id_G) \to \prod_{F : \Cont} \prod_{e : F \simeq G} P(F, e)
-  \]
-  such that \( \Op{J}_{\Cont}(p, G, \id_G) = p \) for all \( p : P(G, \id_G) \).
-  \qed
-\end{problem}
-
-This \( \Op{J} \)-rule for containers is especially useful when reasoning about types of
-fillers of commutative diagrams, i.e.\@ certain types of identifications \( f_0; \ldots; f_n = g_0; \ldots; g_k \)
-of container morphisms.
-\begin{lemma}\label{container-precomp-equiv}
-  Let \( F, G, H : \Cont \) and \( e : F \simeq G \).
-  The precomposition map \( e ;\Blank : (G \to H) \to (F \to H) \)
-  is an equivalence of types of container morphisms.
-  In particular, \( (e;h = e;h') \simeq (h = h') \) for all \( h, h' : G \to H \).
-  \begin{proof}
-    By application of \( \Op{J}_{\Cont} \) to \( P(F, e) \DefEq \forall H\Where \Op{isEquiv}(\lambda h : G \to H\Where e ; h) \)
-    it suffices to show that \( \id_G; \Blank \) is an equivalence.
-    This follows from left-unitality, \( \id_G ; h = h \).
   \end{proof}
 \end{lemma}
 
@@ -246,13 +246,13 @@ and define a derivative in terms of \emph{isolated} positions:
   Ordered lists are encoded in the container \( \List \DefEq (\MkCont{n : \Nat}{\Fin{n}}) \);
   its extent is the ordinary list functor \( \Ext{\List}(X) = \sum_{n : \Nat} X^{\Fin{n}} \).
   Intuitively, \( \Der{\List} \) computes a type equivalent to \emph{pairs of lists},
-  i.e. \( \Der{\List} \simeq \List \CTimes \List \).
+  i.e. \( \Der{\List} \CartEquiv \List \CTimes \List \).
 
   We compute this as follows.
   First, note that the standard finite types are discrete, hence \( \Isolated{\Fin{n}} \simeq \Fin{n} \) for all \( n : \Nat \).
   Thus, we expand
   \[
-    \Der{\List} \simeq \bigl( \MkCont{ (n, k) : {\textstyle \sum_{n : \Nat} \Fin{n}} }{ {\Fin{n} \setminus k} } \bigr)
+    \Der{\List} \CartEquiv \bigl( \MkCont{ (n, k) : {\textstyle \sum_{n : \Nat} \Fin{n}} }{ {\Fin{n} \setminus k} } \bigr)
   \]
   Next, observe that pairs of lists of length \( m \) and \( n \) correspond uniquely to lists of length \( m + 1 + n \) with a hole at position \( m \):
   The map \( \lambda (m, n)\Where (m + 1 + n, m) \) extends to an equivalence of type \( \Nat \times \Nat \simeq \sum_{n : \Nat} \Fin{n} \),
@@ -263,13 +263,13 @@ and define a derivative in terms of \emph{isolated} positions:
   Therefore,
   \[
     \List \CTimes \List
-      \simeq
+      \CartEquiv
     \bigl( \MkCont{ (m, n) : {\Nat \times \Nat} }{ {\Fin{m} + \Fin{n}} } \bigr)
-      \simeq
+      \CartEquiv
     \bigl( \MkCont{ (n, k) : {\textstyle \sum_{n : \Nat} \Fin{n}} }{ {\Fin{n} \setminus k} } \bigr)
   \]
   and
-  \( \Der{\List} \simeq \List \CTimes \List \) as desired.
+  \( \Der{\List} \CartEquiv \List \CTimes \List \) as desired.
 \end{example}
 
 We can not only take the derivative of a container, but also act functorially on morphisms:

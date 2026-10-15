@@ -408,15 +408,7 @@ module _ where
   ```
 
 
-**Lemma 3.7**:
-Extensionality for morphisms says that we can compare them by their shape- and position maps.
-```agda
-_ : (f g : F ⊸ G)
-  → (Σ[ p ∈ f .shape ≡ g .shape ] (PathP (λ i → ∀ s → G .Pos (p i s) ≃ F .Pos s) (f .pos) (g .pos))) ≃ (f ≡ g)
-_ = ⊸≡Equiv
-```
-
-**Definition 3.8**:
+**Definition 3.7**:
 A morphism is an equivalence of containers if its shape map is an equivalence of types.
 We bundle this into a record.
 ```agda
@@ -431,16 +423,24 @@ open import Derivative.Parametrized.Univalence using (ContainerEquivJ ; containe
 ??? note
     This is defined for parametrized containers (introduced [below](#parametrized-containers)) to avoid having to define it twice.
 
-**Problem 3.9**:
+**Problem 3.8**:
 Equivalence-induction for containers.
 ```agda
 _ = ContainerEquivJ
 ```
 
-**Lemma 3.10**:
+**Lemma 3.9**:
 Precomposition with a container equivalence is an equivalence of types.
 ```agda
-_ = ContainerEquivJ
+_ = containerEquivPreCompEquiv
+```
+
+**Lemma 3.10**:
+Extensionality for morphisms says that we can compare them by their shape- and position maps.
+```agda
+_ : (f g : F ⊸ G)
+  → (Σ[ p ∈ f .shape ≡ g .shape ] (PathP (λ i → ∀ s → G .Pos (p i s) ≃ F .Pos s) (f .pos) (g .pos))) ≃ (f ≡ g)
+_ = ⊸≡Equiv
 ```
 
 ### Derivatives, Universally
