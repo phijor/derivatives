@@ -18,7 +18,7 @@
       imports = [
         inputs.make-shell.flakeModules.default
         inputs.treefmt-nix.flakeModule
-        ./artifact.nix
+        ./artifact/artifact.nix
         ./derivative.nix
         ./paper/paper.nix
         ./site.nix

@@ -37,7 +37,7 @@
           stage ${config.packages.site-offline}/site documentation
           # Stage everything that is tracked by git.
           # To avoid including files from a dirty tree, run `nix build --no-allow-dirty .#artifact`.
-          stage ${./.} source
+          stage ${../.} source
 
           # Reproducible archives: fixed member order, zeroed timestamps and
           # ownership, and `gzip --no-name` so the gzip header carries neither a
@@ -65,6 +65,8 @@
           runHook preInstall
           mkdir -p $out
           cp documentation.tar.gz source.tar.gz $out/
+          # Describe the archives for whoever downloads them from Zenodo.
+          cp ${./README.md} $out/README.md
           runHook postInstall
         '';
       };
