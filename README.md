@@ -6,7 +6,7 @@ Containers conveniently represent a wide class of inductive data types.
 Their derivatives compute representations of types of one-hole contexts,
 useful for implementing tree-traversal algorithms.
 Derivatives of discrete containers (whose positions have decidable equality) satisfy a universal property with respect to _linear_ morphisms of containers.
-This induces we well-behaved notion of linear substitution for one-hole contexts.
+This induces a well-behaved notion of linear substitution for one-hole contexts.
 
 Working in Univalent Foundations, we extend the derivative operation to _untruncated_ containers (whose shapes and positions are arbitrary types).
 We prove that this derivative, defined in terms of a set of _isolated positions_,
