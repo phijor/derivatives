@@ -7,7 +7,6 @@
       ...
     }:
     let
-      inherit (pkgs) texlive;
       inherit (lib) fileset;
 
       src = fileset.toSource {
@@ -21,9 +20,8 @@
       };
     in
     {
-      packages.texlive = texlive.combine {
-        inherit (texlive)
-          scheme-medium
+      packages.texlive = pkgs.texliveMedium.withPackages (
+        ps: with ps; [
           biber
           latex-bin
           latexmk
@@ -39,8 +37,9 @@
           tikz-cd
           todonotes
           translations
-          ;
-      };
+          scheme-medium
+        ]
+      );
       packages.paper = pkgs.stdenvNoCC.mkDerivation {
         pname = "derivatives-paper";
         version = config.packages.derivative.version;
