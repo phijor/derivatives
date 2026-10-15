@@ -3,11 +3,11 @@
 A container \cite{AbbottEtAl2005ContainersConstructingstrictly} encodes the signature of an inductive data type:
 it consists of a collection of shapes \( S \), each \( s : S \) representing a constructor,
 and for each a collection of positions \( P(s) \), indexing arguments of the constructor.
-The container defines polynomial functor \( X \mapsto \sum_{s : S} X^{P(s)} \),
+The container defines a polynomial functor \( X \mapsto \sum_{s : S} X^{P(s)} \),
 called its \emph{extension}.
 Natural transformations of polynomial functors are a well-studied model of parametric polymorphism~\cite{BainbridgeEtAl1990Functorialpolymorphism}.
 \Citeauthor{AbbottEtAl2004ConstructingPolymorphicPrograms} show that
-the extension defines an equivalence between category of containers and that of polynomial functors and natural transformations.
+the extension defines an equivalence between the category of containers and that of polynomial functors and natural transformations.
 This lets us reason about type-polymorphic programs entirely in the language of containers;
 many operations on functors (sums, products, composition, etc.) are representable directly in terms of containers.
 
@@ -133,20 +133,20 @@ some of which we are going to recall now:
 
 \paragraph{Types and terms.}
 All of our types live in a single univalent universe, \( \Type \), unless stated otherwise.
-We assume the existence of a unit type \( 1 \), empty type \( 0 \), natural numbers \( \Nat \), products \( A \times B \), coproducts \( A + B \), and function types \( A \to B \),
+We assume the existence of a unit type \( 1 \), an empty type \( 0 \), natural numbers \( \Nat \), products \( A \times B \), coproducts \( A + B \), and function types \( A \to B \),
 as well as their dependent analogues:
 For \( A : \Type \) and a family \( B : A \to \Type \),
 we denote dependent function types by \( \Pi_{A} B \) or \( \prod_{a : A} B(a) \),
 and dependent sum types by \( \Sigma_{A} B \) or \( \sum_{a : A} B(a) \).
 We do not assume the existence of higher inductive types apart from a propositional truncation \( \PropTrunc{\Blank} \),
-or to illustrate examples.
+or where we use them to illustrate examples.
 A type \( A \) is merely inhabited if \( \PropTrunc{A} \) is inhabited.
 For all \( n : \Nat \), we write \( \Fin{n} : \Type \) for the standard finite type of \( n \) elements,
 i.e. \( \Fin{0} \DefEq 0 \) and \( \Fin{1+n} \DefEq 1 + \Fin{n} \).
 
 Function application is written \( f(a, b) \).
 We move arguments into subscripts, \( f_a(b) \), or even drop them, \( f(b) \), if they can be inferred from context without ambiguity.
-The unit type is inhabited by \( \bullet : 1 \),
+The unit type is inhabited by \( \bullet : 1 \);
 the coproduct has constructors \( \Inl : A \to A + B \) and \( \Inr : B \to A + B \).
 In the special case of \( A + 1 \), we call the constructors \( \Just \DefEq \Inl : A \to A + 1 \) and \( \Nothing \DefEq \Inr(\bullet) : A + 1 \).
 Projections out of \( \times \) and \( \Sigma \) are denoted by \( \Op{fst} \) and \( \Op{snd} \).

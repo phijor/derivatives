@@ -10,7 +10,7 @@ In particular, all operations we define have to have a continuous interpretation
 Removing individual points from a space is at worst impossible to do continuously,
 and at best an over-approximation of the discrete operation.
 
-We recall the notion of isolated points of a type; the subtype of which can be removed continuously.
+We recall the notion of isolated points of a type, and show that they are exactly the points that can be removed continuously.
 Our goal is to characterize the isolated points of a number of inductive types (\autoref{isolated-points-intro}),
 and to show that doing so for \( \Sigma \)-types is constructively difficult.
 We demonstrate that they behave just as one would na{\"i}vely expect when removed from a type in \autoref{removing-points}.
@@ -18,10 +18,10 @@ Lastly, in \autoref{grafting}, we give an induction-like principle for types wit
 If \( a : A \) is isolated, then \( (A \to B) \simeq (A \setminus a \to B) \times B \)
 --- any function \( f : A \to B \) is determined exactly by its restriction to \( A \setminus a \) and its value \( f(a) : B \).
 This property is in general false for non-isolated points in types of higher truncation level,
-since the decomposition discards the behaviour of \( f \) on the higher path spaces around \( a \).
+since the decomposition discards the behavior of \( f \) on the higher path spaces around \( a \).
 
 While we demonstrate properties of isolated points by freely assuming univalence and function extensionality,
-we believe that a majority also hold with more fine-grained assumptions. %;
+we believe that a majority of them also hold with more fine-grained assumptions. %;
 
 \subsection{Isolated Points}\label{isolated-points-intro}
 
@@ -65,7 +65,7 @@ Therefore, the type \( \IsIsolated(a) \) might, \emph{a priori}, not be a propos
 Take for example the circle \( S^1 \): there are \( \mathbb{Z} \)-many proofs of \( \Op{Dec}(\Op{base} =_{S^1} \Op{base}) \).
 However, since equality has to be decidable uniformly for a point to be isolated, this does not happen:
 isolated points \emph{do} have trivial path spaces.\footnote{In fact \( S^1 \) is \emph{perfect}, i.e.\@ has no isolated points at all.}
-This was first noticed as a generalization to Hedberg's theorem in plain \textsc{MLTT} by \citeauthor{Palmgren2011Proofrelevancefamilies}:
+This was first noticed as a generalization of Hedberg's theorem in plain \textsc{MLTT} by \citeauthor{Palmgren2011Proofrelevancefamilies}:
 \begin{lemma}[note={{\cite[Theorem~6.2]{Palmgren2011Proofrelevancefamilies}}}]\label{is-prop-isolated-path}
   If \( a : A \) is isolated, then \( a = b \) is a proposition for all \( b : A \).
 \end{lemma}
@@ -137,7 +137,7 @@ We see that isolated points distribute over sums:
 \begin{problem}\label{isolated-sum-equiv}
   Construct an equivalence \( \Isolated{(A + B)} \simeq \Isolated{A} + \Isolated{B} \).
   \begin{construction}
-    Define the obvious forward- and backward maps by case analysis,
+    Define the obvious forward and backward maps by case analysis,
     and prove that points are isolated using \autoref{sum-embeddings-respect-isolated}.
     That these maps are mutually inverse follows since being isolated is a proposition (\autoref{is-prop-is-isolated}).
   \end{construction}
@@ -276,7 +276,7 @@ In extreme cases, both \( A \) and \( B \) can be complicated types, whereas the
 This lets us describe whether a type is discrete purely in terms of \( \SigmaIsolate \),
 which will be useful in situations in which we have control over the types indexing \( \SigmaIsolate \).
 
-\subsection{Removing points}\label{removing-points}
+\subsection{Removing Points}\label{removing-points}
 
 
 For any type \( A \) and point \( a_0 : A \) we define the subtype of \enquote{\( A \) with \( a_0 \) removed}
@@ -423,7 +423,7 @@ This map is an equivalence whenever we can decide if we are removing from a chos
     then decide whether \( a_0 = a \) or not.
     If \( p : a_0 = a \), let \( b^\prime \DefEq p^{\Inv}_*(b) : B(a_0) \) and map to \( \Inr{(b^\prime, h^\prime)} \),
     where we conclude \( h^\prime : b_0 \neq b^\prime \) from \( h \) and \( p \).
-    In case that \( h : a_0 \neq a \) we map to \( \Inl{((a, h), b)} \) directly.
+    In case that \( h : a_0 \neq a \), we map to \( \Inl{((a, h), b)} \) directly.
     It is straightforward to verify that these maps are inverses of each other.
   \end{proof}
 \end{proposition}
@@ -439,7 +439,7 @@ given by \( \Op{detach}_{a_0}(f) \DefEq (f \circ \Fst, f(a_0)) \).
 In order to derive the chain rule for derivatives,
 \citeauthor{AbbottEtAl2005DataDifferentiating}~\cite{AbbottEtAl2005DataDifferentiating} define the inverse of this operation
 for \emph{discrete} \( A \):
-Given a function \( g : A \setminus a_0 \to B \) and some \( b_0 : B \)
+Given a function \( g : A \setminus a_0 \to B \) and some \( b_0 : B \),
 they call the process of extending \( g \) to a map \( A \to B \) \emph{grafting}.
 
 We obtain a good notion of grafting for higher types by localizing the assumption of decidable equality:
@@ -478,7 +478,7 @@ and a single point \( b_0 : B \).
       b_0 & \text{otherwise}
     \end{cases}
   \]
-  The first computation rule is straightforward, the second follows from an application of \autoref{is-prop-isolated-dec-path}.
+  The first computation rule is straightforward; the second follows from an application of \autoref{is-prop-isolated-dec-path}.
 \end{construction}
 
 It follows that grafting is an inverse to \( \Op{detach} \):

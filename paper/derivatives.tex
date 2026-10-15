@@ -9,7 +9,7 @@ Let us recall some definitions.
   We access shapes and positions via postfix projections
   \( (\MkCont{S}{P})_{\Sh} \DefEq S \) and \( (\MkCont{S}{P})_{\Ps} \DefEq P \).
 \end{definition}
-A container \( (\MkCont{S}{P}) \) can be thought of a normal form for the datatype it represents;
+A container \( (\MkCont{S}{P}) \) can be thought of as a normal form for the datatype it represents;
 each shape \( s : S \) is the name of a data constructor
 and each \( p : P(s) \) indexes an argument to this constructor.
 If \( P(s) \) is finite, then one may think of its cardinality as the \enquote{arity} of the constructor.
@@ -25,7 +25,7 @@ Furthermore, to each position in the output, one must point to its occurrence in
   \[
     (F \to G) \DefEq \sum_{f : S \to T} \prod_{s : S} Q_{fs} \to P_s
   \]
-  We denote the shape- and position components of a morphism \( {f : F \to G} \)
+  We denote the shape and position components of a morphism \( {f : F \to G} \)
   by \( {f_{\Sh} : F_{\Sh} \to G_{\Sh}} \) and \( f_{\Ps} : \prod_{s : F_{\Sh}} G_{\Ps}(f_{\Sh}(s)) \to F_{\Ps}(s) \), respectively.
 \end{definition}
 
@@ -53,8 +53,8 @@ To distinguish these cases, we introduce the following subtypes of \emph{truncat
 \end{definition}
 Traditional set-based containers are \( (0,0) \)-truncated.
 In this case, morphisms form an \( h \)-set.
-An example of containers of higher truncation level are \citeauthor{Gylterud2011}'s \emph{symmetric containers}~\cite{Gylterud2011}:
-these have groupoids for shapes, and sets for positions, hence are exactly the \( (1,0) \)-truncated containers.
+\Citeauthor{Gylterud2011}'s \emph{symmetric containers}~\cite{Gylterud2011} are examples of containers of higher truncation level.
+They have groupoids for shapes, and sets for positions, hence are exactly the \( (1,0) \)-truncated containers.
 
 We denote by \( \ContCart \) the wide wild subcategory of \( \Cont \) containing only the linear morphisms.
 Restricting to a subtype of containers,
@@ -106,7 +106,7 @@ Furthermore, we have the following basic operations on containers:
   \end{itemize}
   Additionally, given \( A : \Type \), we have
   \begin{itemize}
-    \item a \emph{contant} \( \CConst(A) \DefEq (\MkCont{A}{0}) \),
+    \item a \emph{constant} \( \CConst(A) \DefEq (\MkCont{A}{0}) \),
     \item a \emph{tuple} \( \CYo(A) \DefEq (\MkCont{1}{A}) \) for all \( A : \Type \).
   \end{itemize}
   The \emph{identity container} is \( \Id \DefEq (\MkCont{1}{1}) \).
@@ -167,7 +167,7 @@ to construct paths between container morphisms:
 
 \paragraph{Univalence of containers.}
 The 1-category \( \TruncCont{0,0} \) of set-truncated containers is univalent.
-However, neither \( \Cont \) nor \( \ContCart \) are univalent wild categories in the na{\"i}ve sense:
+However, neither \( \Cont \) nor \( \ContCart \) is a univalent wild category in the na{\"i}ve sense:
 The canonical map taking paths of containers \( F = G \) to categorical isomorphisms\footnote{%
   that is, pairs \( f : F \to G, g : G \to F \) with chosen paths \( fg = \id_F \) and \( gf = \id_G \)
 }
@@ -215,7 +215,7 @@ The derivative of a container \( G \) represents a type of
 For traditional containers, this can be implemented as an operation \( G \mapsto \Der{G} \) by removing a chosen position over each shape:
 Given \( G \JudgeEq (\MkCont{T}{Q}) \), \citeauthor{AbbottEtAl2005DataDifferentiating} define \( \Der{G} \)
 to have as shapes pairs \( (t , q) : \sum_{T} Q \), over which the positions are \( Q_t \setminus q \).
-To ensure that \( \Der \) is well behaved, it is characterized by a universal property:
+To ensure that \( \Der \) is well-behaved, it is characterized by a universal property:
 on the subcategory of discrete containers, \( \Der \) extends to an endofunctor,
 and induces an adjunction \( \Maybe{\Blank} \dashv \Der \).
 This describes \( \Der{G} \) as \enquote{\( G \) with a hole} by a mapping-in property:
@@ -312,7 +312,7 @@ and it should be straightforward (albeit tedious) to show that \( \Der \) restri
 
 We now show that this generalized derivative operation is right-adjoint to \( \Maybe{\Blank} \),
 verifying that it has the desired universal property.
-We define this adjunction in terms of unit- and counit natural transformations,
+We define this adjunction in terms of unit and counit natural transformations,
 and discuss how this relates to the original construction of \citeauthor{AbbottEtAl2005DataDifferentiating}.
 
 \begin{problem}\label{derivative-adjunction}
@@ -394,7 +394,7 @@ and discuss how this relates to the original construction of \citeauthor{AbbottE
 
     Let \( G \JudgeEq (\MkCont{T}{Q}) \); define the counit \( \varepsilon_G : \Cart{\Maybe{(\Der{G})}}{G} \) as follows:
     on shapes, \( \varepsilon_G^{\Sh} : \sum_{t : T} \Isolated{Q_t} \times 1 \to T \) is the first projection.
-    On positions the equivalence
+    On positions, the equivalence
     \(
       \varepsilon_G^{\Ps}(t , q) : Q_t \simeq (Q_t \setminus q) + 1
     \)
@@ -411,7 +411,7 @@ and discuss how this relates to the original construction of \citeauthor{AbbottE
 In their original construction, \citeauthor{AbbottEtAl2005DataDifferentiating} only establish isomorphisms between the sets
 \( \Cart{\Maybe{F}}{G} \) and \( \Cart{F}{\Der{G}} \), natural in \( F \).
 This falls short of defining a proper adjunction since \( \Der{G} \) is left undefined for non-discrete containers \( G \).
-We can however complete the search for a suitable subcategory of differentiable containers \cite[14]{AbbottEtAl2005DataDifferentiating}:
+We can, however, complete the search for a suitable subcategory of differentiable containers \cite[14]{AbbottEtAl2005DataDifferentiating}:
 Our derivative is defined functorially for \emph{all} containers,
 and restricting the above wild adjunction to set-truncated containers yields the following:
 \begin{theorem}\label{derivative-adjunction-sets}
@@ -445,8 +445,8 @@ As such, \( \Der^n \) computes \( n \)-hole contexts.
 \subsection{Basic Laws of Derivatives}
 
 Derivatives of containers earn their name by observing how they interact with other operations on containers:
-derivatives of constants are zero, derivatives of sums and products follow the familiar sum- and product rules.
-Let us now investigate to which extent our derivative still respects these basic laws.
+derivatives of constants are zero, derivatives of sums and products follow the familiar sum and product rules.
+Let us now investigate to what extent our derivative still respects these basic laws.
 
 It is easy to see that derivatives of constants are always zero,
 and that \( \Der{\Id} \) is the constant \( \CConst(1) \).
@@ -485,7 +485,7 @@ and that derivatives of products follow a Leibniz rule:
   \end{enumerate}
   \begin{proof}
     Let \( F \JudgeEq (\MkCont{S}{P}) \) and \( G \JudgeEq (\MkCont{T}{Q}) \).
-    Both equivalences are established like in the discrete setting
+    Both equivalences are established as in the discrete setting
     (cf.~\cite[{Proposition 6.3 and 6.4}]{AbbottEtAl2005DataDifferentiating}),
     with one exception:
     to derive the Leibniz rule,
