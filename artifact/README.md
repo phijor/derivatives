@@ -15,6 +15,8 @@ with a mirror on GitHub at <https://github.com/phijor/derivatives>.
 - `source.tar.gz` contains the Cubical Agda library (`agda/`) and the LaTeX sources of the paper (`paper/`).
 - `documentation.tar.gz` contains the rendered, cross-linked documentation of the Agda library.
 
+This artifact has been built from @ARTIFACT_ORIGIN@.
+
 ## Reading the Documentation
 
 Unpack `documentation.tar.gz` and open `documentation/index.html` in a web browser.

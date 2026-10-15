@@ -1,3 +1,21 @@
+{ self, lib, ... }:
+let
+  # The commit the archives were built from, recorded in the README so that a
+  # Zenodo deposit can be traced back to upstream.  `self.rev` is only set for a
+  # clean tree; `self.dirtyRev` names the commit the working tree is based on.
+  origin =
+    if self ? rev then
+      "upstream commit [`${self.rev}`](https://codeberg.org/phijor/derivatives/commits/${self.rev})"
+    else if self ? dirtyRev then
+      let
+        rev = lib.removeSuffix "-dirty" self.dirtyRev;
+      in
+      lib.warn "artifact: building from a dirty git tree, the commit recorded in README.md does not account for uncommitted changes. Build with `nix build --no-allow-dirty .#artifact` for a release." (
+        "a dirty checkout based on upstream commit [`${rev}`](https://codeberg.org/phijor/derivatives/commits/${rev})"
+      )
+    else
+      "a local non-git source checkout";
+in
 {
   perSystem =
     {
@@ -6,6 +24,11 @@
       lib,
       ...
     }:
+    let
+      readme = pkgs.replaceVars ./README.md {
+        ARTIFACT_ORIGIN = origin;
+      };
+    in
     {
       packages.artifact = pkgs.stdenvNoCC.mkDerivation {
         pname = "artifact";
@@ -66,7 +89,7 @@
           mkdir -p $out
           cp documentation.tar.gz source.tar.gz $out/
           # Describe the archives for whoever downloads them from Zenodo.
-          cp ${./README.md} $out/README.md
+          cp ${readme} $out/README.md
           runHook postInstall
         '';
       };
